@@ -210,23 +210,23 @@ EOD;
 	$bind_listenon = ($bind_listenon == "" ? "none;" : $bind_listenon);
 	// print "<PRE>$bind_listenonv6 $bind_listenon";
 	if (array_key_exists("ipv6allow", $config['system'])) {
-		$bind_conf .= "\t\tlisten-on-v6 { $bind_listenonv6 };\n";
+		$bind_conf .= "\tlisten-on-v6 { $bind_listenonv6 };\n";
 	}
 	$bind_conf .= "\tlisten-on { $bind_listenon };\n";
 
 	// forwarder config
 	if ($bind_forwarder == 'on') {
-		$bind_conf .= "\t\tforwarders { $forwarder_ips };\n";
+		$bind_conf .= "\tforwarders { $forwarder_ips };\n";
 	}
 	if ($bind_notify == 'on') {
-		$bind_conf .= "\t\tnotify yes;\n";
+		$bind_conf .= "\tnotify yes;\n";
 	}
 	if ($hide_version == 'on') {
-		$bind_conf .= "\t\tversion none;\n";
+		$bind_conf .= "\tversion none;\n";
 	}
 
 	$bind_conf .= preg_replace("/^/m", "\t", $custom_options);
-	$bind_conf .= "\n\t};\n\n";
+	$bind_conf .= "\n};\n\n";
 
 	if ($bind_logging == 'on') {
 		//check if bind is included on syslog
@@ -260,13 +260,14 @@ logging {
 
 EOD;
 			foreach ($log_categories as $category) {
-				$bind_conf .= "\t\t\tcategory $category\t{custom;};\n";
+				$bind_conf .= "\tcategory $category { custom; };\n";
 			}
-			$bind_conf .= "\t\t};\n\n";
+			$bind_conf .= "};";
 		}
 	} else {
-		$bind_conf .= "\t\tlogging { category default { null; }; };\n\n";
+		$bind_conf .= "logging { category default { null; }; };";
 	}
+	$bind_conf .= "\n\n";
 
 	// Config Zone domain
 
@@ -319,13 +320,14 @@ EOD;
 		}
 		$viewcustomoptions = base64_decode($views['bind_custom_options']);
 
-		$bind_conf .= "view \"$viewname\" { \n\n";
+		$bind_conf .= "view \"$viewname\" { \n";
 		$bind_conf .= "\trecursion $viewrecursion;\n";
 		$bind_conf .= "\tmatch-clients { $viewmatchclients; };\n";
 		$bind_conf .= "\tallow-recursion { $viewallowrecursion; };\n";
 		if (!empty($viewcustomoptions)) {
-			$bind_conf .= "\t$viewcustomoptions\n\n";
+			$bind_conf .= preg_replace("/^/m", "\t", $viewcustomoptions)."\n";
 		}
+		$bind_conf .= "\n";
 
 		if (is_array($config['installedpackages']['bindzone'])) {
 			$bindzone = $config['installedpackages']['bindzone']['config'];
