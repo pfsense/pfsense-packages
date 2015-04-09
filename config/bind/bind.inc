@@ -56,16 +56,6 @@ function bind_zone_validate($post, &$input_errors)
 	}
 
 	switch ($_POST['type']) {
-		case 'slave':
-			if ($_POST['slaveip'] == "") {
-				$input_errors[] = 'The field \'Master Zone IP\' is required for slave zones.';
-			}
-			break;
-		case 'forward':
-			if ($_POST['forwarders'] == "") {
-				$input_errors[] = 'The field \'Forwarders\' is required for forward zones.';
-			}
-			break;
 		case 'redirect':
 			$_POST['tll'] = 300;
 			$_POST['refresh'] = 0;
@@ -76,7 +66,8 @@ function bind_zone_validate($post, &$input_errors)
 			if ($_POST['mail'] == '') {
 				$input_errors[] = "The field 'Mail Admin Zone' is required for {$_POST['type']} zones.";
 			}
-		default:
+			// Intentionally fall through to 'master' zone case
+		case 'master':
 			if ($_POST['nameserver'] == '') {
 				$input_errors[] = "The field 'Name server' is required for {$_POST['type']} zones.";
 			}
@@ -105,6 +96,18 @@ function bind_zone_validate($post, &$input_errors)
 					}
 				}
 			}
+			break;
+		case 'slave':
+			if ($_POST['slaveip'] == "") {
+				$input_errors[] = 'The field \'Master Zone IP\' is required for slave zones.';
+			}
+			break;
+		case 'forward':
+			if ($_POST['forwarders'] == "") {
+				$input_errors[] = 'The field \'Forwarders\' is required for forward zones.';
+			}
+			break;
+		default:
 			break;
 	}
 }
@@ -408,6 +411,24 @@ EOD;
 
 				// Add zone statements
 				switch ($zonetype) {
+					case 'master':
+						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
+						$bind_conf .= "\t\tallow-transfer { $zoneallowtransfer; };\n";
+						if ($zone['enable_updatepolicy'] == "on") {
+							$bind_conf .= "\t\tupdate-policy { $zoneupdatepolicy; };\n";
+						} else {
+							$bind_conf .= "\t\tallow-update { $zoneallowupdate; };\n";
+						}
+						if ($zone['dnssec'] == "on") {
+							//https://kb.isc.org/article/AA-00626/
+							$bind_conf .= "\n\t\t# look for dnssec keys here:\n";
+							$bind_conf .= "\t\tkey-directory \"/etc/namedb/keys\";\n\n";
+							$bind_conf .= "\t\t# publish and activate dnssec keys:\n";
+							$bind_conf .= "\t\tauto-dnssec maintain;\n\n";
+							$bind_conf .= "\t\t# use inline signing:\n";
+							$bind_conf .= "\t\tinline-signing yes;\n\n";
+						}
+						break;
 					case 'slave':
 						$bind_conf .= "\t\tmasters { $zoneipslave; };\n";
 						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
@@ -425,22 +446,6 @@ EOD;
 						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
 						break;
 					default:
-						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
-						$bind_conf .= "\t\tallow-transfer { $zoneallowtransfer; };\n";
-						if ($zone['enable_updatepolicy'] == "on") {
-							$bind_conf .= "\t\tupdate-policy { $zoneupdatepolicy; };\n";
-						} else {
-							$bind_conf .= "\t\tallow-update { $zoneallowupdate; };\n";
-						}
-						if ($zone['dnssec'] == "on") {
-							//https://kb.isc.org/article/AA-00626/
-							$bind_conf .= "\n\t\t# look for dnssec keys here:\n";
-							$bind_conf .= "\t\tkey-directory \"/etc/namedb/keys\";\n\n";
-							$bind_conf .= "\t\t# publish and activate dnssec keys:\n";
-							$bind_conf .= "\t\tauto-dnssec maintain;\n\n";
-							$bind_conf .= "\t\t# use inline signing:\n";
-							$bind_conf .= "\t\tinline-signing yes;\n\n";
-						}
 						break;
 				}
 
@@ -658,6 +663,13 @@ EOD;
 						}
 						$config['installedpackages']['bindzone']['config'][$x]['resultconfig'] = base64_encode($rsconfig);
 						$write_config++;
+						break;
+					case 'forward':
+						// forwarder zone does not have a DB file
+						$config['installedpackages']['bindzone']['config'][$x]['resultconfig'] = '';
+						$write_config++;
+						break;
+					default:
 						break;
 				}
 			}
