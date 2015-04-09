@@ -323,7 +323,9 @@ EOD;
 		$bind_conf .= "\trecursion $viewrecursion;\n";
 		$bind_conf .= "\tmatch-clients { $viewmatchclients; };\n";
 		$bind_conf .= "\tallow-recursion { $viewallowrecursion; };\n";
-		$bind_conf .= "\t$viewcustomoptions\n\n";
+		if (!empty($viewcustomoptions)) {
+			$bind_conf .= "\t$viewcustomoptions\n\n";
+		}
 
 		if (is_array($config['installedpackages']['bindzone'])) {
 			$bindzone = $config['installedpackages']['bindzone']['config'];
@@ -348,25 +350,30 @@ EOD;
 			$zonecustom = base64_decode($zone['custom']);
 			$zoneipslave = $zone['slaveip'];
 			$zoneforwarders = $zone['forwarders'];
+			if (!empty($zoneforwarders)) {
+				$zoneforwarders = rtrim($zoneforwarders, ';');
+			}
 			$zonereverso = $zone['reverso'];
 			$zonereversv6o = $zone['reversv6o'];
 
 			// Ensure zone view folder exists
-			if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview"))) {
-				mkdir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview", 0755, true);
+			if ($zonetype != "forward") {
+				if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview"))) {
+					mkdir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview", 0755, true);
+				}
 			}
 
-			if ($zone['allowupdate'] == '') {
+			if (empty($zone['allowupdate'])) {
 				$zoneallowupdate = "none";
 			} else {
 				$zoneallowupdate = str_replace(',', '; ', $zone['allowupdate']);
 			}
-			if ($zone['allowquery'] == '') {
+			if (empty($zone['allowquery'])) {
 				$zoneallowquery = "none";
 			} else {
 				$zoneallowquery = str_replace(',', '; ', $zone['allowquery']);
 			}
-			if ($zone['allowtransfer'] == '') {
+			if (empty($zone['allowtransfer'])) {
 				$zoneallowtransfer = "none";
 			} else {
 				$zoneallowtransfer = str_replace(',', '; ', $zone['allowtransfer']);
@@ -394,6 +401,7 @@ EOD;
 				switch ($zonetype) {
 					case 'slave':
 						$bind_conf .= "\t\tmasters { $zoneipslave; };\n";
+						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
 						$bind_conf .= "\t\tallow-transfer { $zoneallowtransfer; };\n";
 						$bind_conf .= "\t\tnotify no;\n";
 						break;
@@ -405,6 +413,7 @@ EOD;
 						$bind_conf .= "\t\t# While using redirect zones,NXDOMAIN Redirection will not override DNSSEC\n";
 						$bind_conf .= "\t\t# If the client has requested DNSSEC records (DO=1) and the NXDOMAIN response is signed then no substitution will occur\n";
 						$bind_conf .= "\t\t# https://kb.isc.org/article/AA-00376/192/BIND-9.9-redirect-zones-for-NXDOMAIN-redirection.html\n";
+						$bind_conf .= "\t\tallow-query { $zoneallowquery; };\n";
 						break;
 					default:
 						$bind_conf .= "\t\tallow-update { $zoneallowupdate; };\n";
@@ -728,6 +737,8 @@ function bind_print_javascript_type_zone()
 					document.iform.retry.disabled = 0;
 					document.iform.expire.disabled = 0;
 					document.iform.minimum.disabled = 0;
+					document.iform.allowquery.disabled = 0;
+					document.iform.allowupdate.disabled = 0;
 					break;
 				case 'slave':
 					document.iform.slaveip.disabled = 0;
@@ -746,6 +757,8 @@ function bind_print_javascript_type_zone()
 					document.iform.retry.disabled = 1;
 					document.iform.expire.disabled = 1;
 					document.iform.minimum.disabled = 1;
+					document.iform.allowquery.disabled = 0;
+					document.iform.allowupdate.disabled = 1;
 					break;
 				case 'forward':
 					document.iform.slaveip.disabled = 1;
@@ -764,6 +777,8 @@ function bind_print_javascript_type_zone()
 					document.iform.retry.disabled = 1;
 					document.iform.expire.disabled = 1;
 					document.iform.minimum.disabled = 1;
+					document.iform.allowquery.disabled = 1;
+					document.iform.allowupdate.disabled = 1;
 					break;
 				case 'redirect':
 					document.iform.slaveip.disabled = 1;
@@ -782,6 +797,8 @@ function bind_print_javascript_type_zone()
 					document.iform.retry.disabled = 0;
 					document.iform.expire.disabled = 0;
 					document.iform.minimum.disabled = 0;
+					document.iform.allowquery.disabled = 0;
+					document.iform.allowupdate.disabled = 1;
 					break;
 				default:
 					break;
