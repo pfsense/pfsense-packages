@@ -349,6 +349,7 @@ EOD;
 			$zoneipslave = $zone['slaveip'];
 			$zoneforwarders = $zone['forwarders'];
 			$zonereverso = $zone['reverso'];
+			$zonereversv6o = $zone['reversv6o'];
 
 			// Ensure zone view folder exists
 			if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview"))) {
@@ -374,7 +375,11 @@ EOD;
 			if ($zoneview == $viewname) {
 				// Add zone name
 				if ($zonereverso == "on") {
-					$bind_conf .= "\tzone \"$zonename.in-addr.arpa\" {\n";
+					if ($zonereversv6o == "on") {
+						$bind_conf .= "\tzone \"$zonename.ip6.arpa\" {\n";
+					} else {
+						$bind_conf .= "\tzone \"$zonename.in-addr.arpa\" {\n";
+					}
 				} else {
 					$bind_conf .= "\tzone \"$zonename\" {\n";
 				}
@@ -442,10 +447,15 @@ EOD;
 						$zonenameserver = $zone['nameserver'];
 						$zoneipns = $zone['ipns'];
 						$zonereverso = $zone['reverso'];
+						$zonereversv6o = $zone['reversv6o'];
 
 						$zone_conf = "\$TTL {$zonetll}\n;\n";
 						if ($zonereverso == "on") {
-							$zone_conf .= "\$ORIGIN {$zonename}.in-addr.arpa.\n\n";
+							if ($zonereversv6o == "on") {
+								$zone_conf .= "\$ORIGIN {$zonename}.ip6.arpa.\n\n";
+							} else {
+								$zone_conf .= "\$ORIGIN {$zonename}.in-addr.arpa.\n\n";
+							}
 						} else {
 							$zone_conf .= "\$ORIGIN {$zonename}.\n\n";
 						}
@@ -706,6 +716,7 @@ function bind_print_javascript_type_zone()
 					document.iform.tll.disabled = 0;
 					document.iform.nameserver.disabled = 0;
 					document.iform.reverso.disabled = 0;
+					document.iform.reversv6o.disabled = 0;
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 0;
 					document.iform.backupkeys.disabled = 0;
@@ -723,6 +734,7 @@ function bind_print_javascript_type_zone()
 					document.iform.tll.disabled = 1;
 					document.iform.nameserver.disabled = 1;
 					document.iform.reverso.disabled = 0;
+					document.iform.reversv6o.disabled = 0;
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 0;
 					document.iform.backupkeys.disabled = 0;
@@ -740,6 +752,7 @@ function bind_print_javascript_type_zone()
 					document.iform.tll.disabled = 1;
 					document.iform.nameserver.disabled = 1;
 					document.iform.reverso.disabled = 1;
+					document.iform.reversv6o.disabled = 1;
 					document.iform.forwarders.disabled = 0;
 					document.iform.dnssec.disabled = 1;
 					document.iform.backupkeys.disabled = 1;
@@ -757,6 +770,7 @@ function bind_print_javascript_type_zone()
 					document.iform.tll.disabled = 1;
 					document.iform.nameserver.disabled = 0;
 					document.iform.reverso.disabled = 1;
+					document.iform.reversv6o.disabled = 1;
 					document.iform.forwarders.disabled = 1;
 					document.iform.dnssec.disabled = 1;
 					document.iform.backupkeys.disabled = 1;
