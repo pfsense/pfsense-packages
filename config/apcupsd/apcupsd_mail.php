@@ -61,8 +61,11 @@ $mail = new PHPMailer();
 $mail->IsSMTP();
 $mail->Host = $config['notifications']['smtp']['ipaddress'];
 
-if ($config['notifications']['smtp']['ssl'] == "checked")
-	$mail->SMTPSecure =  "ssl";
+if ((isset($config['notifications']['smtp']['ssl']) && $config['notifications']['smtp']['ssl'] != "unchecked") || $config['notifications']['smtp']['ssl'] == "checked")
+	$mail->SMTPSecure = "ssl";
+
+if ((isset($config['notifications']['smtp']['tls']) && $config['notifications']['smtp']['tls'] != "unchecked") || $config['notifications']['smtp']['tls'] == "checked")
+	$mail->SMTPSecure = "tls";
 
 $mail->Port = empty($config['notifications']['smtp']['port']) ? 25 : $config['notifications']['smtp']['port'];
 
