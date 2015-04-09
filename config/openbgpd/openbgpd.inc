@@ -192,36 +192,82 @@ function openbgpd_install_conf() {
 	unset($conffile);
 
 	// Create rc.d file
-	$rc_file_stop = <<<EOF
-killall -TERM bgpd
+	$create_bgpd_sh = <<<EOF
+#!/bin/sh
+
+rc_start() {
+	if [ `pw groupshow {$pkg_group} 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
+		/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
+	fi
+	if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
+		/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
+	fi
+
+	/bin/mkdir -p {$bgpd_config_base}
+	/usr/sbin/chown -R root:wheel {$bgpd_config_base}
+	/bin/chmod 0600  {$bgpd_config_base}/bgpd.conf
+
+	NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
+	if [ \${NUMBGPD} -lt 1 ] ; then
+		{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf
+	else
+		{$pkg_bin}/bgpctl reload
+	fi
+}
+
+rc_stop() {
+	if [ `/bin/pgrep -fl bgpd | grep -c 'session engine'` -gt 0 ]; then
+		kill -15 `/bin/pgrep -fl bgpd | grep 'session engine' | awk '{print $1}'`
+		sleep 1
+	if [ `/bin/pgrep -fl bgpd | grep -c 'route decision engine'` -gt 0 ] || [ `/bin/pgrep -fl bgpd | grep -c 'parent'` -gt 0 ];then
+		killall -9 bgpd
+		echo 'bgpd service was terminated.'
+	else
+		echo 'bgpd service was terminated.'
+	fi
+	else
+		echo 'bgpd service was not running.'
+	fi
+}
+
+rc_status(){
+	if [ `/bin/pgrep -fl bgpd | grep -c 'session engine'` -gt 0 ]; then
+		echo '[bgpd] session engine is running'
+	else
+		echo '[bgpd] session engine is not running'
+	fi
+	if [ `/bin/pgrep -fl bgpd | grep -c 'route decision engine'` -gt 0 ]; then
+		echo '[bgpd] route decision engine is running'
+	else
+		echo '[bgpd] route decision engine is not running'
+	fi
+	if [ `/bin/pgrep -fl bgpd | grep -c 'parent'` -gt 0 ]; then
+		echo '[bgpd] parent is running'
+	else
+		echo '[bgpd] parent is not running'
+	fi
+}
+
+case $1 in
+	status)
+		rc_status
+		;;
+	start)
+		rc_start
+		;;
+	stop)
+		rc_stop
+		;;
+	restart)
+		rc_stop
+		rc_start
+		;;
+esac
+
 EOF;
-	$rc_file_start = <<<EOF
 
-if [ `pw groupshow {$pkg_group} 2>&1 | grep -c "pw: unknown group"` -gt 0 ]; then
-	/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
-fi
-if [ `pw usershow {$pkg_login} 2>&1 | grep -c "pw: no such user"` -gt 0 ]; then
-	/usr/sbin/pw useradd {$pkg_login} -u {$pkg_uid} -g {$pkg_gid} -c "{$pkg_gecos}" -d {$pkg_homedir} -s {$pkg_shell}
-fi
-
-/bin/mkdir -p {$bgpd_config_base}
-/usr/sbin/chown -R root:wheel {$bgpd_config_base}
-/bin/chmod 0600  {$bgpd_config_base}/bgpd.conf
-
-NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
-if [ \${NUMBGPD} -lt 1 ] ; then
-	{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf
-else
-	{$pkg_bin}/bgpctl reload
-fi
-EOF;
-	write_rcfile(array(
-			"file" => "bgpd.sh",
-			"start" => $rc_file_start,
-			"stop" =>  $rc_file_stop
-		)
-	);
-	unset($rc_file_start, $rc_file_stop);
+	file_put_contents('/usr/local/etc/rc.d/bgpd.sh', $create_bgpd_sh);
+	unset($create_bgpd_sh);
 
 	$_gb = exec("/sbin/sysctl net.inet.ip.ipsec_in_use=1");
 	// bgpd process running?  if so reload, else start.
