@@ -232,11 +232,11 @@ function apccontrol_scripts_install($emailnotification){
 		define('APCUPSD_BASE', '/usr/local');
 	}
 
-	$apcstatus[commfailure] = "\$HOSTNAME - Communications with UPS \$1 lost";
-	$apcstatus[commok] = "\$HOSTNAME - Communications with UPS \$1 restored";
-	$apcstatus[onbattery] = "\$HOSTNAME - Power failure. Running on UPS \$1 batteries";
-	$apcstatus[offbattery] = "\$HOSTNAME - UPS \$1 Power has returned...";
-	$apcstatus[changeme] = "\$HOSTNAME - Emergency! UPS batteries have failed. Change them NOW";
+	$apcstatus['commfailure'] = "\$HOSTNAME - Communications with UPS \$1 lost";
+	$apcstatus['commok'] = "\$HOSTNAME - Communications with UPS \$1 restored";
+	$apcstatus['onbattery'] = "\$HOSTNAME - Power failure. Running on UPS \$1 batteries";
+	$apcstatus['offbattery'] = "\$HOSTNAME - UPS \$1 Power has returned...";
+	$apcstatus['changeme'] = "\$HOSTNAME - Emergency! UPS batteries have failed. Change them NOW";
 
 	$apccontrol_scripts = array("offbattery","onbattery","commfailure","commok","changeme");
 	foreach($apccontrol_scripts as $apccontrol_script) {
