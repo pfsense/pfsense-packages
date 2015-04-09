@@ -702,7 +702,7 @@ function sg_rebuild_db($shtag, $rdb_dbhome, $rdb_itemslist)
     $sh_scr[] = "chown -R -v " . OWNER_NAME . " $dbhome";
 
     # restart squid for changes to take effects
-    $sh_scr[] = SQUID_LOCALBASE . "/sbin/squid -k reconfigure";
+    $sh_scr[] = SQUID_BASE . "/sbin/squid -k reconfigure";
 
     # store & exec sh
     $sh_scr = implode("\n", $sh_scr);
@@ -2266,7 +2266,7 @@ function sg_update_blacklist($from_file)
             set_file_access($dbhome, OWNER_NAME, 0755);
 
             squidguard_update_log("Reconfigure Squid proxy.");
-            mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
+            mwexec(SQUID_BASE . "/sbin/squid -k reconfigure");
 
             squidguard_update_log("Blacklist update complete.");
 
@@ -2405,7 +2405,7 @@ function squidguard_blacklist_restore_arcdb()
         squidguard_rebuild_db("arc_", $dbhome, $files);
 
         squidguard_update_log("Reconfigure Squid proxy.");
-        mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
+        mwexec(SQUID_BASE . "/sbin/squid -k reconfigure");
 
         conf_mount_ro();
         squidguard_update_log("Restore success.");
