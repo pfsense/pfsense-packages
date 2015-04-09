@@ -123,8 +123,8 @@ function validate_input_apcupsd($post,&$input_errors){
 
 			if (empty($post['smtpport'])) {
 					$input_errors[]='SMTP Port cannot be empty if SMTP builtin is enabled.';
-			}elseif(!is_numericint($post['smtpport'])){
-					$input_errors[]='SMTP Port is not numeric.';
+			}elseif(!is_port($post['smtpport'])){
+					$input_errors[]='SMTP Port is not a valid port.';
 			}
 
 			if (empty($post['smtpfrom'])) {
