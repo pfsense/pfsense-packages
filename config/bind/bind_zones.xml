@@ -154,11 +154,13 @@
 		<field>
 			<fielddescr>View</fielddescr>
 			<fieldname>view</fieldname>
-			<description><![CDATA[Select the View that this zone will belong.]]></description>
+			<description><![CDATA[Select(CTRL+click) views that this zone will belong.]]></description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindviews']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>02</size>
 		</field>
 		<field>
 			<fielddescr>Reverse Zone</fielddescr>

@@ -346,7 +346,7 @@ EOD;
 				$custom_root_zone = true;
 			}
 			$zonetype = $zone['type'];
-			$zoneview = $zone['view'];
+			$zoneviewlist = explode(',', $zone['view']);
 			$zonecustom = base64_decode($zone['custom']);
 			$zoneipslave = $zone['slaveip'];
 			$zoneforwarders = $zone['forwarders'];
@@ -358,8 +358,10 @@ EOD;
 
 			// Ensure zone view folder exists
 			if ($zonetype != "forward") {
-				if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview"))) {
-					mkdir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview", 0755, true);
+				foreach ($zoneviewlist as $zoneview) {
+					if (!(is_dir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview"))) {
+						mkdir(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview", 0755, true);
+					}
 				}
 			}
 
@@ -383,7 +385,8 @@ EOD;
 				$zoneallowtransfer = str_replace(',', '; ', $zone['allowtransfer']);
 			}
 
-			if ($zoneview == $viewname) {
+			if (in_array($viewname, $zoneviewlist)) {
+				$zoneview = $viewname;
 				// Add zone name
 				if ($zonereverso == "on") {
 					if ($zonereversv6o == "on") {
