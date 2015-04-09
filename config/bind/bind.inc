@@ -799,12 +799,15 @@ function bind_print_javascript_type_zone2()
 
 function bind_write_rcfile()
 {
+	global $config;
+	$bind = $config['installedpackages']['bind']['config'][0];
+	$ip_version = ($bind['bind_ip_version'] ? $bind['bind_ip_version'] : "");
 	$rc = array();
 	$BIND_LOCALBASE = "/usr/local";
 	$rc['file'] = 'named.sh';
 	$rc['start'] = <<<EOD
-		if [ -z "`ps auxw | grep "[n]amed -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
-			{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /cf/named/
+		if [ -z "`ps auxw | grep "[n]amed {$ip_version} -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
+			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
 		fi
 EOD;
 	$rc['stop'] = <<<EOD
@@ -812,12 +815,12 @@ EOD;
 		sleep 2
 EOD;
 	$rc['restart'] = <<<EOD
-		if [ -z "`ps auxw | grep "[n]amed -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
-			{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /cf/named/
+		if [ -z "`ps auxw | grep "[n]amed {$ip_version} -c /etc/namedb/named.conf"|awk '{print $2}'`" ];then
+			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
 		else
 			killall -9 named 2>/dev/null
 		        sleep 3
-			{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /cf/named/
+			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
 		fi
 EOD;
 	conf_mount_rw();

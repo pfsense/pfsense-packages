@@ -143,6 +143,18 @@
 			<required/>
 		</field>
 		<field>
+			<fielddescr>IP Version</fielddescr>
+			<fieldname>bind_ip_version</fieldname>
+			<description><![CDATA[Select IP transport version.<br>
+						This controls which transports are used when resolving queries.]]></description>
+			<type>select</type>
+			<options>
+				<option><name>IPv4+IPv6</name><value></value></option>
+				<option><name>IPv4</name><value>-4</value></option>
+				<option><name>IPv6</name><value>-6</value></option>
+			</options>
+		</field>
+		<field>
 			<fielddescr>Listen on</fielddescr>
 			<fieldname>listenon</fieldname>
 			<description><![CDATA[Choose the interfaces on which to enable BIND.]]></description>
