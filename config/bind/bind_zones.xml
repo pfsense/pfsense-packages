@@ -317,7 +317,7 @@
 			<fielddescr>Enable Update-policy</fielddescr>
 			<fieldname>enable_updatepolicy</fieldname>
 			<description><![CDATA[Enable Update-policy which overrides Allow-update.<br>
-						The update-policy statment replaces the allow-update statement.]]></description>
+						The update-policy statement replaces the allow-update statement.]]></description>
 			<type>checkbox</type>
 			<enablefields>updatepolicy</enablefields>
 		</field>
