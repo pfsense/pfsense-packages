@@ -43,8 +43,8 @@ if ($_POST) {
 	# Actions
 	$filter = preg_replace('/(@|!|>|<)/',"",htmlspecialchars($_POST['strfilter']));
 	$program = strtolower($_POST['program']);
-    switch ($program) {
-       case 'squid':
+    	switch ($program) {
+       		case 'squid':
 			// Define log file
 			$log='/var/squid/logs/access.log';
 			//show table headers
@@ -52,43 +52,43 @@ if ($_POST) {
 			//fetch lines
 			$logarr=fetch_log($log);
 			// Print lines
-    		foreach ($logarr as $logent) {
-		        // Split line by space delimiter
+    			foreach ($logarr as $logent) {
+		        	// Split line by space delimiter
 				$logline  = preg_split("/\s+/", $logent);
 
-		        // Apply date format to first line
-		        //$logline[0] = date("d.m.Y H:i:s",$logline[0]);
+		        	// Apply date format to first line
+		        	//$logline[0] = date("d.m.Y H:i:s",$logline[0]);
 
-		        // Word wrap the URL
-		        $logline[7] = htmlentities($logline[7]);
-		        $logline[7] = html_autowrap($logline[7]);
+		        	// Word wrap the URL
+		        	$logline[7] = htmlentities($logline[7]);
+		        	$logline[7] = html_autowrap($logline[7]);
 
-		        // Remove /(slash) in destination row
+		        	// Remove /(slash) in destination row
 				$logline_dest =  preg_split("/\//", $logline[9]);
 
-		        // Apply filter and color
+		        	// Apply filter and color
 				// Need validate special chars
-		        if ($filter != "")
-		            $logline = preg_replace("@($filter)@i","<spam><font color='red'>$1</font></span>",$logline);
+		        	if ($filter != "")
+		            		$logline = preg_replace("@($filter)@i","<spam><font color='red'>$1</font></span>",$logline);
 				echo "<tr valign=\"top\">\n";
 				echo "<td class=\"listlr\" nowrap>{$logline[0]} {$logline[1]}</td>\n";
 				echo "<td class=\"listr\">{$logline[3]}</td>\n";
 				echo "<td class=\"listr\">{$logline[4]}</td>\n";
-		        echo "<td class=\"listr\" width=\"*\">{$logline[7]}</td>\n";
+		        	echo "<td class=\"listr\" width=\"*\">{$logline[7]}</td>\n";
 				echo "<td class=\"listr\">{$logline[8]}</td>\n";
 				echo "<td class=\"listr\">{$logline_dest[1]}</td>\n";
 				echo "</tr>\n";
-		    }
+		    	}
 			break;
 		case 'sguard';
-				$log='/var/squidGuard/log/block.log';
-				//show table headers
-				show_tds(array("Date-Time","ACL","Address","Host","User"));
-				//fetch lines
-				$logarr=fetch_log($log);
-			    foreach ($logarr as $logent) {
-			        // Split line by space delimiter
-				    $logline  = preg_split("/\s+/", $logent);
+			$log='/var/squidGuard/log/block.log';
+			//show table headers
+			show_tds(array("Date-Time","ACL","Address","Host","User"));
+			//fetch lines
+			$logarr=fetch_log($log);
+			foreach ($logarr as $logent) {
+				// Split line by space delimiter
+				$logline  = preg_split("/\s+/", $logent);
 
 			        // Apply time format
 			        $logline[0] = date("d.m.Y", strtotime($logline[0]));
@@ -97,23 +97,48 @@ if ($_POST) {
 			        $logline[4] = htmlentities($logline[4]);
 			        $logline[4] = html_autowrap($logline[4]);
 
-
 			        // Apply filter color
-					// Need validate special chars
+				// Need validate special chars
 			        if ($filter != "")
-			            $logline = preg_replace("@($filter)@i","<spam><font color='red'>$1</font></span>",$logline);
-
+			        	$logline = preg_replace("@($filter)@i","<spam><font color='red'>$1</font></span>",$logline);
 
 			        echo "<tr>\n";
 			        echo "<td class=\"listlr\" nowrap>{$logline[0]} {$logline[1]}</td>\n";
 			        echo "<td class=\"listr\">{$logline[3]}</td>\n";
-					echo "<td class=\"listr\" width=\"*\">{$logline[4]}</td>\n";
+				echo "<td class=\"listr\" width=\"*\">{$logline[4]}</td>\n";
 			        echo "<td class=\"listr\">{$logline[5]}</td>\n";
 			        echo "<td class=\"listr\">{$logline[6]}</td>\n";
 			        echo "</tr>\n";
-			    }
+			}
 			break;
-    }
+		case 'clamav';
+			$log='/var/log/c-icap/virus.log';
+			//show table headers
+			show_tds(array("Date-Time","Message","Virus","URL","Host","User"));
+			//fetch lines
+			$logarr=fetch_log($log);
+			foreach ($logarr as $logent) {
+				// Split line by space delimiter
+				$logline  = preg_split("/\|/", $logent);
+
+				// Apply time format
+				$logline[0] = date("d.m.Y H:i:s", strtotime($logline[0]));
+
+            			// Word wrap the URL
+		        	$logline[3] = htmlentities($logline[3]);
+		        	$logline[3] = html_autowrap($logline[3]);
+
+				echo "<tr>\n";
+				echo "<td class=\"listlr\" nowrap>{$logline[0]}</td>\n";
+				echo "<td class=\"listr\" nowrap>{$logline[1]}</td>\n";
+				echo "<td class=\"listr\">{$logline[2]}</td>\n";
+				echo "<td class=\"listr\">{$logline[3]}</td>\n";
+				echo "<td class=\"listr\">{$logline[4]}</td>\n";
+				echo "<td class=\"listr\">{$logline[5]}</td>\n";
+				echo "</tr>\n";
+			}
+			break;
+	}
 }
 
 # ------------------------------------------------------------------------------
