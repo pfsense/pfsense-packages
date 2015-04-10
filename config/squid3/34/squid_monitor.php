@@ -184,6 +184,28 @@ include("head.inc");
 			</tr>
 		</tbody>
 	</table>
+	
+	<!-- clamav Table -->
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tbody>
+			<tr>
+				<td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="6" class="listtopic"><center><?=gettext("clamav Logs"); ?><center></td>
+						</tr>
+						<tbody id="clamView">
+							<script language="JavaScript">
+								// Call function to show squidGuard log
+								showLog('clamView', 'squid_monitor_data.php','clamav');
+							</script>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>	
+	
 </div>
 <?php }?>
 </td>
