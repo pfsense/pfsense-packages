@@ -92,7 +92,7 @@ function dshield_sensor_resync_config_command()
 function dshield_sensor_install_command()
 {
 	copy('/usr/pbi/dshield-sensor-'.php_uname("m").'/local/etc/dshield-sensor/dshield.cnf', '/var/etc/dshield.cnf');
-	chmod('/var/etc/dshield-sensor.cnf', 0644);
+	chmod('/var/etc/dshield.cnf', 0644);
 }
 
 
