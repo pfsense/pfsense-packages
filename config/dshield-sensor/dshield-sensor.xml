@@ -6,7 +6,7 @@
   <include_file>/usr/local/pkg/dshield-sensor.inc</include_file>
   <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
   <menu>
-    <name>DShield Sensor Settings</name>
+    <name>DShield Sensor</name>
     <section>Services</section>
     <configfile>dshield-sensor.xml</configfile>
     <tooltiptext>DShield Sensor settings.</tooltiptext>

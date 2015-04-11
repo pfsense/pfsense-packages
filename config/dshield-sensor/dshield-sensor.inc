@@ -26,17 +26,18 @@ function dshield_sensor_resync_config_command()
 	global $dshield_sensor_cron_command;
 
 	$dshield_config = $config['installedpackages']['dshieldsensor']['config'][0];
-	$config_file = '/usr/pbi/dshield-sensor-'.php_uname("m").'/local/etc/dshield-sensor/dshield.cnf';
+	$config_file = '/var/etc/dshield.cnf';
+	$sample_config_file = '/usr/pbi/dshield-sensor-'.php_uname("m").'/local/etc/dshield-sensor/dshield.cnf.sample';
 
 	$configuration = "";
 	$config_size = 0;
-	$config_handle = fopen($config_file, "rb");
+	$config_handle = fopen($config_file, "r");
 	if ($config_handle !== FALSE) {
 		$config_size = filesize($config_file);
 	} else {
-		$config_handle = fopen ($config_file.".sample", "rb");
+		$config_handle = fopen ($sample_config_file, "r");
 		if ($config_handle !== FALSE) {
-			$config_size = filesize($config_file.".sample");
+			$config_size = filesize($sample_config_file);
 		}
 	}
 	if ($config_handle !== FALSE) {
@@ -47,7 +48,7 @@ function dshield_sensor_resync_config_command()
 		}
 		fclose($config_handle);
 	} else {
-		dshield_sensor_warn("Couldn't open {$config_file} or it was empty, reinstall");
+		dshield_sensor_warn("Couldn't open {$config_file} or {$sample_config_file}, reinstall");
 	}
 
 	$enabled = !empty($dshield_config['enable']);
@@ -90,6 +91,8 @@ function dshield_sensor_resync_config_command()
 
 function dshield_sensor_install_command()
 {
+	copy('/usr/pbi/dshield-sensor-'.php_uname("m").'/local/etc/dshield-sensor/dshield.cnf', '/var/etc/dshield.cnf');
+	chmod('/var/etc/dshield-sensor.cnf', 0644);
 }
 
 
@@ -98,6 +101,7 @@ function dshield_sensor_deinstall_command()
 	global $dshield_sensor_cron_command;
 
 	install_cron_job($dshield_sensor_cron_command, FALSE);
+	unlink_if_exists('/var/etc/dshield.cnf');
 }
 
 ?>
