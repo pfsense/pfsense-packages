@@ -92,7 +92,7 @@ include("head.inc");
 			$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=squid.xml&amp;id=0");
 			$tab_array[] = array(gettext("Remote Cache"), false, "/pkg.php?xml=squid_upstream.xml");
 			$tab_array[] = array(gettext("Local Cache"), false, "/pkg_edit.php?xml=squid_cache.xml&amp;id=0");
-			$tab_array[] = array(gettext("Antivirus"), false, "/pkg_edit.php?xml=antivirus.xml&amp;id=0");
+			$tab_array[] = array(gettext("Antivirus"), false, "/pkg_edit.php?xml=squid_antivirus.xml&amp;id=0");
 			$tab_array[] = array(gettext("ACLs"), false, "/pkg_edit.php?xml=squid_nac.xml&amp;id=0");
 			$tab_array[] = array(gettext("Traffic Mgmt"), false, "/pkg_edit.php?xml=squid_traffic.xml&amp;id=0");
 			$tab_array[] = array(gettext("Authentication"), false, "/pkg_edit.php?xml=squid_auth.xml&amp;id=0");
@@ -184,6 +184,28 @@ include("head.inc");
 			</tr>
 		</tbody>
 	</table>
+	
+	<!-- clamav Table -->
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tbody>
+			<tr>
+				<td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="6" class="listtopic"><center><?=gettext("clamav Logs"); ?><center></td>
+						</tr>
+						<tbody id="clamView">
+							<script language="JavaScript">
+								// Call function to show squidGuard log
+								showLog('clamView', 'squid_monitor_data.php','clamav');
+							</script>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>	
+	
 </div>
 <?php }?>
 </td>

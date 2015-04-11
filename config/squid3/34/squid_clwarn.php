@@ -56,6 +56,7 @@ $vr[1]="";
 
 $virus = preg_replace($vp,$vr,$virus);
 
+error_log(date("Y-m-d H:i:s")." | VIRUS FOUND | ".$virus." | ".$url." | ".$source." | ".$user."\n", 3, "/var/log/c-icap/virus.log");
 
 ?>
 <style type="text/css">
