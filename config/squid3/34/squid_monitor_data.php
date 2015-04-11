@@ -113,6 +113,34 @@ if ($_POST) {
 			        echo "</tr>\n";
 			    }
 			break;
+		case 'clamav';
+				// Define log file
+				$log='/var/log/c-icap/virus.log';
+				//show table headers
+				show_tds(array("Date-Time","Message","Virus","URL","Host","User"));
+				//fetch lines
+				$logarr=fetch_log($log);
+			    	foreach ($logarr as $logent) {
+			        	// Split line by space delimiter
+				    	$logline  = preg_split("/\|/", $logent);
+
+			        	// Apply time format
+			        	$logline[0] = date("d.m.Y H:i:s", strtotime($logline[0]));
+
+            				// Word wrap the URL
+		        		$logline[3] = htmlentities($logline[3]);
+		        		$logline[3] = html_autowrap($logline[3]);
+
+			    		echo "<tr>\n";
+			        	echo "<td class=\"listlr\" nowrap>{$logline[0]}</td>\n";
+			        	echo "<td class=\"listr\" nowrap>{$logline[1]}</td>\n";
+					echo "<td class=\"listr\">{$logline[2]}</td>\n";
+			        	echo "<td class=\"listr\">{$logline[3]}</td>\n";
+			        	echo "<td class=\"listr\">{$logline[4]}</td>\n";
+			        	echo "<td class=\"listr\">{$logline[5]}</td>\n";
+			        	echo "</tr>\n";
+			    	}
+			break;			
     }
 }
 
