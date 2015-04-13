@@ -143,6 +143,18 @@
 			<required/>
 		</field>
 		<field>
+			<fielddescr>IP Version</fielddescr>
+			<fieldname>bind_ip_version</fieldname>
+			<description><![CDATA[Select IP transport version.<br>
+						This controls which transports are used when resolving queries.]]></description>
+			<type>select</type>
+			<options>
+				<option><name>IPv4+IPv6</name><value></value></option>
+				<option><name>IPv4</name><value>-4</value></option>
+				<option><name>IPv6</name><value>-6</value></option>
+			</options>
+		</field>
+		<field>
 			<fielddescr>Listen on</fielddescr>
 			<fieldname>listenon</fieldname>
 			<description><![CDATA[Choose the interfaces on which to enable BIND.]]></description>
@@ -292,6 +304,23 @@
 			<description>
 				<![CDATA[You can put your own custom options here, one per line.<br>
 					They'll be added to the configuration. They need to be named.conf native options.]]>
+			</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Global Settings</name>
+			<fieldname>temp01</fieldname>
+		</field>
+		<field>
+			<fielddescr>Global Settings</fielddescr>
+			<fieldname>bind_global_settings</fieldname>
+			<description>
+				<![CDATA[You can put your own global settings here.<br>
+					They'll be added to the configuration. They need to be named.conf native settings.]]>
 			</description>
 			<type>textarea</type>
 			<cols>65</cols>

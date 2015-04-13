@@ -154,16 +154,25 @@
 		<field>
 			<fielddescr>View</fielddescr>
 			<fieldname>view</fieldname>
-			<description><![CDATA[Select the View that this zone will belong.]]></description>
+			<description><![CDATA[Select(CTRL+click) views that this zone will belong.]]></description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindviews']['config']]]></source>
 			<source_name>name</source_name>
 			<source_value>name</source_value>
+			<multiple/>
+			<size>02</size>
 		</field>
 		<field>
 			<fielddescr>Reverse Zone</fielddescr>
 			<fieldname>reverso</fieldname>
 			<description>Enable if this is a reverse zone.</description>
+			<type>checkbox</type>
+			<enablefields>reversv6o</enablefields>
+		</field>
+		<field>
+			<fielddescr>IPv6 Reverse Zone</fielddescr>
+			<fieldname>reversv6o</fieldname>
+			<description>Enable if this is a IPv6 reverse zone. Reverse Zone must also be enabled.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -303,6 +312,22 @@
 			<source_value>name</source_value>
 			<multiple/>
 			<size>03</size>
+		</field>
+		<field>
+			<fielddescr>Enable Update-policy</fielddescr>
+			<fieldname>enable_updatepolicy</fieldname>
+			<description><![CDATA[Enable Update-policy which overrides Allow-update.<br>
+						The update-policy statement replaces the allow-update statement.]]></description>
+			<type>checkbox</type>
+			<enablefields>updatepolicy</enablefields>
+		</field>
+		<field>
+			<fielddescr>Update-policy</fielddescr>
+			<fieldname>updatepolicy</fieldname>
+			<description><![CDATA[Update-policy defines the policy for submitting dynamic updates to 'master' zones.<br>
+						Do not include the surrounding { } when using multiple statements]]></description>
+			<type>input</type>
+			<size>75</size>
 		</field>
 		<field>
 			<fielddescr>Allow-query</fielddescr>
