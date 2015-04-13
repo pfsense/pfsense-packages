@@ -53,7 +53,7 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.5P1_5 pkg v 0.3.6</version>
+		<version>9.9.5P1_5 pkg v 0.3.7</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
@@ -153,7 +153,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.22</version>
+		<version>1.5.3 pkg v 0.23</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy1_5/haproxy.xml</config_file>
@@ -177,7 +177,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.22</version>
+		<version>1.5.3 pkg v 0.23</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -418,7 +418,7 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/PHPService</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/phpservice/phpservice.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<version>0.4.1</version>
+		<version>0.4.2</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -521,7 +521,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>spamd-4.9.1.tbz</depends_on_package>
 		<depends_on_package_pbi>spamd-4.9.1-amd64.pbi</depends_on_package_pbi>
-		<version>4.9.1 v1.1.1</version>
+		<version>4.9.1 v1.1.2</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
 		<configurationfile>spamd.xml</configurationfile>
@@ -1279,7 +1279,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.10</version>
+		<version>1.4_4 pkg v.1.9.12</version>
 		<status>Beta</status>
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1324,7 +1324,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.6</version>
+		<version>1.4_4 pkg v.1.9.12</version>
 		<status>Beta</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
@@ -1575,7 +1575,7 @@
 		</build_pbi>
 		<build_options></build_options>
 		<config_file>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.xml</config_file>
-		<version>v0.1.1</version>
+		<version>v0.1.2</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
@@ -1870,7 +1870,7 @@
 		<descr>Set of programs for controlling APC UPS.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>apcupsd-3.14.10_1 pkg v0.3.4</version>
+		<version>apcupsd-3.14.10_1 pkg v0.3.6</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>

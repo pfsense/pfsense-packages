@@ -639,19 +639,19 @@ function squid_validate_reverse($post, &$input_errors) {
 		$input_errors[] = 'The field \'external FQDN\' must contain a valid domain name';
 
 	$port = trim($post['reverse_http_port']);
-	preg_match("/(\d+)/",`sysctl net.inet.ip.portrange.first`,$portrange);
+	preg_match("/(\d+)/",`sysctl net.inet.ip.portrange.reservedhigh`,$portrange);
 	if (!empty($port) && !is_port($port))
 		$input_errors[] = 'The field \'reverse HTTP port\' must contain a valid port number';
-	if (!empty($port) && is_port($port) && $port < $portrange[1]){
-		$input_errors[] = "The field 'reverse HTTP port' must contain a port number higher than net.inet.ip.portrange.first sysctl value({$portrange[1]}).";
-		$input_errors[] = "To listen on low ports, change portrange.first sysctl value to 0 on system tunable options and restart squid daemon.";
+	if (!empty($port) && is_port($port) && $port <= $portrange[1]){
+		$input_errors[] = "The field 'reverse HTTP port' must contain a port number higher than net.inet.ip.portrange.reservedhigh sysctl value({$portrange[1]}).";
+		$input_errors[] = "To listen on low ports, change portrange.reservedhigh sysctl value to 0 on system tunable options and restart squid daemon.";
 	}
 	$port = trim($post['reverse_https_port']);
 	if (!empty($port) && !is_port($port))
 		$input_errors[] = 'The field \'reverse HTTPS port\' must contain a valid port number';
-	if (!empty($port) && is_port($port) && $port < $portrange[1]){
-		$input_errors[] = "The field 'reverse HTTPS port' must contain a port number higher than net.inet.ip.portrange.first sysctl value({$portrange[1]}).";
-		$input_errors[] = "To listen on low ports, change portrange.first sysctl value to 0 on system tunable options and restart squid daemon.";
+	if (!empty($port) && is_port($port) && $port <= $portrange[1]){
+		$input_errors[] = "The field 'reverse HTTPS port' must contain a port number higher than net.inet.ip.portrange.reservedhigh sysctl value({$portrange[1]}).";
+		$input_errors[] = "To listen on low ports, change portrange.reservedhigh sysctl value to 0 on system tunable options and restart squid daemon.";
 	}
 	if ($post['reverse_ssl_cert'] == 'none')
 		$input_errors[] = 'A valid certificate for the external interface must be selected';

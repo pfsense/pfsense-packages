@@ -91,11 +91,20 @@ define('CONFIG_SG_HEADER', "
 # ------------------------------------------------------------------------------
 # squid config options
 # ------------------------------------------------------------------------------
+
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+
 define('REDIRECTOR_OPTIONS_REM',   '# squidGuard options');
-define('REDIRECTOR_PROGRAM_OPT',   'redirect_program');
-define('REDIRECT_BYPASS_OPT',      'redirector_bypass');
 define('REDIRECT_CHILDREN_OPT',    'url_rewrite_children');
-define('REDIRECTOR_PROCESS_COUNT', '5'); # redirector processes count will started
+if ($pf_version >= 2.2) { 
+   define('REDIRECTOR_PROGRAM_OPT',   'url_rewrite_program');
+   define('REDIRECT_BYPASS_OPT',      'url_rewrite_bypass');
+   define('REDIRECTOR_PROCESS_COUNT', '16 startup=8 idle=4 concurrency=0');
+} else {
+   define('REDIRECTOR_PROGRAM_OPT',   'redirect_program');
+   define('REDIRECT_BYPASS_OPT',      'redirector_bypass');
+   define('REDIRECTOR_PROCESS_COUNT', '5');
+}
 
 # ------------------------------------------------------------------------------
 # squidguard config options
@@ -111,7 +120,7 @@ define('REDIRECT_URL_ARGS', '&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u');
 # squidguard system constants
 # ------------------------------------------------------------------------------
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+
 if ($pf_version > 2.0) {
 	if (file_exists('/usr/pbi/squidguard-squid3-' . php_uname("m")))
 		define('SQUIDGUARD_LOCALBASE', '/usr/pbi/squidguard-squid3-' . php_uname("m"));
@@ -693,7 +702,7 @@ function sg_rebuild_db($shtag, $rdb_dbhome, $rdb_itemslist)
     $sh_scr[] = "chown -R -v " . OWNER_NAME . " $dbhome";
 
     # restart squid for changes to take effects
-    $sh_scr[] = SQUID_LOCALBASE . "/sbin/squid -k reconfigure";
+    $sh_scr[] = SQUID_BASE . "/sbin/squid -k reconfigure";
 
     # store & exec sh
     $sh_scr = implode("\n", $sh_scr);
@@ -2257,7 +2266,7 @@ function sg_update_blacklist($from_file)
             set_file_access($dbhome, OWNER_NAME, 0755);
 
             squidguard_update_log("Reconfigure Squid proxy.");
-            mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
+            mwexec(SQUID_BASE . "/sbin/squid -k reconfigure");
 
             squidguard_update_log("Blacklist update complete.");
 
@@ -2396,7 +2405,7 @@ function squidguard_blacklist_restore_arcdb()
         squidguard_rebuild_db("arc_", $dbhome, $files);
 
         squidguard_update_log("Reconfigure Squid proxy.");
-        mwexec(SQUID_LOCALBASE . "/sbin/squid -k reconfigure");
+        mwexec(SQUID_BASE . "/sbin/squid -k reconfigure");
 
         conf_mount_ro();
         squidguard_update_log("Restore success.");
