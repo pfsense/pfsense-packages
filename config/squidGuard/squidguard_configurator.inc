@@ -2038,15 +2038,16 @@ function squidguard_ramdisk($enable)
 
     # delete old squidguard ramdisk
     if (file_exists("/dev/md15")) {
-        mwexec("umount -f " . SQUIDGUARD_TMP);
+        mwexec("/sbin/umount -f " . SQUIDGUARD_TMP);
         mwexec("sleep 1");
-        mwexec("mdconfig -d -u 15");
+        mwexec("/sbin/mdconfig -d -u 15");
     }
 
     if ($enable === true) {
         # create temp ramdisk
         # size 300Mb very nice for work with Archive < 30Mb
         # this is size use physical RAM + Swap file
+        mwexec("mkdir -p ".SQUIDGUARD_TMP);
         mwexec("/sbin/mdmfs -s {$ramsize}M md15 " . SQUIDGUARD_TMP);
         mwexec("chmod 1777 " . SQUIDGUARD_TMP);
     }
