@@ -53,7 +53,7 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.5P1_5 pkg v 0.3.7</version>
+		<version>9.9.5P1_5 pkg v 0.3.8</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
