@@ -179,8 +179,8 @@ EOD;
 		$log_only = ($bind['log_only'] == "no" ? "no" : "yes");
 		$bind_conf .= <<<EOD
 	rate-limit {
-		responses-per-second { $rate_limit };
-		log-only { $log_only };
+		responses-per-second $rate_limit;
+		log-only $log_only;
 	};
 
 EOD;
