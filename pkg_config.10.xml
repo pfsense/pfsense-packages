@@ -431,27 +431,26 @@
 		<build_options>postfix_SET_FORCE=PCRE SASL2 SPF TLS</build_options>
 	</package>
 	<package>
-		<name>Dansguardian</name>
-		<website>http://www.dansguardian.org/</website>
-		<descr><![CDATA[DansGuardian is an award winning Open Source web content filter.<br />
-						It filters the actual content of pages based on many methods including phrase matching, PICS filtering and URL filtering.<br />
-						It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br />
-						For all non-commercial its free, without cost.<br />
-						For all commercial use visit dansguardian website to get a licence.]]></descr>
+		<name>e2guardian</name>
+		<website>http://e2guardian.org/</website>
+		<descr><![CDATA[e2guardian is a content filtering proxy that works in conjunction with squid<br />
+				It's a fork of DansGuardian and filters the actual content of pages based on <br />
+				many methods including phrase matching, PICS filtering and URL filtering.<br />
+				It does not purely filter based on a banned list of sites like lesser totally commercial filters.]]></descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.xml</config_file>
-		<pkginfolink>https://forum.pfsense.org/index.php/topic,43786.0.html</pkginfolink>
-		<depends_on_package_pbi>dansguardian-2.12.0.3_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.12.0.3_2 pkg v.0.1.12</version>
+		<config_file>https://packages.pfsense.org/packages/config/e2guardian/e2guardian.xml</config_file>
+		<pkginfolink>https://forum.pfsense.org/index.php?topic=92664.0</pkginfolink>
+		<!--<depends_on_package_pbi>e2guardian-3.0.4_1-##ARCH##.pbi</depends_on_package_pbi> -->
+		<version>3.0.4 pkg v.0.1</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
-		<configurationfile>dansguardian.xml</configurationfile>
+		<configurationfile>e2guardian.xml</configurationfile>
 		<build_pbi>
-			<custom_name>dansguardian</custom_name>
+			<custom_name>e2guardian</custom_name>
 			<ports_before>security/ca_root_nss</ports_before>
-			<port>www/dansguardian-devel</port>
+			<port>www/e2guardian</port>
 		</build_pbi>
-		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET_FORCE=TRICKLE CLAMD ICAP NTLM SSL</build_options>
+		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET_FORCE=TRICKLE CLAMD ICAP NTLM</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
 	</package>
 	<package>
