@@ -185,7 +185,7 @@ function set_mail_report_cron_jobs($a_mailreports) {
 	}
 }
 
-include('phpmailer/class.phpmailer.php');
+include('phpmailer/PHPMailerAutoload.php');
 
 function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	global $config, $g;
@@ -286,7 +286,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 
 	/* this should never happen */
 	if($end < $start) {
-		log_error("start $start is smaller than end $end");
+		log_error("start $start is greater than end $end");
 			$end = $now;
 	}
 
@@ -392,7 +392,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 
 	$speedlimit = ($upstream + $downstream);
 
-	/* Set default colors explicity, the theme can then override them below.
+	/* Set default colors explicitly, the theme can then override them below.
 	   This prevents missing colors in themes from crashing the graphs. */
 	$colortrafficup = array("666666", "CCCCCC");
 	$colortrafficdown = array("990000", "CC0000");
@@ -402,6 +402,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 	$colorstates = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
 	$colorprocessor = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
 	$colormemory = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
+	$colormbuf = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
 	$colorqueuesup = array('000000','7B0000','990000','BB0000','CC0000','D90000','EE0000','FF0000','CC0000');
 	$colorqueuesdown = array('000000','7B7B7B','999999','BBBBBB','CCCCCC','D9D9D9','EEEEEE','FFFFFF','CCCCCC');
 	$colorqueuesdropup = array('000000','7B0000','990000','BB0000','CC0000','D90000','EE0000','FF0000','CC0000');
@@ -531,7 +532,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 		$graphcmd .= "--height 200 --width 620 ";
 
 		$iflist = get_configured_interface_list();
-		$g = 0;
+		$h = 0;
 		$operand = "";
 		$comma = "";
 		$graphtputbip = "";
@@ -577,7 +578,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_out_t_block={$ifname}-out_bytes,0,$speedlimit,LIMIT,UN,0,{$ifname}-out_bytes_block,IF,$seconds,*\" ";
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_t_pass={$ifname}-bytes_in_t_pass,{$ifname}-bytes_out_t_pass,+\" ";
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_t_block={$ifname}-bytes_in_t_block,{$ifname}-bytes_out_t_block,+\" ";
-			if ($g > 0) {
+			if ($h > 0) {
 				$operand .= ",+";
 				$comma = ",";
 			}
@@ -593,7 +594,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 			$graphtputbyob .= "{$comma}{$ifname}-bytes_out_t_block";
 			$graphtputbytp .= "{$comma}{$ifname}-bytes_t_pass";
 			$graphtputbytb .= "{$comma}{$ifname}-bytes_t_block";
-			$g++;
+			$h++;
 		}
 		$graphcmd .= "CDEF:\"tput-in_bits_pass={$graphtputbip}{$operand}\" ";
 		$graphcmd .= "CDEF:\"tput-out_bits_pass={$graphtputbop}{$operand}\" ";
@@ -718,7 +719,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 		$graphcmd .= "COMMENT:\"\t\t\t\t\t\t\t\t\t\t\t\t\t`date +\"%b %d %H\:%M\:%S %Y\"`\" ";
 	}
 	elseif((strstr($curdatabase, "-wireless.rrd")) && (file_exists("$rrddbpath$curdatabase"))) {
-		/* define graphcmd for packets stats */
+		/* define graphcmd for wireless stats */
 		$graphcmd = "$rrdtool graph $rrdtmppath$curdatabase-$curgraph.png ";
 		$graphcmd .= "--start $start --end $end ";
 		$graphcmd .= "--vertical-label \"snr/channel/rate\" ";
@@ -924,6 +925,50 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 		$graphcmd .= "GPRINT:\"wire:AVERAGE:%7.2lf %s	\" ";
 		$graphcmd .= "GPRINT:\"wire:MAX:%7.2lf %s	\" ";
 		$graphcmd .= "GPRINT:\"wire:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"\t\t\t\t\t\t\t\t\t\t\t\t\t`date +\"%b %d %H\:%M\:%S %Y\"`\" ";
+	}
+	elseif((strstr($curdatabase, "-mbuf.rrd")) && (file_exists("$rrddbpath$curdatabase"))) {
+		/* define graphcmd for mbuf usage stats */
+		$graphcmd = "$rrdtool graph $rrdtmppath$curdatabase-$curgraph.png ";
+		$graphcmd .= "--start $start --end $end ";
+		$graphcmd .= "--vertical-label \"utilization, percent\" ";
+		$graphcmd .= "--color SHADEA#eeeeee --color SHADEB#eeeeee ";
+		$graphcmd .= "--title \"`hostname` - {$prettydb} clusters - {$hperiod} - {$havg} average\" ";
+		$graphcmd .= "--height 200 --width 620 ";
+		$graphcmd .= "DEF:\"current=$rrddbpath$curdatabase:current:AVERAGE\" ";
+		$graphcmd .= "DEF:\"cache=$rrddbpath$curdatabase:cache:AVERAGE\" ";
+		$graphcmd .= "DEF:\"total=$rrddbpath$curdatabase:total:AVERAGE\" ";
+		$graphcmd .= "DEF:\"max=$rrddbpath$curdatabase:max:AVERAGE\" ";
+		$graphcmd .= "LINE2:\"current#{$colormbuf[0]}:current\" ";
+		$graphcmd .= "LINE2:\"cache#{$colormbuf[1]}:cache\" ";
+		$graphcmd .= "LINE2:\"total#{$colormbuf[2]}:total\" ";
+		$graphcmd .= "LINE2:\"max#{$colormbuf[3]}:max\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"\t\t	minimum	average	maximum	current\\n\" ";
+		$graphcmd .= "COMMENT:\"Current.	\" ";
+		$graphcmd .= "GPRINT:\"current:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"current:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"current:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"current:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"Cache.	\" ";
+		$graphcmd .= "GPRINT:\"cache:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"cache:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"cache:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"cache:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"Total.	\" ";
+		$graphcmd .= "GPRINT:\"total:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"total:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"total:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"total:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"Max.		\" ";
+		$graphcmd .= "GPRINT:\"max:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"max:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"max:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"max:LAST:%7.2lf %S	\" ";
 		$graphcmd .= "COMMENT:\"\\n\" ";
 		$graphcmd .= "COMMENT:\"\t\t\t\t\t\t\t\t\t\t\t\t\t`date +\"%b %d %H\:%M\:%S %Y\"`\" ";
 	}

@@ -199,10 +199,6 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc");
-if ($input_errors)
-	print_input_errors($input_errors);
-if ($savemsg)
-	print_info_box($savemsg);
 ?>
 <script type="text/javascript" src="/javascript/autosuggest.js">
 </script>
@@ -210,6 +206,14 @@ if ($savemsg)
 </script>
 <form action="suricata_passlist_edit.php" method="post" name="iform" id="iform">
 <input name="id" type="hidden" value="<?=$id;?>" />
+
+<?php
+if ($input_errors)
+	print_input_errors($input_errors);
+if ($savemsg)
+	print_info_box($savemsg);
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>

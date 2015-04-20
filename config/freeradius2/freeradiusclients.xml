@@ -163,7 +163,7 @@
 		<field>
 			<fielddescr>Client Shared Secret</fielddescr>
 			<fieldname>varclientsharedsecret</fieldname>
-			<description><![CDATA[Enter the shared secret of the RADIUS client here. This is the shared secret (password) which the NAS (switch or accesspoint) needs to communicate with the RADIUS server.]]></description>
+			<description><![CDATA[Enter the shared secret of the RADIUS client here. This is the shared secret (password) which the NAS (switch or accesspoint) needs to communicate with the RADIUS server. FreeRADIUS is limited to 31 characters for the shared secret.]]></description>
 			<type>password</type>
 			<required/>
 		</field>

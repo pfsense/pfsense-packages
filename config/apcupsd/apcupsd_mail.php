@@ -29,7 +29,7 @@
 
 require_once("pkg-utils.inc");
 require_once("globals.inc");
-require_once("phpmailer/class.phpmailer.php");
+require_once("phpmailer/PHPMailerAutoload.php");
 
 global $config, $g;
 
@@ -61,8 +61,11 @@ $mail = new PHPMailer();
 $mail->IsSMTP();
 $mail->Host = $config['notifications']['smtp']['ipaddress'];
 
-if ($config['notifications']['smtp']['ssl'] == "checked")
-	$mail->SMTPSecure =  "ssl";
+if ((isset($config['notifications']['smtp']['ssl']) && $config['notifications']['smtp']['ssl'] != "unchecked") || $config['notifications']['smtp']['ssl'] == "checked")
+	$mail->SMTPSecure = "ssl";
+
+if ((isset($config['notifications']['smtp']['tls']) && $config['notifications']['smtp']['tls'] != "unchecked") || $config['notifications']['smtp']['tls'] == "checked")
+	$mail->SMTPSecure = "tls";
 
 $mail->Port = empty($config['notifications']['smtp']['port']) ? 25 : $config['notifications']['smtp']['port'];
 

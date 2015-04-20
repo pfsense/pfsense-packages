@@ -10,7 +10,7 @@
 	pfBlockerNG_Top20.xml
 
 	pfBlockerNG
-	Copyright (C) 2014 BBcan177@gmail.com
+	Copyright (C) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfblocker for pfSense
@@ -111,6 +111,10 @@
 		<tab>
 			<text>S.A.</text>
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>P.S.</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Logs</text>

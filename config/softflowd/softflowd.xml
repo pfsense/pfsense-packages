@@ -1,6 +1,6 @@
 <packagegui>
 	<name>softflowd</name>
-	<version>0.9.8 pkg v1.0.1</version>
+	<version>0.9.8_2 pkg v1.1</version>
 	<title>softflowd: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=softflowd.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -18,6 +18,10 @@
 	</service>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
+		<field>
+			<name>General Settings</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>interface</fieldname>
@@ -44,6 +48,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Hop Limit</fielddescr>
+			<fieldname>hoplimit</fieldname>
+			<description>Set the IPv4 TTL or the IPv6 hop limit to hoplimit.  softflowd will use the default system TTL when exporting flows to a unicast host.  When exporting to a multicast group, the default TTL will be 1 (i.e. link-local).</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>Netflow version</fielddescr>
 			<fieldname>version</fieldname>
 			<description>Select the desired version of the NetFlow protocol.</description>
@@ -62,6 +72,72 @@
 					<value>1</value>
 				</option>
 			</options>
+		</field>
+		<field>
+			<fielddescr>Flow Tracking Level</fielddescr>
+			<fieldname>flowtracking</fieldname>
+			<description>Specify which flow elements softflowd should be used to define a flow.  track_level may be one of: &quot;full&quot; (track everything in the flow, the default), &quot;proto&quot; (track source and destination addresses and protocol), or &quot;ip&quot; (only track source and destination addresses).  Selecting either of the latter options will produce flows with less information in them (e.g. TCP/UDP ports will not be recorded).  This will cause flows to be consolidated, reducing the quantity of output and CPU load that softflowd will place on the system at the cost of some detail being lost.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>Full</name>
+					<value>full</value>
+				</option>
+				<option>
+					<name>Proto</name>
+					<value>proto</value>
+				</option>
+				<option>
+					<name>IP</name>
+					<value>ip</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<name>Timeout Values</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>General</fielddescr>
+			<fieldname>timeout-general</fieldname>
+			<description>(Seconds) This is the general timeout applied to all traffic unless overridden by one of the other timeouts.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Maximum Lifetime</fielddescr>
+			<fieldname>timeout-maxlife</fieldname>
+			<description>(Seconds) This is the maximum lifetime that a flow may exist for.  All flows are forcibly expired when they pass maxlife seconds.  To disable this feature, specify a maxlife of 0.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Expire Interval</fielddescr>
+			<fieldname>timeout-expint</fieldname>
+			<description>(Seconds) Specify the interval between expiry checks.  Increase this to group more flows into a NetFlow packet.  To disable this feature, specify a expint of 0.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>TCP</fielddescr>
+			<fieldname>timeout-tcp</fieldname>
+			<description>(Seconds) This is the general TCP timeout, applied to open TCP connections.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>TCP RST</fielddescr>
+			<fieldname>timeout-tcp-rst</fieldname>
+			<description>(Seconds) This timeout is applied to a TCP connection when a RST packet has been sent by one or both endpoints.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>TCP FIN</fielddescr>
+			<fieldname>timeout-tcp-fin</fieldname>
+			<description>(Seconds) This timeout is applied to a TCP connection when a FIN packet has been sent by both endpoints.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>UDP</fielddescr>
+			<fieldname>timeout-udp</fieldname>
+			<description>(Seconds) This is the general UDP timeout, applied to all UDP connections.</description>
+			<type>input</type>
 		</field>
 	</fields>
 	<custom_php_global_functions>
@@ -82,14 +158,32 @@
 					if (empty($interface))
 						continue;
 					$start .= "\n\t/usr/local/sbin/softflowd ";
-					$start .= " -i {$interface}";
-					$start .= " -n {$cf['host']}:{$cf['port']}";
+					$start .= " -i " . escapeshellarg($interface);
+					$start .= " -n " . escapeshellarg("{$cf['host']}:{$cf['port']}");
 					if (is_numeric($cf['maxflows']))
-						$start .= " -m {$cf['maxflows']}";
+						$start .= " -m " . escapeshellarg($cf['maxflows']);
+					if (is_numeric($cf['hoplimit']))
+						$start .= " -L " . escapeshellarg($cf['hoplimit']);
 					if ($cf['version'] != "") 
-						$start .= " -v {$cf['version']}";
-					$start .= " -p /var/run/softflowd.{$interface}.pid";
-					$start .= " -c /var/run/softflowd.{$interface}.ctl";
+						$start .= " -v " . escapeshellarg($cf['version']);
+					if ($cf['flowtracking'] != "")
+						$start .= " -T " . escapeshellarg($cf['flowtracking']);
+					if (is_numeric($cf['timeout-general']))
+						$start .= " -t " . escapeshellarg("general={$cf['timeout-general']}");
+					if (is_numeric($cf['timeout-maxlife']))
+						$start .= " -t " . escapeshellarg("maxlife={$cf['timeout-maxlife']}");
+					if (is_numeric($cf['timeout-expint']))
+						$start .= " -t " . escapeshellarg("expint={$cf['timeout-expint']}");
+					if (is_numeric($cf['timeout-tcp']))
+						$start .= " -t " . escapeshellarg("tcp={$cf['timeout-tcp']}");
+					if (is_numeric($cf['timeout-tcp-rst']))
+						$start .= " -t " . escapeshellarg("tcp.rst={$cf['timeout-tcp-rst']}");
+					if (is_numeric($cf['timeout-tcp-fin']))
+						$start .= " -t " . escapeshellarg("tcp.fin={$cf['timeout-tcp-fin']}");
+					if (is_numeric($cf['timeout-udp']))
+						$start .= " -t " . escapeshellarg("udp={$cf['timeout-udp']}");
+					$start .= " -p " . escapeshellarg("/var/run/softflowd.{$interface}.pid");
+					$start .= " -c " . escapeshellarg("/var/run/softflowd.{$interface}.ctl");
 				}
 				write_rcfile(array(
 						"file" => "softflowd.sh",
@@ -108,6 +202,28 @@
 				$input_errors[] = 'You must specify a valid ip address in the \'Host\' field';
 			if (($post['port'] == "") || !is_port($post['port']))
 				$input_errors[] = 'You must specify a valid port number in the \'Port\' field';
+
+			if (($post['version'] == "" || !in_array($post['version'], array(1, 5, 9))))
+				$input_errors[] = 'You must specify a netflow version';
+			if (($post['flowtracking'] == "" || !in_array($post['flowtracking'], array("full", "proto", "ip"))))
+				$input_errors[] = 'You must specify a valid flow tracking selection';
+
+			if (!empty($post['hoplimit'])        && (!is_numeric($post['hoplimit']) || ($post['hoplimit'] < 1) || ($post['hoplimit'] > 255)))
+				$input_errors[] = 'You must specify a valid hop limit';
+			if (!empty($post['timeout-general']) && (!is_numeric($post['timeout-general']) || ($post['timeout-general'] < 0)))
+				$input_errors[] = 'You must specify a valid General Timeout';
+			if (!empty($post['timeout-maxlife']) && (!is_numeric($post['timeout-maxlife']) || ($post['timeout-maxlife'] < 0)))
+				$input_errors[] = 'You must specify a valid Maximum Lifetime Timeout';
+			if (!empty($post['timeout-expint'])  && (!is_numeric($post['timeout-expint']) || ($post['timeout-expint'] < 0)))
+				$input_errors[] = 'You must specify a valid Expire Interval';
+			if (!empty($post['timeout-tcp'])     && (!is_numeric($post['timeout-tcp']) || ($post['timeout-tcp'] < 0)))
+				$input_errors[] = 'You must specify a valid TCP Timeout';
+			if (!empty($post['timeout-tcp-rst']) && (!is_numeric($post['timeout-tcp-rst']) || ($post['timeout-tcp-rst'] < 0)))
+				$input_errors[] = 'You must specify a valid TCP RST Timeout';
+			if (!empty($post['timeout-tcp-fin']) && (!is_numeric($post['timeout-tcp-fin']) || ($post['timeout-tcp-fin'] < 0)))
+				$input_errors[] = 'You must specify a valid TCP FIN Timeout';
+			if (!empty($post['timeout-udp'])     && (!is_numeric($post['timeout-udp']) || ($post['timeout-udp'] < 0)))
+				$input_errors[] = 'You must specify a valid UDP Timeout';
 		}
 		
 		function cleanup_config_softflowd() {

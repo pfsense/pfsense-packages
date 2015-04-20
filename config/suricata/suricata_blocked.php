@@ -163,18 +163,20 @@ include_once("fbegin.inc");
 /* refresh every 60 secs */
 if ($pconfig['brefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/suricata/suricata_blocked.php\" />\n";
+?>
 
+<form action="/suricata/suricata_blocked.php" method="post">
+<input type="hidden" name="ip" id="ip" value=""/>
+
+<?php
 /* Display Alert message */
 if ($input_errors) {
-	print_input_errors($input_errors); // TODO: add checks
+	print_input_errors($input_errors);
 }
 if ($savemsg) {
 	print_info_box($savemsg);
 }
 ?>
-
-<form action="/suricata/suricata_blocked.php" method="post">
-<input type="hidden" name="ip" id="ip" value=""/>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>

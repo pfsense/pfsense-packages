@@ -28,6 +28,7 @@
 */
 require_once("config.inc");
 
+global $pfs_version;
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
 	case "1.2":
@@ -84,8 +85,11 @@ function sudo_install() {
 }
 
 function sudo_write_config() {
-	global $config;
+	global $config, $pfs_version;
 	$sudoers = "";
+	if ($pfs_version == "2.2") {
+		mwexec_bg("/sbin/ldconfig -m /usr/pbi/sudo-" . php_uname("m") . "/local/lib/");
+	}
 	conf_mount_rw();
 
 	$sudoconf = "Plugin sudoers_policy " . SUDO_LIBEXEC_DIR . "/sudoers.so\n";

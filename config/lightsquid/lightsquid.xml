@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    lightsquid.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -46,7 +46,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>lightsquid</name>
-	<version>1.7.1</version>
+	<version>1.8.2 pkg v.2.35</version>
 	<title>Services: Proxy Reports (LightSquid, SQStat) -> Settings</title>
 	<category>Status</category>
 	<include_file>/usr/local/pkg/lightsquid.inc</include_file>

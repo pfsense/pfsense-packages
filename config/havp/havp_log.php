@@ -79,7 +79,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("General page"), false, "antivirus.php");
 	$tab_array[] = array(gettext("HTTP proxy"), false, "pkg_edit.php?xml=havp.xml&amp;id=0");
 	$tab_array[] = array(gettext("Settings"), false, "pkg_edit.php?xml=havp_avset.xml&amp;id=0");
-	$tab_array[] = array(gettext("Log"), true, "havp_log.php");
+	$tab_array[] = array(gettext("HAVP Log"), true, "havp_log.php");
 	display_top_tabs($tab_array);
 ?>
   </td></tr>

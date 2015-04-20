@@ -46,8 +46,8 @@
 	<requirements>None</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.9.7.0</version>
-	<title>Services:2.9.7.0 pkg v3.2.2</title>
+	<version>2.9.7.2</version>
+	<title>Services:2.9.7.2 pkg v3.2.4</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>

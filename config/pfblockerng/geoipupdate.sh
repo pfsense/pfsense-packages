@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # pfBlockerNG MaxMind GeoLite GeoIP Updater Script - By BBcan177@gmail.com
-# Copyright (C) 2014 BBcan177@gmail.com
+# Copyright (C) 2015 BBcan177@gmail.com
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License Version 2 as
@@ -23,19 +23,23 @@
 # may be met by including the following in all advertising and documentation
 # mentioning features of or use of this database.
 
-# Folder Locations
+mtype=$(/usr/bin/uname -m);
+
+# Application Locations
 pathfetch=/usr/bin/fetch
 pathtar=/usr/bin/tar
 pathgunzip=/usr/bin/gunzip
 
-# File Locations
+# Folder Locations
 pathdb=/var/db/pfblockerng
+pathpbi=/usr/pbi/pfblockerng-$mtype/share/GeoIP
 pathlog=/var/log/pfblockerng
+
+# File Locations
 errorlog=$pathlog/geoip.log
-pathgeoipdatgz=$pathdb/GeoIP.dat.gz
-pathgeoipdatgzv6=$pathdb/GeoIPv6.dat.gz
-pathgeoipdat=$pathdb/GeoIP.dat
-pathgeoipdatv6=$pathdb/GeoIPv6.dat
+geoipdat=/GeoIP.dat
+geoipdatv6=/GeoIPv6.dat
+
 pathgeoipcc=$pathdb/country_continent.csv
 pathgeoipcsv4=$pathdb/GeoIPCountryCSV.zip
 pathgeoipcsvfinal4=$pathdb/GeoIPCountryWhois.csv
@@ -56,12 +60,12 @@ binaryupdate() {
 
 echo " ** Downloading MaxMind GeoLite IPv4 Binary Database (For Reputation/Alerts Processes) **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
-$pathfetch -v -o $pathgeoipdatgz -T 20 $URL
+$pathfetch -v -o $pathpbi$geoipdat.gz -T 20 $URL
 if [ "$?" -eq "0" ]; then
-	$pathgunzip -f $pathgeoipdatgz
+	$pathgunzip -f $pathpbi$geoipdat.gz
 	echo; echo " ( MaxMind IPv4 GeoIP.dat has been updated )"; echo
 	echo "Current Date/Timestamp:"
-	/bin/ls -alh $pathgeoipdat
+	/bin/ls -alh $pathpbi$geoipdat
 	echo
 else
 	echo; echo " => MaxMind IPv4 GeoIP.dat Update [ FAILED ]"; echo
@@ -72,12 +76,12 @@ fi
 
 echo; echo " ** Downloading MaxMind GeoLite IPv6 Binary Database (For Reputation/Alerts Processes) **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz"
-$pathfetch -v -o $pathgeoipdatgzv6 -T 20 $URL
+$pathfetch -v -o $pathpbi$geoipdatv6.gz -T 20 $URL
 if [ "$?" -eq "0" ]; then
-	$pathgunzip -f $pathgeoipdatgzv6
+	$pathgunzip -f $pathpbi$geoipdatv6.gz
 	echo; echo " ( MaxMind IPv6 GeoIPv6.dat has been updated )"; echo
 	echo "Current Date/Timestamp:"
-	/bin/ls -alh $pathgeoipdatv6
+	/bin/ls -alh $pathpbi$geoipdatv6
 	echo
 else
 	echo; echo " => MaxMind IPv6 GeoIPv6.dat Update [ FAILED ]"; echo

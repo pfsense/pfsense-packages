@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>squid</name>
-	<version>3.4.10_2 pkg 0.2.2</version>
+	<version>3.4.10_2 pkg 0.2.6</version>
 	<title>Proxy server: General settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<menu>
@@ -237,6 +237,11 @@
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/squid3/34/squid_log_parser.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/squid3/34/squid_clwarn.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/shortcuts/</prefix>
@@ -480,10 +485,18 @@
 			<default_value>en</default_value>
 		</field>
 		<field>
-			<fielddescr>Disable X-Forward</fielddescr>
-			<fieldname>disable_xforward</fieldname>
-			<description>If not set, Squid will include your system's IP address or name in the HTTP requests it forwards.</description>
-			<type>checkbox</type>
+			<fielddescr>X-Forward Mode</fielddescr>
+			<fieldname>xforward_mode</fieldname>
+			<description>&lt;p&gt;&lt;b&gt; on:&lt;/b&gt; Squid will append your client's IP address in the HTTP requests it forwards. (Default)&lt;p&gt;          By default it looks like: X-Forwarded-For: 192.1.2.3  &lt;p&gt; &lt;b&gt; off:&lt;/b&gt; It will appear as: X-Forwarded-For: unknown&lt;p&gt; &lt;b&gt; transparent:&lt;/b&gt; Squid will not alter the X-Forwarded-For header in any way.&lt;p&gt; &lt;b&gt; delete:&lt;/b&gt; Squid will delete the entire X-Forwarded-For header.&lt;p&gt; &lt;b&gt; truncate:&lt;/b&gt; Squid will remove all existing X-Forwarded-For entries, and place the client IP as the sole entry.</description>
+			<type>select</type>
+			<default_value>on</default_value>
+			<options>
+				<option><name>(on)</name><value>on</value></option>
+				<option><name>off</name><value>off</value></option>
+				<option><name>transparent</name><value>transparent</value></option>
+				<option><name>delete</name><value>delete</value></option>
+				<option><name>truncate</name><value>truncate</value></option>
+			</options>
 		</field>
 		<field>
 			<fielddescr>Disable VIA</fielddescr>

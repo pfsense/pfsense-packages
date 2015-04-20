@@ -104,7 +104,11 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
+?>
 
+<form action="/suricata/suricata_passlist.php" method="post">
+<input type="hidden" name="list_id" id="list_id" value=""/>
+<?php
 /* Display Alert message */
 if ($input_errors) {
 	print_input_errors($input_errors);
@@ -113,9 +117,6 @@ if ($savemsg) {
 	print_info_box($savemsg);
 }
 ?>
-
-<form action="/suricata/suricata_passlist.php" method="post">
-<input type="hidden" name="list_id" id="list_id" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>

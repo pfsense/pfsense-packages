@@ -3,7 +3,7 @@
 	pfBlockerNG_Log.php
 
 	pfBlockerNG
-	Copyright (c) 2014 BBcan177@gmail.com
+	Copyright (c) 2015 BBcan177@gmail.com
 	All rights reserved.
 
 	Portions of this code are based on original work done for the
@@ -17,7 +17,7 @@
 	All rights reserved.
 
 	Adapted for Suricata by:
-	Copyright (C) 2014 Bill Meeks
+	Copyright (C) 2015 Bill Meeks
 	All rights reserved.
 
 	Javascript and Integration modifications by J. Nieuwenhuizen
@@ -142,6 +142,12 @@ $pfb_logtypes = array(	'defaultlogs'	=> array('name'		=> 'Log Files',
 			'etiprep'	=> array('name'		=> 'ET IPRep Files',
 						'ext'		=> '*',
 						'logdir'	=> "{$pfb['etdir']}/",
+						'download'	=> TRUE,
+						'clear'		=> FALSE
+						),
+			'country'	=> array('name'		=> 'Country Files',
+						'ext'		=> 'txt',
+						'logdir'	=> "{$pfb['ccdir']}/",
 						'download'	=> TRUE,
 						'clear'		=> FALSE
 						)
@@ -288,6 +294,7 @@ if ($savemsg) {
 		$tab_array[] = array(gettext("N.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_NorthAmerica.xml&id=0");
 		$tab_array[] = array(gettext("Oceania"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_Oceania.xml&id=0");
 		$tab_array[] = array(gettext("S.A."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_SouthAmerica.xml&id=0");
+		$tab_array[] = array(gettext("P.S."), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_ProxyandSatellite.xml&id=0");
 		$tab_array[] = array(gettext("Logs"), true, "/pfblockerng/pfblockerng_log.php");
 		$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&id=0");
 		display_top_tabs($tab_array, true);

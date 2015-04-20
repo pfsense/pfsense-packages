@@ -17,6 +17,7 @@ $priv_list['page-firewall-pfblockerng']['match'][] = "pkg_edit.php?xml=pfblocker
 $priv_list['page-firewall-pfblockerng']['match'][] = "pkg_edit.php?xml=pfblockerng/pfblockerng_NorthAmerica.xml*";
 $priv_list['page-firewall-pfblockerng']['match'][] = "pkg_edit.php?xml=pfblockerng/pfblockerng_Oceania.xml*";
 $priv_list['page-firewall-pfblockerng']['match'][] = "pkg_edit.php?xml=pfblockerng/pfblockerng_SouthAmerica.xml*";
+$priv_list['page-firewall-pfblockerng']['match'][] = "pkg_edit.php?xml=pfblockerng/pfblockerng_ProxyandSatellite.xml*";
 $priv_list['page-firewall-pfblockerng']['match'][] = "pkg_edit.php?xml=pfblockerng/pfblockerng_sync.xml*";
 $priv_list['page-firewall-pfblockerng']['match'][] = "pfblockerng/pfblockerng_update.php*";
 $priv_list['page-firewall-pfblockerng']['match'][] = "pfblockerng/pfblockerng_alerts.php*";

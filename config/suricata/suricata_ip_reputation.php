@@ -177,11 +177,6 @@ include_once("head.inc");
 
 <?php 
 include("fbegin.inc"); 
-/* Display Alert message */
-if ($input_errors)
-	print_input_errors($input_errors);
-if ($savemsg)
-	print_info_box($savemsg);
 ?>
 
 <form action="suricata_ip_reputation.php" method="post" name="iform" id="iform" >
@@ -193,7 +188,13 @@ if ($savemsg)
 <?php if (is_subsystem_dirty('suricata_iprep') && !$input_errors): ?><p>
 <?php print_info_box_np(gettext("A change has been made to IP List file assignments.") . "<br/>" . gettext("You must apply the change in order for it to take effect."));?>
 <?php endif; ?>
-
+<?php
+/* Display Alert message */
+if ($input_errors)
+	print_input_errors($input_errors);
+if ($savemsg)
+	print_info_box($savemsg);
+?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tbody>
 	<tr>

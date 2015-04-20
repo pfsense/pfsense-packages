@@ -115,6 +115,27 @@ if ($pkgid >= 0) {
 /* Define a default Dashboard Widget Container for Snort */
 $snort_widget_container = "snort_alerts-container:col2:close";
 
+/*********************************************************/
+/* START OF BUG FIX CODE                                 */
+/*                                                       */
+/* Remove any Snort cron tasks that may have been left   */
+/* from a previous uninstall due to a bug that saved     */
+/* edited cron tasks as new ones while still leaving     */
+/* the original task.  Correct cron task entries will    */
+/* be recreated below if saved settings are detected.    */
+/*********************************************************/
+$cron_count = 0;
+while (snort_cron_job_exists("snort2c", FALSE)) {
+	install_cron_job("snort2c", false);
+	$cron_count++;
+}
+if ($cron_count > 0)
+	log_error(gettext("[Snort] Removed {$cron_count} duplicate 'remove_blocked_hosts' cron task(s)."));
+
+/*********************************************************/
+/* END OF BUG FIX CODE                                   */
+/*********************************************************/
+
 /* remake saved settings */
 if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	log_error(gettext("[Snort] Saved settings detected... rebuilding installation with saved settings..."));
@@ -242,8 +263,8 @@ if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
 	$config['widgets']['sequence'] .= ",{$snort_widget_container}";
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2";
-write_config("Snort pkg v3.2: post-install configuration saved.");
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2.4";
+write_config("Snort pkg v3.2.4: post-install configuration saved.");
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);

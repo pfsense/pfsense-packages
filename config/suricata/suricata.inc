@@ -327,10 +327,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv4($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
-				$sn = get_interface_subnet($suricatacfg['interface']);
-				$ip = gen_subnet($suricataip, $sn) . "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnet($suricatacfg['interface'])) {
+					$ip = gen_subnet($suricataip, $sn) . "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 		}
 	}
@@ -349,10 +350,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 	if (($externallist && $localnet == 'yes') || (!$externallist && (!$passlist || $localnet == 'yes' || empty($localnet)))) {
 		if (is_ipaddrv6($suricataip)) {
 			if ($suricatacfg['interface'] <> "wan") {
-				$sn = get_interface_subnetv6($suricatacfg['interface']);
-				$ip = gen_subnetv6($suricataip, $sn). "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnetv6($suricatacfg['interface'])) {
+					$ip = gen_subnetv6($suricataip, $sn). "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 		}
 	}
@@ -386,10 +388,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 				continue;
 			$subnet = get_interface_ip($int);
 			if (is_ipaddrv4($subnet)) {
-				$sn = get_interface_subnet($int);
-				$ip = gen_subnet($subnet, $sn) . "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnet($int)) {
+					$ip = gen_subnet($subnet, $sn) . "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 
 			$subnet = get_interface_ipv6($int);
@@ -397,10 +400,11 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 			if (strpos($subnet, "%") !== FALSE)
 				$subnet = substr($subnet, 0, strpos($subnet, "%"));
 			if (is_ipaddrv6($subnet)) {
-				$sn = get_interface_subnetv6($int);
-				$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
-				if (!in_array($ip, $home_net))
-					$home_net[] = $ip;
+				if ($sn = get_interface_subnetv6($int)) {
+					$ip = gen_subnetv6($subnet, $sn). "/{$sn}";
+					if (!in_array($ip, $home_net))
+						$home_net[] = $ip;
+				}
 			}
 
 			// Add link-local address
@@ -642,9 +646,10 @@ function suricata_rules_up_install_cron($should_install=true) {
 	if (suricata_cron_job_exists($command, TRUE, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root"))
 		return;
 
-	// Else install the new or updated cron job
-	if ($should_install)
-		install_cron_job($command, $should_install, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root");
+	// Else install the new or updated cron job by removing the
+	// existing job first, then installing the new or updated job.
+	install_cron_job("suricata_check_for_rule_updates.php", false);
+	install_cron_job($command, $should_install, $suricata_rules_up_min, $suricata_rules_up_hr, $suricata_rules_up_mday, $suricata_rules_up_month, $suricata_rules_up_wday, "root");
 }
 
 function suricata_loglimit_install_cron($should_install=true) {
@@ -660,7 +665,9 @@ function suricata_loglimit_install_cron($should_install=true) {
 	if ($should_install && suricata_cron_job_exists("/usr/local/pkg/suricata/suricata_check_cron_misc.inc", TRUE, "*/5"))
 		return;
 
-	// Else install the new or updated cron job
+	// Else install the new or updated cron job by removing the
+	// existing job first, then installing the new or updated job.
+	install_cron_job("suricata_check_cron_misc.inc", false);
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", $should_install, "*/5");
 }
 
@@ -765,10 +772,10 @@ function suricata_rm_blocked_install_cron($should_install) {
 	if (suricata_cron_job_exists($command, TRUE, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root"))
 		return;
 
-	// Else install the new or updated cron job
-	if ($should_install) {
-		install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
-	}
+	// Else install the new or updated cron job by removing the
+	// existing job first, then installing the new or updated job.
+	install_cron_job("{$suri_pf_table}", false);
+	install_cron_job($command, $should_install, $suricata_rm_blocked_min, $suricata_rm_blocked_hr, $suricata_rm_blocked_mday, $suricata_rm_blocked_month, $suricata_rm_blocked_wday, "root");
 }
 
 function sync_suricata_package_config() {

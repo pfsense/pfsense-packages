@@ -134,7 +134,42 @@ function freeradius_install_command() {
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = FREERADIUS_ETC . '/rc.d/radiusd onestart';
+	$freeradius_etc_dir = FREERADIUS_ETC;
+	$rcfile['start'] = <<<EOD
+SERVICENAME="radiusd"
+	LOCKFILE="/tmp/\${SERVICENAME}_start.lock"
+	PIDFILE="/var/run/\${SERVICENAME}.pid"
+
+	# prevent this part of script from running in parallel
+	if ( set -o noclobber; echo "\$\$" > "\$LOCKFILE") 2> /dev/null; then
+		# make sure lock file is removed even if script is terminated
+		trap 'rm -f "\$LOCKFILE"; exit \$?' INT TERM EXIT
+
+		{$freeradius_etc_dir}/rc.d/radiusd onestart
+
+		# try to wait until the service starts
+		if [ ! -f "\$PIDFILE" ]; then
+			echo "\$SERVICENAME.sh: PID file was not found"
+
+			for i in 1 2 3 4 5; do
+				if [ -f "\$PIDFILE" ]; then
+					echo "\$SERVICENAME.sh: Service started PID: `cat \$PIDFILE`"
+					break
+				else
+					echo "\$SERVICENAME.sh: Waiting 0.5 seconds"
+					sleep 0.5
+				fi
+			done
+		else
+			echo "\$SERVICENAME.sh: Service running PID: `cat \$PIDFILE`"
+		fi
+
+		rm -f "\$LOCKFILE"
+		trap - INT TERM EXIT
+	else
+		echo "\$SERVICENAME.sh: Cannot continue at this moment, this script is already trying to start service PID: \$(cat \$LOCKFILE)"
+	fi
+EOD;
 	$rcfile['stop'] = FREERADIUS_ETC . '/rc.d/radiusd onestop';
 	write_rcfile($rcfile);
 		conf_mount_ro();
