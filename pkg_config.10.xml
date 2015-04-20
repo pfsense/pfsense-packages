@@ -63,7 +63,7 @@
 			<custom_name>bind</custom_name>
 			<port>dns/bind99</port>
 		</build_pbi>
-		<build_options>OPTIONS_UNSET_FORCE=IDN REPLACE_BASE FIXED_RRSET GSSAPI LARGE_FILE;OPTIONS_SET_FORCE=IPV6 LINKS SSL THREADS XML DLZ_FILESYSTEM FILTER_AAAA SIGCHASE RRL</build_options>
+		<build_options>bind_UNSET_FORCE=IDN REPLACE_BASE FIXED_RRSET GSSAPI LARGE_FILE;bind_SET_FORCE=IPV6 LINKS SSL THREADS XML DLZ_FILESYSTEM FILTER_AAAA SIGCHASE RRL</build_options>
 	</package>
 	<package>
 		<name>Filer</name>
@@ -148,7 +148,7 @@
 			<custom_name>haproxy-devel</custom_name>
 			<port>/usr/ports/net/haproxy</port>
 		</build_pbi>
-		<build_options>WITH_OPENSSL_PORT=yes;OPTIONS_UNSET_FORCE=PCRE DPCRE;OPTIONS_SET_FORCE=OPENSSL SPCRE</build_options>
+		<build_options>WITH_OPENSSL_PORT=yes;haproxy_UNSET_FORCE=DPCRE;haproxy_SET_FORCE=OPENSSL SPCRE</build_options>
 	</package>
 	<package>
 		<name>haproxy-devel</name>
@@ -169,7 +169,7 @@
 			<custom_name>haproxy-devel</custom_name>
 			<port>/usr/ports/net/haproxy</port>
 		</build_pbi>
-		<build_options>WITH_OPENSSL_PORT=yes;OPTIONS_UNSET_FORCE=PCRE DPCRE;OPTIONS_SET_FORCE=OPENSSL SPCRE</build_options>
+		<build_options>WITH_OPENSSL_PORT=yes;haproxy_UNSET_FORCE=DPCRE;haproxy_SET_FORCE=OPENSSL SPCRE</build_options>
 	</package>
 	<package>
 		<name>Apache with mod_security-dev</name>
@@ -213,7 +213,7 @@
 			<port>www/apache22-worker-mpm</port>
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
-		<build_options>OPTIONS_UNSET_FORCE=BDB MYSQL PGSQL;OPTIONS_SET_FORCE=SQLITE THREADS IPV6 SSL;WITH_MPM=worker;apache22-worker-mpm_UNSET_FORCE=AUTHNZ_LDAP AUTHN_DBD BUCKETEER CASE_FILTER CASE_FILTER_IN CGID DBD EXT_FILTER LDAP LOG_FORENSIC OPTIONAL_FN_EXPORT OPTIONAL_FN_IMPORT OPTIONAL_HOOK_EXPORT OPTIONAL_HOOK_IMPORT SUBSTITUTE SUEXEC SUEXEC_RSRCLIMIT;apache22-worker-mpm_SET_FORCE=ACTIONS ALIAS AUTHN_ALIAS VHOST_ALIAS ASIS AUTHN_ANON AUTHN_DBM AUTHN_DEFAULT AUTHN_FILE AUTHZ_DBM AUTHZ_DEFAULT AUTHZ_GROUPFILE AUTHZ_HOST AUTHZ_OWNER AUTHZ_USER AUTH_BASIC AUTH_DIGEST AUTOINDEX CACHE DISK_CACHE FILE_CACHE MEM_CACHE CERN_META CGI CHARSET_LITE DAV DAV_FS DEFLATE DIR DUMPIO ENV EXPIRES FILTER HEADERS IMAGEMAP INCLUDE INFO LOGIO LOG_CONFIG  MIME MIME_MAGIC NEGOTIATION PROXY PROXY_AJP PROXY_BALANCER PROXY_CONNECT PROXY_FTP PROXY_HTTP PROXY_SCGI REQTIMEOUT REWRITE SETENVIF SPELING STATUS THREADS UNIQUE_ID USERDIR USERTRACK VERSION</build_options>
+		<build_options>apr_UNSET_FORCE=BDB MYSQL PGSQL NSS;apr_SET_FORCE=SQLITE THREADS IPV6 SSL;apache22-worker-mpm_UNSET_FORCE=AUTHNZ_LDAP AUTHN_DBD BUCKETEER CASE_FILTER CASE_FILTER_IN CGID DBD EXT_FILTER LDAP LOG_FORENSIC OPTIONAL_FN_EXPORT OPTIONAL_FN_IMPORT OPTIONAL_HOOK_EXPORT OPTIONAL_HOOK_IMPORT SUBSTITUTE SUEXEC SUEXEC_RSRCLIMIT;apache22-worker-mpm_SET_FORCE=ACTIONS ALIAS AUTHN_ALIAS VHOST_ALIAS ASIS AUTHN_ANON AUTHN_DBM AUTHN_DEFAULT AUTHN_FILE AUTHZ_DBM AUTHZ_DEFAULT AUTHZ_GROUPFILE AUTHZ_HOST AUTHZ_OWNER AUTHZ_USER AUTH_BASIC AUTH_DIGEST AUTOINDEX CACHE DISK_CACHE FILE_CACHE MEM_CACHE CERN_META CGI CHARSET_LITE DAV DAV_FS DEFLATE DIR DUMPIO ENV EXPIRES FILTER HEADERS IMAGEMAP INCLUDE INFO LOGIO LOG_CONFIG  MIME MIME_MAGIC NEGOTIATION PROXY PROXY_AJP PROXY_BALANCER PROXY_CONNECT PROXY_FTP PROXY_HTTP PROXY_SCGI REQTIMEOUT REWRITE SETENVIF SPELING STATUS THREADS UNIQUE_ID USERDIR USERTRACK VERSION</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
@@ -245,7 +245,7 @@
 			<ports_before>databases/gdbm net/GeoIP x11-fonts/font-util x11-fonts/webfonts graphics/graphviz</ports_before>
 			<port>net/ntop</port>
 		</build_pbi>
-		<build_options>WITH_PCAP_PORT=true;WITH_XMLDUMP=true;WITHOUT_JUMBO_FRAMES=true;WITH_MAKO=true;WITHOUT_DEJAVU=true;WITH_JSON=true;WITH_MMAP=true;WITHOUT_PERL_MODULE=true;WITHOUT_PYTHON_MODULE=true;WITHOUT_RUBY_MODULE=true;WITHOUT_EXAMPLES=true;WITHOUT_FPECTL=true;WITH_IPV6=true;WITH_NLS=true;WITHOUT_PTH=true;WITH_PYMALLOC=true;WITHOUT_SEM=true;WITH_THREADS=true;WITHOUT_UCS2=true;WITH_UCS4=true;WITH_FONTCONFIG=true;WITH_ICONV=true;WITHOUT_XPM=true;WITHOUT_DAG=true;WITHOUT_DIGCOLA=true;WITHOUT_IPSEPCOLA=true;WITHOUT_PANGOCAIRO=true;WITHOUT_GTK=true;WITHOUT_XCB=true</build_options>
+		<build_options>ntop_SET_FORCE=PCAP_PORT XMLDUMP MAKO;ntop_UNSET_FORCE=JUMBO_FRAMES;rrdtool_UNSET_FORCE=DEJAVU PERL_MODULE PYTHON_MODULE RUBY_MODULE;rrdtool_SET_FORCE=JSON MMAP NLS;graphviz_UNSET_FORCE=XPM DIGCOLA IPSEPCOLA PANGOCAIRO;graphviz_SET_FORCE=ICONV NLS;cairo_UNSET_FORCE=XCB;libgd_UNSET_FORCE=FONTCONFIG XPM;libgd_SET_FORCE=ICONV;libpcap_UNSET_FORCE=DAG;libpcap_SET_FORCE=IPV6</build_options>
 		<version>5.0.1_4 v2.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
@@ -358,7 +358,7 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET=PULLEDPORK FILEINSPECT HA;perl_SET=THREADS</build_options>
+		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET_FORCE=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET_FORCE=PULLEDPORK FILEINSPECT HA</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
 		<version>2.9.7.2 pkg v3.2.4</version>
 		<required_version>2.2</required_version>
@@ -473,7 +473,7 @@
 			<port>mail/mailscanner</port>
 			<ports_after>shells/bash mail/pyzor mail/dcc-dccd security/clamav mail/spamassassin</ports_after>
 		</build_pbi>
-		<build_options>mailscanner_UNSET_FORCE=BDC CLAMAVMODULE;mailscanner_SET_FORCE=SPAMASSASSIN CLAMAV;p5-Mail-SpamAssassin_SET_FORCE=DCC</build_options>
+		<build_options>mailscanner_UNSET_FORCE=BDC CLAMAVMODULE;mailscanner_SET_FORCE=SPAMASSASSIN CLAMAV;spamassassin_SET_FORCE=DCC</build_options>
 	</package>
 	<package>
 		<name>siproxd</name>
@@ -518,7 +518,7 @@
 			<ports_before>lang/perl5.14 graphics/gd graphics/p5-GD</ports_before>
 			<port>www/lightsquid</port>
 		</build_pbi>
-		<build_options>WITHOUT_DEBUGGING=true;WITHOUT_GDBM=true;WITHOUT_PERL_MALLOC=true;WITH_PERL_64BITINT=true;WITHOUT_THREADS=true;WITHOUT_MULTIPLICITY=true;WITHOUT_SUIDPERL=true;WITHOUT_SITECUSTOMIZE=true;WITH_USE_PERL=true;WITH_GDSUPPORT=true</build_options>
+		<build_options>lightsquid_SET_FORCE=GD;libgd_UNSET_FORCE=FONTCONFIG XPM;perl_UNSET_FORCE=MULTIPLICITY</build_options>
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/lightsquid/lightsquid.xml</config_file>
@@ -620,7 +620,7 @@
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
 			<port>dns/djbdns</port>
 		</build_pbi>
-		<build_options>WITH_IPV6=true;WITH_SRV=true;WITHOUT_DUMPCACHE=true;WITHOUT_IGNOREIP=true;WITHOUT_JUMBO=true;WITHOUT_MAN=true;WITHOUT_PERSISTENT_MMAP=true</build_options>
+		<build_options>ucspi-tcp_SET_FORCE=IPV6;djbdns_SET_FORCE=SRV;djbdns_UNSET_FORCE=DUMPCACHE IGNOREIP JUMBO PERSISTENT_MMAP</build_options>
 	</package>
 	<package>
 		<name>Open-VM-Tools</name>
@@ -819,7 +819,7 @@
 			<ports_before>net/libpcap databases/postgresql91-client graphics/gd</ports_before>
 			<port>net-mgmt/bandwidthd</port>
 		</build_pbi>
-		<build_options>WITH_NLS=true;WITHOUT_PAM=true;WITHOUT_LDAP=true;WITHOUT_MIT_KRB5=true;WITHOUT_HEIMDAL_KRB5=true;WITHOUT_OPTIMIZED_CFLAGS=true;WITHOUT_XML=true;WITHOUT_TZDATA=true;WITHOUT_DEBUG=true;WITHOUT_GSSAPI=true;WITHOUT_ICU=true;WITH_INTDATE=true</build_options>
+		<build_options>libgd_UNSET_FORCE=FONTCONFIG XPM</build_options>
 	</package>
 	<package>
 		<name>stunnel</name>
@@ -836,7 +836,7 @@
 		<build_pbi>
 			<port>security/stunnel</port>
 		</build_pbi>
-		<build_options>WITHOUT_FORK=true;WITH_PTHREAD=true;WITHOUT_UCONTEXT=true;WITHOUT_IPV6=true;WITH_LIBWRAP=true;WITHOUT_SSL_PORT=true</build_options>
+		<build_options>stunnel_SET_FORCE=PTHREAD LIBWRAP;stunnel_UNSET_FORCE=FORK UCONTEXT IPV6</build_options>
 	</package>
 	<package>
 		<name>iperf</name>
@@ -993,12 +993,12 @@
 		<version>1.4_7 pkg v.1.9.14</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
-		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
+		<4epends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>www/squid33 databases/db5 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
-		<build_options>OPTIONS_SET_FORCE=FETCH LDAP;squidGuard_UNSET_FORCE=SQUID27;squidGuard_SET_FORCE=SAMPLE_BL SASL SQUID33;c-icap_UNSET_FORCE=IPV6 squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>squidGuard_UNSET_FORCE=SQUID27 SQUID32;squidGuard_SET_FORCE=SAMPLE_BL SASL SQUID33 LDAP;c-icap_UNSET_FORCE=IPV6 squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1154,7 +1154,6 @@
 			<ports_before>sysutils/ipmitool devel/libstatgrab</ports_before>
 			<port>sysutils/muse</port>
 		</build_pbi>
-		<build_options></build_options>
 		<config_file>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.xml</config_file>
 		<version>v0.1.2</version>
 		<status>RC1</status>
@@ -1292,7 +1291,6 @@
 		<build_pbi>
 			<port>security/tinc</port>
 		</build_pbi>
-		<build_options></build_options>
 		<version>1.0.24 v1.2.1</version>
 		<status>ALPHA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/tinc_package</pkginfolink>
@@ -1318,7 +1316,6 @@
 			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
 		</build_pbi>
-		<build_options></build_options>
 		<maintainer>laleger@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng.xml</config_file>
 		<configurationfile>syslog-ng.xml</configurationfile>
@@ -1359,7 +1356,7 @@
 			<custom_name>zabbix22-proxy</custom_name>
 			<port>net-mgmt/zabbix22-proxy</port>
 		</build_pbi>
-		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
+		<build_options>zabbix22_SET_FORCE=SQLITE IPV6;zabbix22_UNSET_FORCE=MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1400,7 +1397,7 @@
 			<custom_name>zabbix24-proxy</custom_name>
 			<port>net-mgmt/zabbix24-proxy</port>
 		</build_pbi>
-		<build_options>OPTIONS_SET+= SQLITE IPV6;OPTIONS_UNSET+= MYSQL JABBER GSSAPI</build_options>
+		<build_options>zabbix24_SET_FORCE=SQLITE IPV6;zabbix24_UNSET_FORCE=MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_pbi>zabbix24-proxy-2.4.3-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
@@ -1494,7 +1491,7 @@
 			<port>security/suricata</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET=IPFW PORTS_PCAP GEOIP JSON NSS LUAJIT HTP_PORT;suricata_UNSET=PRELUDE TESTS SC LUA</build_options>
+		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET_FORCE=IPFW PORTS_PCAP GEOIP JSON NSS LUAJIT HTP_PORT;suricata_UNSET_FORCE=PRELUDE TESTS SC LUA</build_options>
 		<depends_on_package_pbi>suricata-2.0.6-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
