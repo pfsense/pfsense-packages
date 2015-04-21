@@ -5,22 +5,8 @@ function open_vm_tools_deinstall() {
 }
 
 function open_vm_tools_install() {
-	exec("/bin/cp /usr/local/lib/vmware-tools/modules/drivers/*.ko /boot/kernel/");
-	if(!file_exists("/boot/loader.conf")) 
-		touch("/boot/loader.conf");
-	$load_conf = file_get_contents("/boot/loader.conf");
-	if(!strstr($load_conf, "vmmemctl")) {
-		$load_conf .= <<<EOFA
 
-vmblock_load="YES"
-vmmemctl_load="YES"
-vmhgfs_load="YES"
-
-EOFA;
-
-	file_put_contents("/boot/loader.conf", $load_conf);
-}
-
+	$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m");
 	$vmware_tools_conf = <<<EOF
 [powerops]
 poweron-script=
@@ -56,7 +42,7 @@ unset start_cmd
 stop_precmd="\${checkvm_cmd}"
 unset stop_cmd
 command="/usr/local/bin/vmtoolsd"
-command_args="-c /usr/local/share/vmware-tools/tools.conf -p /usr/local/lib/open-vm-tools/plugins/vmsvc"
+command_args="-c {$openvmtools_path}/share/vmware-tools/tools.conf -p /usr/local/lib/open-vm-tools/plugins/vmsvc"
 pidfile="/var/run/\${name}.pid"
 
 load_rc_config \$name
@@ -154,10 +140,10 @@ EOF;
 	}
 	fwrite($fd, $vmware_kmod);
 	fclose($fd);
-	$fd = fopen("/usr/local/share/vmware-tools/tools.conf", "w");
+	$fd = fopen("$openvmtools_path/local/share/vmware-tools/tools.conf", "w");
 	if (!$fd) {
-		log_error("Could not open /usr/local/share/vmware-tools/tools.conf for writing");
-		die("Could not open /usr/local/share/vmware-tools/tools.conf for writing");
+		log_error("Could not open $openvmtools_path/local/share/vmware-tools/tools.conf for writing");
+		die("Could not open $openvmtools_path/local/share/vmware-tools/tools.conf for writing");
 	}
 	fwrite($fd, $vmware_tools_conf);
 	fclose($fd);
