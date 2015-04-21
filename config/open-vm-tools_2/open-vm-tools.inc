@@ -2,25 +2,32 @@
 
 function open_vm_tools_deinstall() {
 	exec("rm /usr/local/etc/rc.d/vmware*");
+	unlink_if_exists("/boot/kernel/vmblock.ko");
+	unlink_if_exists("/boot/kernel/vmhgfs.ko");
+	unlink_if_exists("/boot/kernel/vmmemctl.ko");
+	unlink_if_exists("/boot/kernel/vmxnet.ko");
 }
 
 function open_vm_tools_install() {
-	exec("/bin/cp /usr/local/lib/vmware-tools/modules/drivers/*.ko /boot/kernel/");
-	if(!file_exists("/boot/loader.conf")) 
-		touch("/boot/loader.conf");
-	$load_conf = file_get_contents("/boot/loader.conf");
-	if(!strstr($load_conf, "vmxnet")) {
-		$load_conf .= <<<EOFA
 
-vmblock_load="YES"
-vmmemct_load="YES"
-vmhgfs_load="YES"
-vmxnet_load="YES"
+	// clean up old .ko files if they exist
+	unlink_if_exists("/boot/kernel/vmblock.ko");
+	unlink_if_exists("/boot/kernel/vmhgfs.ko");
+	unlink_if_exists("/boot/kernel/vmmemctl.ko");
+	unlink_if_exists("/boot/kernel/vmxnet.ko");
 
-EOFA;
+	$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m");
+	
+	exec("cp $openvmtools_path/local/lib/vmware-tools/modules/drivers/vmmemctl /boot/kernel/");
+	
+	$vmware_tools_conf = <<<EOF
+[powerops]
+poweron-script=
+resume-script=
+suspend-script=
+poweroff-script=
 
-	file_put_contents("/boot/loader.conf", $load_conf);
-}
+EOF;
 
 	$vmware_guestd = <<<EOF
 #!/bin/sh
@@ -48,7 +55,7 @@ unset start_cmd
 stop_precmd="\${checkvm_cmd}"
 unset stop_cmd
 command="/usr/local/bin/vmtoolsd"
-command_args="-c /usr/local/share/vmware-tools/tools.conf -p /usr/local/lib/open-vm-tools/plugins/vmsvc"
+command_args="-c {$openvmtools_path}/share/vmware-tools/tools.conf -p {$openvmtools_path}/local/lib/open-vm-tools/plugins/vmsvc"
 pidfile="/var/run/\${name}.pid"
 
 load_rc_config \$name
@@ -80,22 +87,7 @@ checkvm_cmd="/usr/local/bin/vmware-checkvm > /dev/null"
 vmware_guest_vmmemctl_start()
 {
 	echo 'Loading vmmemctl kernel module.'
-	kldload /usr/local/lib/vmware-tools/modules/drivers/vmmemctl.ko >/dev/null 2>&1
-}
-vmware_guest_vmxnet_start()
-{
-	echo 'Loading vmxnet kernel module.'
-	kldload /usr/local/lib/vmware-tools/modules/drivers/vmxnet.ko >/dev/null 2>&1
-}
-vmware_guest_vmblock_start()
-{
-	echo 'Loading vmblock kernel module.'
-	kldload /usr/local/lib/vmware-tools/modules/drivers/vmblock.ko >/dev/null 2>&1
-}
-vmware_guest_vmhgfs_start()
-{
-	echo 'Loading vmhgfs kernel module.'
-	kldload /usr/local/lib/vmware-tools/modules/drivers/vmhgfs.ko >/dev/null 2>&1
+	kldload vmmemctl.ko >/dev/null 2>&1
 }
 
 # VMware kernel module: vmmemctl
@@ -110,54 +102,29 @@ load_rc_config \$name
 vmware_guest_vmmemctl_enable="YES"
 run_rc_command "\$1"
 
-# VMware kernel module: vmxnet
-name="vmware_guest_vmxnet"
-rcvar="\${name}_enable"
-start_precmd="\${checkvm_cmd}"
-start_cmd="vmware_guest_vmxnet_start"
-stop_precmd="\${checkvm_cmd}"
-stop_cmd=":"
-
-load_rc_config \$name
-vmware_guest_vmxnet_enable="YES"
-run_rc_command "\$1"
-
-# VMware kernel module: vmblock
-name="vmware_guest_vmblock"
-rcvar="\${name}_enable"
-start_precmd="\${checkvm_cmd}"
-start_cmd="vmware_guest_vmblock_start"
-stop_precmd="\${checkvm_cmd}"
-stop_cmd=":"
-
-load_rc_config \$name
-vmware_guest_vmblock_enable="YES"
-run_rc_command "\$1"
-
-# VMware kernel module: vmhgfs
-name="vmware_guest_vmhgfs"
-rcvar="\${name}_enable"
-start_precmd="\${checkvm_cmd}"
-start_cmd="vmware_guest_vmhgfs_start"
-stop_precmd="\${checkvm_cmd}"
-stop_cmd=":"
-
-load_rc_config \$name
-vmware_guest_vmhgfs_enable="YES"
-run_rc_command "\$1"
-
 EOF;
 
 	// Write out conf files.
 	$fd = fopen("/usr/local/etc/rc.d/vmware-guestd.sh", "w");
-	if(!$fd) 
+	if (!$fd) {
+		log_error("Could not open /usr/local/etc/rc.d/vmware-guestd.sh for writing");
 		die("Could not open /usr/local/etc/rc.d/vmware-guestd.sh for writing");
+	}
 	fwrite($fd, $vmware_guestd);
 	fclose($fd);
 	$fd = fopen("/usr/local/etc/rc.d/vmware-kmod.sh", "w");
-	if(!$fd) 
+	if (!$fd) {
+		log_error("Could not open /usr/local/etc/rc.d/vmware-kmod.sh for writing");
 		die("Could not open /usr/local/etc/rc.d/vmware-kmod.sh for writing");
+	}
 	fwrite($fd, $vmware_kmod);
+	fclose($fd);
+	$fd = fopen("$openvmtools_path/local/share/vmware-tools/tools.conf", "w");
+	if (!$fd) {
+		log_error("Could not open $openvmtools_path/local/share/vmware-tools/tools.conf for writing");
+		die("Could not open $openvmtools_path/local/share/vmware-tools/tools.conf for writing");
+	}
+	fwrite($fd, $vmware_tools_conf);
 	fclose($fd);
 
 	// Remove non used files

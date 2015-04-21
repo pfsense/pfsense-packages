@@ -53,7 +53,7 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.5P1_5 pkg v 0.3.7</version>
+		<version>9.9.5P1_5 pkg v 0.3.9</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
@@ -1292,7 +1292,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
-		<version>1.4_4 pkg v.1.9.12</version>
+		<version>1.4_4 pkg v.1.9.14</version>
 		<status>Beta</status>
 		<required_version>1.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
