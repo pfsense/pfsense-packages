@@ -923,7 +923,7 @@
 			<port>www/squid</port>
 			<ports_after>www/squid_radius_auth security/clamav www/squidclamav security/ca_root_nss www/c-icap-modules devel/pcre</ports_after>
 		</build_pbi>
-		<build_options>c-icap_SET_FORCE=LARGE_FILES;squid_UNSET_FORCE=AUTH_SASL AUTH_SMB AUTH_SQL DEBUG TP_IPFW DNS_HELPER ESI FS_ROCK TP_IPF NETTLE STACKTRACES VIA_DB DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS DELAY_POOLS ECAP FOLLOW_XFF FS_AUFS FS_DISKD HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SNMP SSL SSL_CRTD LAX_HTTP TP_PF WCCP WCCPV2 CACHE_DIGESTS</build_options>
+		<build_options>c-icap_SET_FORCE=LARGE_FILES;squid_UNSET_FORCE=AUTH_SASL AUTH_SMB AUTH_SQL DEBUG TP_IPFW DNS_HELPER ESI FS_ROCK TP_IPF NETTLE STACKTRACES VIA_DB;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS DELAY_POOLS ECAP FOLLOW_XFF FS_AUFS FS_DISKD HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SNMP SSL SSL_CRTD LAX_HTTP TP_PF WCCP WCCPV2 CACHE_DIGESTS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.10_2-##ARCH##.pbi</depends_on_package_pbi>
@@ -998,7 +998,7 @@
 			<ports_before>www/squid33 databases/db5 security/cyrus-sasl2</ports_before>
 			<port>www/squidguard</port>
 		</build_pbi>
-		<build_options>squidGuard_UNSET_FORCE=QUOTE_STRING;squidGuard_SET_FORCE=DNS_BL LDAP;c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG DOCS EXAMPLES;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
+		<build_options>squidGuard_UNSET_FORCE=QUOTE_STRING;squidGuard_SET_FORCE=DNS_BL LDAP;c-icap_UNSET_FORCE=IPV6;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DNS_HELPER FS_COSS ESI SNMP ECAP STACKTRACES STRICT_HTTP TP_IPF TP_IPFW VIA_DB DEBUG;squid_SET_FORCE=ARP_ACL AUTH_KERB AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF TP_PF MSSL_CRTD WCCP WCCPV2 FS_AUFS HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE SSL SSL_CRTD</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -1458,7 +1458,7 @@
 			<custom_name>apcupsd</custom_name>
 			<port>sysutils/apcupsd</port>
 		</build_pbi>
-		<build_options>apcupsd_SET_FORCE=APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;apcupsd_UNSET_FORCE=CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON DOCS</build_options>
+		<build_options>apcupsd_SET_FORCE=APCSMART_DRV APCDUMB_DRV PCNET_DRV USB TCP_WRAPPERS SNMP_DRV;apcupsd_UNSET_FORCE=CLIENT_ONLY CGI SNMP_DRV_OLD TEST_DRV GAPCMON</build_options>
 		<depends_on_package_pbi>apcupsd-3.14.12_1-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
