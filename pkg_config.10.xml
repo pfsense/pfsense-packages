@@ -515,7 +515,7 @@
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_pbi>lightsquid-1.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
-			<ports_before>lang/perl5.14 graphics/gd graphics/p5-GD</ports_before>
+			<ports_before>graphics/gd graphics/p5-GD</ports_before>
 			<port>www/lightsquid</port>
 		</build_pbi>
 		<build_options>lightsquid_SET_FORCE=GD;libgd_UNSET_FORCE=FONTCONFIG XPM;perl_UNSET_FORCE=MULTIPLICITY</build_options>
