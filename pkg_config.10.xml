@@ -56,11 +56,13 @@
 		<descr><![CDATA[The most widely used name server software]]></descr>
 		<website>http://www.isc.org/downloads/BIND/</website>
 		<category>Services</category>
-		<version>9.9.6P1_3 pkg v 0.3.9</version>
+		<version>0.3.9</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bind/bind.xml</config_file>
 		<configurationfile>bind.xml</configurationfile>
+		<run_depends>bin/bind9-config:dns/bind99</run_depends>
+		<port_category>dns</port_category>
 		<depends_on_package_pbi>bind-9.9.6P1_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<custom_name>bind</custom_name>
