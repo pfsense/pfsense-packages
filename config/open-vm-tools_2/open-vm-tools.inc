@@ -18,7 +18,8 @@ function open_vm_tools_install() {
 
 	$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m");
 	
-	exec("cp $openvmtools_path/local/lib/vmware-tools/modules/drivers/vmmemctl.ko /boot/kernel/");
+	// won't copy this either for now, some sequences of loading/unloading of the module will kernel panic. 
+	//exec("cp $openvmtools_path/local/lib/vmware-tools/modules/drivers/vmmemctl.ko /boot/kernel/");
 	
 	$vmware_tools_conf = <<<EOF
 [powerops]
@@ -112,6 +113,8 @@ EOF;
 	}
 	fwrite($fd, $vmware_guestd);
 	fclose($fd);
+
+	/* the kernel modules aren't stable at this time, omit them. 
 	$fd = fopen("/usr/local/etc/rc.d/vmware-kmod.sh", "w");
 	if (!$fd) {
 		log_error("Could not open /usr/local/etc/rc.d/vmware-kmod.sh for writing");
@@ -119,6 +122,8 @@ EOF;
 	}
 	fwrite($fd, $vmware_kmod);
 	fclose($fd);
+	*/
+	
 	$fd = fopen("$openvmtools_path/local/share/vmware-tools/tools.conf", "w");
 	if (!$fd) {
 		log_error("Could not open $openvmtools_path/local/share/vmware-tools/tools.conf for writing");
