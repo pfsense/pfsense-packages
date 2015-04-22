@@ -18,7 +18,7 @@ function open_vm_tools_install() {
 
 	$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m");
 	
-	exec("cp $openvmtools_path/local/lib/vmware-tools/modules/drivers/vmmemctl /boot/kernel/");
+	exec("cp $openvmtools_path/local/lib/vmware-tools/modules/drivers/vmmemctl.ko /boot/kernel/");
 	
 	$vmware_tools_conf = <<<EOF
 [powerops]
