@@ -252,6 +252,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/ntop2/ntop.xml</config_file>
 		<configurationfile>ntop.xml</configurationfile>
 		<noembedded>true</noembedded>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>ntopng</name>
