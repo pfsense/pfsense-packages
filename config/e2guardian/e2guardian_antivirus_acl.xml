@@ -136,7 +136,7 @@
 			<tab_level>2</tab_level>
 		</tab>
 		<tab>
-			<text>Searche Engine</text>
+			<text>Search Engine</text>
 			<url>/pkg.php?xml=e2guardian_search_acl.xml</url>
 			<tab_level>2</tab_level>
 		</tab>

@@ -32,10 +32,6 @@
 
 require_once("guiconfig.inc");
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
-	$one_two = true;
-
 $pgtitle = "About: E2guardian Package";
 include("head.inc");
 
@@ -85,7 +81,7 @@ include("head.inc");
                         </tr>
 						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Whatis");?></td>
-						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://e2guardian.org/?page=whatisdg'>What is E2guardian</a><br><br>");?>
+						<td width="78%" class="vtable"><?=gettext("<a target=_new href='http://e2guardian.org/'>What is E2guardian</a><br><br>");?>
                         </tr>
                         <tr>
 						<td colspan="2" valign="top" class="listtopic"><?=gettext("About e2guardian pfSense package"); ?></td>

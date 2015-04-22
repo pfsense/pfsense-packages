@@ -52,7 +52,7 @@
 # and easier to customise the access denied page.
 # The language file is used no matter what setting however.
 #
-languagedir = '{$dg_dir}/share/e2guardian/languages'
+languagedir = '{$e2_dir}/share/e2guardian/languages'
 
 # language to use from languagedir.
 language = '{$reportlanguage}'
@@ -210,7 +210,7 @@ nonstandarddelimiter = {$nonstandarddelimiter}
 # icons from banned domains.
 # on (default) | off
 usecustombannedimage = {$usecustombannedimage}
-custombannedimagefile = '{$dg_dir}/share/e2guardian/transparent1x1.gif'
+custombannedimagefile = '{$e2_dir}/share/e2guardian/transparent1x1.gif'
 
 
 #Banned flash replacement

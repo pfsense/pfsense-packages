@@ -296,7 +296,7 @@
 		<field>
 			<fielddescr>config</fielddescr>
 			<fieldname>modify_urllist</fieldname>
-			<description><![CDATA[Enter Exception url List for this group.<br>	
+			<description><![CDATA[Enter 'Modify URL List' for this group.<br>	
 								  Leave empty to load e2guardian defaults]]></description>
 			<type>textarea</type>
 			<cols>80</cols>

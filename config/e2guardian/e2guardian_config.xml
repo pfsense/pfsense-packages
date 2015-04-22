@@ -104,7 +104,7 @@
 		<field>
 			<fielddescr>Auth Plugins</fielddescr>
 			<fieldname>auth_plugin</fieldname>
-			<description><![CDATA[This option handle the extraction of client usernames from various sources, such as Proxy-Authorisation headers and ident servers, 
+			<description><![CDATA[This option handles the extraction of client usernames from various sources, such as Proxy-Authorisation headers and ident servers, 
 								enabling requests to be handled according to the settings of the user's filter group.<br>
 								Use CTRL + click for multiple select.<br>
 						<strong>Note: Do NOT select more then one auth plugin if you plan to use more then one listening interface.</strong>]]></description>
@@ -186,7 +186,7 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Positive (clean) result caching for URLs Caches good pages so they don't need to be scanned again.It also works with AV plugins.<br>
-			0 = off (recommended for ISPs with users with disimilar browsing)<br>
+			0 = off (recommended for ISPs with users with dissimilar browsing)<br>
 			<strong>1000 = recommended for most user</strong><br>
 			5000 = suggested max upper limit<br>
 			If you're using an AV plugin then use at least 5000.]]></description>

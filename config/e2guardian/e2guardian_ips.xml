@@ -103,7 +103,7 @@
 		<field>
 			<fieldname>exceptioniplist</fieldname>
 			<fielddescr>Exception Ip List</fielddescr>
-			<description><![CDATA[Include ip addresses and or ipadresses/netmask of computers from which web access should not be filtered.<br>
+			<description><![CDATA[Include ip addresses and or ip addresses/netmask of computers from which web access should not be filtered.<br>
 								  Leave empty to load e2guardian defaults.]]></description>
 			<type>textarea</type>
 			<cols>80</cols>
@@ -117,7 +117,7 @@
 		<field>
 			<fieldname>default</fieldname>
 			<fielddescr>Default</fielddescr>
-			<description><![CDATA[Include ip addresses and or ipadresses/netmask for this group one per line<br>Hint:192.168.1.0/255.255.255.0<br>192.168.1.5]]></description>
+			<description><![CDATA[Include ip addresses and or ip addresses/netmask for this group one per line<br>Hint:192.168.1.0/255.255.255.0<br>192.168.1.5]]></description>
 			<type>textarea</type>
 
 			<cols>80</cols><rows>12</rows>

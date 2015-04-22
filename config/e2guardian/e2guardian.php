@@ -42,7 +42,7 @@ function fetch_blacklist($log_notice=true,$install_process=false) {
 	global $config,$g;
 	if (is_array($config['installedpackages']['e2guardianblacklist']) && is_array($config['installedpackages']['e2guardianblacklist']['config'])){
 	   	$url=$config['installedpackages']['e2guardianblacklist']['config'][0]['url'];
-	   	$uw="Found a previouns install, checking Blacklist config...";
+	   	$uw="Found a previous install, checking Blacklist config...";
 		}
 	else{
 		$uw="Found a clean install, reading default access lists...";

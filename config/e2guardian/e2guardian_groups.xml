@@ -133,7 +133,7 @@
 			<size>60</size>
 		</field>
 		<field>
-			<name>Acess Lists</name>
+			<name>Access Lists</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -299,7 +299,7 @@
 		<field>
 			<fielddescr>Naughtiness limit</fielddescr>
 			<fieldname>naughtynesslimit</fieldname>
-			<description><![CDATA[This the limit over which the page will be blocked.  Each weighted phrase is given a value either positive or negative and the values added up.<br>
+			<description><![CDATA[This is the limit over which the page will be blocked.  Each weighted phrase is given a value either positive or negative and the values added up.<br>
 					Phrases to do with good subjects will have negative values, and bad subjects will have positive values.<br>
 					See the weightedphraselist file for examples.<br>
 					As a guide:<br>
@@ -398,7 +398,7 @@
 			<fielddescr>LDAP</fielddescr>
 			<fieldname>ldap</fieldname>
 			<description><![CDATA[Select LDAP servers to extract users from<br>
-								 The group must has the same name( or description) in e2guardian and on active directory<br>
+								 The group must have the same name( or description) in e2guardian and on active directory<br>
 								 <strong>This is not aplicable for default group</strong>]]></description>
 	    	<type>select_source</type>
 	    	<size>05</size>
@@ -422,7 +422,7 @@
  				<option><name>Password CANNOT Change(code 64)</name><value>64</value></option>
  				<option><name>Password has Expired (code 8388608)</name><value>8388608</value></option>
  				<option><name>Account will Never Expire (code 65536)</name><value>65536</value></option>
- 				<option><name>Enabled and Does NOT expire Paswword (code 66048)</name><value>66048</value></option>
+ 				<option><name>Enabled and Does NOT expire Password (code 66048)</name><value>66048</value></option>
  				<option><name>Server Trusted Account for Delegation (code 8192)</name><value>8192</value></option>
  				<option><name>Trusted Account for Delegation (code 524288)</name><value>524288</value></option>
  				<option><name>Enabled, User Cannot Change Password, Password Never Expires (code 590336)</name><value>590336</value></option>
@@ -435,7 +435,7 @@
 		<field>
 			<fielddescr>Update frequency</fielddescr>
 			<fieldname>freq</fieldname>
-			<description><![CDATA[How often extract users from active directory and verify changes<br>
+			<description><![CDATA[How often to extract users from active directory and verify changes<br>
 								Valid options are minutes(m), hours(h)<br>
 								Sample: To update every two minute, use 2m]]></description>
 	    	<type>input</type>

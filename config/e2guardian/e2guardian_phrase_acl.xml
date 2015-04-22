@@ -194,7 +194,7 @@
 		<field>
 			<fielddescr>Config file</fielddescr>
 			<fieldname>banned_phraselist</fieldname>
-			<description><![CDATA[Enter Banned Pharase List for this group.<br>	
+			<description><![CDATA[Enter Banned Phrase List for this group.<br>	
 								  Leave empty to load e2guardian defaults]]></description>
 			<type>textarea</type>
 			<cols>80</cols>

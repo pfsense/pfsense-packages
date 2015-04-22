@@ -213,7 +213,7 @@
 		<field>
 			<fielddescr>Extension</fielddescr>
 			<fieldname>exception_extensionlist</fieldname>
-			<description><![CDATA[Enter banned extension List for this group.<br>	
+			<description><![CDATA[Enter exception extension List for this group.<br>	
 								  Leave empty to load e2guardian defaults]]></description>
 			<type>textarea</type>
 			<cols>80</cols>
@@ -223,7 +223,7 @@
 		<field>
 			<fielddescr>Mime</fielddescr>
 			<fieldname>exception_mimetypelist</fieldname>
-			<description><![CDATA[Enter banned mimetype List for this group.<br>	
+			<description><![CDATA[Enter exception mimetype List for this group.<br>	
 								  Leave empty to load e2guardian defaults]]></description>
 			<type>textarea</type>
 			<cols>80</cols>

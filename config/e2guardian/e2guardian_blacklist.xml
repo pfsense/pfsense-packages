@@ -104,8 +104,8 @@
 		<field>
 			<fielddescr>List on</fielddescr>
 			<fieldname>liston</fieldname>
-			<description><![CDATA[Select where to list categories dowloaded form file<br>
-							List on Banned and Exception is usefull if you want to whitelist any category downloaded from url.]]></description>
+			<description><![CDATA[Select where to list categories extracted from downloaded file<br>
+							List on Banned and Exception is useful if you want to whitelist any category downloaded from url.]]></description>
 	    	<type>select</type>
  				<options>
  				<option><name>Banned only</name><value>banned</value></option>

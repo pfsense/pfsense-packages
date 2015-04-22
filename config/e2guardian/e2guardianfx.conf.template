@@ -58,22 +58,22 @@ groupmode = {$e2guardian_groups['mode']}
 groupname = '{$e2guardian_groups['name']}'
 
 # Content filtering files location
-bannedphraselist = '{$dg_dir}/etc/e2guardian/lists/bannedphraselist.g_{$e2guardian_groups['name']}'
-weightedphraselist = '{$dg_dir}/etc/e2guardian/lists/weightedphraselist.g_{$e2guardian_groups['name']}'
-exceptionphraselist = '{$dg_dir}/etc/e2guardian/lists/exceptionphraselist.g_{$e2guardian_groups['name']}'
-bannedsitelist = '{$dg_dir}/etc/e2guardian/lists/bannedsitelist.g_{$e2guardian_groups['name']}'
-greysitelist = '{$dg_dir}/etc/e2guardian/lists/greysitelist.g_{$e2guardian_groups['name']}'
-exceptionsitelist = '{$dg_dir}/etc/e2guardian/lists/exceptionsitelist.g_{$e2guardian_groups['name']}'
-bannedurllist = '{$dg_dir}/etc/e2guardian/lists/bannedurllist.g_{$e2guardian_groups['name']}'
-greyurllist = '{$dg_dir}/etc/e2guardian/lists/greyurllist.g_{$e2guardian_groups['name']}'
-exceptionurllist = '{$dg_dir}/etc/e2guardian/lists/exceptionurllist.g_{$e2guardian_groups['name']}'
-exceptionregexpurllist = '{$dg_dir}/etc/e2guardian/lists/exceptionregexpurllist.g_{$e2guardian_groups['name']}'
-bannedregexpurllist = '{$dg_dir}/etc/e2guardian/lists/bannedregexpurllist.g_{$e2guardian_groups['name']}'
-picsfile = '{$dg_dir}/etc/e2guardian/lists/g_{$e2guardian_groups['name']}'
-contentregexplist = '{$dg_dir}/etc/e2guardian/lists/contentregexplist.g_{$e2guardian_groups['name']}'
-urlregexplist = '{$dg_dir}/etc/e2guardian/lists/urlregexplist.g_{$e2guardian_groups['name']}'
-authexceptionsitelist = '{$dg_dir}/etc/e2guardian/lists/authexceptionsitelist'
-authexceptionurllist = '{$dg_dir}/etc/e2guardian/lists/authexceptionurllist'
+bannedphraselist = '{$e2_dir}/etc/e2guardian/lists/bannedphraselist.g_{$e2guardian_groups['name']}'
+weightedphraselist = '{$e2_dir}/etc/e2guardian/lists/weightedphraselist.g_{$e2guardian_groups['name']}'
+exceptionphraselist = '{$e2_dir}/etc/e2guardian/lists/exceptionphraselist.g_{$e2guardian_groups['name']}'
+bannedsitelist = '{$e2_dir}/etc/e2guardian/lists/bannedsitelist.g_{$e2guardian_groups['name']}'
+greysitelist = '{$e2_dir}/etc/e2guardian/lists/greysitelist.g_{$e2guardian_groups['name']}'
+exceptionsitelist = '{$e2_dir}/etc/e2guardian/lists/exceptionsitelist.g_{$e2guardian_groups['name']}'
+bannedurllist = '{$e2_dir}/etc/e2guardian/lists/bannedurllist.g_{$e2guardian_groups['name']}'
+greyurllist = '{$e2_dir}/etc/e2guardian/lists/greyurllist.g_{$e2guardian_groups['name']}'
+exceptionurllist = '{$e2_dir}/etc/e2guardian/lists/exceptionurllist.g_{$e2guardian_groups['name']}'
+exceptionregexpurllist = '{$e2_dir}/etc/e2guardian/lists/exceptionregexpurllist.g_{$e2guardian_groups['name']}'
+bannedregexpurllist = '{$e2_dir}/etc/e2guardian/lists/bannedregexpurllist.g_{$e2guardian_groups['name']}'
+picsfile = '{$e2_dir}/etc/e2guardian/lists/g_{$e2guardian_groups['name']}'
+contentregexplist = '{$e2_dir}/etc/e2guardian/lists/contentregexplist.g_{$e2guardian_groups['name']}'
+urlregexplist = '{$e2_dir}/etc/e2guardian/lists/urlregexplist.g_{$e2guardian_groups['name']}'
+authexceptionsitelist = '{$e2_dir}/etc/e2guardian/lists/authexceptionsitelist'
+authexceptionurllist = '{$e2_dir}/etc/e2guardian/lists/authexceptionurllist'
 
 # Filetype filtering
 #
@@ -87,28 +87,28 @@ authexceptionurllist = '{$dg_dir}/etc/e2guardian/lists/authexceptionurllist'
 # (on | off)
 #
 blockdownloads = {$e2guardian_groups['blockdownloads']}
-exceptionextensionlist = '{$dg_dir}/etc/e2guardian/lists/exceptionextensionlist.g_{$e2guardian_groups['name']}'
-exceptionmimetypelist = '{$dg_dir}/etc/e2guardian/lists/exceptionmimetypelist.g_{$e2guardian_groups['name']}'
+exceptionextensionlist = '{$e2_dir}/etc/e2guardian/lists/exceptionextensionlist.g_{$e2guardian_groups['name']}'
+exceptionmimetypelist = '{$e2_dir}/etc/e2guardian/lists/exceptionmimetypelist.g_{$e2guardian_groups['name']}'
 #
 # Use the following lists to block specific kinds of file downloads.
 # The two exception lists above can be used to override these.
 #
-bannedextensionlist = '{$dg_dir}/etc/e2guardian/lists/bannedextensionlist.g_{$e2guardian_groups['name']}'
-bannedmimetypelist = '{$dg_dir}/etc/e2guardian/lists/bannedmimetypelist.g_{$e2guardian_groups['name']}'
+bannedextensionlist = '{$e2_dir}/etc/e2guardian/lists/bannedextensionlist.g_{$e2guardian_groups['name']}'
+bannedmimetypelist = '{$e2_dir}/etc/e2guardian/lists/bannedmimetypelist.g_{$e2guardian_groups['name']}'
 #
 # In either file filtering mode, the following list can be used to override
 # MIME type & extension blocks for particular domains & URLs (trusted download sites).
 #
-exceptionfilesitelist = '{$dg_dir}/etc/e2guardian/lists/exceptionfilesitelist.g_{$e2guardian_groups['name']}'
-exceptionfileurllist = '{$dg_dir}/etc/e2guardian/lists/exceptionfileurllist.g_{$e2guardian_groups['name']}'
+exceptionfilesitelist = '{$e2_dir}/etc/e2guardian/lists/exceptionfilesitelist.g_{$e2guardian_groups['name']}'
+exceptionfileurllist = '{$e2_dir}/etc/e2guardian/lists/exceptionfileurllist.g_{$e2guardian_groups['name']}'
 
 # Categorise without blocking:
 # Supply categorised lists here and the category string shall be logged against
 # matching requests, but matching these lists does not perform any filtering
 # action.
-logsitelist = '{$dg_dir}/etc/e2guardian/lists/logsitelist.g_{$e2guardian_groups['name']}'
-logurllist = '{$dg_dir}/etc/e2guardian/lists/logurllist.g_{$e2guardian_groups['name']}'
-logregexpurllist = '{$dg_dir}/etc/e2guardian/lists/logregexpurllist.g_{$e2guardian_groups['name']}'
+logsitelist = '{$e2_dir}/etc/e2guardian/lists/logsitelist.g_{$e2guardian_groups['name']}'
+logurllist = '{$e2_dir}/etc/e2guardian/lists/logurllist.g_{$e2guardian_groups['name']}'
+logregexpurllist = '{$e2_dir}/etc/e2guardian/lists/logregexpurllist.g_{$e2guardian_groups['name']}'
 
 # Outgoing HTTP header rules:
 # Optional lists for blocking based on, and modification of, outgoing HTTP
@@ -119,8 +119,8 @@ logregexpurllist = '{$dg_dir}/etc/e2guardian/lists/logregexpurllist.g_{$e2guardi
 # Headers are matched/replaced on a line-by-line basis, not as a contiguous
 # block.
 # Use for example, to remove cookies or prevent certain user-agents.
-headerregexplist = '{$dg_dir}/etc/e2guardian/lists/headerregexplist.g_{$e2guardian_groups['name']}'
-bannedregexpheaderlist = '{$dg_dir}/etc/e2guardian/lists/bannedregexpheaderlist.g_{$e2guardian_groups['name']}'
+headerregexplist = '{$e2_dir}/etc/e2guardian/lists/headerregexplist.g_{$e2guardian_groups['name']}'
+bannedregexpheaderlist = '{$e2_dir}/etc/e2guardian/lists/bannedregexpheaderlist.g_{$e2guardian_groups['name']}'
 
 # Weighted phrase mode
 # Optional; overrides the weightedphrasemode option in e2guardian.conf
@@ -147,7 +147,7 @@ naughtynesslimit = {$e2guardian_groups['naughtynesslimit']}
 # List of regular expressions for matching search engine URLs.  It is assumed
 # that the search terms themselves will be contained within the first submatch
 # of each expression.
-searchregexplist = '{$dg_dir}/etc/e2guardian/lists/searchengineregexplist.g_{$e2guardian_groups['name']}'
+searchregexplist = '{$e2_dir}/etc/e2guardian/lists/searchengineregexplist.g_{$e2guardian_groups['name']}'
 #
 # Search term limit
 # The limit over which requests will be blocked for containing search terms
@@ -169,9 +169,9 @@ searchtermlimit = {$e2guardian_groups['searchtermlimit']}
 # of text.
 # Please note that all or none of the below should be uncommented, not a
 # mixture.
-bannedsearchtermlist = '{$dg_dir}/etc/e2guardian/lists/bannedsearchtermlist.g_{$e2guardian_groups['name']}'
-weightedsearchtermlist = '{$dg_dir}/etc/e2guardian/lists/weightedsearchtermlist.g_{$e2guardian_groups['name']}'
-exceptionsearchtermlist = '{$dg_dir}/etc/e2guardian/lists/exceptionsearchtermlist.g_{$e2guardian_groups['name']}'
+bannedsearchtermlist = '{$e2_dir}/etc/e2guardian/lists/bannedsearchtermlist.g_{$e2guardian_groups['name']}'
+weightedsearchtermlist = '{$e2_dir}/etc/e2guardian/lists/weightedsearchtermlist.g_{$e2guardian_groups['name']}'
+exceptionsearchtermlist = '{$e2_dir}/etc/e2guardian/lists/exceptionsearchtermlist.g_{$e2guardian_groups['name']}'
 
 # Category display threshold
 # This option only applies to pages blocked by weighted phrase filtering.
@@ -256,7 +256,7 @@ infectionbypasserrorsonly = {$e2guardian_groups['infectionbypasserrorsonly']}
 disablecontentscan = {$e2guardian_groups['disablecontentscan']}
 
 # Enable Deep URL Analysis
-# When enabled, DG looks for URLs within URLs, checking against the bannedsitelist and
+# When enabled, E2guardian looks for URLs within URLs, checking against the bannedsitelist and
 # bannedurllist. This can be used, for example, to block images originating from banned
 # sites from appearing in Google Images search results, as the original URLs are
 # embedded in the thumbnail GET requests.
@@ -298,12 +298,12 @@ deepurlanalysis = {$e2guardian_groups['deepurlanalysis']}
 # only used in reporting level 3.
 #
 # The default template file path is <languagedir>/<language>/template.html
-# e.g. {$dg_dir}/share/e2guardian/languages/ukenglish/template.html when using 'ukenglish'
+# e.g. {$e2_dir}/share/e2guardian/languages/ukenglish/template.html when using 'ukenglish'
 # language.
 #
 # This option generates a file path of the form:
 # <languagedir>/<language>/<htmltemplate>
-# e.g. {$dg_dir}/share/e2guardian/languages/ukenglish/custom.html
+# e.g. {$e2_dir}/share/e2guardian/languages/ukenglish/custom.html
 #
 #htmltemplate = 'custom.html'
 
@@ -369,7 +369,7 @@ deepurlanalysis = {$e2guardian_groups['deepurlanalysis']}
 # this is in seconds. If 'violations' occur in 'threshold' seconds, then
 # a notification is made.
 # if this is set to 0, then whenever the set number of violations are made a 
-# notifaction will be sent.
+# notification will be sent.
 #!! Not compiled !!threshold = 0
 
 #SSL certificate checking

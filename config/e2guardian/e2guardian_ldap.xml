@@ -146,7 +146,7 @@
 	</field>
 	<field>
 		<fielddescr>mask</fielddescr>
-		<description><![CDATA[Default: USER<br>Apply prefix or sufix any info to username extracted.<br>
+		<description><![CDATA[Default: USER<br>Apply prefix or suffix any info to username extracted.<br>
 								use "," if you need more than one mask for each user<br>
 								<strong>domain\USER #NAME,USER@MYDOMAIN.COM</strong><br>
 								NAME shows user name<br>

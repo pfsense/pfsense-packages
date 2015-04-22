@@ -129,7 +129,7 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[<strong>Default is 2000</strong><br>
-						This is only used if you use a content scanner plugin such as AV. This is the max size of file that DG will download and cache in RAM.<br>
+						This is only used if you use a content scanner plugin such as AV. This is the max size of file that E2guardian will download and cache in RAM.<br>
 						After this limit is reached it will cache to disk. This value must be less than or equal to maxcontentfilecachescansize.<br>
 						The size is in Kibibytes - eg 10240 = 10Mb<br>
 						use 0 to set it to maxcontentfilecachescansize<br>
@@ -141,7 +141,7 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[<strong>Default is 2000</strong><br>
-						 This is only used if you use a content scanner plugin such as AV. This is the max size file that DG will download so that it can be scanned or virus checked.<br>
+						 This is only used if you use a content scanner plugin such as AV. This is the max size file that E2guardian will download so that it can be scanned or virus checked.<br>
 						 This value must be greater or equal to maxcontentramcachescansize.<br>
 						 The size is in Kibibytes - eg 10240 = 10Mb]]></description>
 		</field>
