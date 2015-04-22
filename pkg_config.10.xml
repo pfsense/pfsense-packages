@@ -96,6 +96,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/strikeback/strikeback.xml</config_file>
 		<configurationfile>strikeback.xml</configurationfile>
 		<only_for_archs>i386</only_for_archs>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>File Manager</name>
