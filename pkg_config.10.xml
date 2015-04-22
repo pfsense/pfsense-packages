@@ -45,6 +45,7 @@
 		<build_pbi>
 			<port>net/asterisk</port>
 		</build_pbi>
+		<build_options>asterisk_SET_FORCE=SRTP;asterisk_UNSET_FORCE=FREETDS PGSQL</build_options>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
