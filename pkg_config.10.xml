@@ -35,10 +35,12 @@
 		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br />Asterisk turns an ordinary computer into a communications server.]]></descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>1.8.32.1 pkg v0.3.1</version>
+		<version>0.3.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
+		<run_depends>sbin/asterisk:net/asterisk</run_depends>
+		<port_category>net</port_category>
 		<depends_on_package_pbi>asterisk-1.8.32.1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/asterisk</port>
