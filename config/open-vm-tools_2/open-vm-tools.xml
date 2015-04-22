@@ -51,13 +51,11 @@
 		conf_mount_rw();
 		open_vm_tools_install();
 		exec("/usr/local/etc/rc.d/vmware-guestd.sh start");
-		exec("/usr/local/etc/rc.d/vmware-kmod.sh start");
 		conf_mount_ro();
     </custom_php_install_command>
     <custom_php_deinstall_command>
 		conf_mount_rw();
 		exec("/usr/local/etc/rc.d/vmware-guestd.sh stop");
-		exec("/usr/local/etc/rc.d/vmware-kmod.sh stop");
 		open_vm_tools_deinstall();
 		conf_mount_ro();
     </custom_php_deinstall_command>
