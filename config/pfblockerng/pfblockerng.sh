@@ -13,12 +13,20 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 
+pfs_version=$(cat /etc/version | cut -c 1-3)
+
+if [ "${pfs_version}" = "2.2" ]; then
+	mtype=$(/usr/bin/uname -m)
+	prefix="/usr/pbi/pfblockerng-${mtype}"
+else
+	prefix="/usr/local"
+fi
+
 now=$(/bin/date +%m/%d/%y' '%T)
-mtype=$(/usr/bin/uname -m);
 
 # Application Paths
-pathgrepcidr="/usr/pbi/pfblockerng-$mtype/bin/grepcidr"
-pathgeoip="/usr/pbi/pfblockerng-$mtype/bin/geoiplookup"
+pathgrepcidr="${prefix}/bin/grepcidr"
+pathgeoip="${prefix}/bin/geoiplookup"
 
 pathtar=/usr/bin/tar
 pathgunzip=/usr/bin/gunzip
@@ -35,8 +43,8 @@ etblock=$(echo $8 | sed 's/,/, /g')
 etmatch=$(echo $9 | sed 's/,/, /g')
 
 # File Locations
-aliasarchive="/usr/pbi/pfblockerng-$mtype/etc/aliastables.tar.bz2"
-pathgeoipdat=/usr/pbi/pfblockerng-$mtype/share/GeoIP/GeoIP.dat
+aliasarchive="${prefix}/etc/aliastables.tar.bz2"
+pathgeoipdat="${prefix}/share/GeoIP/GeoIP.dat"
 pfbsuppression=/var/db/pfblockerng/pfbsuppression.txt
 masterfile=/var/db/pfblockerng/masterfile
 mastercat=/var/db/pfblockerng/mastercat

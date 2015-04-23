@@ -60,14 +60,22 @@ require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
 global $rule_list;
 pfb_global();
 
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+
+if ($pfs_version == "2.2") {
+	$prefix = "/usr/pbi/pfblockerng-" . php_uname("m");
+} else {
+	$prefix = "/usr/local";
+}
+
 // Application Paths
-$pathgeoip	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/bin/geoiplookup";
-$pathgeoip6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/bin/geoiplookup6";
+$pathgeoip	= $prefix . "/bin/geoiplookup";
+$pathgeoip6	= $prefix . "/bin/geoiplookup6";
 
 // Define File Locations
 $filter_logfile = "{$g['varlog_path']}/filter.log";
-$pathgeoipdat	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIP.dat";
-$pathgeoipdat6	= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP/GeoIPv6.dat";
+$pathgeoipdat	= $prefix . "/share/GeoIP/GeoIP.dat";
+$pathgeoipdat6	= $prefix . "/share/GeoIP/GeoIPv6.dat";
 
 // Define Alerts Log filter Rollup window variable. (Alert Filtering Code adapted from B.Meeks - Snort Package)
 $pfb['filterlogentries'] = FALSE;

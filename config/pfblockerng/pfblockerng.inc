@@ -50,6 +50,14 @@ require_once("services.inc");
 function pfb_global() {
 	global $g,$config,$pfb;
 
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+
+	if ($pfs_version == "2.2") {
+		$prefix = "/usr/pbi/pfblockerng-" . php_uname("m");
+	} else {
+		$prefix = "/usr/local";
+	}
+
 	# Collect pfSense Version
 	$pfb['pfsenseversion']	= substr(trim(file_get_contents("/etc/version")),0,3);
 
@@ -63,7 +71,7 @@ function pfb_global() {
 	$pfb['matchdir']	= "{$pfb['dbdir']}/match";
 	$pfb['permitdir']	= "{$pfb['dbdir']}/permit";
 	$pfb['origdir']		= "{$pfb['dbdir']}/original";
-	$pfb['ccdir']		= "/usr/pbi/pfblockerng-" . php_uname("m") . "/share/GeoIP";
+	$pfb['ccdir']		= $prefix . "/share/GeoIP";
 
 	# Create Folders if not Exist.
 	$folder_array = array ("{$pfb['dbdir']}","{$pfb['logdir']}","{$pfb['ccdir']}","{$pfb['origdir']}","{$pfb['nativedir']}","{$pfb['denydir']}","{$pfb['matchdir']}","{$pfb['permitdir']}","{$pfb['aliasdir']}");
@@ -78,7 +86,7 @@ function pfb_global() {
 	$pfb['log']	= "{$pfb['logdir']}/pfblockerng.log";
 	$pfb['supptxt']	= "{$pfb['dbdir']}/pfbsuppression.txt";
 	$pfb['script']	= 'sh /usr/local/pkg/pfblockerng/pfblockerng.sh';
-	$pfb['aliasarchive'] = "/usr/pbi/pfblockerng-" . php_uname("m") . "/etc/aliastables.tar.bz2";
+	$pfb['aliasarchive'] = $prefix . "/etc/aliastables.tar.bz2";
 
 	# General Variables
 	$pfb['config']	= $config['installedpackages']['pfblockerng']['config'][0];

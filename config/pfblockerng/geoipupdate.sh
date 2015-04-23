@@ -23,7 +23,7 @@
 # may be met by including the following in all advertising and documentation
 # mentioning features of or use of this database.
 
-mtype=$(/usr/bin/uname -m);
+pfs_version=$(cat /etc/version | cut -c 1-3)
 
 # Application Locations
 pathfetch=/usr/bin/fetch
@@ -32,8 +32,13 @@ pathgunzip=/usr/bin/gunzip
 
 # Folder Locations
 pathdb=/var/db/pfblockerng
-pathpbi=/usr/pbi/pfblockerng-$mtype/share/GeoIP
 pathlog=/var/log/pfblockerng
+if [ "${pfs_version}" = "2.2" ]; then
+	mtype=$(/usr/bin/uname -m)
+	pathshare=/usr/pbi/pfblockerng-$mtype/share/GeoIP
+else
+	pathshare=/usr/local/share/GeoIP
+fi
 
 # File Locations
 errorlog=$pathlog/geoip.log
@@ -60,12 +65,12 @@ binaryupdate() {
 
 echo " ** Downloading MaxMind GeoLite IPv4 Binary Database (For Reputation/Alerts Processes) **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz"
-$pathfetch -v -o $pathpbi$geoipdat.gz -T 20 $URL
+$pathfetch -v -o $pathshare$geoipdat.gz -T 20 $URL
 if [ "$?" -eq "0" ]; then
-	$pathgunzip -f $pathpbi$geoipdat.gz
+	$pathgunzip -f $pathshare$geoipdat.gz
 	echo; echo " ( MaxMind IPv4 GeoIP.dat has been updated )"; echo
 	echo "Current Date/Timestamp:"
-	/bin/ls -alh $pathpbi$geoipdat
+	/bin/ls -alh $pathshare$geoipdat
 	echo
 else
 	echo; echo " => MaxMind IPv4 GeoIP.dat Update [ FAILED ]"; echo
@@ -76,12 +81,12 @@ fi
 
 echo; echo " ** Downloading MaxMind GeoLite IPv6 Binary Database (For Reputation/Alerts Processes) **"; echo
 URL="http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz"
-$pathfetch -v -o $pathpbi$geoipdatv6.gz -T 20 $URL
+$pathfetch -v -o $pathshare$geoipdatv6.gz -T 20 $URL
 if [ "$?" -eq "0" ]; then
-	$pathgunzip -f $pathpbi$geoipdatv6.gz
+	$pathgunzip -f $pathshare$geoipdatv6.gz
 	echo; echo " ( MaxMind IPv6 GeoIPv6.dat has been updated )"; echo
 	echo "Current Date/Timestamp:"
-	/bin/ls -alh $pathpbi$geoipdatv6
+	/bin/ls -alh $pathshare$geoipdatv6
 	echo
 else
 	echo; echo " => MaxMind IPv6 GeoIPv6.dat Update [ FAILED ]"; echo

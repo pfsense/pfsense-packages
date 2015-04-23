@@ -129,6 +129,8 @@
 		<required_version>2.2</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>
 		<configurationfile>pfblockerng.xml</configurationfile>
+		<run_depends>bin/geoiplookup:net/GeoIP bin/grepcidr:net-mgmt/grepcidr</run_depends>
+		<port_category>net</port_category>
 		<depends_on_package_pbi>pfblockerng-1.6.3_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net/GeoIP</port>
