@@ -30,14 +30,10 @@
 */
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-switch ($pfs_version) {
-	case "1.2":
-	case "2.0":
-		define('AVAHI_BASE', '/usr/local');
-		break;
-	default:
-		define('AVAHI_BASE', '/usr/pbi/avahi-' . php_uname("m"));
-}
+if ($pfs_version == "2.1" || $pfs_version == "2.2")
+	define('AVAHI_BASE', '/usr/pbi/avahi-' . php_uname("m"));
+else
+	define('AVAHI_BASE', '/usr/local');
 
 function avahi_start() {
 	 mwexec_bg("/usr/local/etc/rc.d/avahi-daemon.sh start");
