@@ -111,6 +111,7 @@
 		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>filemgr.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>pfBlockerNG</name>
