@@ -34,7 +34,7 @@ require_once("service-utils.inc");
 $shortcut_section = "apache";
 // Check to find out on which system the package is running
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
+if ($pf_version == "2.1" || $pf_version == "2.2")
 	define('APACHEDIR', '/usr/pbi/proxy_mod_security-' . php_uname("m"));
 else
 	define('APACHEDIR', '/usr/local');
