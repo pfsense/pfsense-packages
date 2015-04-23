@@ -100,6 +100,7 @@
 	</package>
 	<package>
 		<name>File Manager</name>
+		<internal_name>File_Manager</internal_name>
 		<website/>
 		<descr>PHP File Manager</descr>
 		<category>Diagnostics</category>
