@@ -362,6 +362,12 @@ function haproxy_custom_php_install_command() {
 	update_output_window($static_output);
 	conf_mount_rw();
 	
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version == "2.1" || $pf_version == "2.2")
+		$haproxy_binary = "/usr/pbi/haproxy-devel-" . php_uname("m") . "/sbin/haproxy";
+	else
+		$haproxy_binary = "/usr/local/sbin/haproxy";
+
 	$static_output .= "HAProxy, create '/usr/local/etc/rc.d/haproxy.sh'\n";
 	update_output_window($static_output);
 	$haproxy = <<<EOD
@@ -375,7 +381,7 @@ function haproxy_custom_php_install_command() {
 
 name="haproxy"
 rcvar="\${name}_enable"
-command="/usr/pbi/haproxy-devel-`uname -m`/sbin/haproxy"
+command="{$haproxy_binary}"
 haproxy_enable=\${haproxy-"YES"}
 
 start_cmd="haproxy_start"
