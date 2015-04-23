@@ -226,6 +226,7 @@
 		<version>0.1.7</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
+		<maximum_version>2.2.999</maximum_version>
 		<config_file>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
 		<run_depends>${APACHEMODDIR}/mod_security2.so:www/mod_security ${APACHEMODDIR}/mod_memcache.so:www/mod_memcache</run_depends>
 		<port_uses>USE_APACHE_RUN=22</port_uses>
