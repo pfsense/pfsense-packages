@@ -202,7 +202,7 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
 		<run_depends>${APACHEMODDIR}/mod_security2.so:www/mod_security ${APACHEMODDIR}/mod_memcache.so:www/mod_memcache</run_depends>
-		<port_uses>USE_APACHE=24</port_uses>
+		<port_uses>USE_APACHE_RUN=24</port_uses>
 		<port_category>net</port_category>
 		<conflicts>apache-mod_security</conflicts>
 		<depends_on_package_pbi>proxy_mod_security-2.4.9_4-##ARCH##.pbi git-2.2.1-##ARCH##.pbi</depends_on_package_pbi>
@@ -228,7 +228,7 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
 		<run_depends>${APACHEMODDIR}/mod_security2.so:www/mod_security ${APACHEMODDIR}/mod_memcache.so:www/mod_memcache</run_depends>
-		<port_uses>USE_APACHE=22</port_uses>
+		<port_uses>USE_APACHE_RUN=22</port_uses>
 		<port_category>net</port_category>
 		<conflicts>apache-mod_security-devel</conflicts>
 		<depends_on_package_pbi>proxy_mod_security-2.2.27_5-##ARCH##.pbi</depends_on_package_pbi>
