@@ -387,7 +387,7 @@
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<run_depends>bin/snort:security/snort</run_depends>
-		<ports_category>security</ports_category>
+		<port_category>security</port_category>
 		<depends_on_package_pbi>snort-2.9.7.2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/snort</port>
