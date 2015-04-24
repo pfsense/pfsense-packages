@@ -445,7 +445,7 @@
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/backup/backup.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.1.5</version>
+		<version>0.1.6</version>
 		<status>Beta</status>
 		<required_version>1.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
