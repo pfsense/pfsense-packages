@@ -38,7 +38,7 @@ require("/usr/local/pkg/snort/snort_defs.inc");
 global $g, $config, $pkg_interface, $snort_gui_include, $rebuild_rules;
 
 $snortdir = SNORTDIR;
-$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
+$snortlibdir = SNORT_PBI_BASEDIR . "lib";
 $snortlogdir = SNORTLOGDIR;
 $snortiprepdir = SNORT_IPREP_PATH;
 $snortbindir = SNORT_PBI_BINDIR;

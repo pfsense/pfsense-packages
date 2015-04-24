@@ -3096,7 +3096,7 @@ function snort_deinstall() {
 	global $config, $g;
 
 	$snortdir = SNORTDIR;
-	$snortlibdir = "/usr/pbi/snort-" . php_uname("m") . "/lib";
+	$snortlibdir = SNORT_PBI_BASEDIR . "lib";
 	$snortlogdir = SNORTLOGDIR;
 	$rcdir = RCFILEPREFIX;
 	$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
