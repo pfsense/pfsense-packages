@@ -371,6 +371,7 @@
 		<website/>
 		<descr>It is a web server package that can host HTML, Javascript, CSS, and PHP. It uses the lighttpd web server that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite.</descr>
 		<category>Services</category>
+		<port_category>www</port_category>
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
 		<version>0.7.5</version>
