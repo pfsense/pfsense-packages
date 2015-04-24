@@ -469,7 +469,7 @@
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<port_category>mail</port_category>
-		<run_depends>libexec/postfix/bounces:mail/postfix</run_depends>
+		<run_depends>bin/qshape:mail/postfix</run_depends>
 		<build_pbi>
 			<port>mail/postfix</port>
 		</build_pbi>
