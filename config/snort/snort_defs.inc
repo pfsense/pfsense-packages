@@ -34,8 +34,13 @@
 global $g, $config;
 
 /* Define some useful constants for Snort */
-if (!defined("SNORT_PBI_BASEDIR"))
-	define("SNORT_PBI_BASEDIR", "/usr/pbi/snort-" . php_uname("m") . "/");
+if (!defined("SNORT_PBI_BASEDIR")) {
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version == "2.1" || $pf_version == "2.2")
+		define("SNORT_PBI_BASEDIR", "/usr/pbi/snort-" . php_uname("m") . "/");
+	else
+		define("SNORT_PBI_BASEDIR", "/usr/local/");
+}
 if (!defined("SNORT_PBI_BINDIR"))
 	define("SNORT_PBI_BINDIR", SNORT_PBI_BASEDIR . "bin/");
 if (!defined("SNORTDIR"))
