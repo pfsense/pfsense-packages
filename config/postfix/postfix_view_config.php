@@ -29,7 +29,9 @@
 */
 $shortcut_section = "postfix";
 require("guiconfig.inc");
-if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
+
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
 } else {
 	define('POSTFIX_LOCALBASE','/usr/local');

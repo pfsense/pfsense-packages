@@ -455,6 +455,7 @@
 	</package>
 	<package>
 		<name>Postfix Forwarder</name>
+		<internal_name>Postfix_Forwarder</internal_name>
 		<website>http://www.postfix.org/</website>
 		<descr><![CDATA[Postfix mail forwarder acts as a relay server for your domain.<br />
 				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br />
@@ -463,10 +464,12 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_pbi>postfix-2.11.3_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.11.3_2 pkg v.2.4.1</version>
+		<version>2.4.1</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
+		<port_category>mail</port_category>
+		<run_depends>libexec/postfix/bounces:mail/postfix</run_depends>
 		<build_pbi>
 			<port>mail/postfix</port>
 		</build_pbi>

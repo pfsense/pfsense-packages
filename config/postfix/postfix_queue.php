@@ -34,7 +34,8 @@ $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
 
-if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
 } else {
 	define('POSTFIX_LOCALBASE','/usr/local');
