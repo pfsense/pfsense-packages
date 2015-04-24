@@ -54,10 +54,8 @@ function cron_sync_package()
 	global $config;   
 	//synch cron tab
 	configure_cron();
-	$handle = popen("/usr/local/etc/rc.d/cron.sh stop", "r");
-	pclose($handle);
-	$handle = popen("/usr/local/etc/rc.d/cron.sh start", "r");
-	pclose($handle);
+	exec("/usr/local/etc/rc.d/cron.sh stop");
+	exec("/usr/local/etc/rc.d/cron.sh start");
 
 }
     
@@ -68,14 +66,6 @@ function cron_install_command()
 	global $config;
 	conf_mount_rw();
 	config_lock();
-
-	if (!is_dir('/usr/local/www/packages/cron/')) {
-		exec("mkdir -p /usr/local/www/packages/cron/");
-	}
-
-	//Copy PHP files from .tmp to .php - don't move or put them in /tmp or the pkg system will miss them if it gets cleared.
-	exec("cp /usr/local/pkg/cron.tmp /usr/local/www/packages/cron/cron.php");
-	exec("cp /usr/local/pkg/cron_edit.tmp /usr/local/www/packages/cron/cron_edit.php");
 
 	//write_config();
 
@@ -101,14 +91,9 @@ function cron_install_command()
 function cron_deinstall_command()
 {
 	conf_mount_rw();
-	config_lock();
-	$handle = popen("/usr/local/etc/rc.d/cron.sh stop", "r");
-	unlink_if_exists("/usr/local/pkg/cron.xml");
-	unlink_if_exists("/usr/local/www/cron.inc");
-	exec("rm -R /usr/local/www/packages/cron");
-	//unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
+	exec("/usr/local/etc/rc.d/cron.sh stop");
+	unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
 	conf_mount_ro();
-	config_unlock();
 }
 
 ?>

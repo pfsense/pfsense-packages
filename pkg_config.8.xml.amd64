@@ -446,7 +446,7 @@
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/cron/cron.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<version>0.1.8</version>
+		<version>0.1.9</version>
 		<status>Beta</status>
 		<required_version>1.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
