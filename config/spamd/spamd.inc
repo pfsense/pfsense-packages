@@ -35,7 +35,7 @@ if(!function_exists("filter_configure"))
 function sync_package_spamd() {
 	global $config, $g;
 	$pf_version = substr(trim(file_get_contents("/etc/version")),0,3);
-	if ($pf_version < 2.2) {
+	if ($pf_version != "2.2") {
 		$localpath = "/usr/local";
 	} else {
 		$ARCH = php_uname("m");

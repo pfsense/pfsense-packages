@@ -439,9 +439,11 @@
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_pbi>spamd-4.9.1_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>4.9.1_2 v1.1.2</version>
+		<version>1.1.2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
+		<port_category>net</port_category>
+		<run_depends>sbin/spamdb:mail/spamd</run_depends>
 		<configurationfile>spamd.xml</configurationfile>
 		<build_pbi>
 			<port>mail/spamd</port>
