@@ -498,6 +498,7 @@
 		</build_pbi>
 		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET_FORCE=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>mailscanner</name>
