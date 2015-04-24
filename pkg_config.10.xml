@@ -320,6 +320,7 @@
 		<descr>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</descr>
 		<category>Services</category>
 		<pkginfolink/>
+		<port_category>ftp</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/tftp2/tftp.xml</config_file>
 		<version>2.0</version>
 		<status>Stable</status>
