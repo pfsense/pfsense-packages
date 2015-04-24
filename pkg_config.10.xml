@@ -502,7 +502,6 @@
 	</package>
 	<package>
 		<name>mailscanner</name>
-		<internal_name>mailscanner</internal_name>
 		<website>http://www.mailscanner.info</website>
 		<descr><![CDATA[MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
 						This is a level3 mail scanning tool with high CPU load.]]></descr>
