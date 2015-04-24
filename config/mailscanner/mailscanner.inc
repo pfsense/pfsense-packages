@@ -33,11 +33,16 @@ require_once("globals.inc");
 #require("guiconfig.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-define('MAILSCANNER_PREFIX', '/usr/pbi/mailscanner-' . php_uname("m"));
-if ($pf_version == "2.1")
-	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX);
-else
-	define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX . '/local');
+if ($pf_version == "2.1" || $pf_version == "2.2") {
+	define('MAILSCANNER_PREFIX', '/usr/pbi/mailscanner-' . php_uname("m"));
+	if ($pf_version == "2.1")
+		define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX);
+	else
+		define('MAILSCANNER_LOCALBASE', MAILSCANNER_PREFIX . '/local');
+} else {
+	define('MAILSCANNER_PREFIX', '/usr/local');
+	define('MAILSCANNER_LOCALBASE', '/usr/local');
+}
 
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
