@@ -35,7 +35,7 @@
 $shortcut_section = "varnish";
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if (is_dir('/usr/pbi/varnish-' . php_uname("m"))) {
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 		define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m"));
 } else {
 	define('VARNISH_LOCALBASE','/usr/local');

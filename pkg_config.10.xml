@@ -631,12 +631,14 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>https://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>3.0.5_3 pkg v.0.2.4</version>
+		<version>0.2.4</version>
 		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/varnish3/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_pbi>varnish-3.0.5_3-##ARCH##.pbi</depends_on_package_pbi>
+		<port_category>www</port_category>
+		<run_depends>bin/varnishadm:www/varnish</run_depends>
 		<build_pbi>
 			<port>www/varnish</port>
 			<ports_after>lang/gcc</ports_after>
