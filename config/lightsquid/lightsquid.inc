@@ -115,6 +115,8 @@ define('LS_XML_SHEDULERTIME',		'lightsquid_refreshsheduler_time');
 define('LS_XML_SQUID_SHEDULERTIME',	'lightsquid_squidrotatelog_sheduler_time');
 
 function lightsquid_install() {
+	global $pfs_version;
+
 	update_log("lightsquid_install: started");
 
 	// create lightsquid report catalog
@@ -123,27 +125,29 @@ function lightsquid_install() {
 		mwexec("/bin/mkdir -p " . LS_REPORTPATH);
 	}
 
-	# check perl
-	$perl_path = '/usr/bin/perl';
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		# check perl
+		$perl_path = '/usr/bin/perl';
 
-	/* Clean up a bad perl link. */
-	ls_cleanup_bad_link($perl_path);
+		/* Clean up a bad perl link. */
+		ls_cleanup_bad_link($perl_path);
 
-	if (!file_exists("/usr/bin/perl")) {
-		if (is_executable('/usr/local/bin/perl')) {
-			symlink('/usr/local/bin/perl', '/usr/bin/perl');
-		} elseif (is_executable(LIGHTSQUID_BASE . '/bin/perl')) {
-			symlink(LIGHTSQUID_BASE . '/bin/perl', '/usr/bin/perl');
+		if (!file_exists("/usr/bin/perl")) {
+			if (is_executable('/usr/local/bin/perl')) {
+				symlink('/usr/local/bin/perl', '/usr/bin/perl');
+			} elseif (is_executable(LIGHTSQUID_BASE . '/bin/perl')) {
+				symlink(LIGHTSQUID_BASE . '/bin/perl', '/usr/bin/perl');
+			}
 		}
-	}
-	if (!is_dir('/usr/local/lib/perl5') && is_dir(LIGHTSQUID_BASE . '/lib/perl5')) {
-		symlink(LIGHTSQUID_BASE . '/lib/perl5', '/usr/local/lib/perl5');
-	}
-	if (!is_dir('/usr/local/etc/lightsquid') && is_dir(LS_CONFIGPATH)) {
-		symlink(LS_CONFIGPATH, '/usr/local/etc/lightsquid');
-	}
-	if (!is_dir('/usr/local/www/lightsquid') && is_dir(LS_WWWPATH)) {
-		symlink(LS_WWWPATH, '/usr/local/www/lightsquid');
+		if (!is_dir('/usr/local/lib/perl5') && is_dir(LIGHTSQUID_BASE . '/lib/perl5')) {
+			symlink(LIGHTSQUID_BASE . '/lib/perl5', '/usr/local/lib/perl5');
+		}
+		if (!is_dir('/usr/local/etc/lightsquid') && is_dir(LS_CONFIGPATH)) {
+			symlink(LS_CONFIGPATH, '/usr/local/etc/lightsquid');
+		}
+		if (!is_dir('/usr/local/www/lightsquid') && is_dir(LS_WWWPATH)) {
+			symlink(LS_WWWPATH, '/usr/local/www/lightsquid');
+		}
 	}
 
 	update_log("lightsquid_install: stopped");
@@ -160,16 +164,18 @@ function lightsquid_deinstall() {
 }
 
 function lightsquid_resync() {
-	global $config;
+	global $config, $pfs_version;
 	$tm = '';
 	$tm_squid = '';
 
-	# check perl
-	if (!file_exists("/usr/bin/perl"))
-		mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		# check perl
+		if (!file_exists("/usr/bin/perl"))
+			mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
 
-	// Fixup library path so GD can find its libraries for graphs.
-	mwexec("/sbin/ldconfig -m " . LIGHTSQUID_BASE . "/lib/");
+		// Fixup library path so GD can find its libraries for graphs.
+		mwexec("/sbin/ldconfig -m " . LIGHTSQUID_BASE . "/lib/");
+	}
 
 	// create lightsquid report catalog
 	if (!file_exists(LS_REPORTPATH)) {
