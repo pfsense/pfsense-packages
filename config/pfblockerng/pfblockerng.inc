@@ -2423,8 +2423,7 @@ function pfblockerng_php_install_command() {
 	@rmdir_recursive("{$pfb['dbdir']}/cc");
 
 	# Uncompress Country Code File
-	@copy("{$pfb['dbdir']}/countrycodes.tar.bz2", "{$pfb['ccdir']}/countrycodes.tar.bz2");
-	exec("/usr/bin/tar -jx -C {$pfb['ccdif']} -f {$pfb['ccdir']}/countrycodes.tar.bz2");
+	exec("/usr/bin/tar -jx -C {$pfb['ccdir']} -f {$pfb['dbdir']}/countrycodes.tar.bz2");
 	# Download MaxMind Files and Create Country Code files and Build Continent XML Files
 	update_output_window(gettext("Downloading MaxMind Country Databases. This may take a minute..."));
 	exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");

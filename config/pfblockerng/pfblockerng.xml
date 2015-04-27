@@ -49,7 +49,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>pfblockerng</name>
-	<version>1.07</version>
+	<version>1.08</version>
 	<title>pfBlockerNG: General Settings</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
 	<menu>
