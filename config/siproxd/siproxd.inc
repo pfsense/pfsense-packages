@@ -33,10 +33,10 @@ require_once("service-utils.inc");
 
 // Check to find out on which system the package is running
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pfs_version == "2.0") {
-	define('SIPROXD', '/usr/local');
-} else {
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 	define('SIPROXD', '/usr/pbi/siproxd-' . php_uname("m"));
+} else {
+	define('SIPROXD', '/usr/local');
 }
 // End of system check
 

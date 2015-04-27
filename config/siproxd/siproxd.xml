@@ -37,7 +37,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>siproxdsettings</name>
-	<version>0.8.0_2 pkg v1.0.2</version>
+	<version>1.0.3</version>
 	<title>siproxd: Settings</title>
 	<include_file>/usr/local/pkg/siproxd.inc</include_file>
 	<aftersaveredirect>/pkg_edit.php?xml=siproxd.xml&amp;id=0</aftersaveredirect>
