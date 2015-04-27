@@ -33,7 +33,7 @@ require_once("service-utils.inc");
 define('PKG_BGPD_CONFIG_BASE', '/var/etc/openbgpd');
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
+if ($pf_version == "2.1" || $pf_version == "2.2")
 	define('PKG_BGPD_BIN', '/usr/pbi/openbgpd-' . php_uname("m") . '/sbin');
 else
 	define('PKG_BGPD_BIN','/usr/local/sbin');
