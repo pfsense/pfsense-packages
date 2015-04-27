@@ -676,6 +676,8 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/tinydns/tinydns.xml</config_file>
 		<configurationfile>tinydns.xml</configurationfile>
+		<port_category>dns</port_category>
+		<run_depends>bin/dnsq:dns/djbdns</run_depends>
 		<depends_on_package_pbi>djbdns-1.05_20-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/ucspi-tcp sysutils/daemontools</ports_before>
