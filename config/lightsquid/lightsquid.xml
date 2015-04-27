@@ -286,11 +286,6 @@
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/whousesite.html</item>
 	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl</prefix>
-		<chmod>0444</chmod>
-		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/x</item>
-	</additional_files_needed>
         <fields>
                 <field>
                         <fielddescr>Language</fielddescr>
