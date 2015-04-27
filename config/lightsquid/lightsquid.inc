@@ -186,7 +186,9 @@ function lightsquid_resync() {
 
 		// variables for update
 		$lsconf_var[LS_VAR_CFGPATH]	= "\"" . LS_CONFIGPATH . "\"";
-		$lsconf_var[LS_VAR_LOGPATH]	= "\"" . LS_SQUIDLOGPATH . "\"";
+		if (isset($config['installedpackages']['squid']['config'][0])) {
+			$lsconf_var[LS_VAR_LOGPATH]	= "\"" . LS_SQUIDLOGPATH . "\"";
+		}
 		$lsconf_var[LS_VAR_TPLPATH]	= "\"" . LS_TEMPLATEPATH . "\"";
 		$lsconf_var[LS_VAR_LANGPATH]	= "\"" . LS_LANGPATH . "\"";
 		$lsconf_var[LS_VAR_REPORTPATH]	= "\"" . LS_REPORTPATH . "\"";
@@ -431,14 +433,16 @@ function refresh_full() {
 	update_log("refresh_full: execute command '$cmd'");
 	mwexec_bg("$cmd $log_name");
 	// parse access.log.x
-	for ($i=0; $i<100; $i++) {
-		$lg = LS_SQUIDLOG . ".$i";
-		if (file_exists(LS_SQUIDLOGPATH . "/$lg")) {
-			update_log("refresh_full: execute command '$cmd $lg'");
-			mwexec_bg("$cmd $lg");
-		} else
-			// really go <= 10 cycles
-			break;
+	if (isset($config['installedpackages']['squid']['config'][0])) {
+		for ($i=0; $i<100; $i++) {
+			$lg = LS_SQUIDLOG . ".$i";
+			if (file_exists(LS_SQUIDLOGPATH . "/$lg")) {
+				update_log("refresh_full: execute command '$cmd $lg'");
+				mwexec_bg("$cmd $lg");
+			} else
+				// really go <= 10 cycles
+				break;
+		}
 	}
 	update_log("refresh_full: stop");
 }
