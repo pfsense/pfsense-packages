@@ -32,7 +32,7 @@
                                                                               */
 /* ========================================================================== */
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0){
+if ($pf_version == "2.1" || $pf_version == "2.2"){
 
 	// Function to get squidGuard directory
 	// each squidGuard version has a different directory
