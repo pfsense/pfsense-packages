@@ -652,10 +652,12 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
 		<category>Network Management</category>
 		<depends_on_package_pbi>vnstat-1.12-##ARCH##.pbi</depends_on_package_pbi>
+		<port_category>net</port_category>
+		<run_depends>bin/vnstat:net/vnstat</run_depends>
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.12,3</version>
+		<version>1.12_3</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
