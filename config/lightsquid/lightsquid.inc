@@ -63,7 +63,7 @@ define('LS_CONFIGPATH',			LIGHTSQUID_BASE . '/etc/lightsquid');
 define('LS_CONFIGFILE',			'lightsquid.cfg');
 define('LS_CONFIGFILE_DIST',		'lightsquid.cfg.dist');
 define('LS_WWWPATH',			LIGHTSQUID_BASE . '/www/lightsquid');
-define('LS_TEMPLATEPATH',		LIGHTSQUID_BASE . '/www/lightsquid/tpl');
+define('LS_TEMPLATEPATH',		'/usr/local/www/lightsquid/tpl');
 define('LS_LANGPATH',			LIGHTSQUID_BASE . '/share/lightsquid/lang');
 define('LS_REPORTPATH',			'/var/lightsquid/report');
 
@@ -121,13 +121,6 @@ function lightsquid_install() {
 	if (!file_exists(LS_REPORTPATH)) {
 		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
 		mwexec("/bin/mkdir -p " . LS_REPORTPATH);
-	}
-
-	// install templates
-	$lstpl_file = "/var/tmp/lightsquid_tpl.tbz";
-	if (file_exists($lstpl_file)) {
-		mwexec("/usr/bin/tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
-		update_log("lightsquid_install: Install templates from $lstpl_file");
 	}
 
 	# check perl
