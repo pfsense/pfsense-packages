@@ -16,7 +16,11 @@ function open_vm_tools_install() {
 	unlink_if_exists("/boot/kernel/vmmemctl.ko");
 	unlink_if_exists("/boot/kernel/vmxnet.ko");
 
-	$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m");
+	$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2")
+		$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m");
+	else
+		$openvmtools_path = "/usr/local";
 	
 	// won't copy this either for now, some sequences of loading/unloading of the module will kernel panic. 
 	//exec("cp $openvmtools_path/local/lib/vmware-tools/modules/drivers/vmmemctl.ko /boot/kernel/");
