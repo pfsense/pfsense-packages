@@ -766,6 +766,8 @@ MASTEREOF2;
 			}
 	if (!file_exists("/etc/mail/aliases"))
 		touch("/etc/mail/aliases");
+	if (!file_exists("/etc/aliases"))
+		@symlink("/etc/mail/aliases", "/etc/aliases");
 	exec("/usr/local/bin/newaliases");
 	postfix_start();
 
@@ -846,6 +848,7 @@ function postfix_php_deinstall_command() {
 	sync_package_postfix();
 	conf_mount_rw();
 	unlink_if_exists("/usr/local/etc/rc.d/postfix.sh");
+	unlink_if_exists("/etc/aliases");
 	conf_mount_ro();
 }
 
