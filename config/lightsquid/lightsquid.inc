@@ -41,15 +41,15 @@ else update_log("File 'squid.inc' not found.");
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
-	case "1.2":
-	case "2.0":
-		define('LIGHTSQUID_BASE','/usr/local');
-		break;
 	case "2.1":
 		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m"));
 		break;
-	default:
+	case "2.2":
 		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m") . '/local');
+		break;
+	default:
+		define('LIGHTSQUID_BASE','/usr/local');
+		break;
 }
 
 define ('CMD_PKGDELETE', 'pkg_delete lightsquid-1.7.1');

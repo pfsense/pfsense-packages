@@ -562,8 +562,10 @@
 		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
-		<version>1.8.2 pkg v.2.36</version>
+		<version>2.36</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
+		<port_category>www</port_category>
+		<run_depends>libexec/lightsquid/ip2name.list:www/lightsquid</run_depends>
 		<depends_on_package_pbi>lightsquid-1.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>graphics/gd graphics/p5-GD</ports_before>
