@@ -33,7 +33,7 @@
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
 	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-	if (($pfs_version == "2.2") && is_dir('/usr/pbi/lcdproc-' . php_uname('m'))) {
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 		define('LCDPROC_CONFIG', '/usr/pbi/lcdproc-' . php_uname('m') . '/local/etc/LCDd.conf');
 	} else {
 		define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
