@@ -1036,6 +1036,7 @@
 			<port>sysutils/lcdproc</port>
 		</build_pbi>
 		<build_options>lcdproc_SET_FORCE=USB</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>LCDproc-dev</name>
