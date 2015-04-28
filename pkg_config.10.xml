@@ -814,6 +814,8 @@
 		<maintainer>sullrich+pfsp@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/darkstat/darkstat.xml</config_file>
 		<configurationfile>darkstat.xml</configurationfile>
+		<port_category>net-mgmt</port_category>
+		<run_depends>sbin/darkstat:net-mgmt/darkstat</run_depends>
 		<build_pbi>
 			<port>net-mgmt/darkstat</port>
 		</build_pbi>
