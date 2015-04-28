@@ -48,7 +48,10 @@ require_once("services.inc");
 
 // Check pfSense version
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
+if ($pfs_version == "2.1" || $pfs_version == "2.2")
+	define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
+else
+	define('FREERADIUS_BASE', '/usr/local');
 $bash_path = FREERADIUS_BASE . "/bin/bash";
 
 if ($pfs_version == "2.1") {
