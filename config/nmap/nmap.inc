@@ -32,14 +32,14 @@ function nmap_install() {
 	$destination_file = "/usr/local/share/nmap/nmap-mac-prefixes";
 	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 	switch ($pfs_version) {
-		case "1.2":
-		case "2.0":
-			return null;
 		case "2.1":
 			$source_file = "/usr/pbi/nmap-" . php_uname("m") . "/share/nmap/nmap-mac-prefixes";
 			break;
-		default:
+		case "2.2":
 			$source_file = "/usr/pbi/nmap-" . php_uname("m") . "/local/share/nmap/nmap-mac-prefixes";
+			break;
+		default:
+			return null;
 	}
 	/* Only copy the file if it doesn't exist */
 	if (file_exists($source_file) && !file_exists($destination_file)) {
