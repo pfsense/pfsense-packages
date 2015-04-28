@@ -827,11 +827,12 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.8 pkg v1.0.2</version>
+		<version>1.0.2</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
-		<maintainer></maintainer>
+		<port_category>net</port_category>
+		<run_depends>sbin/pfflowd:net/pfflowd-0.8</run_depends>
 		<build_pbi>
 			<custom_name>pfflowd</custom_name>
 			<port>net/pfflowd-0.8</port>
