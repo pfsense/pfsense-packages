@@ -758,7 +758,7 @@
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
-		<version>20111108_2 pkg v 0.3.2</version>
+		<version>0.3.2</version>
 		<required_version>2.2</required_version>
 		<status>BETA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
@@ -766,6 +766,8 @@
 		<configurationfile>imspector.xml</configurationfile>
 		<depends_on_package_pbi>imspector-20111108_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_options>imspector_SET_FORCE=PLUGINS;imspector_UNSET_FORCE=IPFW</build_options>
+		<port_category>net-im</port_category>
+		<run_depends>sbin/imspector:net-im/imspector</run_depends>
 		<build_pbi>
 			<port>net-im/imspector</port>
 		</build_pbi>
