@@ -933,6 +933,8 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>iperf.xml</configurationfile>
+		<port_category>benchmarks</port_category>
+		<run_depends>bin/iperf:benchmarks/iperf</run_depends>
 		<build_pbi>
 			<port>benchmarks/iperf</port>
 		</build_pbi>
