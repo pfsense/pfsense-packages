@@ -950,6 +950,8 @@
 		<required_version>2.2</required_version>
 		<status>ALPHA</status>
 		<configurationfile>netio.xml</configurationfile>
+		<port_category>benchmarks</port_category>
+		<run_depends>bin/netio:benchmarks/netio</run_depends>
 		<build_pbi>
 			<port>benchmarks/netio</port>
 		</build_pbi>
