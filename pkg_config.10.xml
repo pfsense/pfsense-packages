@@ -777,13 +777,14 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.7.2_6 pkg 2.0.4</version>
+		<version>2.0.4</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
 		<depends_on_package_pbi>nut-2.7.2_6-##ARCH##.pbi</depends_on_package_pbi>
+		<run_depends>bin/upsc:sysutils/nut</run_depends>
 		<build_pbi>
 			<port>sysutils/nut</port>
 		</build_pbi>
