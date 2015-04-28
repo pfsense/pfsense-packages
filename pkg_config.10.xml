@@ -850,6 +850,8 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/widentd/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
+		<port_category>net</port_category>
+		<run_depends>sbin/widentd:net/widentd</run_depends>
 		<build_pbi>
 			<port>net/widentd</port>
 		</build_pbi>
