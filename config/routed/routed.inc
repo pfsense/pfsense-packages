@@ -1,135 +1,132 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<packagegui>
-	<copyright>
-	/* $Id$ */
-	/*
-		part of pfSense (https://www.pfsense.org/)
+<?php
+/* $Id$ */
+/*
+	routed.inc
+	Copyright (C) 2006 Bill Marquette
+	All rights reserved.
 
-		Copyright (C) 2006 Bill Marquette - bill.marquette@gmail.com.
-		All rights reserved.
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-		Redistribution and use in source and binary forms, with or without
-		modification, are permitted provided that the following conditions are met:
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-		1. Redistributions of source code must retain the above copyright notice,
-		   this list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-		2. Redistributions in binary form must reproduce the above copyright
-		   notice, this list of conditions and the following disclaimer in the
-		   documentation and/or other materials provided with the distribution.
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
 
-		THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-		INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-		AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-		AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-		OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-		SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-		INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-		CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-		ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-		POSSIBILITY OF SUCH DAMAGE.
-	*/
-	</copyright>
-	<name>routed</name>
-	<version>1.1</version>
-	<title>Services: RIP</title>
-	<include_file>/usr/local/pkg/routed.inc</include_file>
+*/
 
-	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/routed/routed.inc</item>
-	</additional_files_needed>
+function setup_routed() {
+	global $config;
+	$gw = "";
 
-	<!-- Menu is where this packages menu will appear -->
-	<menu>
-		<name>RIP</name>
-		<section>Services</section>
-		<configfile>routed.xml</configfile>
-		<url>pkg_edit.php?xml=routed.xml&amp;id=0</url>
-	</menu>
-	<tabs>
-		<tab>
-			<text>ROUTED Settings</text>
-			<url>/pkg_edit.php?xml=routed.xml</url>
-			<active/>
-		</tab>
-	</tabs>
-	<!-- configpath gets expanded out automatically and config items will be
-		stored in that location -->
-	<configpath>['installedpackages']['routed']['config']</configpath>
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-		will be parsed and rendered for the user as a gui with input, and selectboxes. -->
-	<fields>
-		<field>
-			<fielddescr>Enable RIP</fielddescr>
-			<fieldname>enable</fieldname>
-			<description>Enables the Routing Information Protocol daemon</description>
-			<type>checkbox</type>
-			<enablefields>iface_array[],ripversion,passwd,enable_no_ag,enable_no_super_ag</enablefields>
-		</field>
-		<field>
-			<fielddescr>Interfaces</fielddescr>
-			<fieldname>iface_array</fieldname>
-			<value>lan</value>
-			<multiple>true</multiple>
-			<size>5</size>
-			<type>interfaces_selection</type>
-			<description>Select the interfaces that RIP will bind to.  You can use the CTRL or COMMAND key to select multiple interfaces.</description>
-			<required />
-		</field>
-		<field>
-			<fielddescr>RIP Version</fielddescr>
-			<fieldname>ripversion</fieldname>
-			<type>select</type>
-			<default_value>2</default_value>
-			<options>
-				<option><name>RIP Version 1</name><value>1</value></option>
-				<option><name>RIP Version 2</name><value>2</value></option>
-			</options>
-			<typehint>Select which RIP version the daemon will listen/advertise using.</typehint>
-			<required />
-		</field>
-		<field>
-			<fielddescr>RIPv2 password</fielddescr>
-			<fieldname>passwd</fieldname>
-			<description>Specify a RIPv2 password.  This password will be sent 
-				in the clear on all RIPv2 responses received and sent.
-			</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>no_ag</fielddescr>
-			<fieldname>enable_no_ag</fieldname>
-			<description>turns off aggregation of subnets in RIPv1 and RIPv2 responses.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>no_super_ag</fielddescr>
-			<fieldname>enable_no_super_ag</fieldname>
-			<description>turns off aggregation of networks into supernets in RIPv2 responses.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>passive</fielddescr>
-			<fieldname>enable_passive_iface_array</fieldname>
-			<value>lan</value>
-			<multiple>true</multiple>
-			<size>5</size>
-			<description>marks the interfaces to not be advertised in updates sent via other interfaces, and turns off all RIP and router discovery through the interface.</description>
-			<type>interfaces_selection</type>
-		</field>
-	</fields>
-	<aftersaveredirect>pkg_edit.php?xml=routed.xml&amp;id=0</aftersaveredirect>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
-	<custom_delete_php_command>
-	</custom_delete_php_command>
-	<custom_php_resync_config_command>
-		conf_mount_rw();
-		setup_routed();
+	if (!is_array($config['installedpackages']['routed']))
+		return;
+	if (!is_array($config['installedpackages']['routed']['config']))
+		return;
+	if (isset($config['installedpackages']['routed']['config'][0]['enable']) &&
+		$config['installedpackages']['routed']['config'][0]['enable'] == "on") {
+			/* if user selected individual interfaces */
+			$ifarr = array_flip(explode(",", $config['installedpackages']['routed']['config'][0]['iface_array']));
+			$allifs = get_interface_arr();
+			/* passive array */
+			$ifarr_passive = array_flip(explode(",", $config['installedpackages']['routed']['config'][0]['enable_passive_iface_array']));
+			if (!empty($ifarr)) {
+				foreach($allifs as $ifname) {
+					$friendly_ifname = convert_real_interface_to_friendly_interface_name($ifname);
+					if (array_key_exists($friendly_ifname, $ifarr))
+					{
+						if(array_key_exists($friendly_ifname, $ifarr_passive))
+						{
+							$gw .= setup_etc_gateways($ifname, 'enable', 'on');
+						}
+						else $gw .= setup_etc_gateways($ifname, 'enable', 'off');
+					}
+					else
+					{
+						$gw .= setup_etc_gateways($ifname, 'disable');
+					}
+				}
+			}
+			else
+				/* setup for all interfaces */
+				$gw = setup_etc_gateways();
+			conf_mount_rw();
+			file_put_contents("/etc/gateways", $gw);
 		conf_mount_ro();
-	</custom_php_resync_config_command>
-	<custom_php_install_command>
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-	</custom_php_deinstall_command>
-</packagegui>
+		restart_routed();
+	} else
+		stop_routed();
+}
+
+function setup_etc_gateways($iface="", $mode="", $passive="") {
+	global $config;
+
+	$ret = "";
+	if ($iface != "") {
+		$realif=convert_friendly_interface_to_real_interface_name($iface);
+		if (!empty($realif))
+			$ret = "if={$realif} ";
+	}
+
+	switch($mode) {
+	case "enable":
+		if ($config['installedpackages']['routed']['config'][0]['ripversion'] == "2") {
+			$ret .= "ripv2 ";
+			$passwd = $config['installedpackages']['routed']['config'][0]['passwd'];
+			if ($passwd != "") {
+				$ret .= "passwd={$passwd} ";
+			}
+			$add_no_ag = $config['installedpackages']['routed']['config'][0]['enable_no_ag'];
+			$add_no_super_ag = $config['installedpackages']['routed']['config'][0]['enable_no_super_ag'];
+			$add_passive = $config['installedpackages']['routed']['config'][0]['enable_passive'];
+			if($add_no_ag == "on") {
+				$ret .= "no_ag ";
+			}
+			if($add_no_super_ag == "on") {
+				$ret .= "no_super_ag ";
+			}
+			if($passive == "on") {
+				$ret .= "passive ";
+			}
+		}
+		break;
+	case "disable":
+		$ret .= "no_rip_out no_solicit no_rdisc no_rdisc_adv";
+		break;
+
+	default:
+		break;
+
+	}
+	$ret .= "\n";
+
+	return $ret;
+}
+
+function start_routed() {
+	mwexec_bg("/sbin/routed");
+}
+
+function stop_routed() {
+	killbyname("routed");
+}
+
+function restart_routed() {
+	stop_routed();
+	start_routed();
+}
+
+?>
