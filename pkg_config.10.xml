@@ -894,7 +894,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
 		<port_category>net-mgmt</port_category>
-		<port_uses>pgsql</port_uses>
+		<port_uses>USES=pgsql</port_uses>
 		<run_depends>bandwidthd/bandwidthd:net-mgmt/bandwidthd</run_depends>
 		<build_pbi>
 			<ports_before>net/libpcap databases/postgresql91-client graphics/gd</ports_before>
