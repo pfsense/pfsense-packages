@@ -54,12 +54,12 @@ else
 	define('FREERADIUS_BASE', '/usr/local');
 $bash_path = FREERADIUS_BASE . "/bin/bash";
 
-if ($pfs_version == "2.1") {
-	define('FREERADIUS_LIB', FREERADIUS_BASE . '/lib');
-	define('FREERADIUS_ETC', FREERADIUS_BASE . '/etc');
-} else {
+if ($pfs_version == "2.2") {
 	define('FREERADIUS_LIB', FREERADIUS_BASE . '/local/lib');
 	define('FREERADIUS_ETC', FREERADIUS_BASE . '/local/etc');
+} else {
+	define('FREERADIUS_LIB', FREERADIUS_BASE . '/lib');
+	define('FREERADIUS_ETC', FREERADIUS_BASE . '/etc');
 }
 
 // Check freeradius lib version
@@ -68,11 +68,11 @@ if ($pfs_version == "2.1") {
 		$libfiles = scandir(FREERADIUS_LIB);
 		foreach ($libfiles as $libfile){
 			if (preg_match("/freeradius-/",$libfile))
-				$frlib=FREERADIUS_BASE . "/lib/{$libfile}";
+				$frlib=FREERADIUS_LIB . '/' . $libfile;
 		}
 	}
 	if ($frlib == ""){
-		log_error("freeRADIUS - No freeradius lib found on ".FREERADIUS_BASE."/lib");
+		log_error("freeRADIUS - No freeradius lib found on ".FREERADIUS_LIB);
 	}
 	
 function freeradius_deinstall_command() {
@@ -95,7 +95,9 @@ function freeradius_install_command() {
 	@symlink(FREERADIUS_ETC . "/raddb", "/usr/local/etc/raddb");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
-	exec("chown -R root:wheel " . FREERADIUS_ETC . "/raddb && chown -R root:wheel {$frlib} && chown -R root:wheel /var/log/radacct");
+	exec("chown -R root:wheel " . FREERADIUS_ETC . "/raddb /var/log/radacct");
+	if (file_exists($frlib))
+		exec("chown -R root:wheel {$frlib}");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists(FREERADIUS_ETC . "/raddb/policy.conf.backup")) {

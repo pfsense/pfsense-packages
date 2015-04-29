@@ -45,7 +45,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradius</name>
-	<version>2.2.0</version>
+	<version>1.6.12</version>
 	<title>FreeRADIUS: Users</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<menu>
