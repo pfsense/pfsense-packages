@@ -1079,6 +1079,7 @@
 			<facilityname>arpwatch</facilityname>
 			<logfilename>arpwatch.log</logfilename>
 		</logging>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>squidGuard</name>
