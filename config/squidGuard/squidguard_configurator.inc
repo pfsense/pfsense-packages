@@ -121,7 +121,7 @@ define('REDIRECT_URL_ARGS', '&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u');
 # ------------------------------------------------------------------------------
 
 
-if ($pf_version > 2.0) {
+if ($pf_version == "2.0" || $pf_version == "2.2") {
 	if (file_exists('/usr/pbi/squidguard-squid3-' . php_uname("m")))
 		define('SQUIDGUARD_LOCALBASE', '/usr/pbi/squidguard-squid3-' . php_uname("m"));
 	else
@@ -129,10 +129,12 @@ if ($pf_version > 2.0) {
 } else
 	define('SQUIDGUARD_LOCALBASE','/usr/local');
 
-if (!defined('SQUID_LOCALBASE') && ($pf_version > 2.0))
-	define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
-elseif (!defined('SQUID_LOCALBASE'))
-	define('SQUID_LOCALBASE','/usr/local');
+if (!defined('SQUID_LOCALBASE')) {
+	if ($pf_version == "2.0" || $pf_version == "2.2")
+		define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
+	else
+		define('SQUID_LOCALBASE','/usr/local');
+}
 
 define('SQUID_CONFIGFILE',              SQUID_LOCALBASE . '/etc/squid/squid.conf');
 define('TMP_DIR',                       '/var/tmp');
