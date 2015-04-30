@@ -1170,6 +1170,8 @@
 		<configurationfile>blinkled.xml</configurationfile>
 		<pkginfolink>https://doc.pfsense.org/index.php/BlinkLED_Package</pkginfolink>
 		<website>https://doc.pfsense.org/index.php/BlinkLED_Package</website>
+		<port_category>sysutils</port_category>
+		<run_depends>bin/blinkled:sysutils/blinkled</run_depends>
 		<build_pbi>
 			<port>sysutils/blinkled</port>
 		</build_pbi>
@@ -1182,6 +1184,7 @@
 		<version>0.2.1</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
+		<port_category>sysutils</port_category>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/gwled/gwled.xml</config_file>
 		<configurationfile>gwled.xml</configurationfile>
