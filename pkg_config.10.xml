@@ -1195,6 +1195,7 @@
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>widget-havp.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Dashboard Widget: Antivirus Status</name>
@@ -1205,6 +1206,7 @@
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>widget-havp.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>RRD Summary</name>
