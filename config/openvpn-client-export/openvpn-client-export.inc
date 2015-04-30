@@ -46,7 +46,6 @@ function openvpn_client_export_install() {
 	global $current_openvpn_version;
 	conf_mount_rw();
 	$tarpath = "/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz";
-	$phpfile = "vpn_openvpn_export.php";
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
 
