@@ -44,16 +44,20 @@ $current_openvpn_version_rev = "03";
 
 function openvpn_client_export_install() {
 	global $current_openvpn_version;
-	conf_mount_rw();
-	$tarpath = "/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz";
-	$ovpndir = "/usr/local/share/openvpn";
-	$workdir = "{$ovpndir}/client-export";
 
-	if (!is_dir($workdir))
-		mkdir($workdir, 0777, true);
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		conf_mount_rw();
+		$tarpath = "/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz";
+		$ovpndir = "/usr/local/share/openvpn";
+		$workdir = "{$ovpndir}/client-export";
 
-	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
-	conf_mount_ro();
+		if (!is_dir($workdir))
+			mkdir($workdir, 0777, true);
+
+		exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
+		conf_mount_ro();
+	}
 }
 
 function openvpn_client_export_deinstall() {
