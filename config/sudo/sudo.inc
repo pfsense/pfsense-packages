@@ -31,11 +31,6 @@ require_once("config.inc");
 global $pfs_version;
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
-	case "1.2":
-	case "2.0":
-		define('SUDO_BASE','/usr/local');
-		define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
-		break;
 	case "2.1":
 		// Hackish way to detect if someone manually did pkg_add rather than use pbi.
 		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
@@ -46,7 +41,7 @@ switch ($pfs_version) {
 			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
 		}
 		break;
-	default:
+	case "2.2":
 		define('SUDO_BASE','/usr/local');
 		// Hackish way to detect if someone manually did pkg_add rather than use pbi.
 		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
@@ -54,6 +49,10 @@ switch ($pfs_version) {
 		} else {
 			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
 		}
+		break;
+	default:
+		define('SUDO_BASE','/usr/local');
+		define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
 }
 
 define('SUDO_CONFIG_DIR', SUDO_BASE . '/etc');
