@@ -1542,6 +1542,8 @@
 		<config_file>https://packages.pfsense.org/packages/config/sudo/sudo.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>sudo.xml</configurationfile>
+		<port_category>security</port_category>
+		<run_depends>bin/sudo:security/sudo</run_depends>
 		<build_pbi>
 			<port>security/sudo</port>
 		</build_pbi>
@@ -1549,6 +1551,7 @@
 	</package>
 	<package>
 		<name>Service Watchdog</name>
+		<internal_name>Service_Watchdog</internal_name>
 		<descr>Monitors for stopped services and restarts them.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>1.6</version>
@@ -1566,11 +1569,13 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/softflowd/softflowd.xml</config_file>
 		<depends_on_package_pbi>softflowd-0.9.8_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.9.8_2 pkg v1.1</version>
+		<version>1.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>softflowd.xml</configurationfile>
 		<maintainer></maintainer>
+		<port_category>net-mgmt</port_category>
+		<run_depends>sbin/softflowd:net-mgmt/softflowd</run_depends>
 		<build_pbi>
 			<port>net-mgmt/softflowd</port>
 		</build_pbi>
