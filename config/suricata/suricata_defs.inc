@@ -58,9 +58,14 @@ $suricata_package_version = "Suricata {$config['installedpackages']['package'][g
 if (!defined('SURICATA_PKG_VER'))
 	define('SURICATA_PKG_VER', $suricata_package_version);
 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 // Define the PBI base directory
-if (!defined('SURICATA_PBI_BASEDIR'))
-	define('SURICATA_PBI_BASEDIR', '/usr/pbi/suricata-' . php_uname("m") . '/');
+if (!defined('SURICATA_PBI_BASEDIR')) {
+	if ($pf_version == "2.1" || $pf_version == "2.2")
+		define('SURICATA_PBI_BASEDIR', '/usr/pbi/suricata-' . php_uname("m") . '/');
+	else
+		define('SURICATA_PBI_BASEDIR', '/usr/local/');
+}
 
 // Define the PBI binary wrapper directory
 if (!defined('SURICATA_PBI_BINDIR'))
