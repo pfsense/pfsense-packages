@@ -1321,12 +1321,14 @@
 	</package>
 	<package>
 		<name>System Patches</name>
+		<internal_name>System_Patches</internal_name>
 		<descr>A package to apply and maintain custom system patches.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>1.0.3</version>
 		<category>System</category>
 		<status>RELEASE</status>
 		<config_file>https://packages.pfsense.org/packages/config/systempatches/systempatches.xml</config_file>
+		<port_category>sysutils</port_category>
 		<pkginfolink></pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>systempatches.xml</configurationfile>
@@ -1379,6 +1381,8 @@
 		<config_file>https://packages.pfsense.org/packages/config/iftop/iftop.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>iftop.xml</configurationfile>
+		<port_category>net-mgmt</port_category>
+		<run_depends>sbin/iftop:net-mgmt/iftop</run_depends>
 		<build_pbi>
 			<port>net-mgmt/iftop</port>
 		</build_pbi>
@@ -1396,6 +1400,8 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<configurationfile>git.xml</configurationfile>
 		<build_options>git_UNSET_FORCE=GITWEB GUI HTMLDOCS CVS P4 SVN;git_SET_FORCE=CONTRIB CURL ETCSHELLS ICONV NLS PERL</build_options>
+		<port_category>devel</port_category>
+		<run_depends>bin/git:devel/git-lite</run_depends>
 		<build_pbi>
 			<port>devel/git</port>
 		</build_pbi>
