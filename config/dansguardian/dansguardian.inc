@@ -164,7 +164,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	$maxips=($dansguardian['maxips']?$dansguardian['maxips']:"0");
 	$preforkchildren=($dansguardian['preforkchildren']?$dansguardian['preforkchildren']:"10");
 	$proxyip=($dansguardian['proxyip']?$dansguardian['proxyip']:"127.0.0.1");
-	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"127.0.0.1");
+	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"3128");
 	$proxytimeout=($dansguardian['proxytimeout']?$dansguardian['proxytimeout']:"30");
 	
 	#general options
