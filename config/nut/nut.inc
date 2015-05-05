@@ -35,6 +35,7 @@
 
 	define('NUT_RCFILE', '/usr/local/etc/rc.d/nut.sh');
 
+	global $pfs_version;
 	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 		define('NUT_DIR', '/usr/pbi/nut-' . php_uname("m") . '/etc/nut');
