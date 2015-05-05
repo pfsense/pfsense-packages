@@ -130,11 +130,11 @@ function squid_dash_z($cache_action='none') {
 		mwexec_bg("/bin/rm -rf {$cachedir}.old");
 	}
 
-	if (!is_dir($cachedir.'/')) {
+	if (!is_dir($cachedir)) {
 		log_error("Creating Squid cache dir {$cachedir}");
 		@mkdir($cachedir, 0755, true);
-		// Double check permissions here, should be safe to recurse cache dir if it's small here.
-		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
+		@chown($cachedir, SQUID_UID);
+		@chgrp($cachedir, SQUID_GID);
 	}
 
 	if (!is_dir($cachedir.'/00/')) {
