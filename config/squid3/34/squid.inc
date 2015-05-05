@@ -892,21 +892,21 @@ function squid_resync_general() {
 		if ($srv_cert != false) {
 			if (base64_decode($srv_cert['prv'])) {
 				// check if ssl_db was initilized by squid
-				if (!file_exists("/var/squid/lib/ssl_db/serial")) {
-					if (is_dir("/var/squid/lib/ssl_db")) {
-						mwexec("/bin/rm -rf /var/squid/lib/ssl_db");
+				if (!file_exists(SQUID_SSL_DB . "/serial")) {
+					if (is_dir(SQUID_SSL_DB)) {
+						mwexec("/bin/rm -rf " . SQUID_SSL_DB);
 					}
-					mwexec(SQUID_LOCALBASE."/libexec/squid/ssl_crtd -c -s /var/squid/lib/ssl_db/");
+					mwexec(SQUID_LOCALBASE."/libexec/squid/ssl_crtd -c -s " . SQUID_SSL_DB);
 				}
 				// force squid user permission on /var/squid/lib/ssl_db/
-				squid_chown_recursive("/var/squid/lib/ssl_db/", 'proxy', 'proxy');
+				squid_chown_recursive(SQUID_SSL_DB, 'proxy', 'proxy');
 				//  cert, key, version, cipher,options, clientca, cafile, capath, crlfile, dhparams,sslflags, and sslcontext
 				$crt_pk=SQUID_CONFBASE."/serverkey.pem";
 				$crt_capath=SQUID_LOCALBASE."/share/certs/";
 				file_put_contents($crt_pk,base64_decode($srv_cert['prv']).base64_decode($srv_cert['crt']));
 				$sslcrtd_children= ($settings['sslcrtd_children'] ? $settings['sslcrtd_children'] : 5);
 				$ssl_interception.="ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=".($sslcrtd_children*2)."MB cert={$crt_pk} capath={$crt_capath}\n";
-				$interception_checks  = "sslcrtd_program ".SQUID_LOCALBASE."/libexec/squid/ssl_crtd -s /var/squid/lib/ssl_db -M 4MB -b 2048\n";
+				$interception_checks  = "sslcrtd_program ".SQUID_LOCALBASE."/libexec/squid/ssl_crtd -s " . SQUID_SSL_DB . " -M 4MB -b 2048\n";
 				$interception_checks .= "sslcrtd_children {$sslcrtd_children}\n";
 				$interception_checks .= "sslproxy_capath {$crt_capath}\n";
 				if (preg_match("/sslproxy_cert_error/",$settings["interception_checks"]))
