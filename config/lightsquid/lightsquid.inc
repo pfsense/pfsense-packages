@@ -115,8 +115,6 @@ define('LS_XML_SHEDULERTIME',		'lightsquid_refreshsheduler_time');
 define('LS_XML_SQUID_SHEDULERTIME',	'lightsquid_squidrotatelog_sheduler_time');
 
 function lightsquid_install() {
-	global $pfs_version;
-
 	update_log("lightsquid_install: started");
 
 	// create lightsquid report catalog
@@ -125,6 +123,7 @@ function lightsquid_install() {
 		mwexec("/bin/mkdir -p " . LS_REPORTPATH);
 	}
 
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 		# check perl
 		$perl_path = '/usr/bin/perl';
@@ -174,10 +173,11 @@ function lightsquid_deinstall() {
 }
 
 function lightsquid_resync() {
-	global $config, $pfs_version;
+	global $config;
 	$tm = '';
 	$tm_squid = '';
 
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 		# check perl
 		if (!file_exists("/usr/bin/perl"))
