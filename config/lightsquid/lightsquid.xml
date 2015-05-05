@@ -46,7 +46,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>lightsquid</name>
-	<version>2.39</version>
+	<version>2.40</version>
 	<title>Services: Proxy Reports (LightSquid, SQStat) -> Settings</title>
 	<category>Status</category>
 	<include_file>/usr/local/pkg/lightsquid.inc</include_file>
@@ -97,192 +97,192 @@
                <item>https://packages.pfsense.org/packages/config/lightsquid/zhabascript.js</item>
         </additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/bigfiles.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/day_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/graph.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/group_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/images/datetime.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/images/flag_red.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/images/graph.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/images/groups.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/images/printer.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/images/users.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/index.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/month_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/print.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/screen.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/topsites.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/user_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/user_month.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/user_time.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novopf/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novopf/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novopf/whousesite.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/bigfiles.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/day_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/graph.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/group_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/images/datetime.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/images/flag_red.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/images/graph.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/images/groups.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/images/printer.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/images/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/images/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/images/users.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/index.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/month_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/print.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/screen.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/topsites.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/user_detail.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/user_month.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/user_time.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/lightsquid/tpl/novosea/</prefix>
+		<prefix>/usr/local/share/lightsquid/tpl/novosea/</prefix>
 		<chmod>0444</chmod>
 		<item>https://packages.pfsense.org/packages/config/lightsquid/tpl/novosea/whousesite.html</item>
 	</additional_files_needed>

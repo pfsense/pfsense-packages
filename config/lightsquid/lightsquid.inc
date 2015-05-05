@@ -63,7 +63,7 @@ define('LS_CONFIGPATH',			LIGHTSQUID_BASE . '/etc/lightsquid');
 define('LS_CONFIGFILE',			'lightsquid.cfg');
 define('LS_CONFIGFILE_DIST',		'lightsquid.cfg.dist');
 define('LS_WWWPATH',			LIGHTSQUID_BASE . '/www/lightsquid');
-define('LS_TEMPLATEPATH',		'/usr/local/www/lightsquid/tpl');
+define('LS_TEMPLATEPATH',		LS_WWWPATH . '/tpl');
 define('LS_LANGPATH',			LIGHTSQUID_BASE . '/share/lightsquid/lang');
 define('LS_REPORTPATH',			'/var/lightsquid/report');
 
@@ -145,9 +145,19 @@ function lightsquid_install() {
 		if (!is_dir('/usr/local/etc/lightsquid') && is_dir(LS_CONFIGPATH)) {
 			symlink(LS_CONFIGPATH, '/usr/local/etc/lightsquid');
 		}
-		if (!is_dir('/usr/local/www/lightsquid') && is_dir(LS_WWWPATH)) {
+
+		if (is_dir('/usr/local/www/lightsquid'))
+			$_gc = exec('rm -rf /usr/local/www/lightsquid');
+
+		if (is_dir(LS_WWWPATH)) {
 			symlink(LS_WWWPATH, '/usr/local/www/lightsquid');
 		}
+	}
+
+	foreach (array('novopf', 'novosea') as $tpl) {
+		if (file_exists(LS_TEMPLATEPATH . '/' . $tpl))
+			$_gc = exec('rm -rf ' . LS_TEMPLATEPATH . '/' . $tpl);
+		symlink('/usr/local/share/lightsquid/tpl/' . $tpl, LS_TEMPLATEPATH . '/' . $tpl);
 	}
 
 	update_log("lightsquid_install: stopped");
