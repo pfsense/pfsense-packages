@@ -74,13 +74,10 @@ function sq_text_area_decode($text) {
 }
 
 function squid_get_real_interface_address($iface) {
-	global $config;
+	if (!function_exists("get_interface_ip"))
+		require_once("interfaces.inc");
 
-	$iface = convert_friendly_interface_to_real_interface_name($iface);
-	$line = trim(shell_exec("ifconfig $iface | grep inet | grep -v inet6"));
-	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
-
-	return array($ip, long2ip(hexdec($netmask)));
+	return array(get_interface_ip($iface), gen_subnet_mask(get_interface_subnet($iface)));
 }
 
 function squid_chown_recursive($dir, $user, $group) {
