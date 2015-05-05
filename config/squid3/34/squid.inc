@@ -148,9 +148,9 @@ function squid_dash_z($cache_action='none') {
 	}
 
 	if (file_exists("/var/squid/cache/swap.state")) {
-		chown("/var/squid/cache/swap.state", "proxy");
-		chgrp("/var/squid/cache/swap.state", "proxy");
-		exec("chmod a+rw /var/squid/cache/swap.state");
+		chown("/var/squid/cache/swap.state", SQUID_UID);
+		chgrp("/var/squid/cache/swap.state", SQUID_GID);
+		chmod("/var/squid/cache/swap.state", "a+rw");
 	}
 }
 
