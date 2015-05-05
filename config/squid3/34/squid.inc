@@ -328,7 +328,7 @@ function squid_install_command() {
 			SQUID_LIB,
 			SQUID_SSL_DB ) as $dir) {
 		@mkdir($dir, 0755, true);
-		squid_chown_recursive($dir, 'proxy', 'proxy');
+		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
 	}
 
 	/* kill any running proxy alarm scripts */
@@ -906,7 +906,7 @@ function squid_resync_general() {
 					mwexec(SQUID_LOCALBASE."/libexec/squid/ssl_crtd -c -s " . SQUID_SSL_DB);
 				}
 				// force squid user permission on /var/squid/lib/ssl_db/
-				squid_chown_recursive(SQUID_SSL_DB, 'proxy', 'proxy');
+				squid_chown_recursive(SQUID_SSL_DB, SQUID_UID, SQUID_GID);
 				//  cert, key, version, cipher,options, clientca, cafile, capath, crlfile, dhparams,sslflags, and sslcontext
 				$crt_pk=SQUID_CONFBASE."/serverkey.pem";
 				$crt_capath=SQUID_LOCALBASE."/share/certs/";
@@ -986,7 +986,7 @@ function squid_resync_general() {
 	$pidfile = "{$piddir}/squid.pid";
 	if (!is_dir($piddir)) {
 		@mkdir($piddir, 0755, true);
-		squid_chown_recursive($piddir, 'proxy', 'wheel');
+		squid_chown_recursive($piddir, SQUID_UID, 'wheel');
 	}
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'en');
 	$icondir = SQUID_CONFBASE . '/icons';
@@ -996,19 +996,22 @@ function squid_resync_general() {
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	if (!is_dir($logdir)) {
 		@mkdir($logdir, 0755, true);
-		squid_chown_recursive($logdir, 'proxy', 'proxy');
+		squid_chown_recursive($logdir, SQUID_UID, SQUID_GID);
 	}
 	$logdir_cache = $logdir . '/cache.log';
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
 	$pinger_helper = ($settings['disable_pinger']) =='on' ? 'off' : 'on';
 	$pinger_program=SQUID_LOCALBASE."/libexec/squid/pinger";
 
+	$squid_uid = SQUID_UID;
+	$squid_gid = SQUID_GID;
+
 	$conf .= <<< EOD
 icp_port {$icp_port}
 dns_v4_first {$dns_v4_first}
 pid_filename {$pidfile}
-cache_effective_user proxy
-cache_effective_group proxy
+cache_effective_user {$squid_uid}
+cache_effective_group {$squid_gid}
 error_default_language {$language}
 icon_directory {$icondir}
 visible_hostname {$hostname}
@@ -1851,7 +1854,7 @@ function squid_resync_users() {
 			$contents .= $user['username'] . ':' . crypt($user['password'], base64_encode($user['password'])) . "\n";
 	}
 	file_put_contents(SQUID_PASSWD, $contents);
-	chown(SQUID_PASSWD, 'proxy');
+	chown(SQUID_PASSWD, SQUID_UID);
 	chmod(SQUID_PASSWD, 0600);
 }
 
@@ -1867,7 +1870,7 @@ function squid_resync_msnt() {
 	$ntdomain = $settings['auth_ntdomain'];
 
 	file_put_contents(SQUID_CONFBASE."/msntauth.conf","server {$pdcserver} {$bdcserver} {$ntdomain}");
-	chown(SQUID_CONFBASE."/msntauth.conf", 'proxy');
+	chown(SQUID_CONFBASE."/msntauth.conf", SQUID_UID);
 	chmod(SQUID_CONFBASE."/msntauth.conf", 0600);
 }
 
@@ -1894,9 +1897,9 @@ function squid_resync($via_rpc="no") {
 			SQUID_LIB,
 			SQUID_SSL_DB ) as $dir) {
 		@mkdir($dir, 0755, true);
-		chown($dir, 'proxy');
-		chgrp($dir, 'proxy');
-		squid_chown_recursive($dir, 'proxy', 'proxy');
+		chown($dir, SQUID_UID);
+		chgrp($dir, SQUID_GID);
+		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
 	}
 	$conf = squid_resync_general() . "\n";
 	$conf .= squid_resync_cache() . "\n";
@@ -1936,7 +1939,7 @@ function squid_resync($via_rpc="no") {
 		if (!is_dir($log_dir)) {
 			log_error("Creating squid log dir $log_dir");
 			@mkdir($log_dir, 0755, true);
-			squid_chown_recursive($log_dir, 'proxy', 'proxy');
+			squid_chown_recursive($log_dir, SQUID_UID, SQUID_GID);
 		}
 
 		squid_dash_z();
