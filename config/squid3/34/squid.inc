@@ -84,6 +84,9 @@ function squid_get_real_interface_address($iface) {
 }
 
 function squid_chown_recursive($dir, $user, $group) {
+	if ($dir == '/usr/local')
+		return;
+
 	chown($dir, $user);
 	chgrp($dir, $group);
 	$handle = opendir($dir) ;
