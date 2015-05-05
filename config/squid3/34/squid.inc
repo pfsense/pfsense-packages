@@ -47,9 +47,13 @@ $pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 	define('SQUID_BASE', '/usr/pbi/squid-' . php_uname("m"));
 	define('SQUID_LOCALBASE', SQUID_BASE . "/local");
+	define('SQUID_UID', 'proxy');
+	define('SQUID_GID', 'proxy');
 } else {
 	define('SQUID_BASE', '/usr/local');
 	define('SQUID_LOCALBASE', '/usr/local');
+	define('SQUID_UID', 'squid');
+	define('SQUID_GID', 'squid');
 }
 
 define('SQUID_CONFBASE', SQUID_LOCALBASE .'/etc/squid');
