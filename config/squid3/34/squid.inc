@@ -132,7 +132,7 @@ function squid_dash_z($cache_action='none') {
 
 	if (!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir {$cachedir}");
-		make_dirs($cachedir);
+		@mkdir($cachedir, 0755, true);
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
 	}
@@ -324,7 +324,7 @@ function squid_install_command() {
 			SQUID_BASE,
 			SQUID_LIB,
 			SQUID_SSL_DB ) as $dir) {
-		make_dirs($dir);
+		@mkdir($dir, 0755, true);
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
@@ -982,7 +982,7 @@ function squid_resync_general() {
 	$piddir="{$g['varrun_path']}/squid";
 	$pidfile = "{$piddir}/squid.pid";
 	if (!is_dir($piddir)) {
-		make_dirs($piddir);
+		@mkdir($piddir, 0755, true);
 		squid_chown_recursive($piddir, 'proxy', 'wheel');
 	}
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'en');
@@ -992,7 +992,7 @@ function squid_resync_general() {
 
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	if (!is_dir($logdir)) {
-		make_dirs($logdir);
+		@mkdir($logdir, 0755, true);
 		squid_chown_recursive($logdir, 'proxy', 'proxy');
 	}
 	$logdir_cache = $logdir . '/cache.log';
@@ -1466,7 +1466,7 @@ EOF;
 		);
 		foreach ($dirs as $dir_path => $dir_user) {
 			if (!is_dir($dir_path))
-				make_dirs($dir_path);
+				@mkdir($dir_path, 0755, true);
 			squid_chown_recursive($dir_path, $dir_user, "wheel");
 		}
 		// Check clamav database
@@ -1890,7 +1890,7 @@ function squid_resync($via_rpc="no") {
 			SQUID_BASE,
 			SQUID_LIB,
 			SQUID_SSL_DB ) as $dir) {
-		make_dirs($dir);
+		@mkdir($dir, 0755, true);
 		chown($dir, 'proxy');
 		chgrp($dir, 'proxy');
 		squid_chown_recursive($dir, 'proxy', 'proxy');
@@ -1932,7 +1932,7 @@ function squid_resync($via_rpc="no") {
 	if ($log_dir != "") {
 		if (!is_dir($log_dir)) {
 			log_error("Creating squid log dir $log_dir");
-			make_dirs($log_dir);
+			@mkdir($log_dir, 0755, true);
 			squid_chown_recursive($log_dir, 'proxy', 'proxy');
 		}
 

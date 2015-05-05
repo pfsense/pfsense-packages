@@ -909,12 +909,12 @@ function haproxy_writeconf($configpath) {
 	if (!isset($aliastable))
 		alias_make_table($config);
 	$chroot_dir = "/tmp/haproxy_chroot"; // can contain socket to forward connection from backend to frontend. "/var/empty"
-	make_dirs($chroot_dir);
+	@mkdir($chroot_dir, 0755, true);
 
 	$configfile = $configpath . "/haproxy.cfg";
 
 	rmdir_recursive($configpath);
-	make_dirs($configpath);
+	@mkdir($configpath, 0755, true);
 	
 	$a_global = &$config['installedpackages']['haproxy'];
 	$a_frontends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
@@ -1004,7 +1004,7 @@ function haproxy_writeconf($configpath) {
 				$certs = $frontend['ha_certificates']['item'];
 				if (is_array($certs)){
 					if (count($certs) > 0){
-						make_dirs($subfolder);
+						@mkdir($subfolder, 0755, true);
 						foreach($certs as $cert){
 							haproxy_write_certificate_fullchain("$subfolder/{$cert['ssl_certificate']}.pem", $cert['ssl_certificate']);
 						}
