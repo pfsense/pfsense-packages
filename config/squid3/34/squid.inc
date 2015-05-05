@@ -1907,7 +1907,7 @@ function squid_resync($via_rpc="no") {
 		squid_sync_on_changes();
 
 	// write config file
-	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
+	file_put_contents(SQUID_CONFFILE, $conf);
 
 	/* make sure pinger is executable */
 	if (file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger"))
