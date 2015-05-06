@@ -328,7 +328,6 @@ function squid_install_command() {
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-			SQUID_BASE,
 			SQUID_SSL_DB ) as $dir) {
 		@mkdir($dir, 0755, true);
 		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
@@ -1896,11 +1895,8 @@ function squid_resync($via_rpc="no") {
 	conf_mount_rw();
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-			SQUID_BASE,
 			SQUID_SSL_DB ) as $dir) {
 		@mkdir($dir, 0755, true);
-		chown($dir, SQUID_UID);
-		chgrp($dir, SQUID_GID);
 		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
 	}
 	$conf = squid_resync_general() . "\n";
