@@ -516,23 +516,24 @@ function squid_validate_general($post, &$input_errors) {
 }
 
 function squid_validate_upstream($post, &$input_errors) {
-	if ($post['enabled'] == 'on') {
-		$addr = trim($post['proxyaddr']);
-		if (empty($addr)) {
-			$input_errors[] = 'The field \'Hostname\' is required';
-		} else {
-			if (!is_ipaddr($addr) && !is_domain($addr))
-				$input_errors[] = 'You must enter a valid IP address or host name in the \'Proxy hostname\' field';
-		}
+	if ($post['enabled'] != 'on')
+		return;
 
-		foreach (array('proxyport' => 'TCP port', 'icpport' => 'ICP port') as $field => $name) {
-			$port = trim($post[$field]);
-			if (empty($port)) {
-				$input_errors[] = "The field '$name' is required";
-			} else {
-				if (!is_port($port))
-					$input_errors[] = "The field '$name' must contain a valid port number, between 0 and 65535";
-			}
+	$addr = trim($post['proxyaddr']);
+	if (empty($addr)) {
+		$input_errors[] = 'The field \'Hostname\' is required';
+	} else {
+		if (!is_ipaddr($addr) && !is_domain($addr))
+			$input_errors[] = 'You must enter a valid IP address or host name in the \'Proxy hostname\' field';
+	}
+
+	foreach (array('proxyport' => 'TCP port', 'icpport' => 'ICP port') as $field => $name) {
+		$port = trim($post[$field]);
+		if (empty($port)) {
+			$input_errors[] = "The field '$name' is required";
+		} else {
+			if (!is_port($port))
+				$input_errors[] = "The field '$name' must contain a valid port number, between 0 and 65535";
 		}
 	}
 }
