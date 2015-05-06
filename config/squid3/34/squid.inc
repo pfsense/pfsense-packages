@@ -840,7 +840,6 @@ function squid_install_cron($should_install) {
 			parse_config(true);
 			write_config("Adding Squid Cron Jobs");
 		}
-		break;
 	} else {
 		if ($rotate_job_id >= 0) {
 			unset($config['cron']['item'][$rotate_job_id]);
@@ -854,7 +853,6 @@ function squid_install_cron($should_install) {
 			parse_config(true);
 			write_config("Removing Squid Cron Jobs");
 		}
-		break;
 	}
 	configure_cron();
 }
