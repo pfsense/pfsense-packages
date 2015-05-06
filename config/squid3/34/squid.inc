@@ -672,6 +672,7 @@ function squid_validate_reverse($post, &$input_errors) {
 		$input_errors[] = 'The field \'external FQDN\' must contain a valid domain name';
 
 	$port = trim($post['reverse_http_port']);
+	// XXX: Where is $portrange being defined ???
 	preg_match("/(\d+)/",`sysctl net.inet.ip.portrange.reservedhigh`,$portrange);
 	if (!empty($port) && !is_port($port))
 		$input_errors[] = 'The field \'reverse HTTP port\' must contain a valid port number';
@@ -1260,6 +1261,7 @@ function squid_resync_upstream() {
 function squid_resync_redirector() {
 	global $config;
 
+	// XXX: What port provide squirm binary? It's not present
 	$httpav_enabled = ($config['installedpackages']['clamav']['config'][0]['scan_http'] == 'on');
 	if ($httpav_enabled) {
 		$conf = "url_rewrite_program /usr/local/bin/squirm\n";
@@ -1932,6 +1934,7 @@ function squid_resync($via_rpc="no") {
 	file_put_contents(SQUID_CONFFILE, $conf);
 
 	/* make sure pinger is executable */
+	// XXX: Is it really necessary? Who could change its permission?
 	if (file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger"))
 		exec("chmod a+x " . SQUID_LOCALBASE . "/libexec/squid/pinger");
 
