@@ -181,8 +181,10 @@ function squid_install_command() {
 	if (is_array($config['installedpackages']['squid']['config']))
 		$settingsgen = $config['installedpackages']['squid']['config'][0];
 
-	if (file_exists("/usr/local/pkg/check_ip.php"))
-		rename("/usr/local/pkg/check_ip.php", SQUID_BASE . "/bin/check_ip.php");
+	if (SQUID_BASE != '/usr/local' &&
+	    file_exists('/usr/local/bin/check_ip.php') &&
+	    !file_exists(SQUID_BASE . '/bin/check_ip.php'))
+		symlink("/usr/local/bin/check_ip.php", SQUID_BASE . "/bin/check_ip.php");
 
 	/* Set storage system */
 	if ($g['platform'] == "nanobsd") {
