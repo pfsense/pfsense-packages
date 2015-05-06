@@ -469,7 +469,7 @@ function squid_validate_general($post, &$input_errors) {
 
 	$log_rotate = trim($post['log_rotate']);
 
-	if (!empty($log_rotate) && (!is_numeric($log_rotate) or ($log_rotate < 1)))
+	if (!empty($log_rotate) && (!is_numericint($log_rotate) or ($log_rotate < 1)))
 		$input_errors[] = 'You must enter a valid number of days in the \'Log rotate\' field';
 
 	$webgui_port = $config['system']['webgui']['port'];
@@ -547,23 +547,23 @@ function squid_validate_cache($post, &$input_errors) {
 
 	foreach ($num_fields as $field => $name) {
 		$value = trim($post[$field]);
-		if (!is_numeric($value) || ($value < 0))
+		if (!is_numericint($value))
 			$input_errors[] = "You must enter a valid value for '$field'";
 	}
 
 	$value = trim($post['minimum_object_size']);
-	if (!is_numeric($value) || ($value < 0))
+	if (!is_numericint($value))
 		$input_errors[] = 'You must enter a valid value for \'Minimum object size\'';
 
 	if (!empty($post['cache_swap_low'])) {
 		$value = trim($post['cache_swap_low']);
-		if (!is_numeric($value) || ($value > 100))
+		if (!is_numericint($value) || ($value > 100))
 			$input_errors[] = 'You must enter a valid value for \'Low-water-mark\'';
 	}
 
 	if (!empty($post['cache_swap_high'])) {
 		$value = trim($post['cache_swap_high']);
-		if (!is_numeric($value) || ($value > 100))
+		if (!is_numericint($value) || ($value > 100))
 			$input_errors[] = 'You must enter a valid value for \'High-water-mark\'';
 	}
 
@@ -633,25 +633,25 @@ function squid_validate_traffic($post, &$input_errors) {
 
 	foreach ($num_fields as $field => $name) {
 		$value = trim($post[$field]);
-		if (!is_numeric($value) || ($value < 0))
+		if (!is_numericint($value))
 			$input_errors[] = "The field '$name' must contain a positive number";
 	}
 
 	if (!empty($post['quick_abort_min'])) {
 		$value = trim($post['quick_abort_min']);
-		if (!is_numeric($value))
+		if (!is_numericint($value))
 			$input_errors[] = "The field 'Finish when remaining KB' must contain a positive number";
 	}
 
 	if (!empty($post['quick_abort_max'])) {
 		$value = trim($post['quick_abort_max']);
-		if (!is_numeric($value))
+		if (!is_numericint($value))
 			$input_errors[] = "The field 'Abort when remaining KB' must contain a positive number";
 	}
 
 	if (!empty($post['quick_abort_pct'])) {
 		$value = trim($post['quick_abort_pct']);
-		if (!is_numeric($value) || ($value > 100))
+		if (!is_numericint($value) || ($value > 100))
 			$input_errors[] = "The field 'Finish when remaining %' must contain a percentage";
 	}
 }
