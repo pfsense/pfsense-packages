@@ -309,15 +309,17 @@ function squid_install_command() {
 
 	/* make sure pinger is executable */
 	if (file_exists(SQUID_LOCALBASE. "/libexec/squid/pinger"))
-		exec("/bin/chmod a+x ". SQUID_LOCALBASE. "/libexec/squid/pinger");
+		@chmod(SQUID_LOCALBASE. "/libexec/squid/pinger", "a+x");
 
+	// XXX: Is it really necessary?
 	if (file_exists("/usr/local/etc/rc.d/squid"))
-		exec("/bin/rm /usr/local/etc/rc.d/squid");
+		unlink_if_exists("/usr/local/etc/rc.d/squid");
 
 	squid_write_rcfile();
 
+	// XXX: Is it really necessary? mode is set to 0755 in squid.xml
 	if (file_exists("/usr/local/pkg/swapstate_check.php"))
-		exec("/bin/chmod a+x /usr/local/pkg/swapstate_check.php");
+		@chmod("/usr/local/pkg/swapstate_check.php", "a+x");
 
 	write_rcfile(array(
 		"file" => "sqp_monitor.sh",
