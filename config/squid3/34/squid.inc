@@ -129,7 +129,7 @@ function squid_dash_z($cache_action='none') {
 
 	$cachedir = ($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 
-	if ($cache_action == "clean") {
+	if ($cache_action == "clean" && file_exists($cachedir)) {
 		rename ($cachedir, "{$cachedir}.old");
 		mwexec_bg("/bin/rm -rf {$cachedir}.old");
 	}
