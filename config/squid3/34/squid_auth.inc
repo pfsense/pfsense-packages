@@ -1,72 +1,70 @@
 <?php
-/* $Id$ */
-
 /*
-        squid_auth.inc
-        part of pfSense (www.pfSense.com)
+	squid_auth.inc
+	part of pfSense (www.pfSense.com)
 
-        Copyright (C) 2005 Michael Capp <michael.capp@gmail.com>
-        All rights reserved.
+	Copyright (C) 2005 Michael Capp <michael.capp@gmail.com>
+	All rights reserved.
 
-        Redistribution and use in source and binary forms, with or without
-        modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-        1. Redistributions of source code must retain the above copyright notice,
-           this list of conditions and the following disclaimer.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-        2. Redistributions in binary form must reproduce the above copyright
-           notice, this list of conditions and the following disclaimer in the
-           documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-        THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-        AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-        AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-        OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-        INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-        POSSIBILITY OF SUCH DAMAGE.
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-function global_eval_auth_options()
-{
+function global_eval_auth_options() {
 	global $config;
+
 	conf_mount_rw();
 	config_lock();
 
 	switch ($config['installedpackages']['squidauth']['config'][0]['auth_method']) {
-		case "none":
-			dynamic_auth_content("pkg_edit");
-			dynamic_no_auth();
-			break;
-		case "local_auth":
-			dynamic_auth_content("pkg");
-			/* create empty passwd file to prevent stat error with squid reload */
-			touch ("/usr/local/etc/squid/advanced/ncsa/passwd");
-			dynamic_local_auth();
-			break;
-		case "ldap_bind":
-			dynamic_auth_content("pkg_edit");
-			dynamic_ldap_auth();
-			break;
-		case "domain_auth":
-			$filecontents = file("/usr/local/pkg/squid_auth.xml");
-			dynamic_auth_content("pkg_edit");
-			dynamic_domain_auth();
-			break;
-		case "radius_auth":
-			$filecontents = file("/usr/local/pkg/squid_auth.xml");
-			dynamic_auth_content("pkg_edit");
-			dynamic_radius_auth();
-			break;
-		default:
-			$filecontents = file("/usr/local/pkg/squid_auth.xml");
-			dynamic_auth_content("pkg_edit");
-			dynamic_no_auth();
-			break;
+	case "none":
+		dynamic_auth_content("pkg_edit");
+		dynamic_no_auth();
+		break;
+	case "local_auth":
+		dynamic_auth_content("pkg");
+		/* create empty passwd file to prevent stat error with squid reload */
+		touch ("/usr/local/etc/squid/advanced/ncsa/passwd");
+		dynamic_local_auth();
+		break;
+	case "ldap_bind":
+		dynamic_auth_content("pkg_edit");
+		dynamic_ldap_auth();
+		break;
+	case "domain_auth":
+		$filecontents = file("/usr/local/pkg/squid_auth.xml");
+		dynamic_auth_content("pkg_edit");
+		dynamic_domain_auth();
+		break;
+	case "radius_auth":
+		$filecontents = file("/usr/local/pkg/squid_auth.xml");
+		dynamic_auth_content("pkg_edit");
+		dynamic_radius_auth();
+		break;
+	default:
+		$filecontents = file("/usr/local/pkg/squid_auth.xml");
+		dynamic_auth_content("pkg_edit");
+		dynamic_no_auth();
+		break;
 	}
 
 	config_unlock();
@@ -76,6 +74,7 @@ function global_eval_auth_options()
 
 function dynamic_no_auth() {
 	global $config;
+
 	conf_mount_rw();
 	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	fwrite($fout, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n");
@@ -148,6 +147,7 @@ function dynamic_no_auth() {
 
 function dynamic_local_auth() {
 	global $config;
+
 	conf_mount_rw();
 
 	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
@@ -273,6 +273,7 @@ function dynamic_local_auth() {
 
 function dynamic_ldap_auth() {
 	global $config;
+
 	conf_mount_rw();
 
 	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
@@ -405,41 +406,41 @@ function dynamic_ldap_auth() {
 function dynamic_auth_content($pkgvar) {
 
 	switch ($pkgvar) {
-		case "pkg":
-			if ($handle = opendir("/usr/local/pkg")) {
-				while (($file = readdir($handle)) != false) {
-					if (stristr($file, "squid_") && stristr($file, ".xml")) {
-						$filecontents = file("/usr/local/pkg/" . $file);
-						$fout = fopen("/usr/local/pkg/" . $file, "w");
-						foreach($filecontents as $line) {
-							if (stristr($line, "<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>")) {
-								fwrite($fout, "			<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>\n");
-							} else {
-								fwrite($fout, $line);
-							}
+	case "pkg":
+		if ($handle = opendir("/usr/local/pkg")) {
+			while (($file = readdir($handle)) != false) {
+				if (stristr($file, "squid_") && stristr($file, ".xml")) {
+					$filecontents = file("/usr/local/pkg/" . $file);
+					$fout = fopen("/usr/local/pkg/" . $file, "w");
+					foreach($filecontents as $line) {
+						if (stristr($line, "<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>")) {
+							fwrite($fout, "			<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>\n");
+						} else {
+							fwrite($fout, $line);
 						}
 					}
 				}
 			}
-			break;
+		}
+		break;
 
-		case "pkg_edit":
-			if ($handle = opendir("/usr/local/pkg")) {
-				while (($file = readdir($handle)) != false) {
-					if (stristr($file, "squid_") && stristr($file, ".xml")) {
-						$filecontents = file("/usr/local/pkg/" . $file);
-						$fout = fopen("/usr/local/pkg/" . $file,"w");
-						foreach($filecontents as $line) {
-							if (stristr($line, "<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>")) {
-								fwrite($fout, "			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>\n");
-							} else {
-								fwrite($fout, $line);
-							}
+	case "pkg_edit":
+		if ($handle = opendir("/usr/local/pkg")) {
+			while (($file = readdir($handle)) != false) {
+				if (stristr($file, "squid_") && stristr($file, ".xml")) {
+					$filecontents = file("/usr/local/pkg/" . $file);
+					$fout = fopen("/usr/local/pkg/" . $file,"w");
+					foreach($filecontents as $line) {
+						if (stristr($line, "<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>")) {
+							fwrite($fout, "			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>\n");
+						} else {
+							fwrite($fout, $line);
 						}
 					}
 				}
 			}
-			break;
+		}
+		break;
 	}
 
 } /* end function dynamic_auth_content */
