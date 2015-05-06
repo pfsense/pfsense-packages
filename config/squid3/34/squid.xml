@@ -166,16 +166,6 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>https://packages.pfsense.org/packages/config/squid3/34/squid_ng.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-		<item>https://packages.pfsense.org/packages/config/squid3/34/squid_ng.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/squid3/34/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
