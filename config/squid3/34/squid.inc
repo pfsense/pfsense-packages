@@ -103,6 +103,9 @@ function squid_chown_recursive($dir, $user, $group) {
 }
 
 function squid_check_clamav_user($user) {
+	if (SQUID_BASE == '/usr/local')
+		return;
+
 	$_gc = exec("/usr/sbin/pw usershow {$user}",$sq_ex_output,$sq_ex_return);
 	$user_arg=($sq_ex_return == 0?"mod":"add");
 	$_gc = exec("/usr/sbin/pw user{$user_arg} {$user} -G wheel -u 9595 -s /sbin/nologin",$sq_ex_output,$sq_ex_return);
