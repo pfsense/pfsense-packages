@@ -1224,9 +1224,12 @@ EOD;
 
 function squid_resync_upstream() {
 	global $config;
+
+	if (!is_array($config['installedpackages']['squidremote']['config']))
+		$config['installedpackages']['squidremote']['config'] = array();
+
 	$conf = "\n#Remote proxies\n";
-	if (is_array($config['installedpackages']['squidremote']['config']))
-		foreach ($config['installedpackages']['squidremote']['config'] as $settings) {
+	foreach ($config['installedpackages']['squidremote']['config'] as $settings) {
 		if ($settings['enable'] == 'on') {
 			$conf .= "cache_peer {$settings['proxyaddr']} {$settings['hierarchy']} {$settings['proxyport']} ";
 			if ($settings['icpport'] == '7')
