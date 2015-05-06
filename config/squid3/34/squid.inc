@@ -376,6 +376,7 @@ function squid_deinstall_command() {
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	update_status("Removing cache ... One moment please...");
 	update_output_window("$plswait_txt");
+	// XXX: Is it ok to remove cache and logs? It's going to happen every time package is updated
 	mwexec_bg("rm -rf {$cachedir}");
 	mwexec("rm -rf {$logdir}");
 	update_status("Finishing package cleanup.");
@@ -390,6 +391,15 @@ function squid_deinstall_command() {
 
 function squid_before_form_general(&$pkg) {
 	$values = get_dir(SQUID_CONFBASE . '/errors/');
+	/*
+	 * XXX: This logic is broken. Probably the idea in the past
+	 * was to skip '.', '..'. 'COPYRIGHT' and 'TRANSLATORS' and
+	 * errors subdirectories used to be more meaning, like 'English'
+	 * or Brazillian_Portuguese.
+	 *
+	 * Nowadays they are 'en', 'pt-br', ... and also there is a
+	 * 'templates' directory to be skipped
+	 */
 	// Get rid of '..' and '.' and ...
 	array_shift($values);
 	array_shift($values);
