@@ -43,6 +43,7 @@ if (!function_exists("filter_configure"))
 
 $shortcut_section = "squid";
 
+global $pfs_version;
 $pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 	define('SQUID_BASE', '/usr/pbi/squid-' . php_uname("m"));
