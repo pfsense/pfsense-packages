@@ -425,19 +425,20 @@ function squid_before_form_general(&$pkg) {
 function squid_validate_antivirus($post, &$input_errors) {
 	global $config;
 
-	if ($post['enable']=="on") {
-		if ($post['squidclamav'] && preg_match("/(\S+proxy.domain\S+)/",$post['squidclamav'],$a_match)) {
-			$input_errors[] ="Squidclamav warns redirect points to sample config domain ({$a_match[1]})";
-			$input_errors[] ="Change redirect info on 'squidclamav.conf' field to pfsense gui or an external host. ";
+	if ($post['enable'] != "on")
+		return;
+
+	if ($post['squidclamav'] && preg_match("/(\S+proxy.domain\S+)/",$post['squidclamav'],$a_match)) {
+		$input_errors[] ="Squidclamav warns redirect points to sample config domain ({$a_match[1]})";
+		$input_errors[] ="Change redirect info on 'squidclamav.conf' field to pfsense gui or an external host. ";
+	}
+	if ($post['c-icap_conf']) {
+		if (!preg_match("/squid_clamav/",$post['c-icap_conf'])) {
+			$input_errors[] ="c-icap Squidclamav service definition  is no present.";
+			$input_errors[] ="Add 'Service squid_clamav squidclamav.so'(without quotes) to 'c-icap.conf' field in order to get it working.";
 		}
-		if ($post['c-icap_conf']) {
-			if (!preg_match("/squid_clamav/",$post['c-icap_conf'])) {
-				$input_errors[] ="c-icap Squidclamav service definition  is no present.";
-				$input_errors[] ="Add 'Service squid_clamav squidclamav.so'(without quotes) to 'c-icap.conf' field in order to get it working.";
-			}
-			if (preg_match("/(Manager:Apassword\S+)/",$post['c-icap_conf'],$c_match)) {
-				$input_errors[] ="Remove ldap configuration'{$c_match[1]}' from 'c-icap.conf' field.";
-			}
+		if (preg_match("/(Manager:Apassword\S+)/",$post['c-icap_conf'],$c_match)) {
+			$input_errors[] ="Remove ldap configuration'{$c_match[1]}' from 'c-icap.conf' field.";
 		}
 	}
 }
