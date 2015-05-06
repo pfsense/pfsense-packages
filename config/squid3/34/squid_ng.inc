@@ -1,100 +1,96 @@
 <?php
-/* $Id$ */
-
 /*
-        squid_ng.inc
-        part of pfSense (www.pfSense.com)
+	squid_ng.inc
+	part of pfSense (www.pfSense.com)
 
-        Copyright (C) 2005 Michael Capp <michael.capp@gmail.com>
-        All rights reserved.
+	Copyright (C) 2005 Michael Capp <michael.capp@gmail.com>
+	All rights reserved.
 
-        Redistribution and use in source and binary forms, with or without
-        modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-        1. Redistributions of source code must retain the above copyright notice,
-           this list of conditions and the following disclaimer.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-        2. Redistributions in binary form must reproduce the above copyright
-           notice, this list of conditions and the following disclaimer in the
-           documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-        THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-        AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-        AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-        OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-        INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-        POSSIBILITY OF SUCH DAMAGE.
-
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
 */
 
-if(!function_exists("filter_configure"))
+if (!function_exists("filter_configure"))
 	require_once("filter.inc");
 
-function global_write_squid_config()
-{
+function global_write_squid_config() {
 	global $config;
 	conf_mount_rw();
 	config_lock();
 
-    /* define squid configuration file in variable for replace function */
-    $squidconfig = "/usr/local/etc/squid/squid.conf";
+	/* define squid configuration file in variable for replace function */
+	$squidconfig = "/usr/local/etc/squid/squid.conf";
 
-    /* squid.xml values */
-    $active_interface      = $config['installedpackages']['squid']['config'][0]['active_interface'];
-    $transparent_proxy     = $config['installedpackages']['squid']['config'][0]['transparent_proxy'];
-    $log_enabled           = $config['installedpackages']['squid']['config'][0]['log_enabled'];
-    $urlfilter_enable      = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
-    $accesslog_disabled    = $config['installedpackages']['squid']['config'][0]['accesslog_disabled'];
-    $log_query_terms       = $config['installedpackages']['squid']['config'][0]['log_query_terms'];
-    $log_user_agents       = $config['installedpackages']['squid']['config'][0]['log_user_agents'];
-    $proxy_port            = $config['installedpackages']['squid']['config'][0]['proxy_port'];
-    $visible_hostname      = $config['installedpackages']['squid']['config'][0]['visible_hostname'];
-    $cache_admin_email     = $config['installedpackages']['squid']['config'][0]['cache_admin_email'];
-    $error_language 	   = $config['installedpackages']['squid']['config'][0]['error_language'];
-    $cachemgr_enabled	   = $config['installedpackages']['squid']['config'][0]['cachemgr_enabled'];
+	/* squid.xml values */
+	$active_interface      = $config['installedpackages']['squid']['config'][0]['active_interface'];
+	$transparent_proxy     = $config['installedpackages']['squid']['config'][0]['transparent_proxy'];
+	$log_enabled           = $config['installedpackages']['squid']['config'][0]['log_enabled'];
+	$urlfilter_enable      = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
+	$accesslog_disabled    = $config['installedpackages']['squid']['config'][0]['accesslog_disabled'];
+	$log_query_terms       = $config['installedpackages']['squid']['config'][0]['log_query_terms'];
+	$log_user_agents       = $config['installedpackages']['squid']['config'][0]['log_user_agents'];
+	$proxy_port            = $config['installedpackages']['squid']['config'][0]['proxy_port'];
+	$visible_hostname      = $config['installedpackages']['squid']['config'][0]['visible_hostname'];
+	$cache_admin_email     = $config['installedpackages']['squid']['config'][0]['cache_admin_email'];
+	$error_language        = $config['installedpackages']['squid']['config'][0]['error_language'];
+	$cachemgr_enabled      = $config['installedpackages']['squid']['config'][0]['cachemgr_enabled'];
 
-    /* squid_upstream.xml values */
-    $proxy_forwarding	   = $config['installedpackages']['squidupstream']['config'][0]['proxy_forwarding'];
-    $client_ip_forwarding  = $config['installedpackages']['squidupstream']['config'][0]['client_ip_forwarding'];
-    $user_forwarding 	   = $config['installedpackages']['squidupstream']['config'][0]['user_forwarding'];
-    $upstream_proxy 	   = $config['installedpackages']['squidupstream']['config'][0]['upstream_proxy'];
-    $upstream_proxy_port   = $config['installedpackages']['squidupstream']['config'][0]['upstream_proxy_port'];
-    $upstream_username     = $config['installedpackages']['squidupstream']['config'][0]['upstream_username'];
-    $upstream_password 	   = $config['installedpackages']['squidupstream']['config'][0]['upstream_psasword'];
+	/* squid_upstream.xml values */
+	$proxy_forwarding      = $config['installedpackages']['squidupstream']['config'][0]['proxy_forwarding'];
+	$client_ip_forwarding  = $config['installedpackages']['squidupstream']['config'][0]['client_ip_forwarding'];
+	$user_forwarding       = $config['installedpackages']['squidupstream']['config'][0]['user_forwarding'];
+	$upstream_proxy        = $config['installedpackages']['squidupstream']['config'][0]['upstream_proxy'];
+	$upstream_proxy_port   = $config['installedpackages']['squidupstream']['config'][0]['upstream_proxy_port'];
+	$upstream_username     = $config['installedpackages']['squidupstream']['config'][0]['upstream_username'];
+	$upstream_password     = $config['installedpackages']['squidupstream']['config'][0]['upstream_psasword'];
 
-    /* squid_cache.xml values */
-    $memory_cache_size     = $config['installedpackages']['squidcache']['config'][0]['memory_cache_size'];
-    $harddisk_cache_size   = $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size'];
-    $minimum_object_size   = $config['installedpackages']['squidcache']['config'][0]['minimum_object_size'];
-    $maximum_object_size   = $config['installedpackages']['squidcache']['config'][0]['maximum_object_size'];
-    $level_subdirs 		   = $config['installedpackages']['squidcache']['config'][0]['level_subdirs'];
-    $memory_replacement    = $config['installedpackages']['squidcache']['config'][0]['memory_replacement'];
-    $cache_replacement 	   = $config['installedpackages']['squidcache']['config'][0]['cache_replacement'];
-    $domain 			   = $config['installedpackages']['squidcache']['config'][0]['domain'];
-    $enable_offline 	   = $config['installedpackages']['squidcache']['config'][0]['enable_offline'];
+	/* squid_cache.xml values */
+	$memory_cache_size     = $config['installedpackages']['squidcache']['config'][0]['memory_cache_size'];
+	$harddisk_cache_size   = $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size'];
+	$minimum_object_size   = $config['installedpackages']['squidcache']['config'][0]['minimum_object_size'];
+	$maximum_object_size   = $config['installedpackages']['squidcache']['config'][0]['maximum_object_size'];
+	$level_subdirs         = $config['installedpackages']['squidcache']['config'][0]['level_subdirs'];
+	$memory_replacement    = $config['installedpackages']['squidcache']['config'][0]['memory_replacement'];
+	$cache_replacement     = $config['installedpackages']['squidcache']['config'][0]['cache_replacement'];
+	$domain                = $config['installedpackages']['squidcache']['config'][0]['domain'];
+	$enable_offline        = $config['installedpackages']['squidcache']['config'][0]['enable_offline'];
 
-    /* squid_nac.xml values */
-    $allowed_subnets	   = $config['installedpackages']['squidnac']['config'][0]['allowed_subnets'];
-    $unrestricted_ip_addr  = $config['installedpackages']['squidnac']['config'][0]['unrestricted_ip_address'];
-    $unrestricted_mac_addr = $config['installedpackages']['squidnac']['config'][0]['unrestricted_mac_addresses'];
-    $banned_ip_addr		   = $config['installedpackages']['squidnac']['config'][0]['banned_ip_addresses'];
-    $banned_mac_addr 	   = $config['installedpackages']['squidnac']['config'][0]['banned_mac_addresses'];
-    $override_hosts		   = $config['installedpackages']['squidnac']['config'][0]['override_hosts'];
+	/* squid_nac.xml values */
+	$allowed_subnets       = $config['installedpackages']['squidnac']['config'][0]['allowed_subnets'];
+	$unrestricted_ip_addr  = $config['installedpackages']['squidnac']['config'][0]['unrestricted_ip_address'];
+	$unrestricted_mac_addr = $config['installedpackages']['squidnac']['config'][0]['unrestricted_mac_addresses'];
+	$banned_ip_addr        = $config['installedpackages']['squidnac']['config'][0]['banned_ip_addresses'];
+	$banned_mac_addr       = $config['installedpackages']['squidnac']['config'][0]['banned_mac_addresses'];
+	$override_hosts        = $config['installedpackages']['squidnac']['config'][0]['override_hosts'];
 
-    /* squid_traffic.xml values */
-    $max_download_size     = $config['installedpackages']['squidtraffic']['config'][0]['max_download_size'];
-    $max_upload_size       = $config['installedpackages']['squidtraffic']['config'][0]['max_upload_size'];
-    $dl_overall            = $config['installedpackages']['squidtraffic']['config'][0]['dl_overall'];
-    $dl_per_host           = $config['installedpackages']['squidtraffic']['config'][0]['dl_per_host'];
-    $throttle_binary_files = $config['installedpackages']['squidtraffic']['config'][0]['throttle_binary_files'];
-    $throttle_cd_images    = $config['installedpackages']['squidtraffic']['config'][0]['throttle_cd_images'];
-    $throttle_multimedia   = $config['installedpackages']['squidtraffic']['config'][0]['throttle_multimedia'];
+	/* squid_traffic.xml values */
+	$max_download_size     = $config['installedpackages']['squidtraffic']['config'][0]['max_download_size'];
+	$max_upload_size       = $config['installedpackages']['squidtraffic']['config'][0]['max_upload_size'];
+	$dl_overall            = $config['installedpackages']['squidtraffic']['config'][0]['dl_overall'];
+	$dl_per_host           = $config['installedpackages']['squidtraffic']['config'][0]['dl_per_host'];
+	$throttle_binary_files = $config['installedpackages']['squidtraffic']['config'][0]['throttle_binary_files'];
+	$throttle_cd_images    = $config['installedpackages']['squidtraffic']['config'][0]['throttle_cd_images'];
+	$throttle_multimedia   = $config['installedpackages']['squidtraffic']['config'][0]['throttle_multimedia'];
 
-    /* squid_auth.xml values */
+	/* squid_auth.xml values */
 	$auth_method           = $config['installedpackages']['squidauth']['config'][0]['auth_method'];
 	$auth_processes        = $config['installedpackages']['squidauth']['config'][0]['auth_processes'];
 	$auth_cache_ttl        = $config['installedpackages']['squidauth']['config'][0]['auth_cache_ttl'];
@@ -107,18 +103,18 @@ function global_write_squid_config()
 	$bypass_extended       = $config['installedpackages']['squidauth']['config'][0]['bypass_extended'];
 
 	/* squid_extauth.xml (ldap) values */
-	$ldap_basedn		   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_basedn'];
-	$ldap_server		   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_server'];
-	$ldap_type			   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_type'];
-	$ldap_port			   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_port'];
-	$bind_dn_username	   = $config['installedpackages']['squidextldapauth']['config'][0]['bind_dn_username'];
-	$bind_dn_password	   = $config['installedpackages']['squidextldapauth']['config'][0]['bind_dn_password'];
+	$ldap_basedn           = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_basedn'];
+	$ldap_server           = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_server'];
+	$ldap_type             = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_type'];
+	$ldap_port             = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_port'];
+	$bind_dn_username      = $config['installedpackages']['squidextldapauth']['config'][0]['bind_dn_username'];
+	$bind_dn_password      = $config['installedpackages']['squidextldapauth']['config'][0]['bind_dn_password'];
 
 	/* squid_extauth.xml (radius) values */
-	$radius_server		   = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_server'];
-	$radius_port		   = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_port'];
-	$radius_identifier	   = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_identifier'];
-	$radius_secret		   = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_secret'];
+	$radius_server         = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_server'];
+	$radius_port           = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_port'];
+	$radius_identifier     = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_identifier'];
+	$radius_secret         = $config['installedpackages']['squidextradiusauth']['config'][0]['radius_secret'];
 
 	/* static variable assignments for directory mapping */
 	$acldir    = "/usr/local/etc/squid/advanced/acls";
@@ -126,17 +122,17 @@ function global_write_squid_config()
 	$ntlmdir   = "/usr/local/etc/squid/advanced/ntlm";
 	$radiusdir = "/usr/local/etc/squid/advanced/radius";
 
-    $fout = fopen($squidconfig, "w");
+	$fout = fopen($squidconfig, "w");
 
 	$config_array = array('shutdown_lifetime 5 seconds' . "\n\n");
 
-        if (isset($cachemgr_enabled) && ($cachemgr_enabled == "on")) {
+	if (isset($cachemgr_enabled) && ($cachemgr_enabled == "on")) {
 		mwexec("cp /usr/local/libexec/squid/cachemgr.cgi /usr/local/www/cachemgr.cgi");
 		mwexec("chmod a+rx /usr/local/www/cachemgr.cgi");
-        } else {
+	} else {
 		mwexec("rm -f /usr/local/www/cachemgr.cgi");
 	}
-        unset($cachemgr_enabled);
+	unset($cachemgr_enabled);
 
 	if (!isset($icp_port) or ($icp_port == "")) {
 		$icp_port = "3130";
@@ -144,7 +140,7 @@ function global_write_squid_config()
 	$config_array[] = 'icp_port ' . $icp_port . "\n";
 	unset($icp_port);
 
-	if(!isset($proxy_port) or ($proxy_port == "")) {
+	if (!isset($proxy_port) or ($proxy_port == "")) {
 		$proxy_port = "3128";
 	}
 
@@ -250,99 +246,99 @@ function global_write_squid_config()
 	$config_array[] = 'emulate_httpd_log on' . "\n";
 
 	switch ($user_forwarding) {
-		case "on":
-			$config_array[] = 'forwarded_for on' . "\n\n";
-			break;
-		case "off":
-			$config_array[] = 'forwarded_for off' . "\n\n";
-			break;
-		default:
-			$config_array[] = 'forwarded_for off' . "\n\n";
-			break;
+	case "on":
+		$config_array[] = 'forwarded_for on' . "\n\n";
+		break;
+	case "off":
+		$config_array[] = 'forwarded_for off' . "\n\n";
+		break;
+	default:
+		$config_array[] = 'forwarded_for off' . "\n\n";
+		break;
 	}
 	unset($user_forwarding);
 
 	switch ($auth_method) {
-		case "none":
-			break;
-		case "local_auth":
-			$config_array[] = 'auth_param basic program /usr/local/libexec/squid/ncsa_auth /usr/local/etc/squid/advanced/ncsa/passwd' . "\n";
-			if (!isset($auth_processes) or ($auth_processes == "")) {
-				$auth_processes = "5";
-			}
-			$config_array[] = 'auth_param basic children ' . $auth_processes . "\n";
+	case "none":
+		break;
+	case "local_auth":
+		$config_array[] = 'auth_param basic program /usr/local/libexec/squid/ncsa_auth /usr/local/etc/squid/advanced/ncsa/passwd' . "\n";
+		if (!isset($auth_processes) or ($auth_processes == "")) {
+			$auth_processes = "5";
+		}
+		$config_array[] = 'auth_param basic children ' . $auth_processes . "\n";
 
-			if (!isset($auth_realm_prompt) or ($auth_realm_prompt == "")) {
-				$auth_realm_prompt = "pfSense Advanced Proxy";
-			}
-			$config_array[] = 'auth_param basic realm ' . $auth_realm_prompt . "\n";
+		if (!isset($auth_realm_prompt) or ($auth_realm_prompt == "")) {
+			$auth_realm_prompt = "pfSense Advanced Proxy";
+		}
+		$config_array[] = 'auth_param basic realm ' . $auth_realm_prompt . "\n";
 
-			if (!isset($auth_cache_ttl) or ($auth_cache_ttl == "")) {
-				$auth_cache_ttl = "60";
-			}
-			$config_array[] = 'auth_param basic credentialsttl ' . $auth_cache_ttl . ' minutes' . "\n\n";
-			$config_array[] = 'acl for_inetusers proxy_auth REQUIRED' . "\n\n";
+		if (!isset($auth_cache_ttl) or ($auth_cache_ttl == "")) {
+			$auth_cache_ttl = "60";
+		}
+		$config_array[] = 'auth_param basic credentialsttl ' . $auth_cache_ttl . ' minutes' . "\n\n";
+		$config_array[] = 'acl for_inetusers proxy_auth REQUIRED' . "\n\n";
 
-			unset($auth_realm_prompt);
-			unset($auth_processes);
-			unset($auth_cache_ttl);
+		unset($auth_realm_prompt);
+		unset($auth_processes);
+		unset($auth_cache_ttl);
 
-			break;
+		break;
 		case "radius_auth";
-			$config_array[] = 'auth_param basic program /usr/local/libexec/squid/squid_rad_auth -h ' . $radius_server . ' -p ' . $radius_port . ' -i ' . $radius_identifier . ' -w ' . $radius_secret . "\n";
-			if (!isset($auth_processes) or ($auth_processes == "")) {
-				$auth_processes = "5";
-			}
-			$config_array[] = 'auth_param basic children ' . $auth_processes . "\n";
+		$config_array[] = 'auth_param basic program /usr/local/libexec/squid/squid_rad_auth -h ' . $radius_server . ' -p ' . $radius_port . ' -i ' . $radius_identifier . ' -w ' . $radius_secret . "\n";
+		if (!isset($auth_processes) or ($auth_processes == "")) {
+			$auth_processes = "5";
+		}
+		$config_array[] = 'auth_param basic children ' . $auth_processes . "\n";
 
-			if (!isset($auth_realm_prompt) or ($auth_realm_prompt == "")) {
-				$auth_realm_prompt = "pfSense Advanced Proxy";
-			}
-			$config_array[] = 'auth_param basic realm ' . $auth_realm_prompt . "\n";
+		if (!isset($auth_realm_prompt) or ($auth_realm_prompt == "")) {
+			$auth_realm_prompt = "pfSense Advanced Proxy";
+		}
+		$config_array[] = 'auth_param basic realm ' . $auth_realm_prompt . "\n";
 
-			if (!isset($auth_cache_ttl) or ($auth_cache_ttl == "")) {
-				$auth_cache_ttl = "60";
-			}
-			$config_array[] = 'auth_param basic credentialsttl ' . $auth_cache_ttl . ' minutes' . "\n\n";
-			$config_array[] = 'acl for_inetusers proxy_auth REQUIRED' . "\n\n";
+		if (!isset($auth_cache_ttl) or ($auth_cache_ttl == "")) {
+			$auth_cache_ttl = "60";
+		}
+		$config_array[] = 'auth_param basic credentialsttl ' . $auth_cache_ttl . ' minutes' . "\n\n";
+		$config_array[] = 'acl for_inetusers proxy_auth REQUIRED' . "\n\n";
 
-			unset($auth_realm_prompt);
-			unset($auth_processes);
-			unset($auth_cache_ttl);
+		unset($auth_realm_prompt);
+		unset($auth_processes);
+		unset($auth_cache_ttl);
 
-			break;
+		break;
 		case "ldap_bind";
-			$config_array[] = 'auth_param basic program /usr/local/libexec/squid_ldap_auth -b "' . $ldap_basedn . '" -D "' . $bind_dn_username . '" -w "' . $bind_dn_password . '" -f "(&(objectClass=person)(cn=%s))" -u -cn -P "' . $ldap_server . ":" . $ldap_port . "\n";
-			$config_array[] = 'auth_param basic program /usr/local/libexec/squid/squid_ldap_auth';
-			$config_array[] = ' -b "' . $ldap_basedn . '"';
-			$config_array[] = ' -D "' . $bind_dn_username . '"';
-			$config_array[] = " -w " . $bind_dn_password;
-			$config_array[] = ' -f "(&(objectClass=person)(cn=%s))"';
-			$config_array[] = " -u cn -P " . $ldap_server . ":" . $ldap_port . "\n";
+		$config_array[] = 'auth_param basic program /usr/local/libexec/squid_ldap_auth -b "' . $ldap_basedn . '" -D "' . $bind_dn_username . '" -w "' . $bind_dn_password . '" -f "(&(objectClass=person)(cn=%s))" -u -cn -P "' . $ldap_server . ":" . $ldap_port . "\n";
+		$config_array[] = 'auth_param basic program /usr/local/libexec/squid/squid_ldap_auth';
+		$config_array[] = ' -b "' . $ldap_basedn . '"';
+		$config_array[] = ' -D "' . $bind_dn_username . '"';
+		$config_array[] = " -w " . $bind_dn_password;
+		$config_array[] = ' -f "(&(objectClass=person)(cn=%s))"';
+		$config_array[] = " -u cn -P " . $ldap_server . ":" . $ldap_port . "\n";
 
-			if (!isset($auth_processes) or ($auth_processes == "")) {
-				$auth_processes = "5";
-			}
-			$config_array[] = 'auth_param basic children ' . $auth_processes . "\n";
+		if (!isset($auth_processes) or ($auth_processes == "")) {
+			$auth_processes = "5";
+		}
+		$config_array[] = 'auth_param basic children ' . $auth_processes . "\n";
 
-			if (!isset($auth_realm_prompt) or ($auth_realm_prompt == "")) {
-				$auth_realm_prompt = "pfSense Advanced Proxy";
-			}
-			$config_array[] = 'auth_param basic realm ' . $auth_realm_prompt . "\n";
+		if (!isset($auth_realm_prompt) or ($auth_realm_prompt == "")) {
+			$auth_realm_prompt = "pfSense Advanced Proxy";
+		}
+		$config_array[] = 'auth_param basic realm ' . $auth_realm_prompt . "\n";
 
-			if (!isset($auth_cache_ttl) or ($auth_cache_ttl == "")) {
-				$auth_cache_ttl = "60";
-			}
-			$config_array[] = 'auth_param basic credentialsttl ' . $auth_cache_ttl . ' minutes' . "\n\n";
-			$config_array[] = 'acl for_inetusers proxy_auth REQUIRED' . "\n\n";
+		if (!isset($auth_cache_ttl) or ($auth_cache_ttl == "")) {
+			$auth_cache_ttl = "60";
+		}
+		$config_array[] = 'auth_param basic credentialsttl ' . $auth_cache_ttl . ' minutes' . "\n\n";
+		$config_array[] = 'acl for_inetusers proxy_auth REQUIRED' . "\n\n";
 
-			unset($auth_realm_prompt);
-			unset($auth_processes);
-			unset($auth_cache_ttl);
+		unset($auth_realm_prompt);
+		unset($auth_processes);
+		unset($auth_cache_ttl);
 
-			break;
+		break;
 		case "windows_auth";
-			break;
+		break;
 	}
 
 	if (isset($throttle_binary_files) && ($throttle_binary_files == "on")) {
@@ -405,14 +401,14 @@ function global_write_squid_config()
 
 	$config_array[] = 'acl within_timeframe time MTWHFAS 00:00-24:00' . "\n\n";
 
-    /* obtain interface subnet and address for Squid rules */
-    $lactive_interface = strtolower($active_interface);
+	/* obtain interface subnet and address for Squid rules */
+	$lactive_interface = strtolower($active_interface);
 
-    $lancfg = $config['interfaces'][$lactive_interface];
-    $lanif = $lancfg['if'];
-    $lanip = $lancfg['ipaddr'];
-    $lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
-    $lansn = $lancfg['subnet'];
+	$lancfg = $config['interfaces'][$lactive_interface];
+	$lanif = $lancfg['if'];
+	$lanip = $lancfg['ipaddr'];
+	$lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
+	$lansn = $lancfg['subnet'];
 
 	$config_array[] = 'acl all src 0.0.0.0/0.0.0.0' . "\n";
 	$config_array[] = 'acl localnet src ' . $lansa . '/' . $lansn . "\n";
@@ -431,7 +427,7 @@ function global_write_squid_config()
 	$config_array[] = 'acl Safe_ports port 800 # Squids port (for icons)' . "\n\n";
 
 	/* allow access through proxy for custom admin port */
-    $custom_port = $config['system']['webgui']['port'];
+	$custom_port = $config['system']['webgui']['port'];
 	if (isset($custom_port) && ($custom_port !== "")) {
 		$config_array[] = 'acl pf_admin_port port	' . $custom_port . "\n";
 		unset($custom_port);
@@ -439,14 +435,14 @@ function global_write_squid_config()
 		$admin_protocol = $config['system']['webgui']['protocol'];
 		switch ($admin_protocol) {
 			case "http";
-				$config_array[] = 'acl pf_admin_port port 80' ."\n";
-				break;
+			$config_array[] = 'acl pf_admin_port port 80' ."\n";
+			break;
 			case "https";
-				$config_array[] = 'acl pf_admin_port port 443' . "\n";
-				break;
-			default;
-				$config_array[] = 'acl pf_admin_port port 80' . "\n";
-				break;
+			$config_array[] = 'acl pf_admin_port port 443' . "\n";
+			break;
+default;
+$config_array[] = 'acl pf_admin_port port 80' . "\n";
+break;
 		}
 		unset($admin_protocol);
 	}
@@ -586,12 +582,12 @@ function global_write_squid_config()
 	unset($ind_banned_mac);
 
 	$config_array[] = 'acl pf_ips	dst ' . $lanip . "\n";
-    $config_array[] = 'acl CONNECT method CONNECT' . "\n\n";
+	$config_array[] = 'acl CONNECT method CONNECT' . "\n\n";
 
-    if (isset($auth_method) && ($auth_method == "none")) {
-    	$config_array[] = 'http_access allow localnet' . "\n";
-    }
-    $config_array[] = 'http_access allow localhost' . "\n";
+	if (isset($auth_method) && ($auth_method == "none")) {
+		$config_array[] = 'http_access allow localnet' . "\n";
+	}
+	$config_array[] = 'http_access allow localhost' . "\n";
 
 	if (isset($override_hosts) && ($override_hosts !== "")) {
 		$config_array[] = 'http_access allow override_hosts' . "\n";
@@ -599,121 +595,121 @@ function global_write_squid_config()
 	$config_array[] = "\n";
 
 	switch ($config['system']['webgui']['protocol']) {
-		case "http":
-			$config_array[] = 'http_access allow pf_ips' . "\n";
-			$config_array[] = 'http_access allow pf_admin_port' . "\n";
-			$config_array[] = 'http_access deny !pf_networks' . "\n\n";
-			break;
-		case "https":
-			$config_array[] = 'http_access allow CONNECT pf_ips' . "\n";
-			$config_array[] = 'http_access allow CONNECT pf_admin_port' . "\n";
-			$config_array[] = 'http_access deny  CONNECT !pf_networks' . "\n\n";
-			break;
+	case "http":
+		$config_array[] = 'http_access allow pf_ips' . "\n";
+		$config_array[] = 'http_access allow pf_admin_port' . "\n";
+		$config_array[] = 'http_access deny !pf_networks' . "\n\n";
+		break;
+	case "https":
+		$config_array[] = 'http_access allow CONNECT pf_ips' . "\n";
+		$config_array[] = 'http_access allow CONNECT pf_admin_port' . "\n";
+		$config_array[] = 'http_access deny  CONNECT !pf_networks' . "\n\n";
+		break;
 	}
 
-    $config_array[] = 'http_access deny !Safe_ports' . "\n";
-    $config_array[] = 'http_access deny CONNECT !SSL_ports' . "\n\n";
+	$config_array[] = 'http_access deny !Safe_ports' . "\n";
+	$config_array[] = 'http_access deny CONNECT !SSL_ports' . "\n\n";
 
-    if (isset($auth_method) && ($auth_method != "none")) {
-    	$config_array[] = 'http_access allow pf_networks for_inetusers within_timeframe' . "\n";
-    }
+	if (isset($auth_method) && ($auth_method != "none")) {
+		$config_array[] = 'http_access allow pf_networks for_inetusers within_timeframe' . "\n";
+	}
 
-    $config_array[] = 'http_access deny all' . "\n\n";
+	$config_array[] = 'http_access deny all' . "\n\n";
 
 	if (isset($dl_overall) && ($dl_overall !== "") and isset($dl_per_host) && ($dl_per_host == "")) {
-       	$config_array[] = 'delay_pools 1' . "\n";
-       	$config_array[] = 'delay_class 1 3' . "\n";
+		$config_array[] = 'delay_pools 1' . "\n";
+		$config_array[] = 'delay_class 1 3' . "\n";
 
-       	if ($dl_overall == "unlimited") {
-       		$config_array[] = 'delay_parameters 1 -1/-1 -1/-1 ' . ($dl_overall * 125) . '/' . ($dl_overall * 250) . "\n";
-       	} else {
-       		$config_array[] = 'delay_parameters 1 ' . ($dl_overall * 125) . '/' . ($dl_overall * 250) . ' -1/-1 -1/-1' . "\n";
-       	}
+		if ($dl_overall == "unlimited") {
+			$config_array[] = 'delay_parameters 1 -1/-1 -1/-1 ' . ($dl_overall * 125) . '/' . ($dl_overall * 250) . "\n";
+		} else {
+			$config_array[] = 'delay_parameters 1 ' . ($dl_overall * 125) . '/' . ($dl_overall * 250) . ' -1/-1 -1/-1' . "\n";
+		}
 
-   		/* if no unrestricted ip addresses are defined; this line is ignored */
- 		if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr == "")) $config_array[] = 'delay_access 1 deny pf_unrestricted_ip' . "\n";
+		/* if no unrestricted ip addresses are defined; this line is ignored */
+		if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr == "")) $config_array[] = 'delay_access 1 deny pf_unrestricted_ip' . "\n";
 
-   		/* this will define bandwidth delay restrictions for specified throttles */
-   		if (isset($throttle_binary_files) && ($throttle_binary_files == "on")) {
-   			$config_array[] = 'delay_access 1 allow all for_throttled_binary' . "\n";
-   		}
-   		if (isset($throttle_cd_images) && ($throttle_cd_images == "on")) {
-   			$config_array[] = 'delay_access 1 allow all for_throttled_cd' . "\n";
-   		}
-   		if (isset($throttle_multimedia) && ($throttle_multimedia == "on")) {
-   			$config_array[] = 'delay_access 1 allow all for_throttled_multimedia' . "\n";
-   		} else {
-   			$config_array[] = 'delay_access 1 allow all' . "\n";
-   		}
-   		$config_array[] = 'delay_initial_bucket_level 100%' . "\n\n";
-    }
+		/* this will define bandwidth delay restrictions for specified throttles */
+		if (isset($throttle_binary_files) && ($throttle_binary_files == "on")) {
+			$config_array[] = 'delay_access 1 allow all for_throttled_binary' . "\n";
+		}
+		if (isset($throttle_cd_images) && ($throttle_cd_images == "on")) {
+			$config_array[] = 'delay_access 1 allow all for_throttled_cd' . "\n";
+		}
+		if (isset($throttle_multimedia) && ($throttle_multimedia == "on")) {
+			$config_array[] = 'delay_access 1 allow all for_throttled_multimedia' . "\n";
+		} else {
+			$config_array[] = 'delay_access 1 allow all' . "\n";
+		}
+		$config_array[] = 'delay_initial_bucket_level 100%' . "\n\n";
+	}
 
-    if (isset($dl_per_host) && ($dl_per_host !== "") and isset($dl_overall) && ($dl_overall == "")) {
-       	$config_array[] = 'delay_pools 1' . "\n";
-      	$config_array[] = 'delay_class 1 3' . "\n";
+	if (isset($dl_per_host) && ($dl_per_host !== "") and isset($dl_overall) && ($dl_overall == "")) {
+		$config_array[] = 'delay_pools 1' . "\n";
+		$config_array[] = 'delay_class 1 3' . "\n";
 
-      	if ($dl_per_host == "unlimited") {
-      		$config_array[] = 'delay_parameters 1 ' . ($dl_per_host * 125) . '/' . ($dl_per_host * 250) . '-1/-1 -1/-1' . "\n";
-      	} else {
-       		$config_array[] = 'delay_parameters 1 -1/-1 -1/-1 ' . ($dl_per_host * 125) . '/' . ($dl_per_host * 250) . "\n";
-       	}
+		if ($dl_per_host == "unlimited") {
+			$config_array[] = 'delay_parameters 1 ' . ($dl_per_host * 125) . '/' . ($dl_per_host * 250) . '-1/-1 -1/-1' . "\n";
+		} else {
+			$config_array[] = 'delay_parameters 1 -1/-1 -1/-1 ' . ($dl_per_host * 125) . '/' . ($dl_per_host * 250) . "\n";
+		}
 
-   		/* if no unrestricted ip addresses are defined; this line is ignored */
- 		if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr !== "")) $config_array[] = 'delay_access 1 deny pf_unrestricted_ip' . "\n";
+		/* if no unrestricted ip addresses are defined; this line is ignored */
+		if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr !== "")) $config_array[] = 'delay_access 1 deny pf_unrestricted_ip' . "\n";
 
-   		/* this will define bandwidth delay restrictions for specified throttles */
-   		if ($throttle_binary_files == "on") {
-   			$config_array[] = 'delay_access 1 allow all for_throttled_binary' . "\n";
-   		}
-   		if ($throttle_cd_images == "on") {
-   			$config_array[] = 'delay_access 1 allow all for_throttled_cd' . "\n";
-   		}
-   		if ($throttle_multimedia == "on") {
-   			$config_array[] = 'delay_access 1 allow all for_throttled_multimedia' ."\n";
-   		} else {
-   			$config_array[] = 'delay_access 1 allow all' . "\n";
-   		}
-       	$config_array[] = 'delay_initial_bucket_level 100%' . "\n\n\n";
-    }
+		/* this will define bandwidth delay restrictions for specified throttles */
+		if ($throttle_binary_files == "on") {
+			$config_array[] = 'delay_access 1 allow all for_throttled_binary' . "\n";
+		}
+		if ($throttle_cd_images == "on") {
+			$config_array[] = 'delay_access 1 allow all for_throttled_cd' . "\n";
+		}
+		if ($throttle_multimedia == "on") {
+			$config_array[] = 'delay_access 1 allow all for_throttled_multimedia' ."\n";
+		} else {
+			$config_array[] = 'delay_access 1 allow all' . "\n";
+		}
+		$config_array[] = 'delay_initial_bucket_level 100%' . "\n\n\n";
+	}
 
-    if (isset($dl_overall) && ($dl_overall !== "") and isset($dl_per_host) && ($dl_per_host !== "")) {
-    	/* if no bandwidth restrictions are specified, then these parameters are not necessary */
-    	if ($dl_overall !== "unlimited" and $dl_per_host !== "unlimited") {
+	if (isset($dl_overall) && ($dl_overall !== "") and isset($dl_per_host) && ($dl_per_host !== "")) {
+		/* if no bandwidth restrictions are specified, then these parameters are not necessary */
+		if ($dl_overall !== "unlimited" and $dl_per_host !== "unlimited") {
 
-   			if ((isset($dl_overall) && ($dl_overall == "unlimited")) and (isset($dl_per_host) && ($dl_per_host !== ""))) {
-   				$config_array[] = 'delay_pools 1' . "\n";
-   				$config_array[] = 'delay_class 1 3' . "\n";
-   				$config_array[] = 'delay_parameters 1 -1/-1 -1/-1 ' . ($dl_per_host * 125) . '/' . ($dl_overall * 250) . "\n";
-   			} elseif (isset($dl_overall) && ($dl_overall !== "") and isset($dl_per_host) && ($dl_per_host == "unlimited")) {
-   				$config_array[] = 'delay_pools 1' . "\n";
-   				$config_array[] = 'delay_class 1 3' . "\n";
-   				$config_array[] = 'delay_parameters 1 ' . ($dl_overall * 125) . '/' . ($dl_overall * 250) . ' -1/-1 -1/-1' . "\n";
-   			}
-   		}
+			if ((isset($dl_overall) && ($dl_overall == "unlimited")) and (isset($dl_per_host) && ($dl_per_host !== ""))) {
+				$config_array[] = 'delay_pools 1' . "\n";
+				$config_array[] = 'delay_class 1 3' . "\n";
+				$config_array[] = 'delay_parameters 1 -1/-1 -1/-1 ' . ($dl_per_host * 125) . '/' . ($dl_overall * 250) . "\n";
+			} elseif (isset($dl_overall) && ($dl_overall !== "") and isset($dl_per_host) && ($dl_per_host == "unlimited")) {
+				$config_array[] = 'delay_pools 1' . "\n";
+				$config_array[] = 'delay_class 1 3' . "\n";
+				$config_array[] = 'delay_parameters 1 ' . ($dl_overall * 125) . '/' . ($dl_overall * 250) . ' -1/-1 -1/-1' . "\n";
+			}
+		}
 
-   		if ($dl_overall !== "unlimited" and $dl_per_host !== "unlimited") {
+		if ($dl_overall !== "unlimited" and $dl_per_host !== "unlimited") {
 
-   			/* if no unrestricted ip addresses are defined; this line is ignored */
-   			if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr !== "")) $config_array[] = 'delay_access 1 deny pf_unrestricted_ip' . "\n";
+			/* if no unrestricted ip addresses are defined; this line is ignored */
+			if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr !== "")) $config_array[] = 'delay_access 1 deny pf_unrestricted_ip' . "\n";
 
-   			/* this will define bandwidth delay restrictions for specified throttles */
-   			if ($throttle_binary_files == "on") {
-   				$config_array[] = 'delay_access 1 allow all for_throttled_binary' . "\n";
-   			}
-   			if ($throttle_cd_images == "on") {
-   				$config_array[] = 'delay_access 1 allow all for_throttled_cd' . "\n";
-   			}
-   			if ($throttle_multimedia == "on") {
-   				$config_array[] = 'delay_access 1 allow all for_throttled_multimedia' . "\n";
-   			} else {
-   				$config_array[] = 'delay_access 1 allow all' . "\n";
-   			}
-   			$config_array[] = 'delay_initial_bucket_level 100%' . "\n\n";
-   		}
-    }
+			/* this will define bandwidth delay restrictions for specified throttles */
+			if ($throttle_binary_files == "on") {
+				$config_array[] = 'delay_access 1 allow all for_throttled_binary' . "\n";
+			}
+			if ($throttle_cd_images == "on") {
+				$config_array[] = 'delay_access 1 allow all for_throttled_cd' . "\n";
+			}
+			if ($throttle_multimedia == "on") {
+				$config_array[] = 'delay_access 1 allow all for_throttled_multimedia' . "\n";
+			} else {
+				$config_array[] = 'delay_access 1 allow all' . "\n";
+			}
+			$config_array[] = 'delay_initial_bucket_level 100%' . "\n\n";
+		}
+	}
 
-    $config_array[] = 'header_access X-Forwarded-For deny all' . "\n";
-    $config_array[] = 'header_access Via deny all' . "\n\n";
+	$config_array[] = 'header_access X-Forwarded-For deny all' . "\n";
+	$config_array[] = 'header_access Via deny all' . "\n\n";
 
 	/* TODO: acl customization for snmp support */
 	/* fwrite($fout, "\n"); */
@@ -754,15 +750,15 @@ function global_write_squid_config()
 
 	/* define default ruleset for transparent proxy operation */
 	if (isset($transparent_proxy) && ($transparent_proxy == "on")) {
-       	$config_array[] = 'httpd_accel_host virtual' . "\n";
-      	$config_array[] = 'httpd_accel_port 80' . "\n";
-       	$config_array[] = 'httpd_accel_with_proxy on' . "\n";
-       	$config_array[] = 'httpd_accel_uses_host_header on' . "\n\n";
-    }
-   	unset($transparent_proxy);
+		$config_array[] = 'httpd_accel_host virtual' . "\n";
+		$config_array[] = 'httpd_accel_port 80' . "\n";
+		$config_array[] = 'httpd_accel_with_proxy on' . "\n";
+		$config_array[] = 'httpd_accel_uses_host_header on' . "\n\n";
+	}
+	unset($transparent_proxy);
 
 
-    /* define visible hostname */
+	/* define visible hostname */
 	if (isset($visible_hostname) && ($visible_hostname !== "")) {
 		$config_array[] = 'visible_hostname ' . $visible_hostname . "\n";
 	}
@@ -775,14 +771,11 @@ function global_write_squid_config()
 	unset($cache_admin_email);
 
 	/* write configuration file */
-	foreach ($config_array as $config_item)
-	{
+	foreach ($config_array as $config_item) {
 		fwrite($fout, trim($config_item));
 
-		if (stristr($config_item, "\n"))
-		{
-			for ($i = 1; $i < count(explode("\n", $config_item)); $i++)
-			{
+		if (stristr($config_item, "\n")) {
+			for ($i = 1; $i < count(explode("\n", $config_item)); $i++) {
 				fwrite($fout, "\n");
 			}
 		}
@@ -797,110 +790,109 @@ function global_write_squid_config()
 } /* end function write_squid_config */
 
 function squid3_custom_php_install_command() {
-		/* write initial static config for transparent proxy */
-		write_static_squid_config();
+	/* write initial static config for transparent proxy */
+	write_static_squid_config();
 
-		touch("/tmp/squid3_custom_php_install_command");
+	touch("/tmp/squid3_custom_php_install_command");
 
-		/*    make sure this all exists, see:
-		 *    https://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
-		 */
-		update_output_window("Setting up Squid environment...");
-		mwexec("mkdir -p /var/squid");
-		mwexec("chown squid:squid /var/squid");
+	/*    make sure this all exists, see:
+	 *    https://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
+	 */
+	update_output_window("Setting up Squid environment...");
+	mwexec("mkdir -p /var/squid");
+	mwexec("chown squid:squid /var/squid");
+	mwexec("mkdir -p /var/squid/logs");
+	mwexec("chown squid:squid /var/squid/logs");
+	mwexec("mkdir -p /var/squid/cache");
+	mwexec("chown squid:squid /var/squid/cache");
+	mwexec("mkdir -p /usr/local/etc/squid/advanced");
+	mwexec("chown squid:squid /usr/local/etc/squid/advanced");
+	mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
+	mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls");
+	mwexec("touch /usr/local/etc/squid/advanced/acls/src_subnets.acl");
+	mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_subnets.acl");
+	mwexec("touch /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
+	mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
+	mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
+
+
+	/* set a few extra items noted by regan */
+	update_output_window("Creating logs and setting user information...");
+	$fdsquid = fopen("/usr/local/etc/rc.d/aSquid.sh", "w");
+	fwrite($fdsquid, "#/bin/sh\n");
+	fwrite($fdsquid, "# \n");
+	fwrite($fdsquid, "# This file was created by the pfSense package system\n");
+	fwrite($fdsquid, "# Sets up squid option on each bootup that are not persistent\n");
+	fwrite($fdsquid, "# \n\n");
+	fwrite($fdsquid, "chown squid:wheel /dev/pf\n");
+	fwrite($fdsquid, "chmod ug+rw /dev/pf\n");
+	fwrite($fdsquid, "touch /var/log/useragent.log\n");
+	fwrite($fdsquid, "touch /var/log/access.log\n");
+	fwrite($fdsquid, "touch /var/log/cache.log\n");
+	fwrite($fdsquid, "chown squid:wheel /var/log/cache.log\n");
+	fwrite($fdsquid, "chown squid:wheel /var/log/access.log\n");
+	fwrite($fdsquid, "chown squid:wheel /var/log/useragent.log\n");
+	fwrite($fdsquid, "\n");
+	fclose($fdsquid);
+	mwexec("chmod a+rx /usr/local/etc/rc.d/aSquid.sh");
+	mwexec("/usr/local/etc/rc.d/aSquid.sh");
+
+	update_output_window("Creating Proxy Server initialization scripts...");
+	$start = "touch /tmp/ro_root_mount; /usr/local/sbin/squid -D; touch /tmp/filter_dirty";
+	$stop = "/usr/local/sbin/squid -k shutdown";
+	write_rcfile(array(
+		"file" => "squid.sh",
+		"start" => $start,
+		"stop" => $stop
+	));
+
+	mwexec("chmod 755 /usr/local/etc/rc.d/squid.sh");
+
+	/* create log directory hierarchies if they don't exist */
+	update_output_window("Creating required directory hierarchies...");
+
+	if (!file_exists("/var/squid/logs")) {
 		mwexec("mkdir -p /var/squid/logs");
-		mwexec("chown squid:squid /var/squid/logs");
+	}
+	mwexec("/usr/sbin/chown squid:squid /var/squid/logs");
+
+
+	if (!file_exists("/var/squid/cache")) {
 		mwexec("mkdir -p /var/squid/cache");
-		mwexec("chown squid:squid /var/squid/cache");
-		mwexec("mkdir -p /usr/local/etc/squid/advanced");
-		mwexec("chown squid:squid /usr/local/etc/squid/advanced");
+	}
+	mwexec("/usr/sbin/chown squid:squid /var/squid/cache");
+
+	if (!file_exists("/usr/local/etc/squid/advanced/acls")) {
 		mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
-		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls");
-		mwexec("touch /usr/local/etc/squid/advanced/acls/src_subnets.acl");
-		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_subnets.acl");
-		mwexec("touch /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
-		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
-		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
+	}
+	mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/acls");
 
+	if (!file_exists("/usr/local/etc/squid/advanced/ncsa")) {
+		mwexec("mkdir -p /usr/local/etc/squid/advanced/ncsa");
+	}
+	mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ncsa");
 
-		/* set a few extra items noted by regan */
-		update_output_window("Creating logs and setting user information...");
-		$fdsquid = fopen("/usr/local/etc/rc.d/aSquid.sh", "w");
-		fwrite($fdsquid, "#/bin/sh\n");
-		fwrite($fdsquid, "# \n");
-		fwrite($fdsquid, "# This file was created by the pfSense package system\n");
-		fwrite($fdsquid, "# Sets up squid option on each bootup that are not persistent\n");
-		fwrite($fdsquid, "# \n\n");
-		fwrite($fdsquid, "chown squid:wheel /dev/pf\n");
-		fwrite($fdsquid, "chmod ug+rw /dev/pf\n");
-		fwrite($fdsquid, "touch /var/log/useragent.log\n");
-		fwrite($fdsquid, "touch /var/log/access.log\n");
-		fwrite($fdsquid, "touch /var/log/cache.log\n");
-		fwrite($fdsquid, "chown squid:wheel /var/log/cache.log\n");
-		fwrite($fdsquid, "chown squid:wheel /var/log/access.log\n");
-		fwrite($fdsquid, "chown squid:wheel /var/log/useragent.log\n");
-		fwrite($fdsquid, "\n");
-		fclose($fdsquid);
-		mwexec("chmod a+rx /usr/local/etc/rc.d/aSquid.sh");
-		mwexec("/usr/local/etc/rc.d/aSquid.sh");
+	if (!file_exists("/usr/local/etc/squid/advanced/ntlm")) {
+		mwexec("mkdir -p /usr/local/etc/squid/advanced/ntlm");
+	}
+	mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ntlm");
 
-		update_output_window("Creating Proxy Server initialization scripts...");
-		$start = "touch /tmp/ro_root_mount; /usr/local/sbin/squid -D; touch /tmp/filter_dirty";
-		$stop = "/usr/local/sbin/squid -k shutdown";
-		write_rcfile(array(
-					"file" => "squid.sh",
-					"start" => $start,
-					"stop" => $stop
-				)
-		);
+	if (!file_exists("/usr/local/etc/squid/advanced/radius")) {
+		mwexec("mkdir -p /usr/local/etc/squid/advanced/radius");
+	}
+	mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/radius");
 
-		mwexec("chmod 755 /usr/local/etc/rc.d/squid.sh");
+	$devfs_file = fopen("/etc/devfs.conf", "a");
+	fwrite($devfs_file, "\n# Allow squid to query the packet filter bymaking is group-accessable. ");
+	fwrite($devfs_file, "own pf root:squid");
+	fwrite($devfs_file, "perm pf 0640");
+	fclose($devfs_file);
 
-		/* create log directory hierarchies if they don't exist */
-		update_output_window("Creating required directory hierarchies...");
+	update_output_window("Initializing Cache... This may take a moment...");
+	mwexec("/usr/local/sbin/squid -z");
 
-		if (!file_exists("/var/squid/logs")) {
-			mwexec("mkdir -p /var/squid/logs");
-		}
-		mwexec("/usr/sbin/chown squid:squid /var/squid/logs");
-
-
-		if (!file_exists("/var/squid/cache")) {
-			mwexec("mkdir -p /var/squid/cache");
-		}
-		mwexec("/usr/sbin/chown squid:squid /var/squid/cache");
-
-		if (!file_exists("/usr/local/etc/squid/advanced/acls")) {
-			mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
-		}
-		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/acls");
-
-		if (!file_exists("/usr/local/etc/squid/advanced/ncsa")) {
-			mwexec("mkdir -p /usr/local/etc/squid/advanced/ncsa");
-		}
-		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ncsa");
-
-		if (!file_exists("/usr/local/etc/squid/advanced/ntlm")) {
-			mwexec("mkdir -p /usr/local/etc/squid/advanced/ntlm");
-		}
-		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ntlm");
-
-		if (!file_exists("/usr/local/etc/squid/advanced/radius")) {
-			mwexec("mkdir -p /usr/local/etc/squid/advanced/radius");
-		}
-		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/radius");
-
-		$devfs_file = fopen("/etc/devfs.conf", "a");
-		fwrite($devfs_file, "\n# Allow squid to query the packet filter bymaking is group-accessable. ");
-		fwrite($devfs_file, "own pf root:squid");
-		fwrite($devfs_file, "perm pf 0640");
-		fclose($devfs_file);
-
-		update_output_window("Initializing Cache... This may take a moment...");
-		mwexec("/usr/local/sbin/squid -z");
-
-		update_output_window("Starting Proxy Server...");
-		start_service("squid");
+	update_output_window("Starting Proxy Server...");
+	start_service("squid");
 }
 
 function squid3_custom_php_deinstall_command() {
@@ -922,8 +914,9 @@ function squid3_custom_php_deinstall_command() {
 }
 
 function write_static_squid_config() {
-	touch("/tmp/write_static_squid_config");
 	global $config;
+
+	touch("/tmp/write_static_squid_config");
 	$lancfg = $config['interfaces']['lan'];
 	$lanif = $lancfg['if'];
 	$lanip = $lancfg['ipaddr'];
@@ -1031,6 +1024,7 @@ function write_static_squid_config() {
 
 function mod_htpasswd() {
 	global $config;
+
 	conf_mount_rw();
 	config_lock();
 
@@ -1039,7 +1033,7 @@ function mod_htpasswd() {
 	$passfile = fopen("/usr/local/etc/squid/advanced/ncsa/passwd", "w+");
 
 	if (isset($config['installedpackages']['squidextlocalauth']['config']) && $config['installedpackages']['squidextlocalauth']['config'] != "") {
-		foreach($config['installedpackages']['squidextlocalauth']['config'] as $rowhelper) {
+		foreach ($config['installedpackages']['squidextlocalauth']['config'] as $rowhelper) {
 			$encpass = generate_htpasswd($rowhelper['username'], $rowhelper['password']);
 			fwrite($passfile, $rowhelper['username'] . ":" . $encpass . "\n");
 		}
@@ -1052,19 +1046,20 @@ function mod_htpasswd() {
 }
 
 function generate_htpasswd($username, $password) {
-	$all = explode( " ",
-        "a b c d e f g h i j k l m n o p q r s t u v w x y z "
-      . "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z "
-        . "0 1 2 3 4 5 6 7 8 9");
+	$all = explode(" ",
+		"a b c d e f g h i j k l m n o p q r s t u v w x y z " .
+		"A B C D E F G H I J K L M N O P Q R S T U V W X Y Z " .
+		"0 1 2 3 4 5 6 7 8 9"
+	);
 
-    for ($i = 0; $i < 9; $i++) {
-    	srand((double)microtime()*1000000);
-    	$randy = rand(0,61);
-    	$seed .= $all[$randy];
-    }
+	for ($i = 0; $i < 9; $i++) {
+		srand((double)microtime()*1000000);
+		$randy = rand(0,61);
+		$seed .= $all[$randy];
+	}
 
-    $crypt = crypt($password, "$1$$seed");
-    return $crypt;
+	$crypt = crypt($password, "$1$$seed");
+	return $crypt;
 }
 
 ?>
