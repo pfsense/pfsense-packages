@@ -804,8 +804,7 @@ function squid_install_cron($should_install) {
 		}
 		$x++;
 	}
-	switch($should_install) {
-	case true:
+	if ($should_install) {
 		$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 		if ($rotate_job_id < 0) {
 			$cron_item['command']=($settings['clear_cache']=='on' ?  "/usr/local/pkg/swapstate_check.php clean; " : "");
@@ -841,7 +840,7 @@ function squid_install_cron($should_install) {
 			write_config("Adding Squid Cron Jobs");
 		}
 		break;
-	case false:
+	} else {
 		if ($rotate_job_id >= 0) {
 			unset($config['cron']['item'][$rotate_job_id]);
 			$need_write = true;
