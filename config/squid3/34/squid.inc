@@ -1959,11 +1959,9 @@ function squid_resync($via_rpc="no") {
 		if (!is_service_running('squid')) {
 			log_error("Starting Squid");
 			mwexec(SQUID_BASE . "/sbin/squid -f " . SQUID_CONFFILE);
-		} else {
-			if (!isset($boot_process)) {
-				log_error("Reloading Squid for configuration sync");
-				mwexec(SQUID_BASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
-				}
+		} else if (!isset($boot_process)) {
+			log_error("Reloading Squid for configuration sync");
+			mwexec(SQUID_BASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
 		}
 
 		// Sleep for a couple seconds to give squid a chance to fire up fully.
