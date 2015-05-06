@@ -61,7 +61,6 @@ define('SQUID_CONFBASE', SQUID_LOCALBASE .'/etc/squid');
 define('SQUID_CONFFILE', SQUID_CONFBASE . '/squid.conf');
 define('SQUID_ACLDIR', '/var/squid/acl');
 define('SQUID_PASSWD', '/var/etc/squid.passwd');
-define('SQUID_LIB','/var/squid/lib');
 define('SQUID_SSL_DB','/var/squid/lib/ssl_db');
 
 $valid_acls = array();
@@ -330,7 +329,6 @@ function squid_install_command() {
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 			SQUID_BASE,
-			SQUID_LIB,
 			SQUID_SSL_DB ) as $dir) {
 		@mkdir($dir, 0755, true);
 		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
@@ -1899,7 +1897,6 @@ function squid_resync($via_rpc="no") {
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 			SQUID_BASE,
-			SQUID_LIB,
 			SQUID_SSL_DB ) as $dir) {
 		@mkdir($dir, 0755, true);
 		chown($dir, SQUID_UID);
