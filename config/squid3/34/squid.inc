@@ -2148,7 +2148,7 @@ function squid_generate_rules($type) {
 		if (substr($pfsense_version,0,3) > 2.0) {
 			if (preg_match('/255.255.255.255/',$line) && $squid_conf['patch_cp']) {
 				$found_rule++;
-				$new_line .= "\n\t".'$cprules .= "add {$rulenum} skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
+				$new_line .= "\t".'$cprules .= "add {$rulenum} skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
 				$new_line .= "\t".'$cprules .= "add {$rulenum} skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
 			}
 		} else {
