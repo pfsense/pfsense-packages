@@ -1005,7 +1005,9 @@ SSLRandomSeed connect builtin
 Include etc/apache22/Includes/*.conf
 
 EOF;
-
+	if (!is_dir('/usr/local/etc/apache22')) {
+		mkdir('/usr/local/etc/apache22', 0775, true);
+	}
 	$fd = fopen("/usr/local/etc/apache22/httpd.conf", "w");
 	if(!$fd) {
 		$error_text = "Could not open httpd.conf for writing!";
