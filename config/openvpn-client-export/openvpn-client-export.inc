@@ -44,17 +44,20 @@ $current_openvpn_version_rev = "03";
 
 function openvpn_client_export_install() {
 	global $current_openvpn_version;
-	conf_mount_rw();
-	$tarpath = "/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz";
-	$phpfile = "vpn_openvpn_export.php";
-	$ovpndir = "/usr/local/share/openvpn";
-	$workdir = "{$ovpndir}/client-export";
 
-	if (!is_dir($workdir))
-		mkdir($workdir, 0777, true);
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		conf_mount_rw();
+		$tarpath = "/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz";
+		$ovpndir = "/usr/local/share/openvpn";
+		$workdir = "{$ovpndir}/client-export";
 
-	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
-	conf_mount_ro();
+		if (!is_dir($workdir))
+			mkdir($workdir, 0777, true);
+
+		exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
+		conf_mount_ro();
+	}
 }
 
 function openvpn_client_export_deinstall() {
@@ -137,7 +140,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 
 	// lookup server certificate info
 	$server_cert = lookup_cert($settings['certref']);
-	if (!$server_cert) 
+	if (!$server_cert)
 	{
 		$input_errors[] = "Could not locate server certificate.";
 	} else {
@@ -182,7 +185,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 
 	if ($input_errors)
 		return false;
-		
+
 	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
 }
 
@@ -259,7 +262,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 			}
 			$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
 		}
-		if ($proxy['proxy_type'] == "socks") 
+		if ($proxy['proxy_type'] == "socks")
 			$conf .= "socks-proxy {$proxy['ip']} {$proxy['port']} ";
 		if ($proxy['proxy_authtype'] != "none") {
 			if (!isset($proxy['passwdfile']))
@@ -367,7 +370,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		$conf .= "management-forget-disconnect{$nl}";
 		$conf .= $nl;
 	};
-		
+
 	// add advanced options
 	$advancedoptions = str_replace("\r\n", "\n", $advancedoptions);
 	$advancedoptions = str_replace("\n", $nl, $advancedoptions);
@@ -813,7 +816,7 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 			}
 			$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
 		}
-		if ($proxy['proxy_type'] == "socks") 
+		if ($proxy['proxy_type'] == "socks")
 			$conf .= "socks-proxy {$proxy['ip']} {$proxy['port']} ";
 		if ($proxy['proxy_authtype'] != "none") {
 			if (!isset($proxy['passwdfile']))
