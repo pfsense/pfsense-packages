@@ -1408,6 +1408,7 @@
 			<port>devel/git</port>
 		</build_pbi>
 		<depends_on_package_pbi>git-2.2.1-##ARCH##.pbi</depends_on_package_pbi>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>tinc</name>
