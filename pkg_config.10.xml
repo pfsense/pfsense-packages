@@ -450,8 +450,7 @@
 			<ports_before>security/ca_root_nss</ports_before>
 			<port>www/e2guardian</port>
 		</build_pbi>
-		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET_FORCE=TRICKLE CLAMD ICAP NTLM</build_options>
-		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
+		<build_options>e2guardian_UNSET_FORCE=APACHE;e2guardian_SET_FORCE=TRICKLE CLAMD ICAP NTLM</build_options>
 	</package>
 	<package>
 		<name>mailscanner</name>
