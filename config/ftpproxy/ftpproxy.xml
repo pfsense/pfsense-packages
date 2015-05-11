@@ -62,9 +62,9 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Proxy Bypass: Destination</fielddescr>
+			<fielddescr>Proxy Bypass: Destination(s)</fielddescr>
 			<fieldname>bypassdst</fieldname>
-			<description>Enter an IP address or alias for destination server host(s) which should bypass the proxy.</description>
+			<description>Enter an IP address or alias for destination server host(s) which should bypass the proxy. Comma-separate for multiple destinations.</description>
 			<type>input</type>
 		</field>
 		<field>
