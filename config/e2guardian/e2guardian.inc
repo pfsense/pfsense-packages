@@ -3,8 +3,8 @@
 	e2guardian.inc
 	Copyright (C) 2015 Marcello Coutinho
 	part of pfSense (http://www.pfSense.com)
-   	All rights reserved.
-                                                                              */
+	All rights reserved.
+																			*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,6 @@
 
 require_once("util.inc");
 require_once("globals.inc");
-#require("guiconfig.inc");
-//$shortcut_section = "squid";
 $shortcut_section = "e2guardian";
 
 $pf_version = substr(trim(file_get_contents("/etc/version")),0,3);
@@ -50,7 +48,7 @@ if ($uname['machine']=='amd64'){
 	ini_set('memory_limit', '250M');
 }
 
-function e2_text_area_decode($text){
+function e2_text_area_decode($text) {
 	return preg_replace('/\r\n/', "\n",base64_decode($text));
 }
 
@@ -63,31 +61,31 @@ function dg_get_real_interface_address($iface) {
 	return array($ip, long2ip(hexdec($netmask)));
 }
 
-function check_ca_hashes(){
+function check_ca_hashes() {
 	global $config,$g;
 
-	#check certificates
+	//check certificates
 	$cert_count = 0;
 	if (is_dir('/usr/local/share/certs')){
-		if ($handle = opendir('/usr/local/share/certs')) {
-    		while (false !== ($file = readdir($handle))){
-        		if (preg_match ("/\d+.0/",$file)){
-            		$cert_count++;
-        		}
-    		}
-        }
+		if ($handle = opendir('/usr/local/share/certs')){
+			while (false !== ($file = readdir($handle))){
+				if (preg_match ("/\d+.0/",$file)){
+					$cert_count++;
+				}
+			}
+		}
 	}
-    closedir($handle);
+	closedir($handle);
 	if ($cert_count < 10){
 		conf_mount_rw();
-		#create ca-root hashes from ca-root-nss package
+		//create ca-root hashes from ca-root-nss package
 		log_error("Creating root certificate bundle hashes from the Mozilla Project");
 		$cas = file('/usr/local/share/certs/ca-root-nss.crt');
 		$cert = 0;
 		foreach ($cas as $ca){
-	    	if (preg_match("/--BEGIN CERTIFICATE--/",$ca)){
+			if (preg_match("/--BEGIN CERTIFICATE--/",$ca)){
 				$cert = 1;
-	    	}
+			}
 			if ($cert == 1){
 				$crt .= $ca;
 			}
@@ -102,7 +100,7 @@ function check_ca_hashes(){
 		}
 	}
 }
-function sync_package_e2guardian($via_rpc="no",$install_process=false){
+function sync_package_e2guardian($via_rpc="no",$install_process=false) {
 	global $config,$g;
 
 	# detect boot process
@@ -340,7 +338,7 @@ function sync_package_e2guardian($via_rpc="no",$install_process=false){
 		}
 		$svr_cert = lookup_cert($e2guardian_config["dcert"]);
 		if ($svr_cert != false){
-			if (base64_decode($svr_cert['prv'])) {
+			if (base64_decode($svr_cert['prv'])){
 				file_put_contents("/etc/ssl/demoCA/private/serverkey.pem",base64_decode($svr_cert['prv']).base64_decode($svr_cert['crt']));
 				$cert_key = "certprivatekeypath = '/etc/ssl/demoCA/private/serverkey.pem' ";
 			}
@@ -815,13 +813,13 @@ function sync_package_e2guardian($via_rpc="no",$install_process=false){
 
 
 		//create group list files
-		$lists = array("phraseacl" => array("bannedphrase","weightedphrase","exceptionphrase"),
-					 "siteacl"     => array("bannedsite","greysite","exceptionsite","exceptionfilesite","logsite"),
-					 "urlacl"      => array("bannedurl","greyurl","exceptionurl","exceptionregexpurl","bannedregexpurl","urlregexp","exceptionfileurl","logurl","logregexpurl"),
-					 "contentacl"  => array("contentregexp"),
-					 "extensionacl"=> array("exceptionextension","exceptionmimetype","bannedextension","bannedmimetype"),
-					 "headeracl"   => array("headerregexp","bannedregexpheader"),
-					 "searchacl"   => array("searchengineregexp","bannedsearchterm","weightedsearchterm","exceptionsearchterm")
+		$lists = array("phraseacl"	=> array("bannedphrase","weightedphrase","exceptionphrase"),
+					 "siteacl"		=> array("bannedsite","greysite","exceptionsite","exceptionfilesite","logsite"),
+					 "urlacl"		=> array("bannedurl","greyurl","exceptionurl","exceptionregexpurl","bannedregexpurl","urlregexp","exceptionfileurl","logurl","logregexpurl"),
+					 "contentacl"	=> array("contentregexp"),
+					 "extensionacl"	=> array("exceptionextension","exceptionmimetype","bannedextension","bannedmimetype"),
+					 "headeracl"	=> array("headerregexp","bannedregexpheader"),
+					 "searchacl"	=> array("searchengineregexp","bannedsearchterm","weightedsearchterm","exceptionsearchterm")
 					 );
 		foreach ($lists as $list_key => $list_array){
 			// verify groups acls to avoid errors on empty acl group options
@@ -967,7 +965,7 @@ EOF;
 		}
 	}
 	//get clamav user
-	$cconf =  E2GUARDIAN_DIR. "/etc/clamd.conf";
+	$cconf = E2GUARDIAN_DIR. "/etc/clamd.conf";
 	$cconf_file = file_get_contents($cconf);
 	if (preg_match("/User (\w+)/",$cconf_file,$matches)){
 		mwexec("/usr/sbin/pw user show {$matches[1]} || /usr/sbin/pw user add -n {$matches[1]} -s /usr/sbin/nologin");
@@ -1007,35 +1005,35 @@ EOF;
 	if ($e2guardian_config['cron'] && preg_match("/clamd/",$e2guardian_config['content_scanners'])){
 		switch ($e2guardian_config['cron']){
 			case "day":
-				$new_cron['item'][]=array(	"minute" =>	"0",
-											"hour"	 =>	"0",
-											"mday" 	 =>	"*",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	$cron_cmd);
+				$new_cron['item'][]=array(	"minute"	=>	"0",
+											"hour"	=>	"0",
+											"mday"	=>	"*",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
+											"command"	=>	$cron_cmd);
 				$config['cron']=$new_cron;
 				$cron_found++;
 				break;
 			case "02days":
-				$new_cron['item'][]=array(	"minute" =>	"0",
-											"hour"	 =>	"0",
-											"mday" 	 =>	"*/2",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	$cron_cmd);
+				$new_cron['item'][]=array(	"minute"	=>	"0",
+											"hour"	=>	"0",
+											"mday"	=>	"*/2",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
+											"command"	=>	$cron_cmd);
 				$config['cron']=$new_cron;
 				$cron_found++;
 				break;
 			case "week":
-				$new_cron['item'][]=array(	"minute" =>	"0",
-											"hour"	 =>	"0",
-											"mday" 	 =>	"*/7",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	$cron_cmd);
+				$new_cron['item'][]=array(	"minute"	=>	"0",
+											"hour"	=>	"0",
+											"mday"	=>	"*/7",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
+											"command"	=>	$cron_cmd);
 				$config['cron']=$new_cron;
 				$cron_found++;
 				break;
@@ -1045,35 +1043,35 @@ EOF;
 	if ($e2guardian_blacklist['cron']){
 		switch ($e2guardian_blacklist['cron']){
 			case "day":
-				$new_cron['item'][]=array(	"minute" =>	"0",
-											"hour"	 =>	"0",
-											"mday" 	 =>	"*",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	$cron_cmd);
+				$new_cron['item'][]=array(	"minute"	=>	"0",
+											"hour"	=>	"0",
+											"mday"	=>	"*",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
+											"command"	=>	$cron_cmd);
 				$config['cron']=$new_cron;
 				$cron_found++;
 				break;
 			case "02days":
-				$new_cron['item'][]=array(	"minute" =>	"0",
-											"hour"	 =>	"0",
-											"mday" 	 =>	"*/2",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	$cron_cmd);
+				$new_cron['item'][]=array(	"minute"	=>	"0",
+											"hour"	=>	"0",
+											"mday"	=>	"*/2",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
+											"command"	=>	$cron_cmd);
 				$config['cron']=$new_cron;
 				$cron_found++;
 				break;
 			case "week":
-				$new_cron['item'][]=array(	"minute" =>	"0",
-											"hour"	 =>	"0",
-											"mday" 	 =>	"*/7",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	$cron_cmd);
+				$new_cron['item'][]=array(	"minute"	=>	"0",
+											"hour"	=>	"0",
+											"mday"	=>	"*/7",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
+											"command"	=>	$cron_cmd);
 				$config['cron']=$new_cron;
 				$cron_found++;
 				break;
@@ -1082,25 +1080,25 @@ EOF;
 	$cron_cmd = "/usr/local/bin/php /usr/local/www/e2guardian_ldap.php";
 	if (is_array($config['installedpackages']['e2guardiangroups']['config'])){
 		foreach ($config['installedpackages']['e2guardiangroups']['config'] as $e2guardian_groups){
-	  		$e2_group_source = ($e2guardian_groups['groupnamesource'] !="" ? $e2guardian_groups['groupnamesource'] : "name");
-	  		if(preg_match('/(\d+)m/',$e2guardian_groups['freq'],$matches)){
+			$e2_group_source = ($e2guardian_groups['groupnamesource'] !="" ? $e2guardian_groups['groupnamesource'] : "name");
+			if(preg_match('/(\d+)m/',$e2guardian_groups['freq'],$matches)){
 				$new_cron['item'][] = array(	"minute" =>	"*/".$matches[1],
-											"hour"	 =>	"*",
-											"mday" 	 =>	"*",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	"{$cron_cmd} $e2_group_source '{$e2guardian_groups[$e2_group_source]}'");
+											"hour"	=>	"*",
+											"mday"	=>	"*",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
+											"command"	=>	"{$cron_cmd} $e2_group_source '{$e2guardian_groups[$e2_group_source]}'");
 				$config['cron'] = $new_cron;
 				$cron_found++;
 			}
-	  		if(preg_match('/(\d+)h/',$e2guardian_groups['freq'],$matches)){
+			if(preg_match('/(\d+)h/',$e2guardian_groups['freq'],$matches)){
 				$new_cron['item'][] = array(	"minute" =>	"0",
-											"hour"	 =>	"*/".$matches[1],
-											"mday" 	 =>	"*",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
+											"hour"	=>	"*/".$matches[1],
+											"mday"	=>	"*",
+											"month"	=>	"*",
+											"wday"	=>	"*",
+											"who"	=>	"root",
 											"command"=>	"{$cron_cmd} $e2_group_source '{$e2guardian_groups[$e2_group_source]}'");
 				$config['cron'] = $new_cron;
 				$cron_found++;
@@ -1196,7 +1194,7 @@ EOF;
 	touch(E2GUARDIAN_DIRTYPATH);
 
 }
-function e2guardian_check_config(){
+function e2guardian_check_config() {
 	global $savemsg,$config;
 
 	if (!isset($config['installedpackages']['e2guardian']['config'][0]['enable'])){
@@ -1214,7 +1212,7 @@ function e2guardian_check_config(){
 	return 0;
 }
 
-function e2guardian_start($via_rpc="no",$install_process=false,$force_start=false){
+function e2guardian_start($via_rpc="no",$install_process=false,$force_start=false) {
 	global $g,$config,$savemsg;
 
 	unlink_if_exists(E2GUARDIAN_DIRTYPATH);
@@ -1254,63 +1252,63 @@ function e2guardian_start($via_rpc="no",$install_process=false,$force_start=fals
 	check_ca_hashes();
 
 	//mount read only
-    conf_mount_ro();
+	conf_mount_ro();
 
-    //avoid sync during boot process
+	//avoid sync during boot process
 	if (!isset($boot_process) || $via_rpc == "yes"){
-	  /* Uses XMLRPC to synchronize the changes to a remote node */
-	  if (is_array($config['installedpackages']['e2guardiansync']['config'])){
-		$e2_sync = $config['installedpackages']['e2guardiansync']['config'][0];
-		$synconchanges = $e2_sync['synconchanges'];
-		$synctimeout = $e2_sync['synctimeout'];
-		switch ($synconchanges){
-			case "manual":
-				if (is_array($e2_sync[row])){
-					$rs = $e2_sync[row];
-					}
-				else{
-					log_error("[E2guardian] xmlrpc sync is enabled but there is no hosts to push on e2guardian config.");
-					return;
-					}
-				break;
-			case "auto":
-					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-						$system_carp = $config['installedpackages']['carpsettings']['config'][0];
-						$rs[0]['ipaddress'] = $system_carp['synchronizetoip'];
-						$rs[0]['username'] = $system_carp['username'];
-						$rs[0]['password'] = $system_carp['password'];
-						if (! is_ipaddr($system_carp['synchronizetoip'])){
+		/* Uses XMLRPC to synchronize the changes to a remote node */
+		if (is_array($config['installedpackages']['e2guardiansync']['config'])){
+			$e2_sync = $config['installedpackages']['e2guardiansync']['config'][0];
+			$synconchanges = $e2_sync['synconchanges'];
+			$synctimeout = $e2_sync['synctimeout'];
+			switch ($synconchanges){
+				case "manual":
+					if (is_array($e2_sync[row])){
+						$rs = $e2_sync[row];
+						}
+					else{
+						log_error("[E2guardian] xmlrpc sync is enabled but there is no hosts to push on e2guardian config.");
+						return;
+						}
+					break;
+				case "auto":
+						if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
+							$system_carp = $config['installedpackages']['carpsettings']['config'][0];
+							$rs[0]['ipaddress'] = $system_carp['synchronizetoip'];
+							$rs[0]['username'] = $system_carp['username'];
+							$rs[0]['password'] = $system_carp['password'];
+							if (! is_ipaddr($system_carp['synchronizetoip'])){
+								log_error("[E2guardian] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
+								return;
+								}
+						} else {
 							log_error("[E2guardian] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
 							return;
-							}
-					} else {
-						log_error("[E2guardian] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
-						return;
-					}
+						}
+					break;
+				default:
+					return;
 				break;
-			default:
-				return;
-			break;
-		}
-		if (is_array($rs)){
-			log_error("[E2guardian] xmlrpc sync is starting.");
-			foreach($rs as $sh){
-				$sync_to_ip = $sh['ipaddress'];
-				$password = $sh['password'];
-				$username = ($sh['username']?$sh['username']:"admin");
-				if($password && $sync_to_ip){
-					e2guardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$synctimeout);
-				}
 			}
-			log_error("[E2guardian] xmlrpc sync is ending.");
-		}
- 	}
-  }
+			if (is_array($rs)){
+				log_error("[E2guardian] xmlrpc sync is starting.");
+				foreach($rs as $sh){
+					$sync_to_ip = $sh['ipaddress'];
+					$password = $sh['password'];
+					$username = ($sh['username']?$sh['username']:"admin");
+					if($password && $sync_to_ip){
+						e2guardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$synctimeout);
+					}
+				}
+				log_error("[E2guardian] xmlrpc sync is ending.");
+			}
+	 	}
+	}
 
 }
 
 function e2guardian_validate_input($post, &$input_errors) {
-	foreach ($post as $key => $value) {
+	foreach ($post as $key => $value){
 		if (preg_match("/^(name|description)$/",$key) && $value == ""){
 				$input_errors[] = "{$key} could not be empty.";
 		} else if ($key == "name" && $value=="sample"){
@@ -1368,18 +1366,19 @@ function e2guardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$s
 		$synctimeout = 30;
 	}
 	$xmlrpc_sync_neighbor = $sync_to_ip;
-    if($config['system']['webgui']['protocol'] != "") {
+	if ($config['system']['webgui']['protocol'] != ""){
 		$synchronizetoip = $config['system']['webgui']['protocol'];
 		$synchronizetoip .= "://";
-    }
-    $port = $config['system']['webgui']['port'];
-    /* if port is empty lets rely on the protocol selection */
-    if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http")
+	}
+	$port = $config['system']['webgui']['port'];
+	/* if port is empty lets rely on the protocol selection */
+	if ($port == ""){
+		if ($config['system']['webgui']['protocol'] == "http"){
 			$port = "80";
-		else
+		} else {
 			$port = "443";
-    }
+		}
+	}
 	$synchronizetoip .= $sync_to_ip;
 
 	/* xml will hold the sections to sync */
@@ -1422,11 +1421,11 @@ function e2guardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$s
 			$cli->setDebug(1);
 		/* send our XMLRPC message and timeout after $synctimeout seconds */
 		$resp = $cli->send($msg, $synctimeout);
-		if(!$resp) {
+		if (!$resp){
 			$error = "A communications error occurred while attempting e2guardian XMLRPC sync with {$url}:{$port}.";
 			log_error($error);
 			file_notice("sync_settings", $error, "e2guardian Settings Sync", "");
-		} elseif($resp->faultCode()) {
+		} elseif ($resp->faultCode()){
 			$cli->setDebug(1);
 			$resp = $cli->send($msg, $synctimeout);
 			$error = "An error code was received while attempting e2guardian XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
@@ -1438,7 +1437,7 @@ function e2guardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$s
 
 		/* tell e2guardian to reload our settings on the destionation sync host. */
 		$method = 'pfsense.exec_php';
-		$execcmd  = "require_once('/usr/local/pkg/e2guardian.inc');\n";
+		$execcmd = "require_once('/usr/local/pkg/e2guardian.inc');\n";
 		$execcmd .= "sync_package_e2guardian('yes');";
 
 		/* assemble xmlrpc payload */
@@ -1452,11 +1451,11 @@ function e2guardian_do_xmlrpc_sync($sync_to_ip,$username,$password,$sync_type,$s
 		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 		$cli->setCredentials($username, $password);
 		$resp = $cli->send($msg, $synctimeout);
-		if(!$resp) {
+		if (!$resp){
 			$error = "A communications error occurred while attempting e2guardian XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 			log_error($error);
 			file_notice("sync_settings", $error, "e2guardian Settings Sync", "");
-		} elseif($resp->faultCode()) {
+		} elseif($resp->faultCode()){
 			$cli->setDebug(1);
 			$resp = $cli->send($msg, $synctimeout);
 			$error = "An error code was received while attempting e2guardian XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
