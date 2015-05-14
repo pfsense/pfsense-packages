@@ -978,7 +978,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
 		<maintainer></maintainer>
-		<build_port_path>/usr/ports/net/pfflowd-0.8</build_port_path>
+		<build_port_path>/usr/ports/net/pfflowd</build_port_path>
 	</package>
 	<package>
 		<name>widentd</name>

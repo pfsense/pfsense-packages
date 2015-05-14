@@ -835,10 +835,10 @@
 		<required_version>2.2</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
 		<port_category>net</port_category>
-		<run_depends>sbin/pfflowd:net/pfflowd-0.8</run_depends>
+		<run_depends>sbin/pfflowd:net/pfflowd</run_depends>
 		<build_pbi>
 			<custom_name>pfflowd</custom_name>
-			<port>net/pfflowd-0.8</port>
+			<port>net/pfflowd</port>
 		</build_pbi>
 	</package>
 	<package>
