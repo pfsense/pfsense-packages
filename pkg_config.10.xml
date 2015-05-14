@@ -1454,17 +1454,20 @@
 	</package>
 	<package>
 		<name>Zabbix Agent LTS</name>
+		<internal_name>zabbix-agent</internal_name>
 		<descr>LTS (Long Term Support) release of Zabbix Monitoring agent. Zabbix LTS releases are supported for 
 		Zabbix customers during five (5) years i.e. 3 years of Full Support (general, critical and security issues) 
 		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
 		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-agent-lts.xml</config_file>
-		<version>zabbix-agent-lts-2.2.7 pkg v0.8.3</version>
+		<version>0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix-agent-lts.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
+		<port_category>net-mgmt</port_category>
+		<run_depends>sbin/zabbix_agent:net-mgmt/zabbix22-agent</run_depends>
 		<build_pbi>
 			<custom_name>zabbix22-agent</custom_name>
 			<port>net-mgmt/zabbix22-agent</port>
@@ -1474,17 +1477,20 @@
 	</package>
 	<package>
 		<name>Zabbix Proxy LTS</name>
+		<internal_name>zabbix-proxy</internal_name>
 		<descr>LTS (Long Term Support) release of Zabbix agent proxy. Zabbix LTS releases are supported for 
 		Zabbix customers during five (5) years i.e. 3 years of Full Support (general, critical and security issues) 
 		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
 		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-proxy-lts.xml</config_file>
-		<version>zabbix-proxy-lts-2.2.7 pkg v0.8.3</version>
+		<version>0.8.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix-proxy-lts.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
+		<port_category>net-mgmt</port_category>
+		<run_depends>sbin/zabbix_proxy:net-mgmt/zabbix22-proxy</run_depends>
 		<build_pbi>
 			<custom_name>zabbix22-proxy</custom_name>
 			<port>net-mgmt/zabbix22-proxy</port>

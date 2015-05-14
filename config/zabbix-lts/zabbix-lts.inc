@@ -38,6 +38,15 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version == "2.1" || $pf_version == "2.2") {
+	define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
+	define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
+} else {
+	define('ZABBIX_AGENT_BASE', '/usr/local');
+	define('ZABBIX_AGENT_BASE', '/usr/local');
+}
+
 function php_install_zabbix_lts(){
 	sync_package_zabbix_lts();	
 }
@@ -46,8 +55,6 @@ function php_deinstall_zabbix_agent_lts(){
    global $config, $g;
 
    conf_mount_rw();
-
-   define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
 
    exec("/usr/bin/killall zabbix_agentd");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix_agentd_lts.sh");
@@ -69,8 +76,6 @@ function php_deinstall_zabbix_proxy_lts(){
    global $config, $g;
 
    conf_mount_rw();
-
-   define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
 
    exec("/usr/bin/killall zabbix_proxy");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix_proxy_lts.sh");
@@ -169,9 +174,6 @@ function sync_package_zabbix_lts(){
 	global $config, $g;
 
 	conf_mount_rw();
-
-	define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
-	define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
 
 	#check zabbix proxy config
 	if (is_array($config['installedpackages']['zabbixproxylts'])){
