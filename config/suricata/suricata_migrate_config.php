@@ -94,6 +94,91 @@ if (empty($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enabl
 	$updated_cfg = true;
 }
 
+/**********************************************************/
+/* Set default log size and retention limits if not set   */
+/**********************************************************/
+if (!isset($config['installedpackages']['suricata']['config'][0]['alert_log_retention']) && $config['installedpackages']['suricata']['config'][0]['alert_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['alert_log_retention'] = "336";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['alert_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['block_log_retention']) && $config['installedpackages']['suricata']['config'][0]['block_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['block_log_retention'] = "336";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['block_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['block_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['block_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['dns_log_retention']) && $config['installedpackages']['suricata']['config'][0]['dns_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['dns_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['dns_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'] = "750";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['eve_log_retention']) && $config['installedpackages']['suricata']['config'][0]['eve_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['eve_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['eve_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'] = "5000";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['files_json_log_retention']) && $config['installedpackages']['suricata']['config'][0]['files_json_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['files_json_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'] = "1000";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['http_log_retention']) && $config['installedpackages']['suricata']['config'][0]['http_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['http_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['http_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['http_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['http_log_limit_size'] = "1000";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['stats_log_retention']) && $config['installedpackages']['suricata']['config'][0]['stats_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['stats_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['stats_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['stats_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['stats_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['tls_log_retention']) && $config['installedpackages']['suricata']['config'][0]['tls_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['tls_log_retention'] = "336";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['tls_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['tls_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['tls_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['file_store_retention']) && $config['installedpackages']['suricata']['config'][0]['file_store_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['file_store_retention'] = "168";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention']) && $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] = "168";
+	$updated_cfg = true;
+}
+
 // Now process the interface-specific settings
 foreach ($rule as &$r) {
 
@@ -196,87 +281,88 @@ foreach ($rule as &$r) {
 	}
 
 	/******************************************************************/
-	/* Create default log size and retention limits if not set        */
+	/* Remove per interface default log size and retention limits     */ 
+	/* if they were set by early bug.                                 */
 	/******************************************************************/
-	if (!isset($pconfig['alert_log_retention']) && $pconfig['alert_log_retention'] != '0') {
-		$pconfig['alert_log_retention'] = "336";
+	if (isset($pconfig['alert_log_retention'])) {
+		unset($pconfig['alert_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['alert_log_limit_size']) && $pconfig['alert_log_limit_size'] != '0') {
-		$pconfig['alert_log_limit_size'] = "500";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['block_log_retention']) && $pconfig['block_log_retention'] != '0') {
-		$pconfig['block_log_retention'] = "336";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['block_log_limit_size']) && $pconfig['block_log_limit_size'] != '0') {
-		$pconfig['block_log_limit_size'] = "500";
+	if (isset($pconfig['alert_log_limit_size'])) {
+		unset($pconfig['alert_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['dns_log_retention']) && $pconfig['dns_log_retention'] != '0') {
-		$pconfig['dns_log_retention'] = "168";
+	if (isset($pconfig['block_log_retention'])) {
+		unset($pconfig['block_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['dns_log_limit_size']) && $pconfig['dns_log_limit_size'] != '0') {
-		$pconfig['dns_log_limit_size'] = "750";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['eve_log_retention']) && $pconfig['eve_log_retention'] != '0') {
-		$pconfig['eve_log_retention'] = "168";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['eve_log_limit_size']) && $pconfig['eve_log_limit_size'] != '0') {
-		$pconfig['eve_log_limit_size'] = "5000";
+	if (isset($pconfig['block_log_limit_size'])) {
+		unset($pconfig['block_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['files_json_log_retention']) && $pconfig['files_json_log_retention'] != '0') {
-		$pconfig['files_json_log_retention'] = "168";
+	if (isset($pconfig['dns_log_retention'])) {
+		unset($pconfig['dns_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['files_json_log_limit_size']) && $pconfig['files_json_log_limit_size'] != '0') {
-		$pconfig['files_json_log_limit_size'] = "1000";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['http_log_retention']) && $pconfig['http_log_retention'] != '0') {
-		$pconfig['http_log_retention'] = "168";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['http_log_limit_size']) && $pconfig['http_log_limit_size'] != '0') {
-		$pconfig['http_log_limit_size'] = "1000";
+	if (isset($pconfig['dns_log_limit_size'])) {
+		unset($pconfig['dns_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['stats_log_retention']) && $pconfig['stats_log_retention'] != '0') {
-		$pconfig['stats_log_retention'] = "168";
+	if (isset($pconfig['eve_log_retention'])) {
+		unset($pconfig['eve_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['stats_log_limit_size']) && $pconfig['stats_log_limit_size'] != '0') {
-		$pconfig['stats_log_limit_size'] = "500";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['tls_log_retention']) && $pconfig['tls_log_retention'] != '0') {
-		$pconfig['tls_log_retention'] = "336";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['tls_log_limit_size']) && $pconfig['tls_log_limit_size'] != '0') {
-		$pconfig['tls_log_limit_size'] = "500";
+	if (isset($pconfig['eve_log_limit_size'])) {
+		unset($pconfig['eve_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['file_store_retention']) && $pconfig['file_store_retention'] != '0') {
-		$pconfig['file_store_retention'] = "168";
+	if (isset($pconfig['files_json_log_retention'])) {
+		unset($pconfig['files_json_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['files_json_log_limit_size'])) {
+		unset($pconfig['files_json_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['u2_archive_log_retention']) && $pconfig['u2_archive_log_retention'] != '0') {
-		$pconfig['u2_archive_log_retention'] = "168";
+	if (isset($pconfig['http_log_retention'])) {
+		unset($pconfig['http_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['http_log_limit_size'])) {
+		unset($pconfig['http_log_limit_size']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['stats_log_retention'])) {
+		unset($pconfig['stats_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['stats_log_limit_size'])) {
+		unset($pconfig['stats_log_limit_size']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['tls_log_retention'])) {
+		unset($pconfig['tls_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['tls_log_limit_size'])) {
+		unset($pconfig['tls_log_limit_size']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['file_store_retention'])) {
+		unset($pconfig['file_store_retention']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['u2_archive_log_retention'])) {
+		unset($pconfig['u2_archive_log_retention']);
 		$updated_cfg = true;
 	}
 
