@@ -104,6 +104,9 @@ function suricata_check_dir_size_limit($suricataloglimitsize) {
 			// Check for any captured stored files and clean them up
 			unlink_if_exists("{$suricata_log_dir}/files/*");
 
+			// Check for any captured stored TLS certs and clean them up
+			unlink_if_exists("{$suricata_log_dir}/certs/*");
+
 			// This is needed if suricata is run as suricata user
 			mwexec('/bin/chmod 660 /var/log/suricata/*', true);
 		}
@@ -234,6 +237,23 @@ if ($config['installedpackages']['suricata']['config'][0]['enable_log_mgmt'] == 
 			}
 			if ($prune_count > 0)
 				log_error(gettext("[Suricata] File Store cleanup job removed {$prune_count} file(s) from {$suricata_log_dir}/files/..."));
+			unset($files);
+		}
+
+		// Prune aged-out TLS Certs Store files if any exist
+		if (is_dir("{$suricata_log_dir}/certs") &&
+		    $config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] > 0) {
+			$now = time();
+			$files = glob("{$suricata_log_dir}/certs/*.*");
+			$prune_count = 0;
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($f);
+				}
+			}
+			if ($prune_count > 0)
+				log_error(gettext("[Suricata] TLS Certs Store cleanup job removed {$prune_count} file(s) from {$suricata_log_dir}/certs/..."));
 			unset($files);
 		}
 
