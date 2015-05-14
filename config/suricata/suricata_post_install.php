@@ -281,8 +281,8 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1.4";
-write_config("Suricata pkg v2.1.4: post-install configuration saved.");
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1.5";
+write_config("Suricata pkg v2.1.5: post-install configuration saved.");
 
 // Done with post-install, so clear flag
 unset($g['suricata_postinstall']);
