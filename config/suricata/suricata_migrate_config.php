@@ -174,6 +174,11 @@ if (!isset($config['installedpackages']['suricata']['config'][0]['file_store_ret
 	$updated_cfg = true;
 }
 
+if (!isset($config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention']) && $config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] = "168";
+	$updated_cfg = true;
+}
+
 if (!isset($config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention']) && $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] != '0') {
 	$config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] = "168";
 	$updated_cfg = true;
