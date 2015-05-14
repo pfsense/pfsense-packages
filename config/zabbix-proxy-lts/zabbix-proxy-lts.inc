@@ -214,11 +214,18 @@ EOF;
 			"stop" => $zproxy_stop
 			)
 		);
-		mwexec("{$zproxy_rcfile} restart");
+
+		// Check if zabbix_proxy is currently running
+		if (!is_process_running("zabbix_proxy")) {
+			mwexec("{$zproxy_rcfile} start");
+		}else{
+			sigkillbyname("zabbix_proxy", "HUP");
+		}
+	
 	}else{
-		if (file_exists($zproxy_rcfile)){
-		mwexec("{$zproxy_rcfile} stop");
-		unlink($zproxy_rcfile);
+		if (file_exists($zproxy_rcfile)) {
+			mwexec("{$zproxy_rcfile} stop");
+			unlink($zproxy_rcfile);
 		}
 	}
 	
