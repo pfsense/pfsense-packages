@@ -1,6 +1,6 @@
 <packagegui>
 	<name>pfflowd</name>
-	<version>0.8.3 pkg v1.0.1</version>
+	<version>1.0.3</version>
 	<title>pfflowd: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=pfflowd.xml&amp;id=0</aftersaveredirect>
 	<menu>
