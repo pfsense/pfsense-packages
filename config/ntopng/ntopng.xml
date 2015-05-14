@@ -153,9 +153,7 @@
 		$ntopng_config =& $config['installedpackages']['ntopng']['config'][0];
 		$if_final = "";
 		$ifaces_final = "";
-		system("/bin/mkdir -p /var/db/ntopng");
-		system("/bin/mkdir -p /var/db/ntopng/rrd");
-		system("/bin/mkdir -p /var/db/ntopng/rrd/graphics");
+		mkdir("/var/db/ntopng/rrd/graphics", 0755, true);
 		system("/bin/chmod -R 755 /var/db/ntopng");
 		system("/usr/sbin/chown -R nobody:nobody /var/db/ntopng");
 		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
@@ -206,13 +204,18 @@
 		}
 
 		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-		if ($pf_version >= 2.2) {
+		if ($pf_version == "2.2") {
 			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/bin";
-		} else {
+		} else if ($pf_version == "2.1") {
 			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/bin";
+		} else {
+			$redis_path = "/usr/local/bin";
 		}
 
-		$start = "ldconfig -m /usr/pbi/ntopng-" . php_uname("m") . "/lib\n";
+		$start = "";
+		if ($pf_version == "2.1" || $pf_version == "2.2") {
+			$start .= "ldconfig -m /usr/pbi/ntopng-" . php_uname("m") . "/lib\n";
+		}
 		$start .= "\t{$redis_path}/redis-server --dir /var/db/ntopng/ --dbfilename ntopng.rdb &\n";
 		// TODO:
 		//  Add support for --data-dir /somewhere, --httpdocs-dir /somewhereelse,
@@ -243,13 +246,24 @@
 		config_unlock();
 	}
 	function ntopng_update_geoip() {
-		mwexec("/usr/pbi/ntopng-" . php_uname("m") . "/bin/ntopng-geoipupdate.sh");
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version == "2.1" || $pf_version == "2.2") {
+			mwexec("/usr/pbi/ntopng-" . php_uname("m") . "/bin/ntopng-geoipupdate.sh");
+		} else {
+			mwexec("/usr/local/bin/ntopng-geoipupdate.sh");
+		}
 		ntopng_fixup_geoip();
 		restart_service("ntopng");
 	}
 	function ntopng_fixup_geoip() {
-		$target_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/local/share/ntopng/httpdocs/geoip";
-		$source_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng";
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version == "2.1" || $pf_version == "2.2") {
+			$target_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/local/share/ntopng/httpdocs/geoip";
+			$source_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng";
+		} else {
+			$target_dir = "/usr/local/share/ntopng/httpdocs/geoip";
+			$source_dir = "/usr/local/share/ntopng";
+		}
 
 		foreach(glob("{$source_dir}/Geo*.dat*") as $geofile) {
 			/* Decompress if needed. */
