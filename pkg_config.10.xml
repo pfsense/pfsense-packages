@@ -1473,7 +1473,6 @@
 			<port>net-mgmt/zabbix22-agent</port>
 		</build_pbi>
 		<depends_on_package_pbi>zabbix22-agent-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
-		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Zabbix Proxy LTS</name>
@@ -1497,7 +1496,6 @@
 		</build_pbi>
 		<build_options>zabbix22_SET_FORCE=SQLITE IPV6;zabbix22_UNSET_FORCE=MYSQL JABBER GSSAPI</build_options>
 		<depends_on_package_pbi>zabbix22-proxy-2.2.7-##ARCH##.pbi</depends_on_package_pbi>
-		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Zabbix-2 Agent</name>
