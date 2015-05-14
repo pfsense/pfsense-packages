@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    zabbix-lts.inc
+    zabbix-agent-lts.inc
     part of the Zabbix package for pfSense
     Copyright (C) 2013 Danilo G. Baio
     Copyright (C) 2013 Marcello Coutinho
@@ -41,14 +41,12 @@ require_once("globals.inc");
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version == "2.1" || $pf_version == "2.2") {
 	define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
-	define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
 } else {
-	define('ZABBIX_AGENT_BASE', '/usr/local');
 	define('ZABBIX_AGENT_BASE', '/usr/local');
 }
 
-function php_install_zabbix_lts(){
-	sync_package_zabbix_lts();	
+function php_install_zabbix_agent_lts(){
+	sync_package_zabbix_agent_lts();	
 }
 
 function php_deinstall_zabbix_agent_lts(){
@@ -59,62 +57,30 @@ function php_deinstall_zabbix_agent_lts(){
    exec("/usr/bin/killall zabbix_agentd");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix_agentd_lts.sh");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix22/zabbix_agentd.conf");
-   unlink_if_exists("/var/log/zabbix-lts/zabbix_agentd_lts.log");
-   unlink_if_exists("/var/run/zabbix-lts/zabbix_agentd_lts.pid");
+   unlink_if_exists("/var/log/zabbix-agent-lts/zabbix_agentd_lts.log");
+   unlink_if_exists("/var/run/zabbix-agent-lts/zabbix_agentd_lts.pid");
 
-   if (!is_array($config['installedpackages']['zabbixproxylts'])){
-      if (is_dir("/var/log/zabbix-lts"))
-         exec("/bin/rm -r /var/log/zabbix-lts/");
-      if (is_dir("/var/run/zabbix-lts"))
-         exec("/bin/rm -r /var/run/zabbix-lts/");
-   }
+	if (is_dir("/var/log/zabbix-agent-lts")) {
+		exec("/bin/rm -r /var/log/zabbix-agent-lts/");
+	}
 
-   conf_mount_ro();
-}
-
-function php_deinstall_zabbix_proxy_lts(){
-   global $config, $g;
-
-   conf_mount_rw();
-
-   exec("/usr/bin/killall zabbix_proxy");
-   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix_proxy_lts.sh");
-   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy.conf");
-   unlink_if_exists("/var/log/zabbix-lts/zabbix_proxy_lts.log");
-   unlink_if_exists("/var/run/zabbix-lts/zabbix_proxy_lts.pid");
-
-   if (!is_array($config['installedpackages']['zabbixagentlts'])){
-      if (is_dir("/var/log/zabbix-lts"))
-         exec("/bin/rm -r /var/log/zabbix-lts/");
-      if (is_dir("/var/run/zabbix-lts"))
-         exec("/bin/rm -r /var/run/zabbix-lts/");
-   }
-
-   if (is_dir("/var/db/zabbix-lts"))
-      exec("/bin/rm -r /var/db/zabbix-lts/");
+	if (is_dir("/var/run/zabbix-agent-lts")) {
+		exec("/bin/rm -r /var/run/zabbix-agent-lts/");
+	}
 
    conf_mount_ro();
 }
 
-function validate_input_zabbix_lts($post, &$input_errors){
+function validate_input_zabbix_agent_lts($post, &$input_errors){
 
-	if  (isset($post['proxyenabled'])){
-		if (!is_numericint($post['serverport'])) {
-      		$input_errors[]='Server Port is not numeric.'.$ServerPort;
-   			}
-	
-		if (!is_numericint($post['configfrequency'])) {
-			$input_errors[]='Config Frequency is not numeric.';
-			}
-		}
-	if  (isset($post['agentenabled'])){
+	if (isset($post['agentenabled'])) {
 		if (!preg_match("/\w+/", $post['server'])) {
 			$input_errors[]='Server field is required.';
-			}
+		}
 		
 		if (!preg_match("/\w+/", $post['hostname'])) {
 			$input_errors[]='Hostname field is required.';
-			}
+		}
 	
 		if ($post['listenip'] != '') {
 			if (!is_ipaddr_configured($post['listenip']) && !preg_match("/(127.0.0.1|0.0.0.0)/",$post['listenip'])) {
@@ -170,36 +136,11 @@ function validate_input_zabbix_lts($post, &$input_errors){
 	}	
 }
 
-function sync_package_zabbix_lts(){
+function sync_package_zabbix_agent_lts(){
 	global $config, $g;
 
 	conf_mount_rw();
 
-	#check zabbix proxy config
-	if (is_array($config['installedpackages']['zabbixproxylts'])){
-		$zbproxy_config = $config['installedpackages']['zabbixproxylts']['config'][0];
-		if ($zbproxy_config['proxyenabled']=="on"){
-			$Mode=(is_numericint($zbproxy_config['proxymode'])?$zbproxy_config['proxymode'] : 0);
-			$AdvancedParams=base64_decode($zbproxy_config['advancedparams']);
-		
-			$zbproxy_conf_file = <<< EOF
-Server={$zbproxy_config['server']}
-ServerPort={$zbproxy_config['serverport']}
-Hostname={$zbproxy_config['hostname']}
-PidFile=/var/run/zabbix-lts/zabbix_proxy_lts.pid
-DBName=/var/db/zabbix-lts/proxy.db
-LogFile=/var/log/zabbix-lts/zabbix_proxy_lts.log
-ConfigFrequency={$zbproxy_config['configfrequency']}
-FpingLocation=/usr/local/sbin/fping
-#there's currently no fping6 (IPv6) dependency in the package, but if there was, the binary would likely also be in /usr/local/sbin
-Fping6Location=/usr/local/sbin/fping6
-ProxyMode={$Mode}
-{$AdvancedParams}
-
-EOF;
-			file_put_contents(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy.conf", strtr($zbproxy_conf_file, array("\r" => "")));
-		}
-	}
 	/* check zabbix agent settings*/
 	if (is_array($config['installedpackages']['zabbixagentlts'])){
 		$zbagent_config = $config['installedpackages']['zabbixagentlts']['config'][0];
@@ -221,8 +162,8 @@ ListenIP={$ListenIp}
 ListenPort={$ListenPort}
 RefreshActiveChecks={$RefreshActChecks}
 DebugLevel=3
-PidFile=/var/run/zabbix-lts/zabbix_agentd_lts.pid
-LogFile=/var/log/zabbix-lts/zabbix_agentd_lts.log
+PidFile=/var/run/zabbix-agent-lts/zabbix_agentd_lts.pid
+LogFile=/var/log/zabbix-agent-lts/zabbix_agentd_lts.log
 LogFileSize=1
 Timeout={$TimeOut}
 BufferSend={$BufferSend}
@@ -280,58 +221,26 @@ EOF;
 
 	/*check startup script files*/
 	/* create a few directories and ensure the sample files are in place */
-	if (!is_dir(ZABBIX_PROXY_BASE . "/etc/zabbix22"))
-		exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix22");
+	if (!is_dir(ZABBIX_AGENT_BASE . "/etc/zabbix22"))
+		exec("/bin/mkdir -p " . ZABBIX_AGENT_BASE . "/etc/zabbix22");
 
 	$dir_checks  = <<< EOF
-if [ ! -d /var/log/zabbix-lts ]
+if [ ! -d /var/log/zabbix-agent-lts ]
  then
- /bin/mkdir -p /var/log/zabbix-lts
- /usr/sbin/chmod 755 /var/log/zabbix-lts
+ /bin/mkdir -p /var/log/zabbix-agent-lts
+ /usr/sbin/chmod 755 /var/log/zabbix-agent-lts
  fi
-/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix-lts
+/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix-agent-lts
 
-if [ ! -d /var/run/zabbix-lts ]
+if [ ! -d /var/run/zabbix-agent-lts ]
  then
- /bin/mkdir -p /var/run/zabbix-lts
- /usr/sbin/chmod 755 /var/run/zabbix-lts
+ /bin/mkdir -p /var/run/zabbix-agent-lts
+ /usr/sbin/chmod 755 /var/run/zabbix-agent-lts
  fi
-/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix-lts
-
-if [ ! -d /var/db/zabbix-lts ]
- then
- /bin/mkdir -p /var/db/zabbix-lts
- /usr/sbin/chmod 755 /var/db/zabbix-lts
- fi
-/usr/sbin/chown -R zabbix:zabbix /var/db/zabbix-lts
+/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix-agent-lts
 
 EOF;
  
-	$zproxy_rcfile="/usr/local/etc/rc.d/zabbix_proxy_lts.sh";
-	if (is_array($zbproxy_config) && $zbproxy_config['proxyenabled']=="on"){
-		$zproxy_start= strtr($dir_checks, array("\r" => "")). "\necho \"Starting Zabbix Proxy LTS\"...\n";
-		/* start zabbix proxy */
-		$zproxy_start .= ZABBIX_PROXY_BASE . "/sbin/zabbix_proxy\n";
-	
-		$zproxy_stop  = "echo \"Stopping Zabbix Proxy LTS\"\n";
-		$zproxy_stop .= "/usr/bin/killall zabbix_proxy\n";
-		$zproxy_stop .= "/bin/sleep 5\n";
-
-		/* write out rc.d start/stop file */
-		write_rcfile(array(
-			"file" => "zabbix_proxy_lts.sh",
-			"start" => $zproxy_start,
-			"stop" => $zproxy_stop
-			)
-		);
-		mwexec("{$zproxy_rcfile} restart");
-	}else{
-		if (file_exists($zproxy_rcfile)){
-		mwexec("{$zproxy_rcfile} stop");
-		unlink($zproxy_rcfile);
-		}
-	}
-	
 	$zagent_rcfile="/usr/local/etc/rc.d/zabbix_agentd_lts.sh";
 	if (is_array($zbagent_config) && $zbagent_config['agentenabled']=="on"){
 		$zagent_start .= strtr($dir_checks, array("\r" => "")). "\necho \"Starting Zabbix Agent LTS...\"\n";

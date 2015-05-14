@@ -1460,8 +1460,8 @@
 		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
 		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-agent-lts.xml</config_file>
-		<version>0.8.3</version>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix-agent-lts/zabbix-agent-lts.xml</config_file>
+		<version>0.8.4</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix-agent-lts.xml</configurationfile>
@@ -1483,8 +1483,8 @@
 		and 2 additional years of Limited Support (critical and security issues only). Zabbix LTS version release 
 		will result in change of the first version number. More info in http://www.zabbix.com/life_cycle_and_release_policy.php </descr>
 		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix-lts/zabbix-proxy-lts.xml</config_file>
-		<version>0.8.3</version>
+		<config_file>https://packages.pfsense.org/packages/config/zabbix-proxy-lts/zabbix-proxy-lts.xml</config_file>
+		<version>0.8.4</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix-proxy-lts.xml</configurationfile>
