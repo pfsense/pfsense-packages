@@ -215,9 +215,11 @@ EOF;
 			)
 		);
 
-		// Check if zabbix_proxy is currently running
-		// if it's running, is necessary restart the service
-		// because there are not a HUP signal.
+		/*
+			Check if zabbix_proxy is currently running
+			if it's running, is necessary restart the service
+			because there are not a HUP signal.
+		*/
 		if (!is_process_running("zabbix_proxy")) {
 			mwexec("{$zproxy_rcfile} start");
 		}else{

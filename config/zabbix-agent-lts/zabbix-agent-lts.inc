@@ -258,9 +258,11 @@ EOF;
 				)
 		);
 
-		// Check if zabbix_agentd is currently running
-		// if it's running, is necessary restart the service
-		// because there are not a HUP signal.
+		/*
+			Check if zabbix_agentd is currently running
+			if it's running, is necessary restart the service
+			because there are not a HUP signal.
+		*/
 		if (!is_process_running("zabbix_agentd")) {
 			mwexec("{$zagent_rcfile} start");
 		}else{
