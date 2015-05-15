@@ -54,7 +54,7 @@ function php_deinstall_zabbix_proxy_lts(){
 
    conf_mount_rw();
 
-	sigkillbyname("zabbix_proxy", "TERM");
+   sigkillbyname("zabbix_proxy", "TERM");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix_proxy_lts.sh");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy_lts.conf");
    unlink_if_exists("/var/log/zabbix-proxy-lts/zabbix_proxy_lts.log");

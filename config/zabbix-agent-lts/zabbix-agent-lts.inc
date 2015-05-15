@@ -54,7 +54,7 @@ function php_deinstall_zabbix_agent_lts(){
 
    conf_mount_rw();
 
-	sigkillbyname("zabbix_agentd", "TERM");
+   sigkillbyname("zabbix_agentd", "TERM");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix_agentd_lts.sh");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix22/zabbix_agentd.conf");
    unlink_if_exists("/var/log/zabbix-agent-lts/zabbix_agentd_lts.log");
