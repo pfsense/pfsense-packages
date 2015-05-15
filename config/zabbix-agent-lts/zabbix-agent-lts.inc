@@ -257,11 +257,18 @@ EOF;
 						"stop" => "$zagent_stop"
 				)
 		);
-		mwexec("{$zagent_rcfile} restart");	
+
+		// Check if zabbix_agentd is currently running
+		if (!is_process_running("zabbix_agentd")) {
+			mwexec("{$zagent_rcfile} start");
+		}else{
+			sigkillbyname("zabbix_agentd", "HUP");
+		}
+
 	}else{
-		if (file_exists($zagent_rcfile)){
-		mwexec("{$zagent_rcfile} stop");
-		unlink($zagent_rcfile);
+		if (file_exists($zagent_rcfile)) {
+			mwexec("{$zagent_rcfile} stop");
+			unlink($zagent_rcfile);
 		}
 	}
 		
