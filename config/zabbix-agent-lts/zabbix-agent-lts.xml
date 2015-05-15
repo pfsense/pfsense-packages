@@ -41,11 +41,10 @@
 	<name>zabbixagentlts</name>
 	<title>Services: Zabbix Agent LTS</title>
 	<category>Monitoring</category>
-	<version>0.8.4</version>
+	<version>0.8.5</version>
 	<include_file>/usr/local/pkg/zabbix-agent-lts.inc</include_file>
 	<addedit_string>Zabbix Agent LTS has been created/modified.</addedit_string>
 	<delete_string>Zabbix Agent LTS has been deleted.</delete_string>
-	<restart_command>/usr/local/etc/rc.d/zabbix_agentd_lts.sh restart</restart_command>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/zabbix-agent-lts/zabbix-agent-lts.inc</item>
 		<prefix>/usr/local/pkg/</prefix>

@@ -54,7 +54,7 @@ function php_deinstall_zabbix_agent_lts(){
 
    conf_mount_rw();
 
-   exec("/usr/bin/killall zabbix_agentd");
+   sigkillbyname("zabbix_agentd", "TERM");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix_agentd_lts.sh");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix22/zabbix_agentd.conf");
    unlink_if_exists("/var/log/zabbix-agent-lts/zabbix_agentd_lts.log");
@@ -257,11 +257,30 @@ EOF;
 						"stop" => "$zagent_stop"
 				)
 		);
-		mwexec("{$zagent_rcfile} restart");	
+
+		/*
+			Check if zabbix_agentd is currently running
+			if it's running, is necessary restart the service
+			because there are not a HUP signal.
+		*/
+		if (!is_process_running("zabbix_agentd")) {
+			mwexec("{$zagent_rcfile} start");
+		}else{
+			mwexec("{$zagent_rcfile} stop");
+			// Check if zabbix_agentd is still running
+			if (is_process_running("zabbix_agentd")) {
+				sigkillbyname("zabbix_agentd", "KILL");
+				sleep(2);
+				unlink_if_exists("/var/run/zabbix-agent-lts/zabbix_agent_lts.pid");
+			}
+			// Start zabbix_agentd
+			mwexec("{$zagent_rcfile} start");
+		}
+
 	}else{
-		if (file_exists($zagent_rcfile)){
-		mwexec("{$zagent_rcfile} stop");
-		unlink($zagent_rcfile);
+		if (file_exists($zagent_rcfile)) {
+			mwexec("{$zagent_rcfile} stop");
+			unlink($zagent_rcfile);
 		}
 	}
 		

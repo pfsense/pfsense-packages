@@ -54,7 +54,7 @@ function php_deinstall_zabbix_proxy_lts(){
 
    conf_mount_rw();
 
-   exec("/usr/bin/killall zabbix_proxy");
+   sigkillbyname("zabbix_proxy", "TERM");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix_proxy_lts.sh");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy_lts.conf");
    unlink_if_exists("/var/log/zabbix-proxy-lts/zabbix_proxy_lts.log");
@@ -214,11 +214,30 @@ EOF;
 			"stop" => $zproxy_stop
 			)
 		);
-		mwexec("{$zproxy_rcfile} restart");
+
+		/*
+			Check if zabbix_proxy is currently running
+			if it's running, is necessary restart the service
+			because there are not a HUP signal.
+		*/
+		if (!is_process_running("zabbix_proxy")) {
+			mwexec("{$zproxy_rcfile} start");
+		}else{
+			mwexec("{$zproxy_rcfile} stop");
+			// Check if zabbix_proxy is still running
+			if (is_process_running("zabbix_proxy")) {
+				sigkillbyname("zabbix_proxy", "KILL");
+				sleep(2);
+				unlink_if_exists("/var/run/zabbix-proxy-lts/zabbix_proxy_lts.pid");
+			}
+			// Start zabbix_proxy
+			mwexec("{$zproxy_rcfile} start");
+		}
+	
 	}else{
-		if (file_exists($zproxy_rcfile)){
-		mwexec("{$zproxy_rcfile} stop");
-		unlink($zproxy_rcfile);
+		if (file_exists($zproxy_rcfile)) {
+			mwexec("{$zproxy_rcfile} stop");
+			unlink($zproxy_rcfile);
 		}
 	}
 	
