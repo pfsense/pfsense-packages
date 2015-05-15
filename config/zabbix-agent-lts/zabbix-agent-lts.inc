@@ -259,10 +259,20 @@ EOF;
 		);
 
 		// Check if zabbix_agentd is currently running
+		// if it's running, is necessary restart the service
+		// because there are not a HUP signal.
 		if (!is_process_running("zabbix_agentd")) {
 			mwexec("{$zagent_rcfile} start");
 		}else{
-			sigkillbyname("zabbix_agentd", "HUP");
+			mwexec("{$zagent_rcfile} stop");
+			// Check if zabbix_agentd is still running
+			if (is_process_running("zabbix_agentd")) {
+				sigkillbyname("zabbix_agentd", "KILL");
+				sleep(2);
+				unlink_if_exists("/var/run/zabbix-agent-lts/zabbix_agent_lts.pid");
+			}
+			// Start zabbix_agentd
+			mwexec("{$zagent_rcfile} start");
 		}
 
 	}else{
