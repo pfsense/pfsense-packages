@@ -174,38 +174,47 @@ EOF;
 		exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix22");
 
 	$dir_checks  = <<< EOF
-if [ ! -d /var/log/zabbix-proxy-lts ]
- then
- /bin/mkdir -p /var/log/zabbix-proxy-lts
- /usr/sbin/chmod 755 /var/log/zabbix-proxy-lts
- fi
-/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix-proxy-lts
 
-if [ ! -d /var/run/zabbix-proxy-lts ]
- then
- /bin/mkdir -p /var/run/zabbix-proxy-lts
- /usr/sbin/chmod 755 /var/run/zabbix-proxy-lts
- fi
-/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix-proxy-lts
+	if [ ! -d /var/log/zabbix-proxy-lts ]; then
+		/bin/mkdir -p /var/log/zabbix-proxy-lts
+		/usr/sbin/chmod 755 /var/log/zabbix-proxy-lts
+	fi
+	/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix-proxy-lts
 
-if [ ! -d /var/db/zabbix-proxy-lts ]
- then
- /bin/mkdir -p /var/db/zabbix-proxy-lts
- /usr/sbin/chmod 755 /var/db/zabbix-proxy-lts
- fi
-/usr/sbin/chown -R zabbix:zabbix /var/db/zabbix-proxy-lts
+	if [ ! -d /var/run/zabbix-proxy-lts ]; then
+		/bin/mkdir -p /var/run/zabbix-proxy-lts
+		/usr/sbin/chmod 755 /var/run/zabbix-proxy-lts
+	fi
+	/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix-proxy-lts
+
+	if [ ! -d /var/db/zabbix-proxy-lts ]; then
+		/bin/mkdir -p /var/db/zabbix-proxy-lts
+		/usr/sbin/chmod 755 /var/db/zabbix-proxy-lts
+	fi
+	/usr/sbin/chown -R zabbix:zabbix /var/db/zabbix-proxy-lts
+
+EOF;
+
+	$pid_check  = <<< EOF
+
+	/bin/pgrep -anx zabbix_proxy 2>/dev/null
+	if [ "\$?" -eq "0" ]; then
+		/usr/bin/killall -9 zabbix_proxy
+		/bin/rm -f /var/run/zabbix-proxy-lts/zabbix_proxy_lts.pid
+	fi
 
 EOF;
  
 	$zproxy_rcfile="/usr/local/etc/rc.d/zabbix_proxy_lts.sh";
 	if (is_array($zbproxy_config) && $zbproxy_config['proxyenabled']=="on"){
-		$zproxy_start= strtr($dir_checks, array("\r" => "")). "\necho \"Starting Zabbix Proxy LTS\"...\n";
-		/* start zabbix proxy */
-		$zproxy_start .= ZABBIX_PROXY_BASE . "/sbin/zabbix_proxy\n";
+		$zproxy_start  = strtr($dir_checks, array("\r" => ""));
+		$zproxy_start .= "\techo \"Starting Zabbix Proxy LTS\"...\n";
+		$zproxy_start .= "\t" . ZABBIX_PROXY_BASE . "/sbin/zabbix_proxy\n";
 	
 		$zproxy_stop  = "echo \"Stopping Zabbix Proxy LTS\"\n";
-		$zproxy_stop .= "/usr/bin/killall zabbix_proxy\n";
-		$zproxy_stop .= "/bin/sleep 5\n";
+		$zproxy_stop .= "\t/usr/bin/killall zabbix_proxy\n";
+		$zproxy_stop .= "\t/bin/sleep 5\n";
+		$zproxy_stop .= strtr($pid_check, array("\r" => ""));
 
 		/* write out rc.d start/stop file */
 		write_rcfile(array(
