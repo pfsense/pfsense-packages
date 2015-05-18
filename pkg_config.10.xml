@@ -996,6 +996,7 @@
 		<build_options>squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/squid/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>squid3</name>
