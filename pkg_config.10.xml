@@ -1065,6 +1065,7 @@
 		</build_pbi>
 		<build_options>lcdproc_SET_FORCE=USB</build_options>
 		<after_install_info>Please set the service options in Services-LCDproc before running the service.</after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>arpwatch</name>
