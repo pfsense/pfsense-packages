@@ -24,7 +24,7 @@ fi
 
 now=$(/bin/date +%m/%d/%y' '%T)
 
-# Application Paths
+# Application Locations
 pathgrepcidr="${prefix}/bin/grepcidr"
 pathgeoip="${prefix}/bin/geoiplookup"
 
@@ -165,7 +165,7 @@ fi
 if [ -s "$matchfile" -a ! "$dedup" == "on" -a "$ccwhite" == "match" ]; then
 	mon=$(sed -e 's/^/^/' -e 's/\./\\\./g' $matchfile)
 	for ip in $mon; do
-	grep $ip $tempfile >> $tempfile2
+		grep $ip $tempfile >> $tempfile2
 	done
 	mcount=$(grep -c ^ $tempfile2)
 	if [ "$ccwhite" == "match" ]; then
@@ -372,7 +372,7 @@ if [ -e "$pfbsuppression" ] && [ -s "$pfbsuppression" ]; then
 	fi
 else
 	if [ "$cc" == "suppressheader" ]; then
-		echo "===[ Suppression Stats ]========================================"; echo
+		echo; echo "===[ Suppression Stats ]========================================"; echo
 		printf "%-20s %-10s %-10s %-10s %-10s\n" "List" "Pre" "RFC1918" "Suppress" "Masterfile"
 		echo "----------------------------------------------------------------"
 		exitnow
@@ -675,7 +675,6 @@ if [ -s $pfborig$alias".gz" ]; then
 	$pathgunzip -c $pfborig$alias".gz" > $pfborig$alias".raw"
 
 	# ET CSV Format (IP, Category, Score)
-	echo; echo "Processing [ $alias ]"
 	while IFS="," read a b c; do
 		# Some ET Categories are not in use (For Future Use)
 		case "$b" in
@@ -795,7 +794,7 @@ if [ "$alias" == "on" ]; then
 	sort -o $masterfile $masterfile
 	sort -t . -k 1,1n -k 2,2n -k 3,3n -k 4,4n $mastercat > $tempfile; mv -f $tempfile $mastercat
 
-	echo; echo; echo "===[ FINAL Processing ]====================================="; echo
+	echo; echo "===[ FINAL Processing ]====================================="; echo
 	echo "   [ Original count   ]  [ $fcount ]"
 	count=$(grep -c ^ $masterfile)
 	echo; echo "   [ Processed Count  ]  [ $count ]"; echo

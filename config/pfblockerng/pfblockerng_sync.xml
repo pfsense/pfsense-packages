@@ -124,7 +124,7 @@
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&amp;id=0</url>
 			<active/>
 		</tab>
-		</tabs>
+	</tabs>
 	<fields>
 		<field>
 			<name>pfBlockerNG XMLRPC Sync Settings</name>
@@ -132,8 +132,8 @@
 		</field>
 		<field>
 			<fielddescr>LINKS</fielddescr>
-			<fieldname>none</fieldname>
-			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
+			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp;
+				<a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
 			</description>
 			<type>info</type>
 		</field>
@@ -173,7 +173,6 @@
 		</field>
 		<field>
 			<fielddescr>Replication Targets</fielddescr>
-			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<rowhelper>
 				<rowhelperfield>
@@ -217,15 +216,15 @@
 				<rowhelperfield>
 					<fielddescr>Target Password</fielddescr>
 					<fieldname>varsyncpassword</fieldname>
-					<description><![CDATA[Password of the user "admin" on the destination host.]]></description>
+					<description><![CDATA[Password of the user 'admin' on the destination host.]]></description>
 					<type>password</type>
 					<size>20</size>
 				</rowhelperfield>
 			</rowhelper>
 		</field>
 		<field>
-			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
-			'Force Update'</ul>]]></name>
+			<name><![CDATA[<center>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
+			'Force Update'</center>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>
