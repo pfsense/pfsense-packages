@@ -216,7 +216,7 @@ exec("/sbin/pfctl -vv -sr | grep 'pfB_'", $results);
 if (!empty($results)) {
 	foreach ($results as $result) {
 
-		# Find Rule Descriptions
+		// Find Rule Descriptions
 		$descr = "";
 		if (preg_match("/USER_RULE: (\w+)/",$result,$desc)) {
 			$descr = $desc[1];
@@ -225,7 +225,7 @@ if (!empty($results)) {
 		preg_match ("/@(\d+)\(/",$result, $rule);
 
 		$id = $rule[1];
-		# Create array of Rule Description and pfctl Rule Number
+		// Create array of Rule Description and pfctl Rule Number
 		$rule_list['id'][] = $id;
 		$rule_list[$id]['name'] = $descr;
 	}
@@ -905,7 +905,7 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				$country = substr(exec("$pathgeoip6 -f $pathgeoipdat6 $host"),26,2);
 			}
 
-			# IP Query Grep Exclusion
+			// IP Query Grep Exclusion
 			$pfb_ex1 = "grep -v 'pfB\_\|\_v6\.txt'";
 			$pfb_ex2 = "grep -v 'pfB\_\|/32\|/24\|\_v6\.txt' | grep -m1 '/'";
 
@@ -967,7 +967,7 @@ if (!empty($fields_array[$type]) && !empty($rule_list)) {
 				$pfb_query = "No Match";
 			}
 
-			# Split List Column into Two lines.
+			// Split List Column into Two lines.
 			unset ($pfb_match);
 			if ($pfb_query == "No Match") {
 				$pfb_match[1] = "{$pfb_query}";

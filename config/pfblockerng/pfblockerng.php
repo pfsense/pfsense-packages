@@ -146,7 +146,7 @@ function ip_range_to_subnet_array_temp($ip1, $ip2) {
 	return $out;
 }
 
-# Set php Memory Limit
+// Set php Memory Limit
 $uname = posix_uname();
 if ($uname['machine'] == "amd64") {
 	ini_set('memory_limit', '256M');
@@ -226,7 +226,7 @@ if ($argv[1] == 'update') {
 }
 
 if ($argv[1] == 'dc') {
-	# (Options - 'bu' Binary Update for Reputation/Alerts Page, 'all' for Country update and 'bu' options.
+	// (Options - 'bu' Binary Update for Reputation/Alerts Page, 'all' for Country update and 'bu' options.
 	if ($pfb['cc'] == "") {
 		exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");
 	} else {
@@ -275,7 +275,7 @@ if ($argv[1] == 'cron') {
 								$header_url = "{$row['header']}_v6";
 							}
 
-							# Determine Folder Location for Alias (return array $pfbarr)
+							// Determine Folder Location for Alias (return array $pfbarr)
 							pfb_determine_list_detail($list['action'], "", "", "");
 							$pfbfolder = $pfbarr['folder'];
 
@@ -289,7 +289,7 @@ if ($argv[1] == 'cron') {
 								continue;
 							}
 
-							# Check if List file exists, if not found run Update
+							// Check if List file exists, if not found run Update
 							if (!file_exists($pfbfolder . '/' . $header_url . '.txt')) {
 								$log = "  Updates Found\n";
 								pfb_logger("{$log}","1");
@@ -353,7 +353,7 @@ if ($argv[1] == 'cron') {
 		pfb_logger("{$log}","1");
 	}
 
-	# Call Log Mgmt Function
+	// Call Log Mgmt Function
 	// If Update GUI 'Manual view' is selected. Last output will be missed. So sleep for 5 secs.
 	sleep(5);
 	pfb_log_mgmt();
@@ -368,7 +368,7 @@ function pfblockerng_uc_countries() {
 	$maxmind_cc4	= "{$pfb['dbdir']}/GeoIPCountryWhois.csv";
 	$maxmind_cc6	= "{$pfb['dbdir']}/GeoIPv6.csv";
 	
-	# Create Folders if not Exist
+	// Create Folders if not Exist
 	$folder_array = array ("{$pfb['dbdir']}","{$pfb['logdir']}","{$pfb['ccdir']}");
 	foreach ($folder_array as $folder) {
 		safe_mkdir ("{$folder}",0755);
@@ -386,7 +386,7 @@ function pfblockerng_uc_countries() {
 		return;
 	}
 
-	# Save Date/Time Stamp to MaxMind version file
+	// Save Date/Time Stamp to MaxMind version file
 	$maxmind_ver	= "MaxMind GeoLite Date/Time Stamps \n\n";
 	$remote_tds	= @implode(preg_grep("/Last-Modified/", get_headers("http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip")));
 	$maxmind_ver	.= "MaxMind_v4 \t" . $remote_tds . "\n";

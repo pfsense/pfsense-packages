@@ -151,7 +151,7 @@ function pfb_cron_update($type) {
 			ob_flush();
 			flush();
 			fclose($f);
-			# Call Log Mgmt Function
+			// Call Log Mgmt Function
 			pfb_log_mgmt();
 			die();
 		}

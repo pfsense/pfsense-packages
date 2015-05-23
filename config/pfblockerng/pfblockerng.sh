@@ -723,7 +723,7 @@ if [ -s $pfborig$alias".gz" ]; then
 		esac
 	done <"$pfborig$alias.raw"
 	data=$(ls $etdir)
-	echo "Compiling ET IP IQRisk REP Lists based upon User Selected Categories"
+	echo; echo "Compiling ET IP IQRisk REP Lists based upon User Selected Categories"
 	printf "%-10s %-25s\n" "  Action" "Category"
 	echo "-------------------------------------------"
 
