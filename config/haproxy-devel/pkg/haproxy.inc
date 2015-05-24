@@ -346,9 +346,11 @@ function haproxy_custom_php_deinstall_command() {
 	$static_output .= "HAProxy, deleting haproxy webgui\n";
 	update_output_window($static_output);
 	exec("rm /usr/local/etc/rc.d/haproxy.sh");
+	exec("rm /etc/rc.haproxy_ocsp.sh");
 	$static_output .= "HAProxy, installing cron job if needed\n";
 	update_output_window($static_output);
 	haproxy_install_cron(false);
+	haproxy_install_cronjob(false, '/etc/rc.haproxy_ocsp.sh');
 	$static_output .= "HAProxy, running haproxy_custom_php_deinstall_command() DONE\n";
 	update_output_window($static_output);
 }
@@ -433,6 +435,31 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 
+	$haproxy_ocsp = <<<EOD
+#!/usr/local/bin/php -f
+
+<?php
+
+/*
+	Updates haproxy OCSP responses.
+*/
+
+require_once("globals.inc");		
+require_once("functions.inc");
+require_once("haproxy.inc");
+require_once("haproxy_socketinfo.inc");
+haproxy_updateocsp();
+
+?>
+
+EOD;
+	// removing the \r prevents the "No input file specified." error..
+	$haproxy_ocsp = str_replace("\r\n","\n", $haproxy_ocsp);
+	$fd = fopen("/etc/rc.haproxy_ocsp.sh", "w");
+	fwrite($fd, $haproxy_ocsp);
+	fclose($fd);
+	exec("chmod a+rx /etc/rc.haproxy_ocsp.sh");
+
 	$static_output .= "HAProxy, update configuration\n";
 	update_output_window($static_output);
 
@@ -451,6 +478,51 @@ EOD;
 	
 	$static_output .= "HAProxy, running haproxy_custom_php_install_command() DONE\n";
 	update_output_window($static_output);
+}
+
+function haproxy_install_cronjob($should_install, $script, $interval = 60, $parameters = "") {
+	global $config, $g;
+	if($g['booting']==true) 
+		return;
+	$is_installed = false;
+	if(!$config['cron']['item'])
+		return;
+	$x=0;
+	foreach($config['cron']['item'] as $item) {
+		if(strstr($item['command'], $script)) {
+			$is_installed = true;
+			break;
+		}
+		$x++;
+	}
+	switch($should_install) {
+		case true:
+			if(!$is_installed) {
+				$cron_item = array();
+				$cron_item['minute'] = "*/{$interval}";
+				$cron_item['hour'] = "*";
+				$cron_item['mday'] = "*";
+				$cron_item['month'] = "*";
+				$cron_item['wday'] = "*";
+				$cron_item['who'] = "root";
+				$cron_item['command'] = "$script $parameters";		
+				$config['cron']['item'][] = $cron_item;
+				parse_config(true);
+				write_config("haproxy, install cron job");
+				configure_cron();
+			}
+		break;
+		case false:
+			if($is_installed == true) {
+				if($x > 0) {
+					unset($config['cron']['item'][$x]);
+					parse_config(true);
+					write_config("haproxy, remove cron job");
+				}
+				configure_cron();
+			}
+		break;
+	}
 }
 
 function haproxy_install_cron($should_install) {
@@ -903,6 +975,85 @@ function haproxy_write_certificate_fullchain($filename, $certid, $append = false
 	unset($cert);
 }
 
+function haproxy_write_certificate_issuer($filename, $certid) {
+	$cert = haproxy_lookup_cert($certid);
+	$certchaincontent = ca_chain($cert);
+	if ($certchaincontent != "") {
+		$certcontent .= "\r\n" . $certchaincontent;
+	}
+	unset($certchaincontent);
+	file_put_contents($filename, $certcontent, 0);
+	unset($certcontent);
+	unset($cert);
+}
+
+function haproxy_uses_ocsp() {
+	global $config;
+	$a_frontends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+	if (!is_array($a_frontends))
+		return false;
+	
+	$configpath = "{$g['varetc_path']}/haproxy";
+	foreach ($a_frontends as $frontend) {
+		if ($frontend['sslocsp'] == 'yes') {
+			return true;
+		}
+	}
+	return false;
+}
+
+function haproxy_getocspurl($filename) {
+	return exec("openssl x509 -noout -ocsp_uri -in $filename", $output, $err);
+}
+
+function haproxy_updateocsp_one($socketupdate, $filename, $name) {
+	if (file_exists("{$filename}.ocsp")) {
+		// If the .ocsp file exists we want to use ocsp
+		syslog(LOG_NOTICE, "HAProxy Retrieving OCSP for frontend {$name}.. ");
+		$ocsp_url = haproxy_getocspurl($filename);
+		$ocsp_host = parse_url($ocsp_url, PHP_URL_HOST);
+		if (empty($ocsp_url)) {
+			// If cert does not have a ocsp_uri, it cannot be updated..
+			syslog(LOG_ERR, "HAProxy OCSP ERROR Cert does not have a ocsp_uri");
+		} else {
+			$retval = exec("openssl ocsp -issuer {$filename}.issuer -verify_other {$filename}.issuer -cert {$filename} -url {$ocsp_url} -header Host {$ocsp_host} -respout {$filename}.ocsp 2>&1", $output, $err);
+			if ($socketupdate) {
+				$ocspresponse = base64_encode(file_get_contents("{$filename}.ocsp"));
+				$r = haproxy_socket_command("set ssl ocsp-response $ocspresponse");
+				if ($r[0] == "OCSP Response updated!\n")
+					syslog(LOG_NOTICE, "HAProxy OCSP socket update successful for frontend {$name}..result: ".$retval);
+				else {
+					syslog(LOG_ERR, "HAProxy OCSP ERROR while performing haproxy socket update OCSP response for:  {$name}");
+				}
+			} else {
+				syslog(LOG_NOTICE, "HAProxy Retrieving OCSP for frontend {$name}..result: ".$retval);
+			}
+		}
+	}
+}
+
+function haproxy_updateocsp($socketupdate = true) {
+	global $config, $g;
+	$a_frontends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+	if (!is_array($a_frontends))
+		return true;
+	
+	$configpath = "{$g['varetc_path']}/haproxy";
+	foreach ($a_frontends as $frontend) {
+		$filename = "$configpath/{$frontend['name']}.pem";
+		haproxy_updateocsp_one($socketupdate, $filename, $frontend['name']);
+		
+		$subfolder = "$configpath/{$frontend['name']}";
+		$certs = $frontend['ha_certificates']['item'];
+		if (is_array($certs)){
+			foreach($certs as $cert){
+				$filename = "$subfolder/{$cert['ssl_certificate']}.pem";
+				haproxy_updateocsp_one($socketupdate, $filename, $frontend['name']);
+			}
+		}
+	}
+}
+
 function haproxy_writeconf($configpath) {
 	global $config;
 	global $aliastable;
@@ -999,14 +1150,29 @@ function haproxy_writeconf($configpath) {
 				//ssl crt ./server.pem ca-file ./ca.crt verify optional crt-ignore-err all crl-file ./ca_crl.pem
 				$filename = "$configpath/{$frontend['name']}.pem";
 				$ssl_crt = " crt $filename";
+
 				haproxy_write_certificate_fullchain($filename, $frontend['ssloffloadcert']);
+				if ($frontend['sslocsp'] == 'yes') {
+					if (!empty(haproxy_getocspurl($filename))) {
+						haproxy_write_certificate_issuer($filename . ".issuer", $frontend['ssloffloadcert']);
+						touch($filename . ".ocsp");
+					}
+				}
+				
 				$subfolder = "$configpath/{$frontend['name']}";
 				$certs = $frontend['ha_certificates']['item'];
 				if (is_array($certs)){
 					if (count($certs) > 0){
 						@mkdir($subfolder, 0755, true);
 						foreach($certs as $cert){
-							haproxy_write_certificate_fullchain("$subfolder/{$cert['ssl_certificate']}.pem", $cert['ssl_certificate']);
+							$filenamefoldercert = "$subfolder/{$cert['ssl_certificate']}.pem";
+							haproxy_write_certificate_fullchain($filenamefoldercert, $cert['ssl_certificate']);
+							if ($frontend['sslocsp'] == 'yes') {
+								if (!empty(haproxy_getocspurl($filenamefoldercert))) {
+									haproxy_write_certificate_issuer($filenamefoldercert . ".issuer", $cert['ssl_certificate']);
+									touch($filenamefoldercert . ".ocsp");
+								}
+							}
 						}
 						$ssl_crt .= " crt $subfolder";
 					}
@@ -1350,11 +1516,6 @@ function haproxy_writeconf($configpath) {
 			haproxy_do_xmlrpc_sync();
 		}
 	}
-	
-	if (isset($a_global['carpdev']))
-		haproxy_install_cron(true);
-	else
-		haproxy_install_cron(false);
 }
 
 function haproxy_is_running() {
@@ -1566,8 +1727,18 @@ function haproxy_check_run($reload) {
 	$a_global = &$config['installedpackages']['haproxy'];
 	$configpath = "{$g['varetc_path']}/haproxy";
 	
-	if ($reload)
+	if ($reload) {
 		haproxy_writeconf($configpath);
+		haproxy_updateocsp(false);
+		
+		if (isset($a_global['carpdev']))
+			haproxy_install_cron(true);
+		else
+			haproxy_install_cron(false);
+	
+		$useocsp = haproxy_uses_ocsp();
+		haproxy_install_cronjob($useocsp, '/etc/rc.haproxy_ocsp.sh', 120);
+	}
 
 	if(isset($a_global['enable'])) {
 		if (isset($a_global['carpdev'])) {

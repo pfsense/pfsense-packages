@@ -48,7 +48,7 @@ class haproxy_utils {
 				if (haproxy_utils::$pf_version < '2.2')
 					exec("/usr/bin/dig   {$host_esc} $type @$dnsserver | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
 				else
-					exec("/usr/bin/drill {$host_esc} $type @$dnsserver | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
+					exec("/usr/bin/drill {$host_esc} $type @$dnsserver | /usr/bin/awk '{ if($1!=\";;\" && $4==\"{$type}\") print $5 }'", $resolved);
 				foreach($resolved as $item) {
 					$newitem = array();
 					$newitem["typeid"] = $type;

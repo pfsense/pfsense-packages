@@ -71,7 +71,7 @@ uasort($a_pools, haproxy_compareByName);
 global $simplefields;
 $simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
 	'max_connections','client_timeout','port','advanced_bind',
-	'ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadacladditional','sslclientcert-none','sslclientcert-invalid',
+	'ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadacladditional','sslclientcert-none','sslclientcert-invalid','sslocsp',
 	'socket-stats',
 	'dontlognull','dontlog-normal','log-separate-errors','log-detailed');
 
@@ -785,6 +785,12 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 				Choose the cert to use on this frontend.
 				<br/>
 				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches the 'CN' of the certificate)<br/>
+			</td>
+		</tr>
+		<tr class="haproxy_ssloffloading_enabled" align="left">
+			<td width="22%" valign="top" class="vncell">OCSP</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="sslocsp" name="sslocsp" type="checkbox" value="yes" <?php if ($pconfig['sslocsp']=='yes') echo "checked";?> onclick="updatevisibility();" />Load certificate ocsp responses for easy certificate validation by the client.<br/>
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled">
