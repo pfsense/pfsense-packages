@@ -345,8 +345,8 @@ function haproxy_custom_php_deinstall_command() {
 	update_output_window($static_output);
 	$static_output .= "HAProxy, deleting haproxy webgui\n";
 	update_output_window($static_output);
-	exec("rm /usr/local/etc/rc.d/haproxy.sh");
-	exec("rm /etc/rc.haproxy_ocsp.sh");
+	unlink_if_exists("/usr/local/etc/rc.d/haproxy.sh");
+	unlink_if_exists("/etc/rc.haproxy_ocsp.sh");
 	$static_output .= "HAProxy, installing cron job if needed\n";
 	update_output_window($static_output);
 	haproxy_install_cron(false);
