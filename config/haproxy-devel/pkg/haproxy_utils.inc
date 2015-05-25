@@ -42,15 +42,21 @@ class haproxy_utils {
 		$recordtypes = 0;
 		foreach($types as $type){
 			switch ($type) {
-				case 'A': $recordtypes += DNS_A; break;
-				case 'AAAA': $recordtypes += DNS_AAAA; break;
+				case 'A': 
+					$recordtypes += DNS_A; 
+					break;
+				case 'AAAA': 
+					$recordtypes += DNS_AAAA; 
+					break;
 			}
 		}
+		if ($recordtypes == 0)
+			return $result;
+		
 		$dnsresult = dns_get_record($host, $recordtypes);
 		foreach($dnsresult as $item) {
-			$type = $item['type'];
-			$newitem["typeid"] = $type;
-			switch ($type) {
+			$newitem["typeid"] = $item['type'];
+			switch ($item['type']) {
 				case 'A':
 					$newitem["data"] = $item['ip']; 
 					break;
