@@ -433,7 +433,7 @@ EOD;
 	$fd = fopen("/usr/local/etc/rc.d/haproxy.sh", "w");
 	fwrite($fd, $haproxy);
 	fclose($fd);
-	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
+	chmod("/usr/local/etc/rc.d/haproxy.sh", 0755);
 
 	$haproxy_ocsp = <<<EOD
 #!/usr/local/bin/php -f
@@ -458,7 +458,7 @@ EOD;
 	$fd = fopen("/etc/rc.haproxy_ocsp.sh", "w");
 	fwrite($fd, $haproxy_ocsp);
 	fclose($fd);
-	exec("chmod a+rx /etc/rc.haproxy_ocsp.sh");
+	chmod("/etc/rc.haproxy_ocsp.sh", 0755);
 
 	$static_output .= "HAProxy, update configuration\n";
 	update_output_window($static_output);
