@@ -36,26 +36,29 @@ require_once("config.inc");
 class haproxy_utils {
 	public static $pf_version;
 
-	public function query_dns($host, $querytype="A,AAAA", $dnsserver = "127.0.0.1") {
+	public function query_dns($host, $querytype="A,AAAA") {
 		$result = array();
-		$host = trim($host, " \t\n\r\0\x0B[];\"'");
-		$host_esc = escapeshellarg($host);
 		$types = explode(',',$querytype);
+		$recordtypes = 0;
 		foreach($types as $type){
-			$resolved = gethostbyname($host);
-			if($resolved) {
-				$resolved = array();
-				if (haproxy_utils::$pf_version < '2.2')
-					exec("/usr/bin/dig   {$host_esc} $type @$dnsserver | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
-				else
-					exec("/usr/bin/drill {$host_esc} $type @$dnsserver | /usr/bin/awk '{ if($1!=\";;\" && $4==\"{$type}\") print $5 }'", $resolved);
-				foreach($resolved as $item) {
-					$newitem = array();
-					$newitem["typeid"] = $type;
-					$newitem["data"] = $item;
-					$result[] = $newitem;
-				}
+			switch ($type) {
+				case 'A': $recordtypes += DNS_A; break;
+				case 'AAAA': $recordtypes += DNS_AAAA; break;
 			}
+		}
+		$dnsresult = dns_get_record($host, $recordtypes);
+		foreach($dnsresult as $item) {
+			$type = $item['type'];
+			$newitem["typeid"] = $type;
+			switch ($type) {
+				case 'A':
+					$newitem["data"] = $item['ip']; 
+					break;
+				case 'AAAA':
+					$newitem["data"] = $item['ipv6']; 
+					break;
+			}
+			$result[] = $newitem;
 		}
 		return $result;
 	}
