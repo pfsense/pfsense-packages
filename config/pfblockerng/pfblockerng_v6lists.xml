@@ -54,6 +54,7 @@
 	<version>1.0</version>
 	<title>pfBlockerNG: IPv6 Alias/List Configuration</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save IPv6 settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG</name>
 		<tooltiptext></tooltiptext>

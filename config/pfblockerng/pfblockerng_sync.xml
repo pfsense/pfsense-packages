@@ -52,6 +52,7 @@
 	<version>1.0</version>
 	<title>pfBlockerNG: XMLRPC Sync</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save XMLRPC Sync settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG</name>
 		<tooltiptext>Configure pfBlockerNG</tooltiptext>

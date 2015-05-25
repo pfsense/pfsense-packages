@@ -668,6 +668,7 @@ $xml = <<<EOF
 	<version>1.0</version>
 	<title>pfBlockerNG: {$cont}</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save {$cont} settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG: {$cont_name}</name>
 		<tooltiptext>Configure pfBlockerNG</tooltiptext>
@@ -1064,6 +1065,7 @@ $xmlrep = <<<EOF
 	<version>1.0</version>
 	<title>pfBlockerNG: IPv4 Reputation</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save Reputation Settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG</name>
 		<tooltiptext>Configure pfblockerNG</tooltiptext>

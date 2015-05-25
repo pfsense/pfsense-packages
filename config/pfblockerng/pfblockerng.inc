@@ -263,6 +263,10 @@ function pfblockerng_cron_exists($crontask, $pfb_min, $pfb_hour) {
 				if ($item['minute'] != $pfb_min) {
 					return FALSE;
 				}
+				if ($pfb_hour == 'maxmind' && !empty($item['hour'])) {
+					// Maxmind hour is randomized. Skip comparison.
+					return TRUE;
+				}
 				if ($item['hour'] != $pfb_hour) {
 					return FALSE;
 				}
@@ -2662,7 +2666,7 @@ function sync_package_pfblockerng($cron = "") {
 		$pfb_gwho	= "root";
 
 		// Determine if Cron Task requires updating
-		if (!pfblockerng_cron_exists($pfb_gcmd, $pfb_gmin, $pfb_ghour)) {
+		if (!pfblockerng_cron_exists($pfb_gcmd, $pfb_gmin, 'maxmind')) {
 			install_cron_job($pfb_gcmd, true, $pfb_gmin, $pfb_ghour, $pfb_gmday, $pfb_gmonth, $pfb_gwday, $pfb_gwho);
 		}
 	}

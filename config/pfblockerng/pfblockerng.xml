@@ -52,6 +52,7 @@
 	<version>1.09</version>
 	<title>pfBlockerNG: General Settings</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save General Settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG</name>
 		<configfile>pfblockerng.xml</configfile>
