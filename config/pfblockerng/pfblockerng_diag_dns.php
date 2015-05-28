@@ -56,15 +56,6 @@ foreach ($a_aliases as $a) {
 	$counter++;
 }
 
-# Collect pfSense Version
-$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
-
-if ($pfs_version > '2.2') {
-	$cmd = '/usr/bin/drill';
-} else {
-	$cmd = '/usr/bin/dig';
-}
-
 if (isset($_POST['create_alias']) && (is_hostname($host) || is_ipaddr($host))) {
 	if ($_POST['override']) {
 		$override = true;
@@ -73,7 +64,7 @@ if (isset($_POST['create_alias']) && (is_hostname($host) || is_ipaddr($host))) {
 	$type = "hostname";
 	if ($resolved) {
 		$resolved = array();
-		exec("{$cmd} {$host_esc} A | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
+		exec("/usr/bin/drill {$host_esc} A | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
 		$isfirst = true;
 		foreach ($resolved as $re) {
 			if ($re <> "") {
@@ -120,7 +111,7 @@ if ($_POST) {
 		$dns_servers = array();
 		exec("/usr/bin/grep nameserver /etc/resolv.conf | /usr/bin/cut -f2 -d' '", $dns_servers);
 		foreach ($dns_servers as $dns_server) {
-			$query_time = exec("{$cmd} {$host_esc} " . escapeshellarg("@" . trim($dns_server)) . " | /usr/bin/grep Query | /usr/bin/cut -d':' -f2");
+			$query_time = exec("/usr/bin/drill {$host_esc} " . escapeshellarg("@" . trim($dns_server)) . " | /usr/bin/grep Query | /usr/bin/cut -d':' -f2");
 			if ($query_time == "") {
 				$query_time = gettext("No response");
 			}
@@ -149,7 +140,7 @@ if ($_POST) {
 			$resolved = gethostbyname($host);
 			if ($resolved) {
 				$resolved = array();
-				exec("{$cmd} {$host_esc} A | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
+				exec("/usr/bin/drill {$host_esc} A | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
 			}
 			$hostname = $host;
 			if ($host != $resolved) {
@@ -208,7 +199,7 @@ include("head.inc"); ?>
 			<input name="host" type="text" class="formfld unknown" id="host" size="20" value="<?=htmlspecialchars($host);?>">
 			</td>
 			<?php if ($resolved && $type) { ?>
-			<td valign="middle">&nbsp;=&nbsp;</td><td>
+			<td valign="middle">&nbsp;&nbsp;</td><td>
 			<font size="+1">
 <?php
 				$found = 0;
@@ -244,8 +235,8 @@ include("head.inc"); ?>
 		</tr>
 <?php		if ($_POST): ?>
 		<tr>
-		<td width="22%" valign="top" class="vncell"><?=gettext("Resolution time per server");?></td>
-		<td width="78%" class="vtable">
+			<td width="22%" valign="top" class="vncell"><?=gettext("Resolution time per server");?></td>
+			<td width="78%" class="vtable">
 				<table width="170" border="0" cellpadding="6" cellspacing="0" summary="resolution time">
 					<tr>
 						<td class="listhdrr">
@@ -271,7 +262,7 @@ include("head.inc"); ?>
 					endforeach;
 ?>
 				</table>
-		</td>
+		  </td>
 		</tr>
 		<?php endif; ?>
 		<?php if (!$input_errors && $ipaddr) { ?>

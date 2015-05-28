@@ -52,13 +52,13 @@ require_once("/usr/local/pkg/pfblockerng/pfblockerng.inc");
 
 pfb_global();
 
-# Get log files from directory
+// Get log files from directory
 function getlogs($logdir, $log_extentions = array('log')) {
 	if (!is_array($log_extentions)) {
 		$log_extentions = array($log_extentions);
 	}
 
-	# Get logfiles
+	// Get logfiles
 	$log_filenames = array();
 	foreach ($log_extentions as $extention) {
 		if ($extention <> '*') {
@@ -68,7 +68,7 @@ function getlogs($logdir, $log_extentions = array('log')) {
 		}
 	}
 
-	# Convert to filenames only
+	// Convert to filenames only
 	if (count($log_filenames) > 0) {
 		$log_totalfiles = count($log_filenames);
 		for ($cnt = 0; $cnt < $log_totalfiles; $cnt++) {
@@ -76,18 +76,19 @@ function getlogs($logdir, $log_extentions = array('log')) {
 		}
 	}
 	
-	# Sort the filename
+	// Sort the filename
 	asort($log_filenames);
 	
-	# Done
+	// Done
 	return $log_filenames;
 }
 
-# Define logtypes
-# name	=> Displayname of the type
-# ext	=> Log extentions (array for multiple extentions)
-# logdir=> Log directory
-# clear	=> Add clear button (TRUE/FALSE)
+/*	Define logtypes:
+		name	=>	Displayname of the type
+		ext	=>	Log extentions (array for multiple extentions)
+		logdir	=>	Log directory
+		clear	=>	Add clear button (TRUE/FALSE)	*/
+
 $pfb_logtypes = array(	'defaultlogs'	=> array('name'		=> 'Log Files',
 						'logdir'	=> "{$pfb['logdir']}/",
 						'logs'		=> array("pfblockerng.log", "error.log", "geoip.log", "maxmind_ver"),
@@ -153,7 +154,7 @@ $pfb_logtypes = array(	'defaultlogs'	=> array('name'		=> 'Log Files',
 						)
 		);
 
-# Check logtypes
+// Check logtypes
 $logtypeid = 'defaultlogs';
 if (isset($_POST['logtype'])) {
 	$logtypeid = $_POST['logtype'];
@@ -161,13 +162,13 @@ if (isset($_POST['logtype'])) {
 	$logtypeid = htmlspecialchars($_GET['logtype']);
 }
 
-# Check if POST has been set
+// Check if POST has been set
 if (isset($_POST['file'])) {
 	clearstatcache();
 	$pfb_logfilename = $_POST['file'];
 	$pfb_ext = pathinfo($pfb_logfilename, PATHINFO_EXTENSION);
 
-	# Load log
+	// Load log
 	if ($_POST['action'] == 'load') {
 		if (!is_file($pfb_logfilename)) {
 			echo "|3|" . gettext("Log file is empty or does not exist") . ".|";
@@ -187,12 +188,12 @@ if (isset($_POST['file'])) {
 if (isset($_POST['logFile'])) {
 	$s_logfile = $_POST['logFile'];
 
-	# Clear selected file
+	// Clear selected file
 	if (isset($_POST['clear'])) {
 		unlink_if_exists($s_logfile);
 	}
 
-	# Download log
+	// Download log
 	if (isset($_POST['download'])) {
 		if (file_exists($s_logfile)) {
 			ob_start(); //important or other posts will fail

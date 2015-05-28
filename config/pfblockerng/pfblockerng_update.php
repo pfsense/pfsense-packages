@@ -76,7 +76,6 @@ function pfbupdate_status($status) {
 
 // Function to perform a Force Update, Cron or Reload
 function pfb_cron_update($type) {
-
 	global $pfb;
 
 	// Query for any Active pfBlockerNG CRON Jobs
@@ -87,8 +86,9 @@ function pfb_cron_update($type) {
 		exit;
 	}
 
-	if (!file_exists("{$pfb['log']}"))
+	if (!file_exists("{$pfb['log']}")) {
 		touch("{$pfb['log']}");
+	}
 
 	// Update Status Window with correct Task
 	if ($type == "update") {
@@ -102,7 +102,6 @@ function pfb_cron_update($type) {
 
 	// Remove any existing pfBlockerNG CRON Jobs
 	install_cron_job("pfblockerng.php cron", false);
-	write_config();
 
 	// Execute PHP Process in the Background
 	mwexec_bg("/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php {$type} >> {$pfb['log']} 2>&1");
@@ -121,18 +120,19 @@ function pfb_cron_update($type) {
 			$lastpos = $len;
 		} else {
 			$f = fopen($pfb['log'], "rb");
-			if ($f === false)
+			if ($f === false) {
 				die();
+			}
 			fseek($f, $lastpos);
 
 			while (!feof($f)) {
 
 				$pfb_buffer = fread($f, 2048);
 				$pfb_output .= str_replace( array ("\r", "\")"), "", $pfb_buffer);
-
 				// Refresh on new lines only. This allows Scrolling.
-				if ($lastpos != $lastpos_old)
+				if ($lastpos != $lastpos_old) {
 					pfbupdate_output($pfb_output);
+				}
 				$lastpos_old = $lastpos;
 				ob_flush();
 				flush();
@@ -151,7 +151,7 @@ function pfb_cron_update($type) {
 			ob_flush();
 			flush();
 			fclose($f);
-			# Call Log Mgmt Function
+			// Call Log Mgmt Function
 			pfb_log_mgmt();
 			die();
 		}
@@ -207,61 +207,112 @@ include_once("head.inc");
 			<tr>
 				<td colspan="2" class="listr">
 				<?php
-					// Collect Existing CRON settings
-					if (is_array($config['cron']['item'])) {
-						foreach ($config['cron']['item'] as $cron) {
-							if (preg_match("/usr.local.www.pfblockerng.pfblockerng.php cron/",$cron["command"])) {
-								$pfb_min = "{$cron['minute']}";
-								break;
+					if ($pfb['enable'] == "on") {
+
+						/* Legend - Time Variables
+
+							$pfb['interval']	Hour interval setting	(1,2,3,4,6,8,12,24)
+							$pfb['min']		Cron minute start time	(0-23)
+							$pfb['hour']		Cron start hour		(0-23)
+							$pfb['24hour']		Cron daily/wk start hr	(0-23)
+
+							$currenthour		Current hour
+							$currentmin		Current minute
+							$cron_hour_begin	First cron hour setting (interval 2-24)
+							$cron_hour_next		Next cron hour setting  (interval 2-24)
+
+							$max_min_remain		Max minutes to next cron (not including currentmin)
+							$min_remain		Total minutes remaining to next cron
+							$min_final		The minute component in hour:min
+
+							$nextcron		Next cron event in hour:mins
+							$cronreal		Time remaining to next cron in hours:mins	*/
+
+						$currenthour	= date('G');
+						$currentmin	= date('i');
+
+						if ($pfb['interval'] == 1) {
+							if (($currenthour + ($currentmin/60)) <= ($pfb['hour'] + ($pfb['min']/60))) {
+								$cron_hour_next = $currenthour;
+							} else {
+								$cron_hour_next = $currenthour + 1;
+							}
+							if (($currenthour + ($pfb['min']/60)) >= 24) {
+								$cron_hour_next = $pfb['hour'];
+							}
+							$max_min_remain = 60 + $pfb['min'];
+						}
+						elseif ($pfb['interval'] == 24) {
+							$cron_hour_next = $cron_hour_begin = $pfb['24hour'] != '' ? $pfb['24hour'] : '00';
+						}
+						else {
+							// Find Next Cron hour schedule
+							$crondata = pfb_cron_base_hour();
+							if (!empty($crondata)) {
+								foreach ($crondata as $key => $line) {
+									if ($key == 0) {
+										$cron_hour_begin = $line;
+									}
+									if ($line > $currenthour) {
+										$cron_hour_next = $line;
+										break;
+									}
+								}
+							}
+
+							// Roll over to First cron hour setting
+							if (!isset($cron_hour_next)) {
+								if (empty($cron_hour_begin)) {
+									// $cron_hour_begin is hour '0'
+									$cron_hour_next = (24 - $currenthour);
+								} else {
+									$cron_hour_next = $cron_hour_begin;
+								}
 							}
 						}
-					}
-					// Calculate Minutes Remaining till next CRON Event.
-					$currentmin = date('i');
-					switch ($pfb_min) {
-						case "0":
-							$min_remain = (60 - $currentmin);
-							break;
-						case "15":
-							if ($currentmin < 15) {
-								$min_remain = (15 - $currentmin);
-							} else {
-								$min_remain = (75 - $currentmin);
-							}
-							break;
-						case "30":
-							if ($currentmin < 30) {
-								$min_remain = (30 - $currentmin);
-							} else {
-								$min_remain = (90 - $currentmin);
-							}
-							break;
-						case "45":
-							if ($currentmin < 45) {
-								$min_remain = (45 - $currentmin);
-							} else {
-								$min_remain = (105 - $currentmin);
-							}
-							break;
-					}
 
-					// Default to "< 1 minute" if empty
-					if (empty($min_remain))
-						$min_remain = "< 1";
+						if ($pfb['interval'] != 1) {
+							if (($currenthour + ($currentmin/60)) <= ($cron_hour_next + ($pfb['min']/60))) {
+								$max_min_remain = (($cron_hour_next - $currenthour) * 60) + $pfb['min'];
+							} else {
+								$max_min_remain = ((24 - $currenthour + $cron_hour_begin) * 60) + $pfb['min'];
+								$cron_hour_next = $cron_hour_begin;
+							}
+						}
 
-					// Next Scheduled Cron Time
-					if ($pfb_min == "0")
-						$pfb_min = "00";
-					$nextcron = (date('H') +1) . ":{$pfb_min}";
+						$min_remain	= ($max_min_remain - $currentmin);
+						$min_final	= ($min_remain % 60);
+						$sec_final	= (60 - date('s'));
 
-					// If pfBlockerNG is Disabled or Cron Task is Missing
-					if (empty($pfb['enable']) || empty($pfb_min)) {
-						$min_remain = " -- ";
-						$nextcron = " [ Disabled ] ";
+						if (strlen($sec_final) == 1) {
+							$sec_final = '0' . $sec_final;
+						}
+						if (strlen($min_final) == 1) {
+							$min_final = '0' . $min_final;
+						}
+						if (strlen($cron_hour_next) == 1) {
+							$cron_hour_next = '0' . $cron_hour_next;
+						}
+
+						if ($min_remain > 59) {
+							$nextcron = floor($min_remain / 60) . ':' . $min_final . ':' . $sec_final;
+						} else {
+							$nextcron = '00:' . $min_final . ':' . $sec_final;
+						}
+
+						if ($pfb['min'] == 0) {
+							$pfb['min'] = '00';
+						}
+						$cronreal = "{$cron_hour_next}:{$pfb['min']}";
 					}
 
-					echo "NEXT Scheduled CRON Event will run at <font size=\"3\">&nbsp;{$nextcron}</font>&nbsp; in<font size=\"3\">
-						<span class=\"red\">&nbsp;{$min_remain}&nbsp;</span></font> Minutes.";
+					if (empty($pfb['enable']) || empty($cron_hour_next)) {
+						$cronreal = ' [ Disabled ]';
+						$nextcron = '--';
+					}
+
+					echo "NEXT Scheduled CRON Event will run at <font size=\"3\">&nbsp;{$cronreal}</font>&nbsp; with
+						<font size=\"3\"><span class=\"red\">&nbsp;{$nextcron}&nbsp;</span></font> time remaining.";
 
 					// Query for any Active pfBlockerNG CRON Jobs
 					$result_cron = array();
@@ -272,7 +323,7 @@ include_once("head.inc");
 						echo "<img src = '/themes/{$g['theme']}/images/icons/icon_pass.gif' width='15' height='15'
 							border='0' title='pfBockerNG Cron Task is Running.'/>";
 					}
-					echo "<br /><font size=\"3\"><span class=\"red\">Refresh</span></font> to update current Status and Minute(s) remaining";
+					echo "<br /><font size=\"3\"><span class=\"red\">Refresh</span></font> to update current Status and time remaining";
 				?>
 				</td>
 			</tr>
@@ -348,8 +399,9 @@ include("fend.inc");
 // Execute the Viewer output Window
 if (isset($_POST['pfbview'])) {
 
-	if (!file_exists("{$pfb['log']}"))
+	if (!file_exists("{$pfb['log']}")) {
 		touch("{$pfb['log']}");
+	}
 
 	// Reference: http://stackoverflow.com/questions/3218895/php-how-to-read-a-file-live-that-is-constantly-being-written-to
 	pfbupdate_status(gettext("Log Viewing in progress.    ** Press 'END VIEW' to Exit ** "));
@@ -372,8 +424,9 @@ if (isset($_POST['pfbview'])) {
 			$lastpos = $len;
 		} else {
 			$f = fopen($pfb['log'], "rb");
-			if ($f === false)
+			if ($f === false) {
 				die();
+			}
 			fseek($f, $lastpos);
 
 			while (!feof($f)) {
@@ -415,8 +468,9 @@ if (isset($_POST['pfbcron']) && $pfb['enable'] == "on") {
 
 // Execute a Reload of all Aliases and Lists
 if (isset($_POST['pfbreload']) && $pfb['enable'] == "on") {
+	// Set 'Reuse' Flag for Reload process
 	$config['installedpackages']['pfblockerng']['config'][0]['pfb_reuse'] = "on";
-	write_config();
+	write_config("pfBlockerNG: Executing Force Reload");
 	pfb_cron_update(reload);
 }
 

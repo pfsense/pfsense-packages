@@ -146,10 +146,11 @@ function ip_range_to_subnet_array_temp($ip1, $ip2) {
 	return $out;
 }
 
-# Set php Memory Limit
+// Set php Memory Limit
 $uname = posix_uname();
-if ($uname['machine'] == "amd64")
+if ($uname['machine'] == "amd64") {
 	ini_set('memory_limit', '256M');
+}
 
 function pfb_update_check($header_url, $list_url, $url_format, $pfbfolder) {
 	global $pfb;
@@ -220,13 +221,12 @@ function pfb_update_check($header_url, $list_url, $url_format, $pfbfolder) {
 	}
 }
 
-
 if ($argv[1] == 'update') {
 	sync_package_pfblockerng("cron");
 }
 
 if ($argv[1] == 'dc') {
-	# (Options - 'bu' Binary Update for Reputation/Alerts Page, 'all' for Country update and 'bu' options.
+	// (Options - 'bu' Binary Update for Reputation/Alerts Page, 'all' for Country update and 'bu' options.
 	if ($pfb['cc'] == "") {
 		exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 2>&1");
 	} else {
@@ -251,85 +251,13 @@ if ($argv[1] == 'gc') {
 }
 
 if ($argv[1] == 'cron') {
+
+	// Call Base Hour converter
+	$pfb_sch = pfb_cron_base_hour();
+
 	$hour = date('G');
 	$dow  = date('N');
 	$pfb['update_cron'] = FALSE;
-
-	# Start hour of the 'Once a day' Schedule
-	$pfb['dailystart'] = $config['installedpackages']['pfblockerng']['config'][0]['pfb_dailystart'];
-	# Start hour of the Scheduler
-	if ($config['installedpackages']['pfblockerng']['config'][0]['pfb_hour'] != "") {
-		$pfb['hour'] = $config['installedpackages']['pfblockerng']['config'][0]['pfb_hour'];
-	} else {
-		$pfb['hour'] = "1";
-	}
-	$updates = 0;
-
-	# 2 Hour Schedule Converter
-	$shour = intval(substr($pfb['hour'], 0, 2));
-	$sch2 = strval($shour);
-	for ($i=0; $i<11; $i++) {
-		$shour += 2;
-		if ($shour >= 24)
-			$shour -= 24;
-		$sch2 .= "," . strval($shour);
-	}
-
-	# 3 Hour Schedule Converter
-	$shour = intval(substr($pfb['hour'], 0, 2));
-	$sch3 = strval($shour);
-	for ($i=0; $i<7; $i++) {
-		$shour += 3;
-		if ($shour >= 24)
-			$shour -= 24;
-		$sch3 .= "," . strval($shour);
-	}
-
-	# 4 Hour Schedule Converter
-	$shour = intval(substr($pfb['hour'], 0, 2));
-	$sch4 = strval($shour);
-	for ($i=0; $i<5; $i++) {
-		$shour += 4;
-		if ($shour >= 24)
-			$shour -= 24;
-		$sch4 .= "," . strval($shour);
-	}
-
-	# 6 Hour Schedule Converter
-	$shour = intval(substr($pfb['hour'], 0, 2));
-	$sch6 = strval($shour);
-	for ($i=0; $i<3; $i++) {
-		$shour += 6;
-		if ($shour >= 24)
-			$shour -= 24;
-		$sch6 .= "," . strval($shour);
-	}
-
-	# 8 Hour Schedule Converter
-	$shour = intval(substr($pfb['hour'], 0, 2));
-	$sch8 = strval($shour);
-	for ($i=0; $i<2; $i++) {
-		$shour += 8;
-		if ($shour >= 24)
-			$shour -= 24;
-		$sch8 .= "," . strval($shour);
-	}
-
-	# 12 Hour Schedule Converter
-	$shour = intval(substr($pfb['hour'], 0, 2));
-	$sch12 = strval($shour) . ",";
-	$shour += 12;
-	if ($shour >= 24)
-		$shour -= 24;
-	$sch12 .= strval($shour);
-
-	$e_sch2  = explode(",", $sch2);
-	$e_sch3  = explode(",", $sch3);
-	$e_sch4  = explode(",", $sch4);
-	$e_sch6  = explode(",", $sch6);
-	$e_sch8  = explode(",", $sch8);
-	$e_sch12 = explode(",", $sch12);
-
 	$log = " CRON  PROCESS  START [ NOW ]\n";
 	pfb_logger("{$log}","1");
 
@@ -347,8 +275,8 @@ if ($argv[1] == 'cron') {
 								$header_url = "{$row['header']}_v6";
 							}
 
-							# Determine Folder Location for Alias (return array $pfbarr)
-							pfb_determine_list_detail($list['action']);
+							// Determine Folder Location for Alias (return array $pfbarr)
+							pfb_determine_list_detail($list['action'], "", "", "");
 							$pfbfolder = $pfbarr['folder'];
 
 							$list_cron = $list['cron'];
@@ -361,7 +289,7 @@ if ($argv[1] == 'cron') {
 								continue;
 							}
 
-							# Check if List file exists, if not found run Update
+							// Check if List file exists, if not found run Update
 							if (!file_exists($pfbfolder . '/' . $header_url . '.txt')) {
 								$log = "  Updates Found\n";
 								pfb_logger("{$log}","1");
@@ -370,46 +298,48 @@ if ($argv[1] == 'cron') {
 							}
 
 							switch ($list_cron) {
-								case "01hour":
-									pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
-									break;
-								case "02hours":
-									if (in_array($hour, $e_sch2))
-										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
-									break;
-								case "03hours":
-									if (in_array($hour, $e_sch3))
-										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
-									break;
-								case "04hours":
-									if (in_array($hour, $e_sch4))
-										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
-									break;
-								case "06hours":
-									if (in_array($hour, $e_sch6))
-										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
-									break;
-								case "08hours":
-									if (in_array($hour, $e_sch8))
-										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
-									break;
-								case "12hours":
-									if (in_array($hour, $e_sch12))
-										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
-									break;
 								case "EveryDay":
-									if ($hour == $pfb['dailystart'])
+									if ($hour == $pfb['24hour']) {
 										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
+									}
 									break;
 								case "Weekly":
-									if ($hour == $pfb['dailystart'] && $dow == $header_dow)
+									if ($hour == $pfb['24hour'] && $dow == $header_dow) {
 										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
+									}
 									break;
 								default:
+									if ($pfb['interval'] == "1" || in_array($hour, $pfb_sch)) {
+										pfb_update_check($header_url, $list_url, $url_format, $pfbfolder);
+									}
 									break;
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	// If Continents are Defined, continue with Update Process to determine if further changes are required.
+	$continents = array (	"Africa"		=> "pfB_Africa",
+				"Antartica"		=> "pfB_Antartica",
+				"Asia"			=> "pfB_Asia",
+				"Europe"		=> "pfB_Europe",
+				"North America"		=> "pfB_NAmerica",
+				"Oceania"		=> "pfB_Oceania",
+				"South America"		=> "pfB_SAmerica",
+				"Top Spammers"		=> "pfB_Top",
+				"Proxy and Satellite"	=> "pfB_PS"
+				);
+
+	if (!$pfb['update_cron']) {
+		foreach ($continents as $continent => $pfb_alias) {
+			if (is_array($config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'])) {
+				$continent_config = $config['installedpackages']['pfblockerng' . strtolower(preg_replace('/ /','',$continent))]['config'][0];
+				if ($continent_config['action'] != "Disabled" && $pfb['enable'] == "on") {
+					$pfb['update_cron'] = TRUE;
+					break;
 				}
 			}
 		}
@@ -423,7 +353,7 @@ if ($argv[1] == 'cron') {
 		pfb_logger("{$log}","1");
 	}
 
-	# Call Log Mgmt Function
+	// Call Log Mgmt Function
 	// If Update GUI 'Manual view' is selected. Last output will be missed. So sleep for 5 secs.
 	sleep(5);
 	pfb_log_mgmt();
@@ -438,7 +368,7 @@ function pfblockerng_uc_countries() {
 	$maxmind_cc4	= "{$pfb['dbdir']}/GeoIPCountryWhois.csv";
 	$maxmind_cc6	= "{$pfb['dbdir']}/GeoIPv6.csv";
 	
-	# Create Folders if not Exist
+	// Create Folders if not Exist
 	$folder_array = array ("{$pfb['dbdir']}","{$pfb['logdir']}","{$pfb['ccdir']}");
 	foreach ($folder_array as $folder) {
 		safe_mkdir ("{$folder}",0755);
@@ -456,7 +386,7 @@ function pfblockerng_uc_countries() {
 		return;
 	}
 
-	# Save Date/Time Stamp to MaxMind version file
+	// Save Date/Time Stamp to MaxMind version file
 	$maxmind_ver	= "MaxMind GeoLite Date/Time Stamps \n\n";
 	$remote_tds	= @implode(preg_grep("/Last-Modified/", get_headers("http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip")));
 	$maxmind_ver	.= "MaxMind_v4 \t" . $remote_tds . "\n";
@@ -738,6 +668,7 @@ $xml = <<<EOF
 	<version>1.0</version>
 	<title>pfBlockerNG: {$cont}</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save {$cont} settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG: {$cont_name}</name>
 		<tooltiptext>Configure pfBlockerNG</tooltiptext>
@@ -824,44 +755,57 @@ $xml = <<<EOF
 		</field>
 		<field>
 			<fielddescr>LINKS</fielddescr>
-			<fieldname></fieldname>
-			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
+			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp;
+				<a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
 			</description>
 			<type>info</type>
 		</field>
-		<field>	
-			<fielddescr><![CDATA[<br /><strong>IPv4</strong><br />Countries]]></fielddescr>
+		<field>
 			<fieldname>countries4</fieldname>
-			<description>
-			<![CDATA[Select IPv4 Countries you want to take an action on.<br />
-				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
-			</description>
+			<fielddescr><![CDATA[<strong><center>Countries</center></strong><br />
+				<center>Use CTRL + CLICK to unselect countries</center>]]>
+			</fielddescr>
 			<type>select</type>
 			<options>
 			${'options4'}
 			</options>
 			<size>${'ftotal4'}</size>
 			<multiple/>
+
+EOF;
+
+// Adjust combinefields variable if IPv6 is empty.
+if (!empty (${'options6'})) {
+	$xml .= <<<EOF
+			<description><![CDATA[<center><br />IPv4 Countries</center>]]></description>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
 		</field>
 
 EOF;
+} else {
+	$xml .= <<<EOF
+			<description><![CDATA[<br />IPv4 Countries]]></description>
+		</field>
+
+EOF;
+}
 
 // Skip IPv6 when Null data found
 if (!empty (${'options6'})) {
 	$xml .= <<<EOF
 		<field>
-			<fielddescr><![CDATA[<br /><strong>IPv6</strong><br />Countries]]></fielddescr>
 			<fieldname>countries6</fieldname>
-			<description>
-			<![CDATA[Select IPv6 Countries you want to take an action on.<br />
-				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
-			</description>
+			<description><![CDATA[<br /><center>IPv6 Countries</center>]]></description>
 			<type>select</type>
 			<options>
 			${'options6'}
 			</options>
 			<size>${'ftotal6'}</size>
 			<multiple/>
+			<usecolspan2/>
+			<dontdisplayname/>
+			<combinefields>end</combinefields>
 		</field>
 
 EOF;
@@ -870,7 +814,7 @@ EOF;
 $xml .= <<<EOF
 		<field>
 			<fielddescr>List Action</fielddescr>
-			<description><![CDATA[<br />Default : <strong>Disabled</strong><br /><br />
+			<description><![CDATA[<br />Default: <strong>Disabled</strong><br /><br />
 				Select the <strong>Action</strong> for Firewall Rules on lists you have selected.<br /><br />
 				<strong><u>'Disabled' Rules:</u></strong> Disables selection and does nothing to selected Alias.<br /><br />
 
@@ -901,7 +845,7 @@ $xml .= <<<EOF
 				<li>'Alias Permit' and 'Alias Match' will be saved in the Same folder as the other Permit/Match Auto-Rules</li><br />
 				<li>'Alias Native' lists are kept in their Native format without any modifications.</li></ul>
 				<strong>When using 'Alias' rules, change (pfB_) to ( pfb_ ) in the beginning of rule description and use the 'Exact' spelling of
-				the Alias (no trailing Whitespace)&nbsp;</strong> Custom 'Alias' rules with 'pfB_  xxx' description will be removed by package if
+				the Alias (no trailing Whitespace)</strong> Custom 'Alias' rules with 'pfB_  xxx' description will be removed by package if
 				using Auto Rule Creation.<br /><br /><strong>Tip</strong>: You can create the Auto Rules and remove "<u>auto rule</u>" from the Rule
 				Descriptions, then disable Auto Rules. This method will 'KEEP' these rules from being 'Deleted' which will allow editing for a Custom
 				Alias Configuration<br />]]>
@@ -928,9 +872,10 @@ $xml .= <<<EOF
 		<field>
 			<fielddescr>Enable Logging</fielddescr>
 			<fieldname>aliaslog</fieldname>
-			<description><![CDATA[Default:<strong>Enable</strong><br />
+			<description><![CDATA[Default: <strong>Enable</strong><br />
 				Select - Logging to Status: System Logs: FIREWALL ( Log )<br />
-				This can be overriden by the 'Global Logging' Option in the General Tab.]]></description>
+				This can be overriden by the 'Global Logging' Option in the General Tab.]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option><name>Enable</name><value>enabled</value></option>
@@ -938,9 +883,87 @@ $xml .= <<<EOF
 			</options>
 		</field>
 		<field>
-			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Changes are Applied via CRON or
-				'Force Update'</ul>]]>
-			</name>
+			<name>Advanced Inbound Firewall Rule Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<type>info</type>
+			<description><![CDATA[<font color='red'>Note: </font>In general Auto-Rules are created as follows:<br />
+				<ul>Inbound &nbsp;&nbsp;- 'any' port, 'any' protocol and 'any' destination<br />
+				Outbound - 'any' port, 'any' protocol and 'any' destination address in the lists</ul>
+				Configuring the Adv. Inbound Rule settings, will allow for more customization of the Inbound Auto-Rules.<br />
+				<strong>Select the pfSense 'Port' and/or 'Destination' Alias below:</strong>]]>
+			</description>
+		</field>
+		<field>
+			<fieldname>autoports</fieldname>
+			<fielddescr>Enable Custom Port</fielddescr>
+			<type>checkbox</type>
+			<enablefields>aliasports</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fielddescr>Define Alias</fielddescr>
+			<fieldname>aliasports</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=port">Click Here to add/edit Aliases</a>
+				Do not manually enter port numbers. <br />Do not use 'pfB_' in the Port Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>port</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fieldname>autodest</fieldname>
+			<fielddescr>Enable Custom Destination</fielddescr>
+			<type>checkbox</type>
+			<enablefields>aliasdest,autonot</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fieldname>aliasdest</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=ip">Click Here to add/edit Aliases</a>
+				Do not manually enter Addresses(es). <br />Do not use 'pfB_' in the 'IP Network Type' Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>network</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields/>
+		</field>
+		<field>
+			<fielddescr>Invert</fielddescr>
+			<fieldname>autonot</fieldname>
+			<description><![CDATA[<div style="padding-left: 22px;"><strong>Invert</strong> - Option to invert the sense of the match.<br />
+				ie - Not (!) Destination Address(es)</div>]]>
+			</description>
+			<type>checkbox</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fielddescr>Custom Protocol</fielddescr>
+			<fieldname>autoproto</fieldname>
+			<description><![CDATA[<strong>Default: any</strong><br />Select the Protocol used for Inbound Firewall Rule(s).]]></description>
+			<type>select</type>
+			<options>
+				<option><name>any</name><value></value></option>
+				<option><name>TCP</name><value>tcp</value></option>
+				<option><name>UDP</name><value>udp</value></option>
+				<option><name>TCP/UDP</name><value>tcp/udp</value></option>
+			</options>
+			<size>4</size>
+			<default_value></default_value>
+		</field>
+		<field>
+			<name><![CDATA[<center>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
+				'Force Update'</center>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>
@@ -1042,6 +1065,7 @@ $xmlrep = <<<EOF
 	<version>1.0</version>
 	<title>pfBlockerNG: IPv4 Reputation</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save Reputation Settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG</name>
 		<tooltiptext>Configure pfblockerNG</tooltiptext>
@@ -1122,14 +1146,13 @@ $xmlrep = <<<EOF
 		</field>
 		<field>
 			<fielddescr>LINKS</fielddescr>
-			<fieldname></fieldname>
-			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
+			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp;
+				<a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
 			</description>
 			<type>info</type>
 		</field>
 		<field>
 			<fielddescr><![CDATA[<strong>Why Reputation Matters:</strong>]]></fielddescr>
-			<fieldname></fieldname>
 			<type>info</type>
 			<description><![CDATA[By Enabling '<strong>Reputation</strong>', each Blocklist will be analyzed for Repeat Offenders in each IP Range.
 				<ul>Example: &nbsp;&nbsp; x.x.x.1, x.x.x.2, x.x.x.3, x.x.x.4, x.x.x.5<br />
@@ -1150,7 +1173,6 @@ $xmlrep = <<<EOF
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fieldname></fieldname>
 			<fielddescr><![CDATA[<br /><strong>Individual List Reputation</strong><br /><br />]]></fielddescr>
 			<type>info</type>
 			<description></description>
@@ -1177,13 +1199,11 @@ $xmlrep = <<<EOF
 			</options>
 		</field>
 		<field>
-			<fieldname></fieldname>
 			<fielddescr><![CDATA[<br /><strong>Collective List Reputation</strong><br /><br />]]></fielddescr>
 			<type>info</type>
 			<description></description>
 		</field>
 		<field>
-			<fieldname></fieldname>
 			<type>info</type>
 			<description><![CDATA[Once all Blocklists are Downloaded, these two 'additional' processes <strong>[ pMax ] and [ dMax ]</strong><br />
 				Can be used to Further analyze for Repeat Offenders.<br />
@@ -1244,7 +1264,6 @@ $xmlrep = <<<EOF
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fieldname>INFO</fieldname>
 			<type>info</type>
 			<description><![CDATA[When performing Queries for Repeat Offenders, you can choose to <strong>ignore</strong> Repeat Offenders in select
 				Countries. The Original Blocklisted IPs remain intact. All other Repeat Offending Country Ranges will be processed.<br /><br />
@@ -1286,7 +1305,7 @@ $xmlrep = <<<EOF
 		</field>
 		<field>
 			<fielddescr><![CDATA[<br /><strong>IPv4</strong><br />Country Exclusion<br />
-				<br />Geolite Data by:<br />MaxMind Inc.&nbsp;&nbsp;(ISO 3166)]]></fielddescr>
+				<br />Geolite Data by: <br />MaxMind Inc.&nbsp;&nbsp;(ISO 3166)]]></fielddescr>
 			<fieldname>ccexclude</fieldname>
 			<description>
 				<![CDATA[Select Countries you want to <strong>Exclude</strong> from the Reputation Process.<br />
@@ -1305,7 +1324,6 @@ $xmlrep = <<<EOF
 		</field>
 		<field>
 			<fielddescr>Subscription Pro. Blocklist</fielddescr>
-			<fieldname>ETINFO</fieldname>
 			<type>info</type>
 			<description><![CDATA[<strong>Emerging Threats IQRisk</strong> is a Subscription Professional Reputation List.<br /><br />
 					ET IQRisk Blocklist must be entered in the Lists Tab using the following example:
@@ -1429,7 +1447,7 @@ $xmlrep = <<<EOF
 		<field>
 			<fielddescr>Update ET Categories</fielddescr>
 			<fieldname>et_update</fieldname>
-			<description><![CDATA[Default:<strong>Disable</strong><br />
+			<description><![CDATA[Default: <strong>Disable</strong><br />
 				Select - Enable ET Update if Category Changes are Made.<br />
 				You can perform a 'Force Update' to enable these changes.<br />
 				Cron will also resync this list at the next Scheduled Update.]]>
@@ -1441,8 +1459,8 @@ $xmlrep = <<<EOF
 			</options>
 		</field>
 		<field>
-			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
-				'Force Update'</ul>]]></name>
+			<name><![CDATA[<center>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
+				'Force Update'</center>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>

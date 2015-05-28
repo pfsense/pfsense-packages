@@ -52,13 +52,14 @@
 	<version>1.0</version>
 	<title>pfBlockerNG: Top 20 Spammer Countries</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save Top20 settings</addedit_string>
 	<menu>
 		<name>pfBlockerNG</name>
 		<tooltiptext>Configure pfblockerNG</tooltiptext>
 		<section>Firewall</section>
 		<url>pkg_edit.php?xml=pfblockerng.xml&amp;id=0</url>
 	</menu>
-		<tabs>
+	<tabs>
 		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=pfblockerng.xml&amp;id=0</url>
@@ -124,7 +125,7 @@
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml&amp;id=0</url>
 		</tab>
-		</tabs>
+	</tabs>
 	<fields>
 		<field>
 			<name><![CDATA[TOP 20 - Spammer Countries&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Geolite Data by Maxmind Inc. - ISO 3166)]]></name>
@@ -132,20 +133,19 @@
 		</field>
 		<field>
 			<fielddescr>LINKS</fielddescr>
-			<fieldname>none</fieldname>
-			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp; <a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
+			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a> &nbsp;&nbsp;&nbsp;
+				<a href="/firewall_rules.php">Firewall Rules</a> &nbsp;&nbsp;&nbsp; <a href="diag_logs_filter.php">Firewall Logs</a>]]>
 			</description>
 			<type>info</type>
-			</field>
+		</field>
 		<field>
-			<fielddescr><![CDATA[<br /><strong>Top 20 IPv4</strong><br />Spammer Countries]]></fielddescr>
 			<fieldname>countries4</fieldname>
-			<description>
-			<![CDATA[Select Top IPv4 Spammer Countries you want to take an action on.<br />
-					<strong>Use CTRL + CLICK to unselect countries</strong>]]>
-			</description>
+			<fielddescr><![CDATA[<strong><center>Top 20<br /> Spammer Countries</center></strong><br />
+				<center>Use CTRL + CLICK to unselect countries</center>]]>
+			</fielddescr>
+			<description><![CDATA[<center><br />IPv4 Countries</center>]]></description>
 			<type>select</type>
-		<options>
+			<options>
 				<option><name>China-CN</name><value>CN</value></option>
 				<option><name>Russia-RU</name><value>RU</value></option>
 				<option><name>Japan-JP</name><value>JP</value></option>
@@ -169,14 +169,12 @@
 			</options>
 			<size>20</size>
 			<multiple/>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
 		</field>
 		<field>
-			<fielddescr><![CDATA[<br /><strong>Top 20 IPv6</strong><br />Spammer Countries]]></fielddescr>
 			<fieldname>countries6</fieldname>
-			<description>
-			<![CDATA[Select Top IPv6 Spammer Countries you want to take an action on.<br />
-				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
-			</description>
+			<description><![CDATA[<br /><center>IPv6 Countries</center>]]></description>
 			<type>select</type>
 			<options>
 				<option><name>China-CN</name><value>CN</value></option>
@@ -199,13 +197,16 @@
 				<option><name>Taiwan-TW</name><value>TW</value></option>
 				<option><name>Mexico-MX</name><value>MX</value></option>
 				<option><name>Chilie-CL</name><value>CL</value></option>
-				</options>
-				<size>20</size>
-				<multiple/>
+			</options>
+			<size>20</size>
+			<multiple/>
+			<usecolspan2/>
+			<dontdisplayname/>
+			<combinefields>end</combinefields>
 		</field>
 		<field>
 			<fielddescr>List Action</fielddescr>
-			<description><![CDATA[<br />Default : <strong>Disabled</strong><br /><br />
+			<description><![CDATA[<br />Default: <strong>Disabled</strong><br /><br />
 				Select the <strong>Action</strong> for Firewall Rules on lists you have selected.<br /><br />
 				<strong><u>'Disabled' Rules:</u></strong> Disables selection and does nothing to selected Alias.<br /><br />
 
@@ -231,12 +232,12 @@
 				<strong><u>'Alias' Rules:</u></strong><br />
 				<strong>'Alias'</strong> rules create an <a href="/firewall_aliases.php">alias</a> for the list (and do nothing else).
 				This enables a pfBlockerNG list to be used by name, in any firewall rule or pfSense function, as desired.
-				<ul><li><strong>Options &nbsp;&nbsp; - Alias Deny,&nbsp; Alias Permit,&nbsp; Alias Match,&nbsp; Alias Native</strong></li><br />
+				<ul><li><strong>Options - Alias Deny,&nbsp; Alias Permit,&nbsp; Alias Match,&nbsp; Alias Native</strong></li><br />
 				<li>'Alias Deny' can use De-Duplication and Reputation Processes if configured.</li><br />
 				<li>'Alias Permit' and 'Alias Match' will be saved in the Same folder as the other Permit/Match Auto-Rules</li><br />
 				<li>'Alias Native' lists are kept in their Native format without any modifications.</li></ul>
 				<strong>When using 'Alias' rules, change (pfB_) to ( pfb_ ) in the beginning of rule description and Use the 'Exact' spelling of
-				the Alias (no trailing Whitespace)&nbsp;</strong> Custom 'Alias' rules with 'pfB_  xxx' description will be removed by package if
+				the Alias (no trailing Whitespace)</strong> Custom 'Alias' rules with 'pfB_  xxx' description will be removed by package if
 				using Auto Rule Creation.<br /><br /><strong>Tip</strong>: You can create the Auto Rules and remove "<u>auto rule</u>" from the Rule
 				Descriptions, then disable Auto Rules. This method will 'KEEP' these rules from being 'Deleted' which will allow editing for a Custom
 				Alias Configuration<br />]]>
@@ -262,7 +263,7 @@
 		<field>
 			<fielddescr>Enable Logging</fielddescr>
 			<fieldname>aliaslog</fieldname>
-			<description><![CDATA[Default:<strong>Enable</strong><br />
+			<description><![CDATA[Default: <strong>Enable</strong><br />
 				Select - Logging to Status: System Logs: FIREWALL ( Log )]]>
 			</description>
 			<type>select</type>
@@ -272,8 +273,87 @@
 			</options>
 		</field>
 		<field>
-			<name><![CDATA[<ul>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
-			'Force Update'</ul>]]> </name>
+			<name>Advanced Inbound Firewall Rule Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<type>info</type>
+			<description><![CDATA[<font color='red'>Note: </font>In general Auto-Rules are created as follows:<br />
+				<ul>Inbound &nbsp;&nbsp;- 'any' port, 'any' protocol and 'any' destination<br />
+				Outbound - 'any' port, 'any' protocol and 'any' destination address in the lists</ul>
+				Configuring the Adv. Inbound Rule settings, will allow for more customization of the Inbound Auto-Rules.<br />
+				<strong>Select the pfSense 'Port' and/or 'Destination' Alias below:</strong>]]>
+			</description>
+		</field>
+		<field>
+			<fieldname>autoports</fieldname>
+			<fielddescr>Enable Custom Port</fielddescr>
+			<type>checkbox</type>
+			<enablefields>aliasports</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fielddescr>Define Alias</fielddescr>
+			<fieldname>aliasports</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=port">Click Here to add/edit Aliases</a>
+				Do not manually enter port numbers. <br />Do not use 'pfB_' in the Port Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>port</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fieldname>autodest</fieldname>
+			<fielddescr>Enable Custom Destination</fielddescr>
+			<type>checkbox</type>
+			<enablefields>aliasdest,autonot</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fieldname>aliasdest</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=ip">Click Here to add/edit Aliases</a>
+				Do not manually enter Addresses(es). <br />Do not use 'pfB_' in the 'IP Network Type' Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>network</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields/>
+		</field>
+		<field>
+			<fielddescr>Invert</fielddescr>
+			<fieldname>autonot</fieldname>
+			<description><![CDATA[<div style="padding-left: 22px;"><strong>Invert</strong> - Option to invert the sense of the match.<br />
+				ie - Not (!) Destination Address(es)</div>]]>
+			</description>
+			<type>checkbox</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fielddescr>Custom Protocol</fielddescr>
+			<fieldname>autoproto</fieldname>
+			<description><![CDATA[<strong>Default: any</strong><br />Select the Protocol used for Inbound Firewall Rule(s).]]></description>
+			<type>select</type>
+			<options>
+				<option><name>any</name><value></value></option>
+				<option><name>TCP</name><value>tcp</value></option>
+				<option><name>UDP</name><value>udp</value></option>
+				<option><name>TCP/UDP</name><value>tcp/udp</value></option>
+			</options>
+			<size>4</size>
+			<default_value></default_value>
+		</field>
+		<field>
+			<name><![CDATA[<center>Click to SAVE Settings and/or Rule Edits. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Changes are Applied via CRON or
+				'Force Update'</center>]]></name>
 			<type>listtopic</type>
 		</field>
 	</fields>
