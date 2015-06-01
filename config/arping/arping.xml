@@ -47,7 +47,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>arping</name>
 	<version>2.6.0.2</version>
-	<title>Services: ARPing</title>
+	<title>Diagnostics: ARPing</title>
 	<savetext>ARPing</savetext>
 	<preoutput>yes</preoutput>
 	<donotsave>true</donotsave>
@@ -55,7 +55,7 @@
 	<menu>
 		<name>Arping</name>
 		<tooltiptext>Host to arp ping</tooltiptext>
-		<section>Services</section>
+		<section>Diagnostics</section>
 		<url><![CDATA[/pkg_edit.php?xml=arping.xml&id=0]]></url>
 	</menu>
 	<tabs>
