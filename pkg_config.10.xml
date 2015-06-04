@@ -2,7 +2,7 @@
 <!-- pfSense packages -->
 <pfsensepkgs>
 <copy_packages_to_host_ssh_port>22</copy_packages_to_host_ssh_port>
-<copy_packages_to_host_ssh>packagecopy@files.pfsense.org</copy_packages_to_host_ssh>
+<copy_packages_to_host_ssh>packagecopy@files.atx.pfsense.org</copy_packages_to_host_ssh>
 <copy_packages_to_folder_ssh>/usr/local/www/files/packages/10/All/</copy_packages_to_folder_ssh>
 <depends_on_package_base_url>https://files.pfsense.org/packages/10/All/</depends_on_package_base_url>
 <packages>
