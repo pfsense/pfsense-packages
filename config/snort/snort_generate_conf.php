@@ -876,9 +876,9 @@ if (is_array($snortcfg['wlist_files']['item'])) {
 	}
 }
 if (!empty($blist_files))
-	$ip_lists = $blist_files;
+	$ip_lists = ", \\ \n\t" . $blist_files;
 if (!empty($wlist_files))
-	$ip_lists .= ", \\ \n" . $wlist_files;
+	$ip_lists .= ", \\ \n\t" . $wlist_files;
 if ($snortcfg['iprep_scan_local'] == 'on')
 	$ip_lists .= ", \\ \n\tscan_local";	
 
@@ -888,8 +888,7 @@ preprocessor reputation: \
 	memcap {$snortcfg['iprep_memcap']}, \
 	priority {$snortcfg['iprep_priority']}, \
 	nested_ip {$snortcfg['iprep_nested_ip']}, \
-	white {$snortcfg['iprep_white']}, \
-	{$ip_lists}
+	white {$snortcfg['iprep_white']}{$ip_lists}
 
 EOD;
 

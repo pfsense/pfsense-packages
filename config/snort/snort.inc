@@ -40,7 +40,7 @@ require_once("filter.inc");
 require("/usr/local/pkg/snort/snort_defs.inc");
 
 // Snort GUI needs some extra PHP memory space to manipulate large rules arrays
-ini_set("memory_limit", "256M");
+ini_set("memory_limit", "384M");
 
 // Explicitly declare this as global so it works through function call includes 
 global $g, $config, $rebuild_rules, $pfSense_snort_version;

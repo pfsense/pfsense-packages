@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009-2010 Robert Zelaya
  * Copyright (C) 2011-2012 Ermal Luci
- * Copyright (C) 2013,2014 Bill Meeks
+ * Copyright (C) 2013-2015 Bill Meeks
  * part of pfSense
  * All rights reserved.
  *
@@ -55,7 +55,7 @@ if (!defined("SNORT_BIN_VERSION")) {
 	if (!empty($snortver[0]))
 		define("SNORT_BIN_VERSION", $snortver[0]);
 	else
-		define("SNORT_BIN_VERSION", "2.9.7.2");
+		define("SNORT_BIN_VERSION", "2.9.7.3");
 }
 if (!defined("SNORT_SID_MODS_PATH"))
 	define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
