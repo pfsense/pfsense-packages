@@ -191,6 +191,46 @@ function openbgpd_install_conf() {
 	@chmod("{$bgpd_config_base}/bgpd.conf", 0600);
 	unset($conffile);
 
+	$carp_ip_status_check = "";
+	if (is_ipaddr($openbgpd_conf['carpstatusip'])) {
+
+		$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+		switch ($pfs_version) {
+			case "2.0":
+			case "2.1":
+				/* Check for 2.1 and before */
+				$carpcheckinterface = trim(find_carp_interface($openbgpd_conf['carpstatusip']));
+				$carp_ip_status_check = <<<EOF
+
+CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep carp: | /usr/bin/awk '{print \$2;}'`
+if [ \${CARP_STATUS} != "MASTER" ]; then
+	exit;
+fi
+
+EOF;
+				break;
+			case "2.2":
+			default:
+				/* Check for 2.2 and later */
+				if (is_array($config['virtualip']['vip'])) {
+					foreach ($config['virtualip']['vip'] as $vip) {
+						if (($vip['mode'] == "carp") && ($vip['subnet'] == $openbgpd_conf['carpstatusip'])) {
+							$carpcheckinterface = escapeshellarg(get_real_interface($vip['interface']));
+							$vhid = escapeshellarg($vip['vhid']);
+							$carp_ip_status_check = <<<EOF
+
+CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep 'carp:' | /usr/bin/grep 'vhid {$vhid}' | /usr/bin/awk '{print \$2;}'`
+if [ \${CARP_STATUS} != "MASTER" ]; then
+	exit;
+fi
+EOF;
+						}
+					}
+				}
+				break;
+		}
+	}
+
 	// Create rc.d file
 	$rc_file_stop = <<<EOF
 killall -TERM bgpd
@@ -210,6 +250,7 @@ fi
 
 NUMBGPD=`ps auxw | grep -c '[b]gpd.*parent'`
 if [ \${NUMBGPD} -lt 1 ] ; then
+	{$carp_ip_status_check}
 	{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf
 else
 	{$pkg_bin}/bgpctl reload
@@ -225,13 +266,36 @@ EOF;
 
 	$_gb = exec("/sbin/sysctl net.inet.ip.ipsec_in_use=1");
 	// bgpd process running?  if so reload, else start.
+
+	// Kick off newly created rc.d script
+	if (is_ipaddr($openbgpd_conf['carpstatusip'])) {
+		$status = openbgpd_get_carp_status_by_ip($openbgpd_conf['carpstatusip']);
+		switch (strtoupper($status)) {
+			// Stop the service if the VIP is in BACKUP or INIT state.
+			case "BACKUP":
+			case "INIT":
+				exec("/usr/local/etc/rc.d/bgpd.sh stop");
+				break;
+			// Start the service if the VIP is MASTER state.
+			case "MASTER":
+			// Assume it's up if the status can't be determined.
+			default:
+				openbgpd_restart();
+				break;
+		}
+	} else {
+		openbgpd_restart();
+	}
+
+	conf_mount_ro();
+}
+
+function openbgpd_restart() {
 	if(is_openbgpd_running() == true) {
 		exec("{$pkg_bin}/bgpctl reload");
 	} else {
 		exec("{$pkg_bin}/bgpd -f {$bgpd_config_base}/bgpd.conf");
 	}
-
-	conf_mount_ro();
 }
 
 // get the raw openbgpd confi file for manual inspection/editing
@@ -360,6 +424,54 @@ function is_openbgpd_running() {
 		return true;
 	else
 		return false;
+}
+
+function openbgpd_get_carp_status_by_ip($ipaddr) {
+	$iface = trim(find_carp_interface($ipaddr));
+	if ($iface) {
+		$status = get_carp_interface_status($iface);
+		// If there is no status for that interface, return null.
+		if (!$status)
+			$status = null;
+	} else {
+		// If there is no VIP by that IP, return null.
+		$status = null;
+	}
+	return $status;
+}
+
+function openbgpd_plugin_carp($pluginparams) {
+	global $config;
+	require_once("service-utils.inc");
+	// Called when a CARP interface changes state
+	// $pluginparams['event'] either 'rc.carpmaster' or 'rc.carpbackup'
+	// $pluginparams['interface'] contains the affected interface
+
+	/* If there is no bgp config, then stop */
+	if(is_array($config['installedpackages']['openbgpd']['config'])) {
+		$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
+	} else {
+		return null;
+	}
+	/* If there is no properly configured CARP status check IP, then stop */
+	if (!is_ipaddr($openbgpd_conf['carpstatusip'])) {
+		return null;
+	}
+	list($vhid, $iface) = explode("@", trim($pluginparams['interface']));
+	$friendly = convert_real_interface_to_friendly_interface_name($iface);
+	$carp_iface = "{$friendly}_vip${vhid}";
+
+	/* If this CARP transition is not from the IP address to check, then stop. */
+	if (get_interface_ip($carp_iface) != $openbgpd_conf['carpstatusip']) {
+		return null;
+	}
+
+	/* Start or stop the service as needed based on the CARP transition. */
+	if ($pluginparams['event'] == "rc.carpmaster") {
+		start_service("bgpd");
+	} elseif ($pluginparams['event'] == "rc.carpbackup") {
+		stop_service("bgpd");
+	}
 }
 
 ?>
