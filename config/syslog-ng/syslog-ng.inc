@@ -37,7 +37,11 @@ require_once('service-utils.inc');
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
 
-define("SYSLOGNG_BASEDIR", "/usr/pbi/syslog-ng-" . php_uname("m") . "/");
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version == "2.1" || $pf_version == "2.2")
+	define("SYSLOGNG_BASEDIR", "/usr/pbi/syslog-ng-" . php_uname("m") . "/");
+else
+	define("SYSLOGNG_BASEDIR", "/usr/local/");
 
 function syslogng_get_real_interface_address($interface) {
 	$interface = convert_friendly_interface_to_real_interface_name($interface);

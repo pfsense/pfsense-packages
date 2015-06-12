@@ -1462,10 +1462,12 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>3.6.2_3 pkg.v.1.0.6</version>
+		<version>1.0.6</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>syslog-ng-3.6.2_3-##ARCH##.pbi</depends_on_package_pbi>
+		<port_category>sysutils</port_category>
+		<run_depends>sbin/syslog-ng:sysutils/syslog-ng</run_depends>
 		<build_pbi>
 			<ports_before>sysutils/logrotate</ports_before>
 			<port>sysutils/syslog-ng</port>
@@ -1638,6 +1640,8 @@
 		<status>BETA</status>
 		<depends_on_package_pbi>ladvd-1.0.4_1-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/ladvd/ladvd.xml</config_file>
+		<port_category>net</port_category>
+		<run_depends>sbin/ladvd:net/ladvd</run_depends>
 		<build_pbi>
 			<port>net/ladvd</port>
 		</build_pbi>
