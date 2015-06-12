@@ -1658,5 +1658,17 @@
 		<required_version>2.2</required_version>
 		<configurationfile>ftpproxy.xml</configurationfile>
 	</package>
+	<package>
+		<name>Apps by Packetappscom</name>
+		<descr>App Manger from packetapps.com</descr>
+		<category>System</category>
+		<website>https://www.packetapps.com</website>
+		<version>1.0</version>
+		<status>Release</status>
+		<required_version>2.2</required_version>
+		<config_file>http://pkgelo/packages/config/AppsByPacketApps/AppsByPacketApps.xml</config_file>
+		<maintainer>support@packetapps.com</maintainer>
+		<configurationfile>AppsByPacketApps.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>

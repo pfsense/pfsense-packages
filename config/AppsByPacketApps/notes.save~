@@ -1,0 +1,63 @@
+pour /opt :
+
+/cf
+
+pour json :
+
+sur server quelquesoit l'appel ça redirige sur /app/register/
+
+si device, on gère l'enregistrement
+
+pour erreur, server renvoi ERR:code_erreur en tant que val d'un index tab
+
+
+
+on enregistre device_id et secret code
+
+ds /cf/app.../.device/id et sercret_code et aussi secret code
+
+ds /cf/ap.../.packages/keys
+
+regarder comment changer le fichier des clé de redi
+
+
+
+association 
+
+while unasociated do fetch /app/register/device/device_id/associated
+
+sur server associated == ok ou ko
+
+ fichier .associated ds /cf/ap../.device/.associated
+ 
+ appel server pour secret code, si ok associé.
+ 					créer fichier .associated
+ sinon pas ok
+ (voir avec réponse server )
+ 
+ajouter A a nom package Apps
+
+
+lors d'un fail à l'install d'un package, on remonte l'info au server.
+
+bien utiliser les pages php ( pfsense ) qui font les appels sur store et cloud 
+qu'elles font bien le pré control :
+	- bon argument
+	- encodage ascii
+	- taille url < 2000
+	- taille des arg pour register
+	- taille post
+	- vérifier type appel ( get, post )
+	
+	
+licence 
+	2 essai install - > remonter info au server si fail ( envoyer "fail" en data)
+	( ds package, on a un fichier package id qui contient l'id) -> permet de faire les appels fail
+	
+	qd installer, on donne le liens vers index de conf du package ( voir wizard )
+	
+	listing pkg installed
+	
+	
+
+verifier long licence par calcul
