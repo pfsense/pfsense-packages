@@ -3,40 +3,40 @@
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
+		<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
-    e2guardian.xml
- 	Copyright (C) 2015 Marcello Coutinho
+	e2guardian.xml
+	Copyright (C) 2015 Marcello Coutinho
 	part of pfSense (http://www.pfSense.com)
-   	All rights reserved.
-                                                                              */
+	All rights reserved.
+*/
 /* ========================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 /* ========================================================================== */
-	]]>
+		]]>
 	</copyright>
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
@@ -258,7 +258,7 @@
 			<fielddescr>Listen Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
 			<description><![CDATA[Default: <strong>LAN/loopback</strong><br>Select interface(s) that you want to e2guardian to listen on.<br>
-						<strong>Note: Do NOT select more then one interface if you plan to use more then one authentication plugin.</strong>]]></description>
+				<strong>Note: Do NOT select more then one interface if you plan to use more then one authentication plugin.</strong>]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
@@ -274,13 +274,13 @@
 			<fielddescr>Daemon Options</fielddescr>
 			<fieldname>daemon_options</fieldname>
 			<description><![CDATA[Daemon Options. Default values are in ( )]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>nodaemon (off)</name><value>nodaemon</value></option>
- 				<option><name>softrestart (on)</name><value>softrestart</value></option>
- 				</options>
- 				<multiple/>
- 				<size>3</size>
+			<type>select</type>
+			<options>
+				<option><name>nodaemon (off)</name><value>nodaemon</value></option>
+				<option><name>softrestart (on)</name><value>softrestart</value></option>
+			</options>
+			<multiple/>
+			<size>3</size>
 		</field>
 		<field>
 			<fielddescr>Min/Max Children</fielddescr>
@@ -288,9 +288,9 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Default: <strong>8/120</strong><br>
-			 				Sets the minimun and maximum number of processes to spawn to handle the incoming connections.<br>
-			 				Max value usually 250 depending on OS.<br>
-							On large sites you might want to try 32/180.]]></description>
+				Sets the minimun and maximum number of processes to spawn to handle the incoming connections.<br>
+				Max value usually 250 depending on OS.<br>
+				On large sites you might want to try 32/180.]]></description>
 		</field>
 			<field>
 			<fielddescr>Min/Max Spare Children</fielddescr>
@@ -298,8 +298,8 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Default: <strong>4/32</strong><br>
-			 				 Sets the minimum and maximum number of processes to be kept ready to handle connections.<br>
-							 On large sites you might want to try 8/64.]]></description>
+				Sets the minimum and maximum number of processes to be kept ready to handle connections.<br>
+				On large sites you might want to try 8/64.]]></description>
 		</field>
 		<field>
 			<fielddescr>Prefork Children</fielddescr>
@@ -307,7 +307,7 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[sets the minimum number of processes to spawn when it runs out<br>
-						On large sites you might want to try 10]]></description>
+				On large sites you might want to try 10]]></description>
 		</field>
 		<field>
 			<fielddescr>Max Age Children</fielddescr>
@@ -315,9 +315,9 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Default: <strong>500</strong><br>
-			 				Sets the maximum age of a child process before it croaks it.<br>
-							This is the number of connections they handle before exiting.<br>
-							On large sites you might want to try 10000.]]></description>
+				Sets the maximum age of a child process before it croaks it.<br>
+				This is the number of connections they handle before exiting.<br>
+				On large sites you might want to try 10000.]]></description>
 		</field>
 		<field>
 			<fielddescr>Max Ips</fielddescr>
@@ -325,9 +325,9 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Default: <strong>0</strong><br>
-			 				Sets the maximum number of client IP addresses allowed to connect at once.<br>
-							Use this to set a hard limit on the number of users allowed to concurrently<br>
-							browse the web. Set to 0 for no limit, and to disable the IP cache process.]]></description>
+				Sets the maximum number of client IP addresses allowed to connect at once.<br>
+				Use this to set a hard limit on the number of users allowed to concurrently<br>
+				browse the web. Set to 0 for no limit, and to disable the IP cache process.]]></description>
 		</field>
 		<field>
 			<name>Parent proxy Settings</name>
@@ -339,7 +339,7 @@
 			<type>input</type>
 			<size>20</size>
 			<description><![CDATA[Default: <strong>127.0.0.1</strong><br>
-			 				Sets ip address for proxy server(usually squid).]]></description>
+				Sets ip address for proxy server(usually squid).]]></description>
 		</field>
 		<field>
 			<fielddescr>Proxy Port</fielddescr>
@@ -347,24 +347,24 @@
 			<type>input</type>
 			<size>10</size>
 			<description><![CDATA[Default: <strong>3128</strong><br>
-			 				Sets port number for proxy server.]]></description>
+				Sets port number for proxy server.]]></description>
 		</field>
 		<field>
 			<fielddescr>Proxy Time out</fielddescr>
 			<fieldname>proxytimeout</fieldname>
 			<description><![CDATA[This option handles max time to wait for proxy server.]]></description>
-	    	<type>select</type>
- 				<options>
- 				<option><name>30 seconds (default)</name><value>30</value></option>
- 				<option><name>20 seconds</name><value>20</value></option>
- 				<option><name>40 seconds</name><value>40</value></option>
- 				<option><name>50 seconds</name><value>50</value></option>
- 				<option><name>60 seconds</name><value>60</value></option>
- 				<option><name>70 seconds</name><value>70</value></option>
- 				<option><name>80 seconds</name><value>80</value></option>
- 				<option><name>90 seconds</name><value>90</value></option>
- 				<default_value>30</default_value>
- 				</options>
+			<type>select</type>
+			<options>
+				<option><name>30 seconds (default)</name><value>30</value></option>
+				<option><name>20 seconds</name><value>20</value></option>
+				<option><name>40 seconds</name><value>40</value></option>
+				<option><name>50 seconds</name><value>50</value></option>
+				<option><name>60 seconds</name><value>60</value></option>
+				<option><name>70 seconds</name><value>70</value></option>
+				<option><name>80 seconds</name><value>80</value></option>
+				<option><name>90 seconds</name><value>90</value></option>
+				<default_value>30</default_value>
+			</options>
 		</field>
 	</fields>
 	<custom_php_command_before_form>
@@ -380,7 +380,7 @@
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
 		e2guardian_validate_input($_POST, $input_errors);
-	</custom_php_validation_command>	
+	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_e2guardian();
 	</custom_php_resync_config_command>
