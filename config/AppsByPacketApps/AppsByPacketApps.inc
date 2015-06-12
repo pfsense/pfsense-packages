@@ -180,7 +180,7 @@ function app_install(){
 	  * Enregistrement du device
 	  */
 	  $datas = array();
-	  $dns = "http://dev.elonet.fr/packetapps/php";
+	  $dns = "https://www.packetapps.com/php";
 	  
 	  //génrération du device id
 	  $url = "/app/register/device/";

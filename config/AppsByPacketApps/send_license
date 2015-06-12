@@ -15,7 +15,7 @@ function formatName($url,$key){
 
 				
 $key = $_GET['key'];
-$dns = "http://dev.elonet.fr/packetapps/php";
+$dns = "https://www.packetapps.com/php";
 $id = trim(file_get_contents("/usr/local/appsbypacketapps/.device/id"));
 $url = "/app/register/device/".$id."/getpackage";
 $ch = curl_init();

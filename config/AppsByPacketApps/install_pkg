@@ -608,7 +608,7 @@ function install_pkg($archive){
 }
 
 function send_result($install_result,$licence_key,$first_try=false){
-	$dns = "http://dev.elonet.fr/packetapps/php";
+	$dns = "https://www.packetapps.com/php";
 	$id = trim(file_get_contents("/usr/local/appsbypacketapps/.device/id"));
 	if( $first_try ){
 		$url = "/app/register/device/".$id."/".$licence_key."/first_install_result";

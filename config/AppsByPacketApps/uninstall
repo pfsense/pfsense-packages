@@ -12,7 +12,7 @@ $pkg_id = trim(file_get_contents("/usr/local/appsbypacketapps/".$name."/.id"));
 $res = deinstall_pkg($name);
 if( $res ){
 	error_log($pkg_id);
-	$dns = "http://dev.elonet.fr/packetapps/php";
+	$dns = "https://www.packetapps.com/php";
 	$id = trim(file_get_contents("/usr/local/appsbypacketapps/.device/id"));
 	$url = "/app/register/device/".$id."/uninstall";
 	$ch = curl_init();

@@ -104,14 +104,14 @@ jQuery(document).ready(function() {
 							jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'>"+res['text']+"</span></div>").fadeIn(function(){
 								if( res['result'] == 1 ){
 										var infos = res['infos'];
-										jQuery('#prodList').append("<div class='col-xs-6'><div id="+infos['name']+" style='border: 1px solid #EDEDED;text-align:center;border-radius:5px;padding:5px 20px 5px 20px;margin:5px;background:#FAFAFA;box-shadow: 0px 0px 8px rgba(0,0,0,0.3);'><div class='row'><h4 style='text-align:left;'><img class='logo' src='logo/"+infos['name']+"'>"+niceName(infos['name'])+"  <small>( v"+infos['version']+" )</small></h4></div><div class='row'><div class='col-xs-12'><p style='text-align:justify'>"+infos['synopsis']+"</p></div></div><div class='row'><a href="+infos['index']+"><button class='btn-success' style='float:left;border-radius:5px'>Administrate</button></a><button class='deinstall btn-danger' style='float:right;border-radius:5px'>Uninstall</button></div></div></div>");
+										jQuery('#prodList').append("<div class='col-xs-6'><div id="+infos['name']+" style='border: 1px solid #EDEDED;text-align:center;border-radius:5px;padding:5px 20px 5px 20px;margin:5px;background:#FAFAFA;box-shadow: 0px 0px 8px rgba(0,0,0,0.3);'><div class='row'><h4 style='text-align:left;'><img class='logo' src='logo/"+infos['name']+"'>"+niceName(infos['name'])+"  <small>( v"+infos['version']+" )</small></h4></div><div class='row'><div class='col-xs-12'><p style='height:60px;text-align:justify'>"+infos['synopsis']+"</p></div></div><div class='row'><a href="+infos['index']+"><button class='btn-success' style='float:left;border-radius:5px'>Administrate</button></a><button class='deinstall btn-danger' style='float:right;border-radius:5px'>Uninstall</button></div></div></div>");
 										jQuery('#license').fadeOut(function(){
-											jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='http://dev.elonet.fr/packetapps/browse-app.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn btn-info'>Install now</button>	</div>").fadeIn();				
+											jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='https://www.packetapps.com/browse-apps.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn' style='background-color:#0047CC;color:white;'>Install now</button>	</div>").fadeIn();				
 										});
-										if ($('#prodList').length == 0 ) {
+										if ($('#prodList').children().length == 1 ) {
 												$('#list_title').text("You don't have any package installed");
 										}
-										else if($('#prodList').length == 1 ){
+										else if($('#prodList').children().length == 2 ){
 												$('#list_title').text("Your installed product");
 										}
 										else{
@@ -120,7 +120,7 @@ jQuery(document).ready(function() {
 								}
 								else{
 									jQuery('#license').fadeOut(2000,function(){
-										jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='http://dev.elonet.fr/packetapps/browse-app.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn btn-info'>Install now</button>	</div>").fadeIn();
+										jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='https://www.packetapps.com/browse-apps.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn' style='background-color:#0047CC;color:white;'>Install now</button>	</div>").fadeIn();
 									});
 								}
 							});
@@ -129,7 +129,7 @@ jQuery(document).ready(function() {
 					},
 					error : function(){
 						alert("A technical error occured during license key validation, try again");
-						jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='http://dev.elonet.fr/packetapps/browse-app.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn btn-info'>Install now</button>	</div>").fadeIn();
+						jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='https://www.packetapps.com/browse-apps.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn' style='background-color:#0047CC;color:white;'>Install now</button>	</div>").fadeIn();
 					}
 			});
 		});
@@ -154,22 +154,23 @@ jQuery(document).ready(function() {
 										product.fadeOut(1000,function(){
 												product.parent().remove();
 											jQuery('#license').fadeOut(function(){
-												jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='http://dev.elonet.fr/packetapps/browse-app.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn btn-info'>Install now</button>	</div>").fadeIn();				
+												jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='https://www.packetapps.com/browse-apps.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn' style='background-color:#0047CC;color:white;'>Install now</button>	</div>").fadeIn();				
 											});
 										});
-										if ($('#prodList').length == 0 ) {
+										if ($('#prodList').children().length == 1 ) {
 												$('#list_title').text("You don't have any package installed");
 										}
-										else if($('#prodList').length == 1 ){
+										else if($('#prodList').children().length == 2 ){
 												$('#list_title').text("Your installed product");
 										}
 										else{
 												$('#list_title').text("Your installed products");
 										}
+										
 									}
 									else{
 										jQuery('#license').fadeOut(function(){
-											jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='http://dev.elonet.fr/packetapps/browse-app.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn btn-info'>Install now</button>	</div>").fadeIn();
+											jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='https://www.packetapps.com/browse-apps.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn' style='background-color:#0047CC;color:white;'>Install now</button>	</div>").fadeIn();
 										});
 									}
 								});
@@ -177,17 +178,17 @@ jQuery(document).ready(function() {
 						},
 						error :function(){
 							alert("Error during "+product_name+" deinstallation. It seems there a problem with Apps.");
-							jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='http://dev.elonet.fr/packetapps/browse-app.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn btn-info'>Install now</button>	</div>").fadeIn();
+							jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'><a href='https://www.packetapps.com/browse-apps.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span></div><div  class='row' style='text-align:center;'><input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/><button id='license_button' class='btn' style='background-color:#0047CC;color:white;'>Install now</button>	</div>").fadeIn();
 						}
 				});
 			}
 		});
 		
 		jQuery(document).on('click','.help',function(){
-			window.location.replace("http://dev.elonet.fr/packetapps/help.php");
+			window.location.replace("https://www.packetapps.com/help.php");
 		});
 		
-		$(document).tooltip({
+		jQuery(document).tooltip({
 			items: ".tooltip-button",
 			content: function() {
 				var element = $(this).attr('data-tooltip');
@@ -199,18 +200,25 @@ jQuery(document).ready(function() {
 				
 			}
 		});
+		
+		jQuery(document).keypress(function(e){
+				if(e.keyCode==13){
+					$('#license_button').click();
+				}
+		});
+
 
 });
 
 
 </script>
     <div class='row' style='text-align:center;margin-bottom:50px;height:100px;'>
-		<img src='http://dev.elonet.fr/packetapps/img/logo.png' class='col-xs-3' alt='Apps by Packetapps.com'/>
+		<img src='https://www.packetapps.com/img/logo.png' class='col-xs-3' alt='Apps by Packetapps.com'/>
 		<div class="col-xs-9">
 			<span style='color:#08C;font-size:x-large;margin-right:30%;'>Apps by PacketApps.com</span>
 			<div  style="text-align:center;margin-left:30%;margin-top:5px;font-size:12px;" id="one-two-three">
 					<ul id='oneTwoThree' class='breadcrumb' style='background-color:transparent;'>
-							<li style="cursor:pointer;"><span class="tooltip-button" style="margin-left:5px" data-tooltip="Click here to find apps on www.packetapps.com">Find apps</span></li>
+							<li style="cursor:pointer;"><span class="tooltip-button" style="margin-left:5px" data-tooltip="Go on www.packetapps.com to discover more apps">Find apps</span></li>
 							<li style="cursor:pointer;"><b><span class="tooltip-button" style="margin-left:5px" data-tooltip="Once you have chosen apps and device, paste your setup key to this page and the app will be installed">Deploy apps</span></b></li>
 					</ul>
 			</div>
@@ -219,7 +227,7 @@ jQuery(document).ready(function() {
 	
 	<div class='row'  style='color:#08C;text-align: center;'>
 		<div class="col-xs-12">
-			<span >PacketApps.com is a marketplace for apps, services, and hardwares. <a href='http://dev.elonet.fr/packetapps/browse-app.php'>Go browse it !<a/></span>
+			<span >PacketApps.com is a marketplace for apps, services, and hardwares. <a href='https://www.packetapps.com/browse-apps.php'>Go browse it !</a></span>
 		</div>
 		<hr style='width:70%;margin-top : 25px;margin-bottom : 25px;'></hr>
 	</div>
@@ -253,7 +261,7 @@ jQuery(document).ready(function() {
 									</div>
 									<div class='row'>
 										<div class="col-xs-12">
-											<p style='text-align:justify'>
+											<p style='height:60px;text-align:justify'>
 												<?php echo $pkg->synopsis;?>
 											</p>
 										</div>
@@ -270,11 +278,11 @@ jQuery(document).ready(function() {
 		<!-- License add div -->
 		<div id="license" style='margin-top:30px';>
 			<div  class='row' style='text-align:center;margin-bottom:20px;'>
-				<span style='color:#08C;'><a href='http://dev.elonet.fr/packetapps/browse-app.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span>
+				<span style='color:#08C;'><a href='https://www.packetapps.com/browse-apps.php'>Browse and suscribe to a product.</a> Then copy/paste setup key below</span>
 			</div>
 			<div  class='row' style='text-align:center;'>
 				<input id="license_key" type="text" placeholder='Setup key.' style='text-align:center;margin-right:15px;'/>
-				<button id="license_button" class='btn btn-info'>Install now</button>
+				<button id="license_button" class='btn' style='background-color:#0047CC;color:white;'>Install now</button>
 			</div>
 		</div>
 	</div>
@@ -283,17 +291,17 @@ jQuery(document).ready(function() {
 		<div class='row'>
 			<div class='col-xs-4'>
 				<center>
-					<a href="http://dev.elonet.fr/packetapps/help.php"><button class="btn btn-info btn-xs">Common questions</button></a>
+					<a href="https://www.packetapps.com/help.php"><button class="btn btn-info btn-xs">Common questions</button></a>
 				</center>
 			</div>
 			<div class='col-xs-4'>
 				<center>
-					<a href='http://dev.elonet.fr/packetapps/forum.php'><button class="btn btn-info btn-xs">Forum</button></a>
+					<a href='https://www.packetapps.com/forum.php'><button class="btn btn-info btn-xs">Forum</button></a>
 				</center>
 			</div>
 			<div class='col-xs-4'>
 				<center>
-					<a href='http://dev.elonet.fr/packetapps/dashboard.php'><button class="btn btn-info btn-xs">My dashboard</button></a>
+					<a href='https://www.packetapps.com/dashboard.php'><button class="btn btn-info btn-xs">My dashboard</button></a>
 				</center>
 			</div>
 		</div>
