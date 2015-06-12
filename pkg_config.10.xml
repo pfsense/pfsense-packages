@@ -49,6 +49,7 @@
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
 		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>bind</name>
@@ -69,6 +70,7 @@
 			<port>dns/bind99</port>
 		</build_pbi>
 		<build_options>bind_UNSET_FORCE=IDN REPLACE_BASE FIXED_RRSET GSSAPI LARGE_FILE;bind_SET_FORCE=IPV6 LINKS SSL THREADS XML DLZ_FILESYSTEM FILTER_AAAA SIGCHASE RRL</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Filer</name>
@@ -82,6 +84,7 @@
 		<required_version>2.2</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>
 		<configurationfile>filer.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Strikeback</name>
@@ -216,6 +219,7 @@
 		</build_pbi>
 		<build_options>apache24_UNSET_FORCE=MPM_PREFORK;apache24_SET_FORCE=MPM_EVENT SLOTMEM_SHM MOST_ENABLED_MODULES MPM_SHARED SESSION_ENABLED_MODULES PROXY_ENABLED_MODULES SESSION_ENABLED_MODULES;mod_security_SET_FORCE=MLOGC</build_options>
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Proxy Server with mod_security</name>
@@ -328,6 +332,7 @@
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>tftp.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>PHPService</name>
@@ -421,6 +426,7 @@
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>olsrd.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>routed</name>
@@ -454,6 +460,7 @@
 			<facilityname>spamd</facilityname>
 			<logfilename>spamd.log</logfilename>
 		</logging>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Postfix Forwarder</name>
@@ -476,6 +483,7 @@
 			<port>mail/postfix</port>
 		</build_pbi>
 		<build_options>postfix_SET_FORCE=PCRE SASL2 SPF TLS</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Dansguardian</name>
@@ -523,6 +531,7 @@
 			<ports_after>shells/bash mail/pyzor mail/dcc-dccd security/clamav mail/spamassassin</ports_after>
 		</build_pbi>
 		<build_options>mailscanner_UNSET_FORCE=BDC CLAMAVMODULE;mailscanner_SET_FORCE=SPAMASSASSIN CLAMAV;spamassassin_SET_FORCE=DCC</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>siproxd</name>
@@ -602,6 +611,7 @@
 		</build_pbi>
 		<build_options>sarg_UNSET_FORCE=PHP</build_options>
 		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Ipguard-dev</name>
@@ -624,6 +634,7 @@
 			<port>security/ipguard</port>
 		</build_pbi>
 		<after_install_info>Please visit ipguard settings on the Firewall Menu to configure.</after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Varnish3</name>
@@ -647,6 +658,7 @@
 			<ports_after>lang/gcc</ports_after>
 		</build_pbi>
 		<build_options>gcc_UNSET_FORCE=JAVA</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>vnstat2</name>
@@ -667,6 +679,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/vnstat2/vnstat2.xml</config_file>
 		<configurationfile>vnstat2.xml</configurationfile>
 		<after_install_info></after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>dns-server</name>
@@ -687,6 +700,7 @@
 			<port>dns/djbdns</port>
 		</build_pbi>
 		<build_options>ucspi-tcp_SET_FORCE=IPV6;djbdns_SET_FORCE=SRV;djbdns_UNSET_FORCE=DUMPCACHE IGNOREIP JUMBO PERSISTENT_MMAP</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Open-VM-Tools</name>
@@ -774,6 +788,7 @@
 		<build_pbi>
 			<port>net-im/imspector</port>
 		</build_pbi>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>nut</name>
@@ -792,6 +807,7 @@
 			<port>sysutils/nut</port>
 		</build_pbi>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nut_package</pkginfolink>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>diag_new_states</name>
@@ -804,6 +820,7 @@
 		<status>BETA</status>
 		<config_file>https://packages.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
 		<configurationfile>https://packages.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>darkstat</name>
@@ -858,6 +875,7 @@
 		<build_pbi>
 			<port>net/widentd</port>
 		</build_pbi>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>freeradius2</name>
@@ -904,6 +922,7 @@
 			<port>net-mgmt/bandwidthd</port>
 		</build_pbi>
 		<build_options>libgd_UNSET_FORCE=FONTCONFIG XPM</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>stunnel</name>
@@ -923,6 +942,7 @@
 			<port>security/stunnel</port>
 		</build_pbi>
 		<build_options>stunnel_SET_FORCE=PTHREAD LIBWRAP;stunnel_UNSET_FORCE=FORK UCONTEXT IPV6</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>iperf</name>
@@ -958,6 +978,7 @@
 		<build_pbi>
 			<port>benchmarks/netio</port>
 		</build_pbi>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>mtr-nox11</name>
@@ -1452,7 +1473,6 @@
 		<maintainer>laleger@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng.xml</config_file>
 		<configurationfile>syslog-ng.xml</configurationfile>
-		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Zabbix Agent LTS</name>
@@ -1624,7 +1644,6 @@
 		<pkginfolink></pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>ladvd.xml</configurationfile>
-		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>suricata</name>
