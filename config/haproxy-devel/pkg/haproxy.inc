@@ -957,18 +957,23 @@ function haproxy_write_certificate_crl($filename, $crlid, $append = false) {
 	unset($crl);
 }
 
-function haproxy_write_certificate_fullchain($filename, $certid, $append = false) {
+function haproxy_write_certificate_fullchain($filename, $certid, $append = false, $skiproot = true) {
 	$cert = haproxy_lookup_cert($certid);
 
 	$certcontent = base64_decode($cert['crt']);
 	if (isset($cert['prv']))
 		$certcontent .= "\r\n".base64_decode($cert['prv']);
 	
-	$certchaincontent = ca_chain($cert);
-	if ($certchaincontent != "") {
-		$certcontent .= "\r\n" . $certchaincontent;
+	$ca = $cert;
+	while(!empty($ca['caref'])) {
+		$ca = lookup_ca($ca['caref']);
+		if ($ca) {
+			if ($skiproot && (cert_get_subject($ca['crt']) == cert_get_issuer($ca['crt'])))
+				break;
+			$certcontent .= "\r\n" . base64_decode($ca['crt']);
+		} else
+			break;
 	}
-	unset($certchaincontent);
 	$flags = $append ? FILE_APPEND : 0;
 	file_put_contents($filename, $certcontent, $flags);
 	unset($certcontent);
@@ -1155,7 +1160,7 @@ function haproxy_writeconf($configpath) {
 				if ($frontend['sslocsp'] == 'yes') {
 					if (!empty(haproxy_getocspurl($filename))) {
 						haproxy_write_certificate_issuer($filename . ".issuer", $frontend['ssloffloadcert']);
-						touch($filename . ".ocsp");
+						touch($filename . ".ocsp");//create initial empty file. this will trigger updates, and inform haproxy it 'should' be using ocsp
 					}
 				}
 				
