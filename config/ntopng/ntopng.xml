@@ -153,7 +153,7 @@
 		$ntopng_config =& $config['installedpackages']['ntopng']['config'][0];
 		$if_final = "";
 		$ifaces_final = "";
-		mkdir("/var/db/ntopng/rrd/graphics", 0755, true);
+		safe_mkdir("/var/db/ntopng/rrd/graphics", 0755, true);
 		system("/bin/chmod -R 755 /var/db/ntopng");
 		system("/usr/sbin/chown -R nobody:nobody /var/db/ntopng");
 		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
