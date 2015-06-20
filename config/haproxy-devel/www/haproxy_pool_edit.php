@@ -961,7 +961,7 @@ set by the 'retries' parameter.</div>
 			<td colspan="2" valign="top" class="listtopic">Advanced</td>
 		</tr>
 		<tr class="" align="left" id='Strict-Transport-Security'>
-			<td width="22%" valign="top" class="vncell">Strict-Transport-Security</td>
+			<td width="22%" valign="top" class="vncell">HSTS Strict-Transport-Security</td>
 			<td width="78%" class="vtable" colspan="2">
 				When configured enables "HTTP Strict Transport Security" leave empty to disable. (only used on 'http' frontends)<br/>
 				<b>WARNING! the domain will only work over https with a valid certificate!</b><br/>
