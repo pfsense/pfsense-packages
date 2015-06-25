@@ -39,32 +39,37 @@ class haproxy_utils {
 	public function query_dns($host, $querytype="A,AAAA") {
 		$result = array();
 		$types = explode(',',$querytype);
-		$recordtypes = 0;
+		$recordtype = 0;
 		foreach($types as $type){
 			switch ($type) {
 				case 'A': 
-					$recordtypes += DNS_A; 
+					$recordtype = DNS_A; 
 					break;
 				case 'AAAA': 
-					$recordtypes += DNS_AAAA; 
+					$recordtype = DNS_AAAA; 
 					break;
 			}
-		}
-		if ($recordtypes == 0)
-			return $result;
-		
-		$dnsresult = dns_get_record($host, $recordtypes);
-		foreach($dnsresult as $item) {
-			$newitem["typeid"] = $item['type'];
-			switch ($item['type']) {
-				case 'A':
-					$newitem["data"] = $item['ip']; 
-					break;
-				case 'AAAA':
-					$newitem["data"] = $item['ipv6']; 
-					break;
+			if ($recordtype != 0) {
+				//query one type at a time, querying multiple types in one call dns_get_record fails if one is not present..
+				$errreporting = error_reporting();
+				error_reporting($errreporting & ~E_WARNING);// dns_get_record throws a warning if nothing is resolved..
+				$dnsresult = dns_get_record($host, $recordtype);
+				error_reporting($errreporting);
+				if (is_array($dnsresult)) {
+					foreach($dnsresult as $item) {
+						$newitem["typeid"] = $item['type'];
+						switch ($item['type']) {
+							case 'A':
+								$newitem["data"] = $item['ip']; 
+								break;
+							case 'AAAA':
+								$newitem["data"] = $item['ipv6']; 
+								break;
+						}
+						$result[] = $newitem;
+					}
+				}
 			}
-			$result[] = $newitem;
 		}
 		return $result;
 	}

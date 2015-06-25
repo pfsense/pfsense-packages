@@ -811,7 +811,8 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo 'value="'.htmlspecialchars($pconfig['dcertadv']).'"';?> />
 				<br/>
 				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br/>
-				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
+				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets<br/>
+				Example: no-sslv3 ciphers EECDH+aRSA+AES:TLSv1+kRSA+AES:TLSv1+kRSA+3DES
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
