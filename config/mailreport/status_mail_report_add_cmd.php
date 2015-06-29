@@ -130,7 +130,7 @@ include("head.inc");
 			<input name="Submit" type="submit" class="formbtn" value="<?=gettext("Save");?>">
 			<a href="status_mail_report_edit.php?id=<?php echo $reportid;?>"><input name="cancel" type="button" class="formbtn" value="<?=gettext("Cancel");?>"></a>
 			<input name="reportid" type="hidden" value="<?=htmlspecialchars($reportid);?>">
-			<?php if (isset($id) && $a_graphs[$id]): ?>
+			<?php if (isset($id) && $a_cmds[$id]): ?>
 			<input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
 			<?php endif; ?>
 			</td>
