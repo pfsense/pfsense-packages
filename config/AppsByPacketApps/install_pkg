@@ -1,0 +1,1014 @@
+<?php
+
+require_once("globals.inc");
+require_once("pfsense-utils.inc");
+require_once("pkg-utils.inc");
+require_once("config.lib.inc");
+require_once("services.inc");
+
+function xcopy($source, $dest, $permissions = 0755)
+{
+    // Check for symlinks
+    if (is_link($source)) {
+        return symlink(readlink($source), $dest);
+    }
+
+    // Simple copy for a file
+    if (is_file($source)) {
+        return copy($source, $dest);
+    }
+
+    // Make destination directory
+    if (!is_dir($dest)) {
+        @mkdir($dest, $permissions);
+    }
+
+    // Loop through the folder
+    $dir = dir($source);
+    while (false !== $entry = $dir->read()) {
+        // Skip pointers
+        if ($entry == '.' || $entry == '..') {
+            continue;
+        }
+
+        // Deep copy directories
+        xcopy("$source/$entry", "$dest/$entry");
+    }
+
+    // Clean up
+    $dir->close();
+    return true;
+}
+
+function uncompress_pkg($archive){
+	exec(escapeshellcmd("tar")." ".escapeshellarg("-zxvf")." ".escapeshellarg($archive),$output);
+	unlink($archive);
+	$files = scandir("/tmp/app/");
+	return "/tmp/app/".$files[2];
+}
+
+function get_info_pkg($path){ 
+	$pkg_xml = simplexml_load_file($path."/Manifest_package.xml");
+	return json_decode(json_encode($pkg_xml),true);
+}
+
+function get_id_pkg($pkg_name) {
+	$config_app = simplexml_load_file("/usr/local/appsbypacketapps/config.xml");
+	$pkgs = $config_app->packages;
+	foreach($pkgs->package as $name)
+	{
+		if($name->name==$pkg_name)
+		{
+			return $name->name;
+		}
+	}
+	return -1;
+}
+
+function get_installed_infos($pkg_name){
+	$config_app = simplexml_load_file("/usr/local/appsbypacketapps/config.xml");
+	$pkgs = $config_app->packages;
+	foreach($pkgs->package as $pkg)
+	{
+		if(strtoupper($pkg->name)==strtoupper($pkg_name))
+		{
+			return array( 'name' => $pkg->name->__toString(), 'version' => $pkg->version->__toString(), 'synopsis' => $pkg->synopsis->__toString(), 'index' => $pkg->index->__toString());
+		}
+	}
+	return -1;
+}
+
+function check_md5s($path){
+	$files = json_decode(file_get_contents($path."/files.md5"),true);
+	foreach( $files as $file_name => $file_md5 ){
+		if( md5(file_get_contents($path."/".$file_name)) != $file_md5 ){
+			return false ;
+		}
+	}
+	return true;
+}
+
+function cleanAll($path){
+	exec("rm -rf ".$path);
+}
+
+function install_freebsd_pkg($pkg_name){
+	exec('pkg info',$output);
+	foreach( $output as $installed ){
+		if( preg_match("/".$pkg_name.".*/",$output[count($output)-1]) === 1 ){
+			return true;
+		}
+	}
+	exec("env ASSUME_ALWAYS_YES=YES pkg upgrade",$output);
+	if( in_array("Your packages are up to date.",$output)){
+		exec("env ASSUME_ALWAYS_YES=YES pkg install ".escapeshellarg($pkg_name),$output);
+		var_dump($output);
+		if( preg_match("/.*Extracting ".$pkg_name.".* done/",$output[count($output)-1]) === 1 || "The most recent version of packages are already installed" == $output[count($output)-1]){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	else{
+		return false;
+	}
+	
+}
+
+function detectFileMimeType($filename='')
+{
+    $filename = escapeshellcmd($filename);
+    $command = "file -b --mime-type -m /usr/share/misc/magic {$filename}";
+
+    $mimeType = shell_exec($command);
+           
+    return trim($mimeType);
+}
+
+	
+
+//function install_xml_package($pkg){
+function install_xml_package($pkg_info,$path){
+	global $config;
+	$pkg=$pkg_info['name'];
+	if(($pkgid = get_id_pkg($pkg)) == -1) {
+		//$static_output .= sprintf(gettext("The %s package is not installed.%sInstallation aborted."), $pkg, "\n\n");
+		//update_output_window(//$static_output);
+	}
+	else{
+		
+		$configfile = substr(strrchr($pkg_info['configfile'], '/'), 1);
+		if(!empty($pkg_info) ) {
+			
+			
+			
+			
+			/* modify system files */
+			if(is_array($pkg_info['modify_system']) && is_array($pkg_info['modify_system']['item'])) {
+				//$static_output .= gettext("System files... ");
+				//update_output_window(//$static_output);
+				foreach($pkg_info['modify_system']['item'] as $ms) {
+					if($ms['textneeded']) {
+						add_text_to_file($ms['modifyfilename'], $ms['textneeded']);
+					}
+				}
+				//$static_output .= gettext("done.") . "\n";
+				//update_output_window(//$static_output);
+			}
+			
+			/* put cron into config */
+			if(is_array($pkg_info['cron'])) {
+				foreach($pkg_info['cron'] as $cron) {
+					install_cron_job($cron['command'], true, $cron['command']['minute'],$cron['command']['hour'], $cron['command']['mday'], $cron['command']['month'], $cron['command']['wday']);
+				}
+			}
+			
+			
+			/* place additional files */
+			
+			if(is_array($pkg_info['additional_files_needed'])) {
+				//$static_output .= gettext("Additional files... ");
+				//$static_orig = //$static_output;
+				//update_output_window(//$static_output);
+				if(isset($pkg_info['additional_files_needed']["item"])){
+					$tmp=$pkg_info['additional_files_needed'];
+					unset($pkg_info['additional_files_needed']);
+					$pkg_info['additional_files_needed'][0]=$tmp;
+					unset($tmp);
+				}
+				foreach($pkg_info['additional_files_needed'] as $afn) {
+						$filename = $afn['item'];
+						if($afn['chmod'] <> "")
+							$pkg_chmod = $afn['chmod'];
+						else
+							$pkg_chmod = "";
+						if($afn['prefix'] <> "")
+							$prefix = $afn['prefix'];
+						else
+							$prefix = "/usr/local/appsbypacketapps/";
+						
+
+						if(!is_dir($prefix)) 
+							safe_mkdir($prefix);
+						//$static_output .= $filename . " ";
+						//update_output_window(//$static_output);
+						
+						if (copy($path.'/'.$filename, $prefix . basename($filename)) === false) {
+							//$static_output .= "failed.\n";
+							@unlink($prefix . $filename);
+							return false;
+						}
+						if(stristr($filename, ".tgz") <> "") {
+							$tarout = "";
+							exec("/usr/bin/tar xvzf " . escapeshellarg($prefix . $filename) . " -C / 2>&1", $tarout);
+						}
+						if($pkg_chmod <> "") {
+							@chmod($prefix . $filename, $pkg_chmod);
+							system("/bin/chmod {$pkg_chmod} {$prefix}{$filename}");
+						}
+						//$static_output .= gettext("done.") . "\n";
+						//update_output_window(//$static_output);
+					//}
+				}
+			}
+			
+			
+			/* Contrarely to native pfsense installation package procedure
+			 * we dont execute custom command, Apps is executing scripts who 
+			 * replace customs commands
+			 */
+			
+			//on vérifie d'abords que le tableau des menu existe dans la conf
+			if(!isset($config['installedpackages']["menu"])) {
+				$config['installedpackages']["menu"] = array();
+			}
+			
+			//ensuite on va venir vérifier qu'il y a bien une balise 'menu' dans la config du pkg
+			if( isset($pkg_info["menu"])){
+				//$static_output .= gettext("Menu items... ");
+				//update_output_window(//$static_output);
+				//on regarde ensuite si cette variable contient un tableau de menu
+				//ou alors un seul menu est déclarer et la balise contient les infos à insérer das le menu
+				if( isset($pkg_info["menu"]['name'])){
+					//on ve chercher dans les balises menu si une existe déjà avec le même nom
+					//si oui on la remplace par la nouvelle
+					//sinon on ajoute cette balise à la config
+					$i = 0;
+					$found = false;
+					while( $i < count($config['installedpackages']["menu"]) && !$found ){
+						if( $config['installedpackages']["menu"][$i]["name"] == $pkg_info["menu"]['name'] ){
+							$found = true;
+						}
+						else{
+							$i++;
+						}
+					}
+					
+					if( !$found ){
+						$config['installedpackages']["menu"][] = $pkg_info["menu"];
+					}
+					else{
+						$config['installedpackages']["menu"][$i] = $pkg_info["menu"];
+					}
+					
+				}
+				else{
+					foreach( $pkg_info["menu"] as $menu ){
+						$i = 0;
+						$found = false;
+						while( $i < count($config['installedpackages']["menu"]) && !$found ){
+							if( $config['installedpackages']["menu"][$i]["name"] == $menu['name'] ){
+								$found = true;
+							}
+							else{
+								$i++;
+							}
+						}
+						
+						if( !$found ){
+							$config['installedpackages']["menu"][] = $menu;
+						}
+						else{
+							$config['installedpackages']["menu"][$i] = $menu;
+						}
+					}
+				}
+				
+				//$static_output .= gettext("done.") . "\n";
+				//update_output_window(//$static_output);
+			}
+			
+			if( isset($pkg_info['service'])){
+				//$static_output .= gettext("Services... ");
+				//update_output_window(//$static_output);
+				//on regarde ensuite si cette variable contient un tableau de service
+				//ou alors un seul menu est déclarer et la balise contient les infos à insérer dans les services
+				if( isset($pkg_info['service']['name'])){
+					//on ve chercher dans les balises service si une existe déjà avec le même nom
+					//si oui on la remplace par la nouvelle
+					//sinon on ajoute cette balise à la config
+					$i = 0;
+					$found = false;
+					while( $i < count($config['installedpackages']['service']) && !$found ){
+						if( $config['installedpackages']['service'][$i]["name"] == $pkg_info['service']['name'] ){
+							$found = true;
+						}
+						else{
+							$i++;
+						}
+					}
+					
+					if( !$found ){
+						$config['installedpackages']['service'][] = $pkg_info['service'];
+					}
+					else{
+						$config['installedpackages']['service'][$i] = $pkg_info['service'];
+					}
+					
+				}
+				else{
+					foreach( $pkg_info['service'] as $service ){
+						$i = 0;
+						$found = false;
+						while( $i < count($config['installedpackages']['service']) && !$found ){
+							if( $config['installedpackages']['service'][$i]["name"] == $service['name'] ){
+								$found = true;
+							}
+							else{
+								$i++;
+							}
+						}
+						
+						if( !$found ){
+							$config['installedpackages']['service'][] = $service;
+						}
+						else{
+							$config['installedpackages']['service'][$i] = $service;
+						}
+					}
+				}
+				
+				//$static_output .= gettext("done.") . "\n";
+				//update_output_window(//$static_output);
+			}
+			
+		}
+		else {
+			//$static_output .= gettext("Loading package configuration... failed!") . "\n\n" . gettext("Installation aborted.");
+			//update_output_window(//$static_output);
+			pkg_debug(gettext("Unable to load package configuration. Installation aborted.") ."\n");
+			if($pkg_interface <> "console") {
+				echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';</script>";
+				echo "\n<script type=\"text/javascript\">document.progholder.style.visibility='hidden';</script>";
+			}
+			sleep(1);
+			return false;
+		}
+	}
+	
+	/* set up package logging streams */
+	if($pkg_info['logging']) {
+		$path_log = '/usr/local/appsbypacketapps/logs';
+		mwexec("/usr/sbin/fifolog_create -s 32768 {$path_log}/{$pkg_info['logging']['logfilename']}");
+		@chmod($path_log . '/' . $pkg_info['logging']['logfilename'], 0600);
+		add_text_to_file("/etc/syslog.conf", $pkg_info['logging']['facilityname'] . "\t\t\t\t" . $pkg_info['logging']['logfilename']);
+		system_syslogd_start();
+	}
+
+	return true;
+}
+
+function install_pkg($archive){
+	global $config;
+	//first extract archive
+	$path=uncompress_pkg($archive);
+	//get pkg infos 
+	$pkg_info = get_info_pkg($path);
+	
+	
+	
+	//check versions
+
+	$compatible = true;
+	$version = rtrim(file_get_contents("/etc/version"));
+		
+	if (isset($pkg_info['required_version']))
+	{
+		$compatible = (pfs_version_compare("", $version, $pkg_info['required_version']) >= 0);
+	}
+	
+	if (!$compatible) {
+		log_error(sprintf(gettext('Package %s is not supported on this version.'), $pkg_info['name']));
+		//$static_output .= sprintf(gettext("Package %s is not supported on this version."), $pkg_info['name']);
+		////update_status(//$static_output);
+			
+		conf_mount_ro();
+		return false;
+	}
+
+	$pkg_info['name'] = str_replace(' ','_',$pkg_info['name']);
+
+	pkg_debug(gettext("Beginning package installation.") . "\n");
+	//log_error(sprintf(gettext('Beginning package installation for %s .'), $pkg_info['name']));
+	//$static_output .= sprintf(gettext("Beginning package installation for %s ."), $pkg_info['name']);
+	////update_status(//$static_output);
+	
+	
+	
+	//get in place Gui files and Other Php files
+	//Done in install_xml_package in additionnal_file_needed section
+	
+	//get in place log file
+	if (file_exists($path."/".$pkg_info['name'].".log"))
+	{
+		rename($path."/".$pkg_info['name'].".log", "/usr/local/appsbypacketapps/log/".$pkg_info['name'].".log");
+	}
+	//get in place redistributable key for blenc
+	
+	exec('chmod 777 /usr/local/etc/blenckeys',$output);
+	if( count($output) == 0 ){
+		if( file_exists($path."/blenc.key_file") ){
+			exec('cat '.$path."/blenc.key_file".' >> /usr/local/etc/blenckeys',$output);
+			if( count($output) !== 0 ){
+				//$static_output .= sprintf(gettext("Blenc keys unwritable. Abort install"), $pkg_info['name']);
+				////update_status(//$static_output);
+				return false;
+			}
+		}
+	}
+	else{
+		//$static_output .= sprintf(gettext("Blenc keys unwritable. Abort install"), $pkg_info['name']);
+		////update_status(//$static_output);
+	}
+	
+	if(file_exists($path."/scripts/presinstall/"))
+	{
+		$files = scandir($path."/scripts/presinstall/");
+		foreach( $files as $file ){
+			if( basename($file) != "." && basename($file) != ".."){
+				$info = detectFileMimeType($file);
+				if( strpos($info,'php') !== false ){
+					@include_once($path."/scripts/presinstall/".$file);
+				}
+				else if( strpos($info,'shell') !== false ){
+					exec($path."/scripts/presinstall/".$file);
+				}
+			}
+		}
+	}
+	
+	//get package directory in place
+	$pkg_id = file_get_contents($path."/pkg.id");
+	@@mkdir("/usr/local/appsbypacketapps/.".$pkg_id);
+	
+	//get .id in place in pacakge_name directory
+	@@mkdir("/usr/local/appsbypacketapps/".$pkg_info['name']."/");
+	file_put_contents("/usr/local/appsbypacketapps/".$pkg_info['name']."/.id", $pkg_id);
+	
+	//add Manifest_package.xml to package_id hidden directory
+	@@mkdir("/usr/local/pkg/appsbypacketapps/.".$pkg_id."/");
+	copy($path."/Manifest_package.xml","/usr/local/appsbypacketapps/.".$pkg_id."/Manifest_package.xml");
+	//add version to package_id hidden directory
+	copy($path."/version","/usr/local/appsbypacketapps/.".$pkg_id."/version");
+	//add synopsis to package_id hidden directory
+	copy($path."/synopsis","/usr/local/appsbypacketapps/.".$pkg_id."/synopsis");
+	
+	//add logo to logo folder in /usr/local/www/
+	if( file_exists($path."/logo")){
+		copy($path."/logo","/usr/local/www/logo/".$pkg_info['name']);
+	}
+	else{
+		copy("/usr/local/www/logo/logo.png","/usr/local/www/logo/".$pkg_info['name']);
+	}
+	
+
+	if(file_exists($path."/scripts/uninstall/")){
+		exec('mkdir /usr/local/appsbypacketapps/.'.$pkg_id.'/uninstall/');
+		exec("cp -R ".$path."/scripts/uninstall/ /usr/local/appsbypacketapps/.".$pkg_id."/uninstall/");
+	}
+	
+	
+	
+	
+	/* add package information to Manifest_package.xml */
+	
+	$pkgid = get_id_pkg($pkg_info['name']);
+	//$static_output .= gettext("Saving updated package information...") . " ";
+	//update_output_window(//$static_output);
+	
+	//il va faloir selectionner les infos nécessaire au Manifest_package.xml
+	//normallement on met les infos venant du repo
+	//alors qu'ici on prend les infos du .xml du package
+	
+	
+	$folder = file_get_contents("/usr/local/appsbypacketapps/".$pkg_info['name']."/.id");
+	
+		
+	$config_app = simplexml_load_file("/usr/local/appsbypacketapps/config.xml");
+	$new_config = simplexml_load_string('<root><packages></packages></root>');
+	$pkgs = $new_config->packages;
+	$packages = $config_app->packages;
+	
+	$packages = json_decode(json_encode($packages),true);
+
+	foreach( $packages as $package ){
+		if( trim($package['name']) != "" && trim($package['name']) != trim($pkgid) ){
+			$new_pkg = $pkgs->addChild("package");
+			$new_pkg->addChild('name',$package['name']);
+			$new_pkg->addChild('version',$package['version']);
+			$new_pkg->addChild('index',$package['index']);
+			$new_pkg->addChild('synopsis',$package['synonpsis']);
+		}
+	}
+	$new_pkg = $pkgs->addChild("package");
+	$new_pkg->addChild('name',$pkg_info['name']);
+	$new_pkg->addChild('version',file_get_contents('/usr/local/appsbypacketapps/.'.$folder."/version"));
+	
+	if( isset($pkg_info['menu']['name'])){
+		$new_pkg->addChild('index',$pkg_info['menu']['url']);
+	}
+	else{
+		$new_pkg->addChild('index',$pkg_info['menu'][0]['url']);
+	}
+	
+	$new_pkg->addChild('synopsis',file_get_contents('/usr/local/appsbypacketapps/.'.$folder."/synopsis"));
+	$new_config->asXML("/usr/local/appsbypacketapps/config.xml");
+	
+	
+	$changedesc = sprintf(gettext("Installed %s package."),$pkg_info['name']);
+	$to_output = gettext("done.") . "\n";
+	
+	
+	
+	
+	if($pkgid !== -1) { 
+		//$static_output .= sprintf(gettext("Overwrote previous installation of %s."), $pkg_info['name']);
+		////update_status(//$static_output);
+		$manifest = simplexml_load_file("/usr/local/appsbypacketapps/.".$folder."/Manifest_package.xml");
+		$configs = $manifest->configfile;
+		if( count($configs) > 0 ){
+			@mkdir("/usr/local/appsbypacketapps/backups/".$pkg_info['name']);
+			foreach( $configs as $config ){
+				$file = $config;
+				if( !file_exists($config)){
+					$file = "/usr/local/appsbypacketapps/".$pkg_info['name']."/".$config;
+				}
+				
+				if( file_exists($file)){
+					//$static_output .= sprintf(gettext("Backup of configuration file %s in /usr/local/pkg/appsbypacketapps/backups/%s/."), $config,$pkg_info['name']);
+					//update_status(//$static_output);
+					$filename_explode = explode(".",basename($file));
+					$filename = $filename_explode[0];
+					$filext = $filename_explode[1];
+					copy($file,"/usr/local/appsbypacketapps/backups/".$pkg_info['name']."/".$filename.time().$filext);
+				}
+				else{
+					//$static_output .= sprintf(gettext("Backup of configuration file %s impossible."), $config);
+					//update_status(//$static_output);
+				}
+			}
+			
+		}
+		//$static_output .= sprintf(gettext("overwrite!"));
+		//update_status(//$static_output);
+	}
+	
+	conf_mount_ro();
+	
+	
+	
+	/* install other package components */
+
+	//if (!install_xml_package($pkg_info['name'])) {
+	if (!install_xml_package($pkg_info,$path)) {
+		write_config($changedesc);
+		//$static_output .= gettext("Failed to install package.") . "\n";
+		//update_output_window(//$static_output);
+		///arg a ajouter
+		return deinstall_pkg($pkg_info['name']);
+
+	} else {
+		//$static_output .= gettext("Writing configuration... ");
+		//update_output_window(//$static_output);
+		write_config($changedesc);
+		//$static_output .= gettext("done.") . "\n";
+		//update_output_window(//$static_output);
+	}
+	
+	exec("rm /tmp/config.cache");
+	//execute postinstall scripts
+	if(file_exists($path."/scripts/postinstall/"))
+	{
+		$files = scandir($path."/scripts/postinstall/");
+		foreach( $files as $file ){
+			if( basename($file) != "." && basename($file) != ".."){
+				$info = detectFileMimeType($path."/scripts/postinstall/".$file);
+				if( strpos($info,'php') !== false ){
+					@include_once($path."/scripts/postinstall/".$file);
+				}
+				else if( strpos($info,'shell') !== false ){
+					exec($path."/scripts/postinstall/".$file,$out);
+				}
+			}
+		}
+	}
+	
+	//verification of all files with md5 hash
+	if( !check_md5s($path) ){
+		//$static_output .= gettext("Files from package ".$pkg_info['name']." are corrupted.");
+		//update_output_window(//$static_output);
+		return deinstall_pkg($pkg_info['name']);
+	}
+	
+	
+	cleanAll($path);
+	@rmdir('/tmp/app');
+	return $pkg_id;
+}
+
+function send_result($install_result,$licence_key,$first_try=false){
+	$dns = "https://www.packetapps.com/php";
+	$id = trim(file_get_contents("/usr/local/appsbypacketapps/.device/id"));
+	if( $first_try ){
+		$url = "/app/register/device/".$id."/".$licence_key."/first_install_result";
+	}
+	else{
+		$url = "/app/register/device/".$id."/".$licence_key."/second_install_result";
+	}
+	$result = -1;
+	if( count($dns.$url) < 2000 ){
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_URL,trim($dns.$url));
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl, CURLOPT_HEADER, false);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+		$fields = array(
+			'result' => json_encode($install_result),
+		);
+		curl_setopt($curl,CURLOPT_POST, count($fields));
+		curl_setopt($curl,CURLOPT_POSTFIELDS, $fields);
+		$result=curl_exec($curl);
+		curl_close($curl);
+		if( $result !== false ){
+			$result = 0;
+		}
+	}
+	
+	return $result;
+}
+
+
+
+function do_install_from_url($url,$key){
+	
+	//récupération de l'archive contenant le package
+	
+	if( !@mkdir("/tmp/app",0777,true) ){
+		exec("@mkdir /tmp/app");
+	}
+	chdir("/tmp/app");
+	$curl = curl_init();
+	$destination = "/tmp/app/".basename($url);
+	$destination = substr($destination,0,strlen($destination));
+
+	$file=fopen($destination,"w+");
+	curl_setopt($curl, CURLOPT_URL,trim($url));
+	curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+	curl_setopt($curl, CURLOPT_HEADER, false);
+	curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+	curl_setopt($curl, CURLOPT_FILE, $file);
+	$result=curl_exec($curl);
+	fclose($file);
+	curl_close($curl);
+
+	
+	$filename = trim(basename($url));
+	exec("ls ".'"/tmp/app/'.$filename.'"',$output);
+	if (in_array('/tmp/app/'.$filename,$output)) {
+	
+		//first try of install
+		$res = install_pkg('/tmp/app/'.$filename);
+	
+		if($res != false){
+			send_result($res,$key,true);
+			return $res;
+		}
+		else{
+			//second try of install
+			$res = install_pkg('/tmp/app/'.$filename);
+			send_result($res,$key,true);
+			return $res;
+		}	
+	}
+	else{
+		return false;
+	}
+	
+}
+
+function delete_xml_package($pkg) {
+	
+        $pkg = str_replace(' ','_',$pkg);	
+	global $g, $config; //$static_output, $pkg_interface;
+
+	conf_mount_rw();
+	
+	$pkgid = get_id_pkg($pkg);
+	
+	if ($pkgid == -1) {
+		//$static_output .= sprintf(gettext("The %s package is not installed.%sDeletion aborted."), $pkg, "\n\n");
+		//update_output_window(//$static_output);
+		if($pkg_interface <> "console") {
+			echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';</script>";
+			echo "\n<script type=\"text/javascript\">document.progholder.style.visibility='hidden';</script>";
+		}
+		return false;
+	}
+	pkg_debug(sprintf(gettext("Removing %s package... "),$pkg));
+	//$static_output .= sprintf(gettext("Removing %s components..."),$pkg) . "\n";
+	//update_output_window(//$static_output);
+	/* parse package configuration */
+	$config_app = simplexml_load_file("/usr/local/appsbypacketapps/config.xml");
+	$packages = $config_app->packages->package;
+	foreach( $packages as $package ){
+		if( $package->name == $pkgid ){
+			$app_pkg = $package;
+		}
+	}
+	
+
+	$menus =&$config['installedpackages']['menu'];
+	$services = &$config['installedpackages']['service'];
+	
+	$folder = file_get_contents("/usr/local/appsbypacketapps/".$pkgid."/.id");
+	$pkg_info = get_info_pkg("/usr/local/appsbypacketapps/.".$folder);
+	$pkg_info['name'] = str_replace(' ','_',$pkg_info['name']);
+	$manifest = simplexml_load_file("/usr/local/appsbypacketapps/.".$folder."/Manifest_package.xml");
+	$configs = $manifest->configfile;
+	
+	if( count($configs) > 0 ){
+		@mkdir("/usr/local/appsbypacketapps/backups/".$pkg_info['name']);
+		
+		foreach( $configs as $configFile ){
+			$file = $configFile;
+			if( !file_exists($configFile)){
+				$file = "/usr/local/appsbypacketapps/".$pkg_info['name']."/".basename($configFile);
+			}
+			
+			if( file_exists($file)){
+				//$static_output .= sprintf(gettext("Backup of configuration file %s in /usr/local/pkg/appsbypacketapps/backups/%s/."), $config,$pkg_info['name']);
+				//update_status(//$static_output);
+				$filename_explode = explode(".",basename($file));
+				$filename = $filename_explode[0];
+				$filext = $filename_explode[1];
+				copy($file,"/usr/local/appsbypacketapps/backups/".$pkg_info['name']."/".$filename.time().$filext);
+			}
+			else{
+				//$static_output .= sprintf(gettext("Backup of configuration file %s impossible."), $configFile);
+				//update_status(//$static_output);
+			}
+			
+		}
+	}
+	
+	
+	
+	/* remove menu items */
+	if(is_array($pkg_info['menu'])) {
+		//$static_output .= gettext("Menu items... ");
+		//update_output_window(//$static_output);
+		if (is_array($pkg_info['menu']) && is_array($menus)) {
+			if( isset($pkg_info['menu']['name'])){
+				foreach($menus as $key => $instmenu) {
+					if($instmenu['name'] == $pkg_info['menu']['name']) {
+						unset($menus[$key]);
+						break;
+					}
+				}
+			}
+			else{
+				foreach($pkg_info['menu'] as $menu) {
+					foreach($menus as $key => $instmenu) {
+						if($instmenu['name'] == $menu['name']) {
+							unset($menus[$key]);
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		//$static_output .= gettext("done.") . "\n";
+		//update_output_window(//$static_output);
+	}
+	
+	/* remove crons */
+	//put second argument to false make the function uninstall crons
+	if(is_array($pkg_info['cron'])) {
+		foreach($pkg_info['cron'] as $cron) {
+			install_cron_job($cron['command'], false, $cron['command']['minute'],$cron['command']['hour'], $cron['command']['mday'], $cron['command']['month'], $cron['command']['wday']);
+		}
+	}
+	
+	/* remove services */
+	if(is_array($pkg_info['service'])) {
+		//$static_output .= gettext("Services... ");
+		//update_output_window(//$static_output);
+		if (is_array($pkg_info['service']) && is_array($services)) {
+			foreach($pkg_info['service'] as $service) {
+				foreach($services as $key => $instservice) {
+					if($instservice['name'] == $service['name']) {
+						if($g['booting'] != true)
+							stop_service($service['name']);
+						if($service['rcfile']) {
+							$prefix = RCFILEPREFIX;
+							if (!empty($service['prefix']))
+								$prefix = $service['prefix'];
+							if (file_exists("{$prefix}{$service['rcfile']}"))
+								@unlink("{$prefix}{$service['rcfile']}");
+						}
+						unset($services[$key]);
+					}
+				}
+			}
+		}
+		//$static_output .= gettext("done.") . "\n";
+		//update_output_window(//$static_output);
+	}
+	/*
+	 * XXX: Otherwise inclusion of config.inc again invalidates actions taken.
+	 * 	Same is done during installation.
+	 */
+	write_config("Intermediate config write during package removal for {$pkg}.");
+
+	
+	/*here exec script deinstall */
+	if( file_exists("/usr/local/pkg/appsbypacketapps/.".$folder."/uninstall/")){
+		$files = scandir("/usr/local/pkg/appsbypacketapps/.".$folder."/uninstall/");
+		foreach( $files as $file ){
+			if( basename($file) != "." && basename($file) != ".."){
+				$info = detectFileMimeType($file);
+				if( strpos($info,'php') !== false ){
+					@include_once("/usr/local/pkg/appsbypacketapps/.".$folder."/uninstall/".$file);
+				}
+				else if( strpos($info,'shell') !== false ){
+					exec("/usr/local/pkg/appsbypacketapps/.".$folder."/uninstall/".$file);
+				}
+			}
+		}
+	}
+	
+
+	/* system files */
+	if(is_array($pkg_info['modify_system']) && is_array($pkg_info['modify_system']['item'])) {
+		//$static_output .= gettext("System files... ");
+		//update_output_window(//$static_output);
+		foreach($pkg_info['modify_system']['item'] as $ms)
+			if($ms['textneeded']) remove_text_from_file($ms['modifyfilename'], $ms['textneeded']);
+
+		//$static_output .= gettext("done.") . "\n";
+		//update_output_window(//$static_output);
+	}
+	
+	
+	/* remove all additional files */
+	if(is_array($pkg_info['additional_files_needed'])) {
+		//$static_output .= gettext("Auxiliary files... ");
+		//update_output_window(//$static_output);
+		foreach($pkg_info['additional_files_needed'] as $afn) {
+			$filename = basename($afn['item']);
+			if($afn['prefix'] <> "")
+				$prefix = $afn['prefix'];
+			else
+				$prefix = "/usr/local/appsbypacketapps/";
+			
+			unlink_if_exists($prefix . $filename);
+		}
+		//$static_output .= gettext("done.") . "\n";
+		//update_output_window(//$static_output);
+	}
+	/* package XML file */
+	//$static_output .= gettext("Package XML... ");
+	//update_output_window(//$static_output);
+	unlink_if_exists("/usr/local/appsbypacketapps/.".$folder."Manifest_package.xml");
+	//$static_output .= gettext("done.") . "\n";
+	//update_output_window(//$static_output);
+	
+	/* syslog */
+	if(is_array($pkg_info['logging']) && $pkg_info['logging']['logfile_name'] <> "") {
+		//$static_output .= "Syslog entries... ";
+		//update_output_window(//$static_output);
+		remove_text_from_file("/etc/syslog.conf", $pkg_info['logging']['facilityname'] . "\t\t\t\t" . $pkg_info['logging']['logfilename']);
+		system_syslogd_start();
+		@unlink("{$g['varlog_path']}/{$pkg_info['logging']['logfilename']}");
+		//$static_output .= "done.\n";
+		//update_output_window(//$static_output);
+	}
+	
+	conf_mount_ro();
+	/* remove config.xml entries */
+	//$static_output .= gettext("Configuration... ");
+	//update_output_window(//$static_output);
+	$config_app = simplexml_load_file("/usr/local/appsbypacketapps/config.xml");
+	$packages = $config_app->packages;
+	$new_config = simplexml_load_string('<root><packages></packages></root>');
+	$pkgs = $new_config->packages;
+	foreach( $packages as $package ){
+		if( trim($package->name) != "" && trim($package->name) != trim($pkgid) ){
+			$new_pkg = $pkgs->addChild("package");
+			$new_pkg->addChild('name',$package->name);
+			$new_pkg->addChild('version',$package->version);
+			$new_pkg->addChild('index',$package->index);
+			$new_pkg->addChild('synopsis',$package->synonpsis);
+		}
+	}
+	$new_config->asXml("/usr/local/appsbypacketapps/config.xml");
+	
+	//$static_output .= gettext("done.") . "\n";
+	//update_output_window(//$static_output);
+	write_config("Removed {$pkg} package.\n");
+	return true;
+}
+
+
+function deinstall_pkg($pkg_name){
+
+ 	$pkg_name = str_replace(' ','_',$pkg_name);	
+	global $static_output;
+	$id = get_id_pkg($pkg_name);
+	if ($id >= 0) {
+		stop_service($id);
+		//$static_output .= "Stopping Services...\n";
+		//update_output_window(//$static_output);
+	}
+	if( !delete_xml_package($pkg_name) ){
+		return false;
+	}
+	exec("rm /tmp/config.cache");
+	
+	$folder = file_get_contents("/usr/local/appsbypacketapps/".$pkg_name."/.id");
+	if( $folder != null && $folder != "" && $folder != " ") {
+		foreach( scandir('/usr/local/appsbypacketapps/.'.$folder) as $content ){
+			if( is_dir($content) && $content != "." && $content != ".."){
+				foreach( scandir($content) as $sub_content ){
+					if( $sub_content != "." && $sub_content != ".."){
+						unlink('/usr/local/appsbypacketapps/.'.$folder.'/'.$content."/".$sub_content); 
+					}
+				}
+				rmdir($content);
+			}
+			else{
+				if( $content != "." && $content !=".." ){
+					if( $content == "uninstall" ){
+						exec('rm -R /usr/local/appsbypacketapps/.'.$folder.'/'.$content);
+					}
+					else{
+						unlink('/usr/local/appsbypacketapps/.'.$folder.'/'.$content);	
+					}
+				}
+			}
+		}
+		rmdir('/usr/local/appsbypacketapps/.'.$folder);
+	}
+	
+	unlink('/usr/local/appsbypacketapps/'.$pkg_name."/.id");
+	if( count(scandir('/usr/local/appsbypacketapps/'.$pkg_name)) > 2 ){
+		exec('rm -R /usr/local/appsbypacketapps/'.$pkg_name);
+	}
+	else{
+		rmdir('/usr/local/appsbypacketapps/'.$pkg_name);
+	}
+	
+	@unlink('/usr/local/www/logo/'.$pkg_name);
+	
+	//$static_output .= gettext("done.") . "\n";
+	//update_output_window(//$static_output);
+	return true;
+}
+
+function uninstall_from_url($pkg_url){
+	//récupération de l'archive contenant le package
+	
+	$archive_name = basename($pkg_url);
+	$name_length = strlen($archive_name);
+	$name = substr($archive_name,0,$name_length-15);
+	return deinstall_pkg($name);
+}
+
+function stop_service_apps($name) {
+	global $config;
+
+	if (empty($name)){
+		return false;
+	}
+	else{
+		$folder = file_get_contents("/usr/local/appsbypacketapps/".$name."/.id");
+		$pkg_info = get_info_pkg("/usr/local/appsbypacketapps/.".$folder);
+		$pkg_services = isset($pkg_info['services'])? $pkg_info['services'] : array($pkg_info['service']);
+		if (is_array($config['installedpackages']) && is_array($config['installedpackages']['service'])) {
+			foreach($config['installedpackages']['service'] as $service) {
+				foreach( $pkg_services as $pkg_service ){
+					if(strtolower($service['name']) == strtolower($pkg_service['name'])) {
+						if($service['rcfile']) {
+							$prefix = RCFILEPREFIX;
+							if(!empty($service['prefix'])) {
+								$prefix =& $service['prefix'];
+							}
+							if(file_exists("{$prefix}{$service['rcfile']}") || is_link("{$prefix}{$service['rcfile']}")) {
+								mwexec("{$prefix}{$service['rcfile']} stop");
+							}
+							return;
+						}
+						if (!empty($service['stopcmd']))
+							eval($service['stopcmd']);
+		
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+?>

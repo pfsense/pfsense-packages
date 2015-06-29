@@ -1,0 +1,36 @@
+<?php
+header("Expires: Tue, 01 Jan 2000 00:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+include_once("system_apps_by_packetapps_install_pkg.php");
+
+
+$name = $_GET['pkg'];
+$pkg_id = trim(file_get_contents("/usr/local/appsbypacketapps/".$name."/.id"));
+$res = deinstall_pkg($name);
+if( $res ){
+	error_log($pkg_id);
+	$dns = "https://www.packetapps.com/php";
+	$id = trim(file_get_contents("/usr/local/appsbypacketapps/.device/id"));
+	$url = "/app/register/device/".$id."/uninstall";
+	$ch = curl_init();
+	curl_setopt($ch,CURLOPT_URL,$dns.$url);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+	curl_setopt($ch, CURLOPT_HEADER, false);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	$fields = array(
+		'pkg' => urlencode($pkg_id),
+	);
+	curl_setopt($ch,CURLOPT_POST, count($fields));
+	curl_setopt($ch,CURLOPT_POSTFIELDS, $fields);
+	curl_exec($ch);
+	curl_close($ch);
+	echo json_encode(array('result' => 1, 'text' => "Uninstall of ".$name." succed"));
+}
+else{
+	echo json_encode(array('result' => 0, 'text' => "Uninstall of ".$name." failed"));
+}
+
+?>

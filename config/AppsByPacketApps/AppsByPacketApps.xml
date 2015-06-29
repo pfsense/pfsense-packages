@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<packagegui>
+	<name>Apps by PacketApps.com</name>
+	<copyrights>Package created by Elonet</copyrights>
+	<description>App manager for PacketApps.com</description>
+	<requirements>2.2</requirements>
+	<faq>https://www.packetapps.com</faq>
+	<version>1.0</version>
+	<titre>AppsByPacketApps</titre>
+	<include_file>/usr/local/appsbypacketapps/AppsByPacketApps.inc</include_file>
+	<menu>
+		<name>PacketApps.com</name>
+		<tooltiptext>App Manager</tooltiptext>
+		<section>System</section>
+		<url>/system_apps_by_packetapps.php</url>
+	</menu>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0777</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/bootstrap</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0777</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/logo.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/app.inc</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/blenc_i386.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/blenc_amd64.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/main</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/send_license</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/install_pkg</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0777</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/finish_blenc.sh</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0777</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/uninstall</item>
+	</additional_files_needed>
+	<custom_php_install_command>app_install();</custom_php_install_command>
+	<custom_php_deinstall_command>app_deinstall();</custom_php_deinstall_command>
+</packagegui>
