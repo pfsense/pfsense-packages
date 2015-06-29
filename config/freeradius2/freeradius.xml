@@ -45,7 +45,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradius</name>
-	<version>1.6.12</version>
+	<version>1.6.13</version>
 	<title>FreeRADIUS: Users</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<menu>
@@ -472,6 +472,8 @@
 		freeradius_users_resync();
 	</custom_delete_php_command>
 	<custom_php_resync_config_command>
+		freeradius_settings_resync();
+		sleep(1);
 		freeradius_users_resync();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
