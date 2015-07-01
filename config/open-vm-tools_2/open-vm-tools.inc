@@ -20,7 +20,7 @@ function open_vm_tools_install() {
 	if ($pfs_version == "2.1") {
 		$openvmtools_path = "/usr/pbi/open-vm-tools-nox11-" . php_uname("m");
 	} else if ($pfs_version == "2.2") {
-		$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m");
+		$openvmtools_path = "/usr/pbi/open-vm-tools-" . php_uname("m") . "/local";
 	} else {
 		$openvmtools_path = "/usr/local";
 	}
@@ -63,7 +63,7 @@ unset start_cmd
 stop_precmd="\${checkvm_cmd}"
 unset stop_cmd
 command="/usr/local/bin/vmtoolsd"
-command_args="-c {$openvmtools_path}/share/vmware-tools/tools.conf -p {$openvmtools_path}/local/lib/open-vm-tools/plugins/vmsvc"
+command_args="-c {$openvmtools_path}/share/vmware-tools/tools.conf -p {$openvmtools_path}/lib/open-vm-tools/plugins/vmsvc"
 pidfile="/var/run/\${name}.pid"
 
 load_rc_config \$name
@@ -131,10 +131,10 @@ EOF;
 	fclose($fd);
 	*/
 	
-	$fd = fopen("$openvmtools_path/local/share/vmware-tools/tools.conf", "w");
+	$fd = fopen("$openvmtools_path/share/vmware-tools/tools.conf", "w");
 	if (!$fd) {
-		log_error("Could not open $openvmtools_path/local/share/vmware-tools/tools.conf for writing");
-		die("Could not open $openvmtools_path/local/share/vmware-tools/tools.conf for writing");
+		log_error("Could not open $openvmtools_path/share/vmware-tools/tools.conf for writing");
+		die("Could not open $openvmtools_path/share/vmware-tools/tools.conf for writing");
 	}
 	fwrite($fd, $vmware_tools_conf);
 	fclose($fd);
