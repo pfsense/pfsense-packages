@@ -451,6 +451,12 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("The value for Application ID Stats Period must be between 60 and 3600.");
 	}
 
+	// Validate Portscan Ignore_Scanners parameter
+	if ($_POST['sf_portscan'] == 'on' && is_alias($_POST['pscan_ignore_scanners'])) {
+		if (trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = gettext("FQDN aliases are not supported in Snort for the PORTSCAN IGNORE_SCANNERS parameter.");
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */

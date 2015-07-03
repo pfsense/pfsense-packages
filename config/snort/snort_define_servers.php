@@ -107,11 +107,15 @@ if ($_POST['save']) {
 
 	foreach ($snort_servers as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
-			$input_errors[] = "Only aliases are allowed";
+			$input_errors[] = "Only aliases are allowed.";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed in Snort.";
 	}
 	foreach ($snort_ports as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
-			$input_errors[] = "Only aliases are allowed";
+			$input_errors[] = "Only aliases are allowed.";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed in Snort.";
 	}
 	/* if no errors write to conf */
 	if (!$input_errors) {
