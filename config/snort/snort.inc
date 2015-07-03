@@ -3804,6 +3804,38 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username,
 	if (!empty($sid_files) && $error == "")
 		log_error("[snort] Snort pkg XMLRPC CARP sync auto-SID conf files success with {$url}:{$port} (pfsense.exec_php).");
 
+	/*************************************************/
+	/* Send over any IPREP IP List files             */
+	/*************************************************/
+	$sid_files = glob(SNORT_IPREP_PATH . '*');
+	foreach ($sid_files as $file) {
+		$content = base64_encode(file_get_contents($file));
+		$payload = "@file_put_contents('{$file}', base64_decode('{$content}'));";
+
+		/* assemble xmlrpc payload */
+		$method = 'pfsense.exec_php';
+		$params = array( XML_RPC_encode($password), XML_RPC_encode($payload) );
+	
+		log_error("[snort] Snort XMLRPC CARP sync sending IPREP files to {$url}:{$port}.");
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+		$cli->setCredentials($username, $password);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "";
+		if(!$resp) {
+			$error = "A communications error occurred while attempting Snort XMLRPC CARP sync with {$url}:{$port}.  Failed to transfer file: " . basename($file);
+			log_error($error);
+			file_notice("sync_settings", $error, "Snort Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$error = "An error code was received while attempting Snort XMLRPC CARP sync with {$url}:{$port}. Failed to transfer file: " . basename($file) . " - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "Snort Settings Sync", "");
+		}
+	}
+
+	if (!empty($sid_files) && $error == "")
+		log_error("[snort] Snort pkg XMLRPC CARP sync IPREP files success with {$url}:{$port} (pfsense.exec_php).");
+
 	/**************************************************/
 	/* Send over the <snortglobal> portion of the     */
 	/* config.xml.  $xml will hold section to sync.   */
