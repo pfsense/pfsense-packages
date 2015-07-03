@@ -569,6 +569,9 @@ if ($_POST['save']) {
 		    !empty($natent['host_attribute_data']))
 			snort_reload_config($natent, "SIGURG");
 
+		/* Sync to configured CARP slaves if any are enabled */
+		snort_sync_on_changes();
+
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
