@@ -245,9 +245,8 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	if (!($g['booting'])) {
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Starting Snort using rebuilt configuration..."));
-			update_output_window(gettext("Please wait while Snort is started..."));
-			mwexec("{$rcdir}snort.sh start");
-			update_output_window(gettext("Snort has been started using the rebuilt configuration..."));
+			mwexec_bg("{$rcdir}snort.sh start");
+			update_output_window(gettext("Snort is starting as a background taks using the rebuilt configuration..."));
 		}
 		else
 			mwexec_bg("{$rcdir}snort.sh start");
