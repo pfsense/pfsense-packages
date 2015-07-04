@@ -80,6 +80,18 @@ $pconfig = array();
 if (isset($id) && isset($a_nat[$id])) {
 	$pconfig = $a_nat[$id];
 
+	// Initialize multiple config engine arrays for supported preprocessors if necessary
+	if (!is_array($pconfig['frag3_engine']['item']))
+		$pconfig['frag3_engine']['item'] = array();
+	if (!is_array($pconfig['stream5_tcp_engine']['item']))
+		$pconfig['stream5_tcp_engine']['item'] = array();
+	if (!is_array($pconfig['http_inspect_engine']['item']))
+		$pconfig['http_inspect_engine']['item'] = array();
+	if (!is_array($pconfig['ftp_server_engine']['item']))
+		$pconfig['ftp_server_engine']['item'] = array();
+	if (!is_array($pconfig['ftp_client_engine']['item']))
+		$pconfig['ftp_client_engine']['item'] = array();
+
 	/************************************************************/
 	/* To keep new users from shooting themselves in the foot   */
 	/* enable the most common required preprocessors by default */
@@ -1509,10 +1521,10 @@ if ($savemsg) {
 			<?php
 			$values = array('Credit Card', 'Email Addresses', 'U.S. Phone Numbers', 'U.S. Social Security Numbers');
 			foreach ($values as $val): ?>
-			<option value="<?=$val;?>"
-			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>> 
+				<option value="<?=$val;?>"
+				<?php if (strpos($pconfig['sdf_alert_data_type'], $val) !== FALSE) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
-				<?php endforeach; ?>
+			<?php endforeach; ?>
 			</select><br/><?php echo gettext("Choose which types of sensitive data to detect.  Use CTRL + Click for multiple selections."); ?><br/>
 		</td>
 	</tr>
