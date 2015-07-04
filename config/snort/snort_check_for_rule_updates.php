@@ -682,6 +682,12 @@ if ($emergingthreats == 'on') {
 	}
 }
 
+// If removing deprecated rules categories, then do it
+if ($config['installedpackages']['snortglobal']['hide_deprecated_rules'] == "on") {
+	log_error(gettext("[Snort] Hide Deprecated Rules is enabled.  Removing obsoleted rules categories."));
+	snort_remove_dead_rules();
+}
+
 function snort_apply_customizations($snortcfg, $if_real) {
 
 	global $vrt_enabled, $rebuild_rules;

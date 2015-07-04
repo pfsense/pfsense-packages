@@ -85,6 +85,9 @@ conf_mount_rw();
 @rename("{$snortdir}/gen-msg.map-sample", "{$snortdir}/gen-msg.map");
 //@rename("{$snortdir}/attribute_table.dtd-sample", "{$snortdir}/attribute_table.dtd");
 
+/* Move deprecated_rules file to SNORTDIR/rules directory */
+@rename("/usr/local/pkg/snort/deprecated_rules", "{$snortdir}/rules/deprecated_rules");
+
 /* fix up the preprocessor rules filenames from a PBI package install */
 $preproc_rules = array("decoder.rules", "preprocessor.rules", "sensitive-data.rules");
 foreach ($preproc_rules as $file) {
