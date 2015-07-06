@@ -77,10 +77,11 @@ define('HVDEF_MAXSCANSIZE',             '5000000'); # [bytes] ! do not enter 0 o
 define('HVDEF_MAXARCSCANSIZE',          '5000000'); # [bytes] ! do not enter 0 or big size !
 define('HVDEF_PID_FILE',                '/var/run/havp.pid');
 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version == "2.1" || $pf_version == "2.2")
 		define("HVDEF_WORK_DIR", "/usr/pbi/havp-" . php_uname("m") . "/local/etc");
 	else
-		define("HVDEF_WORK_DIR", "/usr/local/etc/havp/");
+		define("HVDEF_WORK_DIR", "/usr/local/etc/havp");
 
 
 $pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
