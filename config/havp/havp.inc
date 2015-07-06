@@ -76,7 +76,12 @@ define('HVDEF_PROXYPORT',	            '8080');
 define('HVDEF_MAXSCANSIZE',             '5000000'); # [bytes] ! do not enter 0 or big size !
 define('HVDEF_MAXARCSCANSIZE',          '5000000'); # [bytes] ! do not enter 0 or big size !
 define('HVDEF_PID_FILE',                '/var/run/havp.pid');
-define('HVDEF_WORK_DIR',                '/usr/pbi/havp-amd64/local/etc');
+
+if ($pf_version == "2.1" || $pf_version == "2.2")
+		define("HVDEF_WORK_DIR", "/usr/pbi/havp-" . php_uname("m") . "/local/etc");
+	else
+		define("HVDEF_WORK_DIR", "/usr/local/etc/havp/");
+
 
 $pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
 if(preg_match("/^2./",$pfSversion))
