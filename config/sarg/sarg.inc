@@ -32,7 +32,7 @@
                                                                               */
 /* ========================================================================== */
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0){
+if ($pf_version == "2.1" || $pf_version == "2.2"){
 
 	// Function to get squidGuard directory
 	// each squidGuard version has a different directory
@@ -354,7 +354,7 @@ function sync_package_sarg() {
 			else
 				$new_cron['item'][]=$cron;
 			}
-		$cron_cmd="/usr/local/bin/php /usr/local/www/sarg.php";
+		$cron_cmd="/usr/local/bin/php --no-header /usr/local/www/sarg.php";
 		$sarg_schedule_id=0;
 		if (is_array($config['installedpackages']['sargschedule']['config']))
 			foreach ($config['installedpackages']['sargschedule']['config'] as $sarg_schedule){

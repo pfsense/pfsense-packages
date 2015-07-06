@@ -27,6 +27,10 @@
 		<active/>
 	</tab>
 	<tab>
+		<text>Raw Config</text>
+		<url>pkg_edit.php?xml=quagga_ospfd_raw.xml&amp;id=0</url>
+	</tab>
+	<tab>
 		<text>Status</text>
 		<url>/status_ospfd.php</url>
 	</tab>	

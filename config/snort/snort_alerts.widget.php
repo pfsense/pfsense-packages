@@ -39,23 +39,14 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_instance = &$config['installedpackages']['snortglobal']['rule'];
 
-// Test pfSense version and set different CSS class variables
-// depending on version.  2.1 offers enhanced CSS styles.
-$pfs_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pfs_version > '2.0') {
-	$alertRowEvenClass = "listMReven";
-	$alertRowOddClass = "listMRodd";
-	$alertColClass = "listMRr";
-}
-else {
-	$alertRowEvenClass = "listr";
-	$alertRowOddClass = "listr";
-	$alertColClass = "listr";
-}
+// Set some CSS class variables
+$alertRowEvenClass = "listMReven";
+$alertRowOddClass = "listMRodd";
+$alertColClass = "listMRr";
 
 /* check if Snort widget alert display lines value is set */
 $snort_nentries = $config['widgets']['widget_snort_display_lines'];
-if (!isset($snort_nentries) || $snort_nentries < 0)
+if (!isset($snort_nentries) || $snort_nentries <= 0)
 	$snort_nentries = 5;
 
 /* array sorting of the alerts */
@@ -93,7 +84,7 @@ if (isset($_GET['getNewAlerts'])) {
 	$counter = 0;
 	foreach ($s_alerts as $a) {
 		$response .= $a['instanceid'] . " " . $a['dateonly'] . "||" . $a['timeonly'] . "||" . $a['src'] . "||";
-		$response .= $a['dst'] . "||" . $a['priority'] . "||" . $a['category'] . "\n";
+		$response .= $a['dst'] . "||" . $a['msg'] . "\n";
 		$counter++;
 		if($counter >= $snort_nentries)
 			break;
@@ -104,7 +95,11 @@ if (isset($_GET['getNewAlerts'])) {
 
 // See if saving new display line count value
 if(isset($_POST['widget_snort_display_lines'])) {
-	$config['widgets']['widget_snort_display_lines'] = $_POST['widget_snort_display_lines'];
+	if($_POST['widget_snort_display_lines'] == "") {
+		unset($config['widgets']['widget_snort_display_lines']);
+	} else {
+		$config['widgets']['widget_snort_display_lines'] = max(intval($_POST['widget_snort_display_lines']), 1);
+	}
 	write_config("Saved Snort Alerts Widget Displayed Lines Parameter via Dashboard");
 	header("Location: ../../index.php");
 }
@@ -165,8 +160,7 @@ function snort_widget_get_alerts() {
 					// Add the DST PORT if not null
 					if (!empty($fields[9]))
 						$snort_alerts[$counter]['dst'] .= ":" . trim($fields[9]);
-					$snort_alerts[$counter]['priority'] = trim($fields[12]);
-					$snort_alerts[$counter]['category'] = trim($fields[11]);
+					$snort_alerts[$counter]['msg'] = trim($fields[4]);
 					$counter++;
 				};
 				fclose($fd);
@@ -205,7 +199,7 @@ function snort_widget_get_alerts() {
 		<tr>
 			<th class="widgetsubheader"><?=gettext("IF/Date");?></th>
 			<th class="widgetsubheader"><?=gettext("Src/Dst Address");?></th>
-			<th class="widgetsubheader"><?=gettext("Classification");?></th>
+			<th class="widgetsubheader"><?=gettext("Description");?></th>
 		</tr>
 	</thead>
 	<tbody id="snort-alert-entries">
@@ -216,9 +210,9 @@ function snort_widget_get_alerts() {
 			foreach ($snort_alerts as $alert) {
 				$alertRowClass = $counter % 2 ? $alertRowEvenClass : $alertRowOddClass;
 				echo("	<tr class='" . $alertRowClass . "'>
-				<td class='" . $alertColClass .  "'>" . $alert['instanceid'] . "&nbsp;" . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>
-				<td class='" . $alertColClass .  "' style='overflow: hidden; text-overflow: ellipsis;' nowrap><div style='display:inline;' title='" . $alert['src'] . "'>" . $alert['src'] . "</div><br/><div style='display:inline;' title='" . $alert['dst'] . "'>" . $alert['dst'] . "</div></td>
-				<td class='" . $alertColClass .  "'>Priority: " . $alert['priority'] . " " . $alert['category'] . "</td></tr>");
+				<td class='listMRr'>" . $alert['instanceid'] . "&nbsp;" . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>
+				<td class='listMRr' style='overflow: hidden; text-overflow: ellipsis;' nowrap><div style='display:inline;' title='" . $alert['src'] . "'>" . $alert['src'] . "</div><br/><div style='display:inline;' title='" . $alert['dst'] . "'>" . $alert['dst'] . "</div></td>
+				<td class='listMRr'><div style='display: fixed; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2em; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis;' title='{$alert['msg']}'>" . $alert['msg'] . "</div></td></tr>");
 				$counter++;
 				if($counter >= $snort_nentries)
 					break;
@@ -233,9 +227,8 @@ function snort_widget_get_alerts() {
 <!-- needed in the snort_alerts.js file code -->
 	var snortupdateDelay = 10000; // update every 10 seconds
 	var snort_nentries = <?=$snort_nentries;?>; // number of alerts to display (5 is default)
-	var snortWidgetRowEvenClass = "<?=$alertRowEvenClass;?>"; // allows alternating background on 2.1 and higher
-	var snortWidgetRowOddClass = "<?=$alertRowOddClass;?>"; // allows alternating background on 2.1 and higher
-	var snortWidgetColClass = "<?=$alertColClass;?>"; // sets column CSS style (different on 2.1 and higher)
+	var snortWidgetRowEvenClass = "<?=$alertRowEvenClass;?>"; // allows alternating background
+	var snortWidgetRowOddClass = "<?=$alertRowOddClass;?>"; // allows alternating background
 
 <!-- needed to display the widget settings menu -->
 	selectIntLink = "snort_alerts-configure";

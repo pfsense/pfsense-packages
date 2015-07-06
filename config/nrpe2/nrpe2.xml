@@ -52,9 +52,8 @@
 		<field>
 			<fielddescr>Bind IP Address</fielddescr>
 			<fieldname>server_address</fieldname>
-			<description>Set this to the IP address of the interface you want the daemon to listen on.</description>
+			<description>Set this to the IP address of the interface you want the daemon to listen on. (optional)</description>
 			<type>input</type>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Nagios Server(s)</fielddescr>
@@ -63,6 +62,13 @@
 			<type>input</type>
 			<required/>
 		</field>
+		<field>
+			<fielddescr>Allow Arguments (dont_blame_nrpe)</fielddescr>
+			<fieldname>dont_blame_nrpe</fieldname>
+			<description>Check this to enable accept NRPE arguments (Default: 0)</description>
+			<type>checkbox</type>
+		</field>
+
 		<field>
 			<type>listtopic</type>
 			<name>Commands</name>
@@ -110,7 +116,7 @@
 					<required/>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>Extra Options</fielddescr>
+					<fielddescr>Extra Options (Example: -s Z \$ARG1\$ \$ARG2\$)</fielddescr>
 					<fieldname>extra</fieldname>
 					<description>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</description>
 					<type>input</type>

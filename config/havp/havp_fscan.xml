@@ -36,10 +36,10 @@
                 </field>
         </fields>
         <custom_php_command_before_form>
-            havp_fscan_before_form(&amp;$pkg);
+            havp_fscan_before_form($pkg);
         </custom_php_command_before_form>
         <custom_php_validation_command>
-            havp_validate_settings($_POST, &amp;$input_errors);
+            havp_validate_settings($_POST, $input_errors);
         </custom_php_validation_command>
         <custom_php_resync_config_command>
         </custom_php_resync_config_command>

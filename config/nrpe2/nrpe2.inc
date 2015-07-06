@@ -25,11 +25,19 @@
 
 require_once('filter.inc');
 
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+
+if ($pfs_version == "2.0") {
 	define('NRPE_BASE', '/usr/local');
 } else {
 	define('NRPE_BASE', '/usr/pbi/nrpe-' . php_uname("m"));
 }
+
+if ($pfs_version == "2.1")
+	define('NRPE_BINARY', NRPE_BASE . "/sbin/nrpe2");
+else
+	define('NRPE_BINARY', "/usr/local/sbin/nrpe2");
+
 define('NRPE_CONFIG_DIR', NRPE_BASE . '/etc');
 define('NRPE_RCFILE', '/usr/local/etc/rc.d/nrpe2.sh');
 
@@ -47,6 +55,7 @@ function nrpe2_custom_php_install_command() {
 		$config['installedpackages']['nrpe2']['config'][0]['server_address'] = $ip;
 		$config['installedpackages']['nrpe2']['config'][0]['server_port'] = 5666;
 		$config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'] = "127.0.0.1";
+		$config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'] = "on";
 	}
 
 	if (!is_array($config['installedpackages']['nrpe2']['config'][0]['row'])) {
@@ -93,6 +102,7 @@ function nrpe2_custom_php_install_command() {
 		);
 	}
 	unlink_if_exists(NRPE_CONFIG_DIR . '/rc.d/nrpe2');
+	$nrpe2_binary = NRPE_BINARY;
 	$fd = fopen(NRPE_RCFILE, 'w');
 	$rc_file = <<<EOD
 #!/bin/sh
@@ -117,9 +127,9 @@ function nrpe2_custom_php_install_command() {
 
 nrpe2_enable=\${nrpe2_enable-"YES"}
 name="nrpe2"
-rcvar=`set_rcvar`
+rcvar="\${name}_enable"
 
-command="{$NRPE_BASE}/sbin/nrpe2"
+command="{$nrpe2_binary}"
 command_args="-d"
 extra_commands="reload"
 
@@ -169,24 +179,32 @@ function nrpe2_custom_php_write_config() {
 	$commands = implode($cmds);
 
 	$server_port = $config['installedpackages']['nrpe2']['config'][0]['server_port'];
-	$server_address = $config['installedpackages']['nrpe2']['config'][0]['server_address'];
 	$allowed_hosts = $config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'];
+	$dont_blame_nrpe = $config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'];
+	if ($config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'] == "on") {
+		$dont_blame_nrpe = 1;
+	} else {
+		$dont_blame_nrpe = 0;
+	}
 
 	$fd = fopen(NRPE_CONFIG_DIR . '/nrpe.cfg', 'w');
 	$nrpe_cfg = <<<EOD
 log_facility=daemon
 pid_file=/var/run/nrpe2.pid
 server_port={$server_port}
-server_address={$server_address}
 nrpe_user=nagios
 nrpe_group=nagios
 allowed_hosts={$allowed_hosts}
-dont_blame_nrpe=0
+dont_blame_nrpe={$dont_blame_nrpe}
 debug=0
 command_timeout=60
 connection_timeout=300
 {$commands}
 EOD;
+	if (defined($config['installedpackages']['nrpe2']['config'][0]['server_address'])) {
+                $server_address = $config['installedpackages']['nrpe2']['config'][0]['server_address'];
+                $nrpe_cfg .= "server_address={$server_address}";
+        }
 	fwrite($fd, $nrpe_cfg);
 	fclose($fd);
 	conf_mount_ro();

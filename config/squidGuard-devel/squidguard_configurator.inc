@@ -93,10 +93,10 @@ define('CONFIG_SG_HEADER', "
 # squid config options
 # ------------------------------------------------------------------------------
 define('REDIRECTOR_OPTIONS_REM',   '# squidGuard options');
-define('REDIRECTOR_PROGRAM_OPT',   'redirect_program');
-define('REDIRECT_BYPASS_OPT',      'redirector_bypass');
+define('REDIRECTOR_PROGRAM_OPT',   'url_rewrite_program');
+define('REDIRECT_BYPASS_OPT',      'url_rewrite_bypass');
 define('REDIRECT_CHILDREN_OPT',    'url_rewrite_children');
-define('REDIRECTOR_PROCESS_COUNT', '5'); # redirector processes count will started
+define('REDIRECTOR_PROCESS_COUNT', '16 startup=8 idle=4 concurrency=0'); # redirector processes count will started
 
 # ------------------------------------------------------------------------------
 # squidguard config options
@@ -206,6 +206,7 @@ define('SQUIDGUARD_GUILOG_LEVEL',           SQUIDGUARD_INFO);     # log level
 define('SQUIDGUARD_GUILOG_MAXCOUNT',        500);                 # log max lines
 define('SQUIDGUARD_GUILOG_ENABLE',          true);                # on/off gui log - option override GUI settings
 define('SQUIDGUARD_LOG_ENABLE',             true);                # on/off SG  log - option override GUI settings
+define('SQUIDGUARD_LOGROTATE_MAXCOUNT',     1000);                # logrotate max lines
 
 #
 define('FLT_DEFAULT_ALL', 'all');
@@ -846,7 +847,7 @@ function sg_create_config()
     }
 
     # check configuration data
-    if (!sg_check_config_data(&$error_res)) {
+    if (!sg_check_config_data($error_res)) {
         sg_addlog("sg_create_config", "Bad config data. It's all error_res: $error_res", SQUIDGUARD_ERROR);
         sg_addlog("sg_create_config", "Terminated.", SQUIDGUARD_ERROR);
         return sg_create_simple_config('', '', "Error! Check squidGuard configuration data." . " (sg_create_config: [2]).");
@@ -1071,8 +1072,8 @@ function sg_create_config()
 
                 # delete blacklist entries from 'pass' if blacklist disabled
                 if ($squidguard_config[F_BLACKLISTENABLED] !== 'on') {
-                    acl_remove_blacklist_items(&$acl[F_DESTINATIONNAME]);
-                    acl_remove_blacklist_items(&$acl[F_OVERDESTINATIONNAME]);
+                    acl_remove_blacklist_items($acl[F_DESTINATIONNAME]);
+                    acl_remove_blacklist_items($acl[F_OVERDESTINATIONNAME]);
                 }
 
                 # not allowing IP in URL
@@ -1128,7 +1129,7 @@ function sg_create_config()
 
         # delete blacklist entries from 'pass' if blacklist disabled
         if ($squidguard_config[F_BLACKLISTENABLED] !== 'on')
-            acl_remove_blacklist_items(&$def[F_DESTINATIONNAME]);
+            acl_remove_blacklist_items($def[F_DESTINATIONNAME]);
 
         # not allowing IP in URL
         if ($def[F_NOTALLOWINGIP])
@@ -1254,7 +1255,7 @@ function sg_redirector_base_url($rdr_info, $redirect_mode)
 
     # check redirect
     $errmsg = '';
-    if (!sg_check_redirect($redirect_mode, $rdr_info, &$errmsg)) {
+    if (!sg_check_redirect($redirect_mode, $rdr_info, $errmsg)) {
         $redirect_mode = RMOD_INT_ERRORPAGE;
         $rdr_info = "Bad redirect settings. $errmsg Check you configuration.";
         sg_addlog("sg_redirector_base_url", "$errmsg", SQUIDGUARD_ERROR);
@@ -1310,7 +1311,7 @@ function sg_aclpass_reorder($pass)
 # ------------------------------------------------------------
 # sg_check_config_data
 # ------------------------------------------------------------
-function sg_check_config_data ($input_errors)
+function sg_check_config_data (&$input_errors)
 {
     global $squidguard_config;
     $elog = array();
@@ -1327,14 +1328,14 @@ function sg_check_config_data ($input_errors)
             # check name as unique and name format
             $tm_name = $tm[F_NAME];
             $err_s = '';
-            if (!check_name_format($tm_name, &$err_s))
+            if (!check_name_format($tm_name, $err_s))
                 $elog[] = "(T1) TIME '$tm_name' error: >>> $err_s";
 
             if ($key_tm[$tm_name] > 1)
                 $elog[] = "(T2) TIME '$tm_name' error: duplicate time name '$tm_name'";
 
             # check time items format
-            sg_check_time($tm, &$elog);
+            sg_check_time($tm, $elog);
         }
     }
 
@@ -1345,7 +1346,7 @@ function sg_check_config_data ($input_errors)
             # check name as unique and name format
             $src_name = $src[F_NAME];
             $err_s = '';
-            if (!check_name_format($src_name, &$err_s))
+            if (!check_name_format($src_name, $err_s))
                 $elog[] = "(A1) ACL '$src_name'error: $err_s";
 
             if ($key_src[$src_name] > 1)
@@ -1362,13 +1363,13 @@ function sg_check_config_data ($input_errors)
             # check name as unique and name format
             $dst_name = $dst[F_NAME];
             $err_s = '';
-            if (!check_name_format($dst_name, &$err_s))
+            if (!check_name_format($dst_name, $err_s))
                 $elog[] = "(D1) DEST '$dst_name' error: $err_s";
 
             if ($key_dst[$dst_name] > 1)
                 $elog[] = "(D2) DEST '$dst_name' error: duplicate destination name '$dst_name'";
             #
-            sg_check_dest($dst, &$elog);
+            sg_check_dest($dst, $elog);
         }
     }
 
@@ -1396,7 +1397,7 @@ function sg_check_config_data ($input_errors)
             # check check name as unique and name format
             $rw_name = $rw[F_NAME];
             $err_s = '';
-            if (!check_name_format($rw_name, &$err_s))
+            if (!check_name_format($rw_name, $err_s))
                 $elog[] = "(R1) REWRITE '$rw_name' error: $err_s";
 
             if ($key_rw[$rw_name] > 1)
@@ -1674,7 +1675,7 @@ function is_username($username)
 # ------------------------------------------------------------------------------
 # check name
 # ------------------------------------------------------------------------------
-function check_name_format ($name, $input_errors)
+function check_name_format ($name, &$input_errors)
 {
     $elog = array();
     $val = trim($name);
@@ -1698,7 +1699,7 @@ function check_name_format ($name, $input_errors)
 # ******************************************************************************
 # check redirect
 # ------------------------------------------------------------------------------
-function sg_check_redirect($rdr_mode, $rdr_info, $err_msg)
+function sg_check_redirect($rdr_mode, $rdr_info, &$err_msg)
 {
     $res = true;
     switch($rdr_mode) {
@@ -1720,7 +1721,7 @@ function sg_check_redirect($rdr_mode, $rdr_info, $err_msg)
 # ------------------------------------------------------------------------------
 # sg_check_time
 # ------------------------------------------------------------------------------
-function sg_check_time($sgtime, $input_errors)
+function sg_check_time($sgtime, &$input_errors)
 {
     $err = '';
     $days = array("*", "mon", "tue", "wed", "thu", "fri", "sat", "sun");
@@ -1746,14 +1747,14 @@ function sg_check_time($sgtime, $input_errors)
 # ------------------------------------------------------------------------------
 # sg_check_dest
 # ------------------------------------------------------------------------------
-function sg_check_dest($sgx, $input_errors)
+function sg_check_dest($sgx, &$input_errors)
 {
     $elog = array();
     $dm = explode(" ", $sgx[F_DOMAINS]);
 #   $ex = explode(" ", $sgx[F_EXPRESSIONS]);
     $ur = explode(" ", $sgx[F_URLS]);
-    array_packitems(&$dm);
-    array_packitems(&$ur);
+    array_packitems($dm);
+    array_packitems($ur);
 
     # domain or ip
     foreach ($dm as $d_it) {
@@ -1765,7 +1766,7 @@ function sg_check_dest($sgx, $input_errors)
         if ($u_it && !is_dest_url($u_it)) $elog[] = "Item '$u_it' is not a url.";
 
     # check redirect
-    sg_check_redirect($sgx[F_RMOD], $sgx[F_REDIRECT], &$elog);
+    sg_check_redirect($sgx[F_RMOD], $sgx[F_REDIRECT], $elog);
 
     # update log
     if (!empty($elog)) {
@@ -1780,7 +1781,7 @@ function sg_check_dest($sgx, $input_errors)
 # ------------------------------------------------------------------------------
 # sg_check_src
 # ------------------------------------------------------------------------------
-function sg_check_src($sgx, $input_errors)
+function sg_check_src($sgx, &$input_errors)
 {
     $elog = array();
 
@@ -1822,7 +1823,7 @@ function str_packspaces($str)
     while(strpos($str, '  ')) $str = str_replace('  ', ' ', $str);
 }
 
-function array_packitems($arval)
+function array_packitems(&$arval)
 {
     if (is_array($arval)) {
         $arval = array_map("trim", $arval);          # trim all items
@@ -1894,7 +1895,7 @@ function check_time($time)
 # -----------------------------------------------------------------------------
 # acl_remove_blacklist_items
 # -----------------------------------------------------------------------------
-function acl_remove_blacklist_items($items)
+function acl_remove_blacklist_items(&$items)
 {
     # add !items and ^items
     $db_entries = sg_entries_blacklist();
@@ -1921,6 +1922,7 @@ function acl_remove_blacklist_items($items)
 # -----------------------------------------------------------------------------
 function sg_script_logrotate()
 {
+	$lines = SQUIDGUARD_LOGROTATE_MAXCOUNT;
 
 	global $squidguard_config;
 
@@ -2206,7 +2208,7 @@ function sg_update_blacklist($from_file)
             $blk_list  = array();
 
             # scan blacklist items
-            scan_blacklist_cat($tmp_unpack_dir, "blk", & $blk_items);
+            scan_blacklist_cat($tmp_unpack_dir, "blk", $blk_items);
 
             # move blacklist catalog structure to 'one level' (from tmp_DB to arch_DB)
             foreach ($blk_items as $key => $val) {
@@ -2415,7 +2417,7 @@ function squidguard_blacklist_restore_arcdb()
 #    ["urls"]        urls file path
 #    ["expressions"] expressions file path
 # ------------------------------------------------------------------------------
-function scan_blacklist_cat($curdir, $key_name, $cat_array)
+function scan_blacklist_cat($curdir, $key_name, &$cat_array)
 {
 
     if (file_exists($curdir) and is_dir($curdir)) {
@@ -2448,7 +2450,7 @@ function scan_blacklist_cat($curdir, $key_name, $cat_array)
                      $fls_key = $key_name . "_" . $fls;
 
                      # recursive call
-                     scan_blacklist_cat($fls_file, $fls_key, & $cat_array);
+                     scan_blacklist_cat($fls_file, $fls_key, $cat_array);
                  }
             }
         }

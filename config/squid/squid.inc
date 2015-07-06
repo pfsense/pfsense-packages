@@ -94,7 +94,7 @@ function squid_dash_z() {
 
 	if(!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir $cachedir");
-		make_dirs($cachedir);
+		@mkdir($cachedir, 0755, true);
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
 	}
@@ -223,7 +223,7 @@ function squid_install_command() {
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 			SQUID_BASE ) as $dir) {
-		make_dirs($dir);
+		@mkdir($dir, 0755, true);
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
@@ -278,7 +278,7 @@ function squid_deinstall_command() {
 	filter_configure();
 }
 
-function squid_before_form_general($pkg) {
+function squid_before_form_general(&$pkg) {
 	$values = get_dir(SQUID_CONFBASE . '/errors/');
 	// Get rid of '..' and '.'
 	array_shift($values);
@@ -299,7 +299,7 @@ function squid_before_form_general($pkg) {
 		$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
 }
 
-function squid_validate_general($post, $input_errors) {
+function squid_validate_general($post, &$input_errors) {
 	global $config;
 	$settings = $config['installedpackages']['squid']['config'][0];
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
@@ -356,7 +356,7 @@ function squid_validate_general($post, $input_errors) {
 	 }}
 }
 
-function squid_validate_upstream($post, $input_errors) {
+function squid_validate_upstream($post, &$input_errors) {
 	if ($post['proxy_forwarding'] == 'on') {
 		$addr = trim($post['proxy_addr']);
 		if (empty($addr))
@@ -378,7 +378,7 @@ function squid_validate_upstream($post, $input_errors) {
 	}
 }
 
-function squid_validate_cache($post, $input_errors) {
+function squid_validate_cache($post, &$input_errors) {
 	$num_fields = array(	'harddisk_cache_size' => 'Hard disk cache size',
 				'memory_cache_size' => 'Memory cache size',
 				'maximum_object_size' => 'Maximum object size',
@@ -417,7 +417,7 @@ function squid_validate_cache($post, $input_errors) {
 
 }
 
-function squid_validate_nac($post, $input_errors) {
+function squid_validate_nac($post, &$input_errors) {
 	$allowed_subnets = explode("\n", $post['allowed_subnets']);
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
@@ -456,7 +456,7 @@ function squid_validate_nac($post, $input_errors) {
 	}
 }
 
-function squid_validate_traffic($post, $input_errors) {
+function squid_validate_traffic($post, &$input_errors) {
 	$num_fields = array(	'max_download_size' => 'Maximum download size',
 				'max_upload_size' => 'Maximum upload size',
 				'perhost_throttling' => 'Per-host bandwidth throttling',
@@ -488,7 +488,7 @@ function squid_validate_traffic($post, $input_errors) {
 
 }
 
-function squid_validate_auth($post, $input_errors) {
+function squid_validate_auth($post, &$input_errors) {
 	$num_fields = array(	array('auth_processes', 'Authentication processes', 1),
 				array('auth_ttl', 'Authentication TTL', 0),
 	);
@@ -1153,7 +1153,7 @@ function squid_resync() {
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 			SQUID_BASE ) as $dir) {
-		make_dirs($dir);
+		@mkdir($dir, 0755, true);
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
@@ -1163,7 +1163,7 @@ function squid_resync() {
 
 	if(!is_dir($log_dir)) {
 		log_error("Creating squid log dir $log_dir");
-		make_dirs($log_dir);
+		@mkdir($log_dir, 0755, true);
 		squid_chown_recursive($log_dir, 'proxy', 'proxy');
 	}
 

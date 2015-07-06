@@ -144,7 +144,7 @@
 						To force sarg to create a report only for specific days, use:<br>
 						<b>TODAY:</b>&nbsp;&nbsp;-d `date +%d/%m/%Y`<br>
 						<b>YESTERDAY:</b>&nbsp;&nbsp;-d `date -v-1d +%d/%m/%Y`<br>
-						<b>WEEKAGO:</b>&nbsp;&nbsp;-d `date -v-1w +%d/%m/%Y`- `date -v-1d +%d/%m/%Y`<br>
+						<b>WEEKAGO:</b>&nbsp;&nbsp;-d `date -v-1w +%d/%m/%Y`-`date -v-1d +%d/%m/%Y`<br>
 						<b>MONTHAGO:</b>&nbsp;&nbsp;-d `date -v-1m +01/%m/%Y`-`date -v-1m +31/%m/%Y`]]></description>
 			<type>input</type>
 			<size>50</size>
@@ -216,7 +216,7 @@
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		sarg_validate_input($_POST, &amp;$input_errors);
+		sarg_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 		sync_package_sarg();

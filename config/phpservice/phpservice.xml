@@ -56,6 +56,9 @@
 		<rcfile>phpservice.sh</rcfile>
 		<executable>phpservice</executable>
 		<description>PHP run from a command line as a service.</description>    
+		<custom_php_service_status_command>
+			exec("/bin/pgrep -f phpservice");
+		</custom_php_service_status_command>
 	</service>
 	<tabs>
 		<tab>

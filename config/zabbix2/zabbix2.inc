@@ -2,10 +2,10 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    zabbix2-proxy.inc
-    part of the Zebedee package for pfSense
+    zabbix2.inc
+    part of the Zabbix package for pfSense
     Copyright (C) 2013 Danilo G. Baio
-	Copyright (C) 2013 Marcello Coutinho
+    Copyright (C) 2013 Marcello Coutinho
 
     All rights reserved.            
 			                                                                  */
@@ -46,16 +46,18 @@ function php_deinstall_zabbix2_agent(){
    global $config, $g;
 
    conf_mount_rw();
-   $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+   $pfs_version = php_zabbix2_pfs_version();
+   $zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
+
    if ($pfs_version > 2.0){
-      define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
+      define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
    } else {
       define('ZABBIX_AGENT_BASE', '/usr/local');
    }
 
    exec("/usr/bin/killall zabbix_agentd");
    unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/rc.d/zabbix2_agentd.sh");
-   unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/zabbix22/zabbix_agentd.conf");
+   unlink_if_exists(ZABBIX_AGENT_BASE . "/etc/" . $zabbix2_pkg_base . "/zabbix_agentd.conf");
    unlink_if_exists("/var/log/zabbix2/zabbix2_agentd.log");
    unlink_if_exists("/var/run/zabbix2/zabbix2_agentd.pid");
 
@@ -73,16 +75,18 @@ function php_deinstall_zabbix2_proxy(){
    global $config, $g;
 
    conf_mount_rw();
-   $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+   $pfs_version = php_zabbix2_pfs_version();
+   $zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
+
    if ($pfs_version > 2.0){
-      define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
+      define('ZABBIX_PROXY_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-proxy-' . php_uname("m"));
    } else {
       define('ZABBIX_PROXY_BASE', '/usr/local');
    }
 
    exec("/usr/bin/killall zabbix_proxy");
    unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/rc.d/zabbix2_proxy.sh");
-   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy.conf");
+   unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base . "/zabbix_proxy.conf");
    unlink_if_exists("/var/log/zabbix2/zabbix_proxy.log");
    unlink_if_exists("/var/run/zabbix2/zabbix2_proxy.pid");
 
@@ -99,7 +103,7 @@ function php_deinstall_zabbix2_proxy(){
    conf_mount_ro();
 }
 
-function validate_input_zabbix2($post,&$input_errors){
+function validate_input_zabbix2($post, &$input_errors){
 
 	if  (isset($post['proxyenabled'])){
 		if (!is_numericint($post['serverport'])) {
@@ -177,11 +181,12 @@ function sync_package_zabbix2(){
 	global $config, $g;
 
 	conf_mount_rw();
-	#check pfsense version
-	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	$pfs_version = php_zabbix2_pfs_version();
+	$zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
+
 	if ($pfs_version > 2.0){
-		define('ZABBIX_AGENT_BASE', '/usr/pbi/zabbix22-agent-' . php_uname("m"));
-		define('ZABBIX_PROXY_BASE', '/usr/pbi/zabbix22-proxy-' . php_uname("m"));
+		define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
+		define('ZABBIX_PROXY_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-proxy-' . php_uname("m"));
 		}
 	else {
 		define('ZABBIX_AGENT_BASE', '/usr/local');
@@ -210,7 +215,7 @@ ProxyMode={$Mode}
 {$AdvancedParams}
 
 EOF;
-			file_put_contents(ZABBIX_PROXY_BASE . "/etc/zabbix22/zabbix_proxy.conf", strtr($zbproxy_conf_file, array("\r" => "")));
+			file_put_contents(ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base . "/zabbix_proxy.conf", strtr($zbproxy_conf_file, array("\r" => "")));
 		}
 	}
 	/* check zabbix agent settings*/
@@ -244,7 +249,7 @@ StartAgents={$StartAgents}
 {$UserParams}
 
 EOF;
-		file_put_contents(ZABBIX_AGENT_BASE . "/etc/zabbix22/zabbix_agentd.conf",  strtr($zbagent_conf_file, array("\r" => "")));
+		file_put_contents(ZABBIX_AGENT_BASE . "/etc/" . $zabbix2_pkg_base . "/zabbix_agentd.conf",  strtr($zbagent_conf_file, array("\r" => "")));
 		}
 	}
 	$want_sysctls = array(
@@ -293,8 +298,8 @@ EOF;
 
 	/*check startup script files*/
 	/* create a few directories and ensure the sample files are in place */
-	if (!is_dir(ZABBIX_PROXY_BASE . "/etc/zabbix22"))
-		exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix22");
+	if (!is_dir(ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base))
+		exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base);
 
 	$dir_checks  = <<< EOF
 if [ ! -d /var/log/zabbix2 ]
@@ -371,4 +376,21 @@ EOF;
 		
 	conf_mount_ro();
 }
+
+function php_zabbix2_pfs_version(){
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	return $pfs_version;
+}
+
+function php_zabbix2_pkg_base($pfs_version){
+	if ($pfs_version >= 2.2){
+		// pfSense 2.2 with zabbix 2.4
+		$zabbix2_pkg_base = "zabbix24";
+	}else{
+		// pfSense 2.1 with zabbix 2.2
+		$zabbix2_pkg_base = "zabbix22";
+	}
+	return $zabbix2_pkg_base;
+}
+
 ?>

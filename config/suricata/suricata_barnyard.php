@@ -79,22 +79,49 @@ if (isset($id) && $a_nat[$id]) {
 	if (empty($a_nat[$id]['barnyard_syslog_opmode']))
 		$pconfig['barnyard_syslog_opmode'] = "default";
 	if (empty($a_nat[$id]['barnyard_syslog_facility']))
-		$pconfig['barnyard_syslog_facility'] = "LOG_USER";
+		$pconfig['barnyard_syslog_facility'] = "LOG_LOCAL1";
 	if (empty($a_nat[$id]['barnyard_syslog_priority']))
 		$pconfig['barnyard_syslog_priority'] = "LOG_INFO";
 	if (empty($a_nat[$id]['barnyard_bro_ids_dport']))
 		$pconfig['barnyard_bro_ids_dport'] = "47760";
 	if (empty($a_nat[$id]['barnyard_sensor_id']))
 		$pconfig['barnyard_sensor_id'] = "0";
-	if (empty($a_nat[$id]['barnyard_sensor_name']))
-		$pconfig['barnyard_sensor_name'] = php_uname("n");
 }
 
 if ($_POST['save']) {
+
+	// If disabling Barnyard2 on the interface, stop any
+	// currently running instance, then save the disabled
+	// state and exit so as to preserve settings.
+	if ($_POST['barnyard_enable'] != 'on') {
+		$a_nat[$id]['barnyard_enable'] = 'off';
+		write_config("Suricata pkg: modified Barnyard2 settings.");
+		suricata_barnyard_stop($a_nat[$id], get_real_interface($a_nat[$id]['interface']));
+
+		// No need to rebuild rules for Barnyard2 changes
+		$rebuild_rules = false;
+		conf_mount_rw();
+		sync_suricata_package_config();
+		conf_mount_ro();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /suricata/suricata_barnyard.php");
+		exit;
+	}
+
 	// Check that at least one output plugin is enabled
 	if ($_POST['barnyard_mysql_enable'] != 'on' && $_POST['barnyard_syslog_enable'] != 'on' &&
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
 		$input_errors[] = gettext("You must enable at least one output option when using Barnyard2.");
+
+	// Validate Sensor Name contains no spaces
+	if ($_POST['barnyard_enable'] == 'on') {
+		if (!empty($_POST['barnyard_sensor_name']) && strpos($_POST['barnyard_sensor_name'], " ") !== FALSE)
+			$input_errors[] = gettext("The value for 'Sensor Name' cannot contain spaces.");
+	}
 
 	// Validate Sensor ID is a valid integer
 	if ($_POST['barnyard_enable'] == 'on') {
@@ -160,14 +187,16 @@ if ($_POST['save']) {
 		if ($_POST['barnyard_syslog_priority']) $natent['barnyard_syslog_priority'] = $_POST['barnyard_syslog_priority']; else $natent['barnyard_syslog_priority'] = 'LOG_INFO';
 		if ($_POST['barnyard_bro_ids_rhost']) $natent['barnyard_bro_ids_rhost'] = $_POST['barnyard_bro_ids_rhost']; else unset($natent['barnyard_bro_ids_rhost']);
 		if ($_POST['barnyard_bro_ids_dport']) $natent['barnyard_bro_ids_dport'] = $_POST['barnyard_bro_ids_dport']; else $natent['barnyard_bro_ids_dport'] = '47760';
-		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']); else unset($natent['barnconfigpassthru']);
+		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['barnconfigpassthru'])); else unset($natent['barnconfigpassthru']);
 
 		$a_nat[$id] = $natent;
-		write_config();
+		write_config("Suricata pkg: modified Barnyard2 settings.");
 
 		// No need to rebuild rules for Barnyard2 changes
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		// If disabling Barnyard2 on the interface, stop any
 		// currently running instance.  If an instance is
@@ -200,8 +229,10 @@ include_once("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); 
+<?php include("fbegin.inc"); ?>
 
+<form action="suricata_barnyard.php" method="post" name="iform" id="iform">
+<?php
 	/* Display Alert message */
 	if ($input_errors) {
 		print_input_errors($input_errors);
@@ -210,23 +241,24 @@ include_once("head.inc");
 	if ($savemsg) {
 		print_info_box($savemsg);
 	}
-
 ?>
-
-<form action="suricata_barnyard.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
     $tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -239,12 +271,14 @@ include_once("head.inc");
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), true, "/suricata/suricata_barnyard.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 	<tr>
 		<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tbody>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic"><?php echo gettext("General Barnyard2 " .
 				"Settings"); ?></td>
@@ -382,7 +416,7 @@ include_once("head.inc");
 					<input name="barnyard_syslog_local" type="checkbox" value="on" <?php if ($pconfig['barnyard_syslog_local'] == "on") echo "checked"; ?> 
 					onClick="toggle_local_syslog()"/>
 					<?php echo gettext("Enable logging of alerts to the local system only"); ?><br/>
-					<?php echo gettext("This will send alert data to the local system only and overrides the host, port, protocol, facility and priority values below."); ?></td>
+					<?php echo gettext("This will send alert data to the local system only and overrides the host, port and protocol values below."); ?></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Remote Host"); ?></td>
@@ -416,8 +450,8 @@ include_once("head.inc");
 				<td width="78%" class="vtable">
 					<select name="barnyard_syslog_facility" id="barnyard_syslog_facility" class="formselect">
 					<?php
-						$log_facility = array(  "LOG_AUTH", "LOG_AUTHPRIV", "LOG_DAEMON", "LOG_KERN", "LOG_SYSLOG", "LOG_USER", "LOG_LOCAL1",
-									"LOG_LOCAL2", "LOG_LOCAL3", "LOG_LOCAL4", "LOG_LOCAL5", "LOG_LOCAL6", "LOG_LOCAL7" );
+						$log_facility = array(  "LOG_AUTH", "LOG_AUTHPRIV", "LOG_DAEMON", "LOG_KERN", "LOG_SYSLOG", "LOG_USER", "LOG_LOCAL0",
+									"LOG_LOCAL1", "LOG_LOCAL2", "LOG_LOCAL3", "LOG_LOCAL4", "LOG_LOCAL5", "LOG_LOCAL6", "LOG_LOCAL7" );
 						foreach ($log_facility as $facility) {
 							$selected = "";
 							if ($facility == $pconfig['barnyard_syslog_facility'])
@@ -425,7 +459,7 @@ include_once("head.inc");
 							echo "<option value='{$facility}'{$selected}>" . $facility . "</option>\n";
 						}
 					?></select>&nbsp;&nbsp;
-					<?php echo gettext("Select Syslog Facility to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_USER") . "</strong>."; ?>
+					<?php echo gettext("Select Syslog Facility to use for remote reporting.  Default is ") . "<strong>" . gettext("LOG_LOCAL1") . "</strong>."; ?>
 				</td>
 			</tr>
 			<tr>
@@ -433,7 +467,7 @@ include_once("head.inc");
 				<td width="78%" class="vtable">
 					<select name="barnyard_syslog_priority" id="barnyard_syslog_priority" class="formselect">
 					<?php
-						$log_priority = array( "LOG_EMERG", "LOG_ALERT", "LOG_CRIT", "LOG_ERR", "LOG_WARNING", "LOG_NOTICE", "LOG_INFO" );
+						$log_priority = array( "LOG_EMERG", "LOG_CRIT", "LOG_ALERT", "LOG_ERR", "LOG_WARNING", "LOG_NOTICE", "LOG_INFO" );
 						foreach ($log_priority as $priority) {
 							$selected = "";
 							if ($priority == $pconfig['barnyard_syslog_priority'])
@@ -498,10 +532,12 @@ include_once("head.inc");
 				<br/>
 				<?php echo gettext("Please save your settings before you click start."); ?> </td>
 			</tr>
+			</tbody>
 		</table>
 		</div>
 		</td>
 	</tr>
+	</tbody>
 </table>
 </form>
 
@@ -549,8 +585,6 @@ function toggle_local_syslog() {
 		document.iform.barnyard_syslog_dport.disabled = endis;
 		document.iform.barnyard_syslog_proto_udp.disabled = endis;
 		document.iform.barnyard_syslog_proto_tcp.disabled = endis;
-		document.iform.barnyard_syslog_facility.disabled = endis;
-		document.iform.barnyard_syslog_priority.disabled = endis;
 	}
 }
 
@@ -598,11 +632,11 @@ function enable_change(enable_change) {
 	document.iform.barnconfigpassthru.disabled = endis;
 }
 
-enable_change(false);
 toggle_mySQL();
 toggle_syslog();
 toggle_local_syslog();
 toggle_bro_ids();
+enable_change(false);
 
 </script>
 

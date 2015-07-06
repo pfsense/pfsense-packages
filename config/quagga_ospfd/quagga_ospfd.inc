@@ -74,20 +74,20 @@ function quagga_ospfd_install_conf() {
 	$quagga_config_base = PKG_QUAGGA_CONFIG_BASE;
 
 	$noaccept = "";
+	
+	// generate ospfd.conf based on the assistant
+	if(is_array($config['installedpackages']['quaggaospfd']['config']))
+		$ospfd_conf = &$config['installedpackages']['quaggaospfd']['config'][0];
+	else {
+		log_error("Quagga OSPFd: No config data found.");
+		return;
+	}
 
-	if ($config['installedpackages']['quaggaospfd']['rawconfig'] && $config['installedpackages']['quaggaospfd']['rawconfig']['item']) {
+	if (isset($config['installedpackages']['quaggaospfdraw']['config'][0]['ospfd'])
+	    && !empty($config['installedpackages']['quaggaospfdraw']['config'][0]['ospfd'])) {
 		// if there is a raw config specifyed in tthe config.xml use that instead of the assisted config
-		$conffile = implode("\n",$config['installedpackages']['quaggaospfd']['rawconfig']['item']);
-		//$conffile = $config['installedpackages']['quaggaospfd']['rawconfig'];
+		$conffile = str_replace("\r","",base64_decode($config['installedpackages']['quaggaospfdraw']['config'][0]['ospfd']));
 	} else {
-		// generate ospfd.conf based on the assistant
-		if($config['installedpackages']['quaggaospfd']['config'])
-			$ospfd_conf = &$config['installedpackages']['quaggaospfd']['config'][0];
-		else {
-			log_error("Quagga OSPFd: No config data found.");
-			return;
-		}
-
 		$conffile = "# This file was created by the pfSense package manager.  Do not edit!\n\n";
 
 		if($ospfd_conf['password'])
@@ -100,7 +100,7 @@ function quagga_ospfd_install_conf() {
 		$passive_interfaces = array();
 		$interface_networks = array();
 
-		if ($config['installedpackages']['quaggaospfdinterfaces']['config']) {
+		if (is_array($config['installedpackages']['quaggaospfdinterfaces']['config'])) {
 			foreach ($config['installedpackages']['quaggaospfdinterfaces']['config'] as $conf) {
 				$realif = get_real_interface($conf['interface']);
 				$conffile .= "interface {$realif}\n" ;
@@ -242,17 +242,23 @@ function quagga_ospfd_install_conf() {
 	fclose($fd);
 
 	/* Make zebra config */
-	$zebraconffile = "# This file was created by the pfSense package manager.  Do not edit!\n\n";
-	if($ospfd_conf['password'])
-		$zebraconffile .= "password {$ospfd_conf['password']}\n";
-	if ($ospfd_conf['logging'])
-		$zebraconffile .= "log syslog\n";
-	if (!empty($noaccept)) {
-		$zebraconffile .= $noaccept;
-		$zebraconffile .= "ip prefix-list ACCEPTFILTER permit any\n";
-		$zebraconffile .= "route-map ACCEPTFILTER permit 10\n";
-		$zebraconffile .= "match ip address prefix-list ACCEPTFILTER\n";
-		$zebraconffile .= "ip protocol ospf route-map ACCEPTFILTER\n";
+	if (isset($config['installedpackages']['quaggaospfdraw']['config'][0]['zebra'])
+	    && !empty($config['installedpackages']['quaggaospfdraw']['config'][0]['zebra'])) {
+		// if there is a raw config specifyed in tthe config.xml use that instead of the assisted config
+		$zebraconffile = str_replace("\r","",base64_decode($config['installedpackages']['quaggaospfdraw']['config'][0]['zebra']));
+	} else {
+		$zebraconffile = "# This file was created by the pfSense package manager.  Do not edit!\n\n";
+		if($ospfd_conf['password'])
+			$zebraconffile .= "password {$ospfd_conf['password']}\n";
+		if ($ospfd_conf['logging'])
+			$zebraconffile .= "log syslog\n";
+		if (!empty($noaccept)) {
+			$zebraconffile .= $noaccept;
+			$zebraconffile .= "ip prefix-list ACCEPTFILTER permit any\n";
+			$zebraconffile .= "route-map ACCEPTFILTER permit 10\n";
+			$zebraconffile .= "match ip address prefix-list ACCEPTFILTER\n";
+			$zebraconffile .= "ip protocol ospf route-map ACCEPTFILTER\n";
+		}
 	}
 	$fd = fopen("{$quagga_config_base}/zebra.conf", "w");
 	fwrite($fd, $zebraconffile);
@@ -260,8 +266,14 @@ function quagga_ospfd_install_conf() {
 
 	$carp_ip_status_check = "";
 	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
-		$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
-		$carp_ip_status_check = <<<EOF
+
+		$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+		switch ($pfs_version) {
+			case "2.0":
+			case "2.1":
+				/* Check for 2.1 and before */
+				$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
+				$carp_ip_status_check = <<<EOF
 
 CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep carp: | /usr/bin/awk '{print \$2;}'`
 if [ \${CARP_STATUS} != "MASTER" ]; then
@@ -269,6 +281,27 @@ if [ \${CARP_STATUS} != "MASTER" ]; then
 fi
 
 EOF;
+				break;
+			case "2.2":
+			default:
+				/* Check for 2.2 and later */
+				if (is_array($config['virtualip']['vip'])) {
+					foreach ($config['virtualip']['vip'] as $vip) {
+						if (($vip['mode'] == "carp") && ($vip['subnet'] == $ospfd_conf['carpstatusip'])) {
+							$carpcheckinterface = escapeshellarg(get_real_interface($vip['interface']));
+							$vhid = escapeshellarg($vip['vhid']);
+							$carp_ip_status_check = <<<EOF
+
+CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep 'carp:' | /usr/bin/grep 'vhid {$vhid}' | /usr/bin/awk '{print \$2;}'`
+if [ \${CARP_STATUS} != "MASTER" ]; then
+	exit;
+fi
+EOF;
+						}
+					}
+				}
+				break;
+		}
 	}
 
 
@@ -375,23 +408,6 @@ function quagga_ospfd_validate_input() {
 		$input_errors[] = "Please select an interface to use for Quagga OSPFd.";
 }
 
-// get the raw ospfd confi file for manual inspection/editing
-function quagga_ospfd_get_raw_config() {
-	return file_get_contents(PKG_QUAGGA_CONFIG_BASE . "/ospfd.conf");
-}
-
-// serialize the raw ospfd confi file to config.xml
-function quagga_ospfd_put_raw_config($conffile) {
-	global $config;
-	if ($conffile == "")
-		unset($config['installedpackages']['quaggaospfd']['rawconfig']);
-	else {
-		$config['installedpackages']['quaggaospfd']['rawconfig'] = array();
-		$config['installedpackages']['quaggaospfd']['rawconfig']['item'] = explode("\n",$_POST['quagga_ospfd_raw']);
-		$config['installedpackages']['quaggaospfd']['rawconfig'] = $conffile;
-	}
-}
-
 function quagga_get_carp_status_by_ip($ipaddr) {
 	$iface = trim(find_carp_interface($ipaddr));
 	if ($iface) {
@@ -406,4 +422,37 @@ function quagga_get_carp_status_by_ip($ipaddr) {
 	return $status;
 }
 
+function quagga_ospfd_plugin_carp($pluginparams) {
+	global $config;
+	require_once("service-utils.inc");
+	// Called when a CARP interface changes state
+	// $pluginparams['event'] either 'rc.carpmaster' or 'rc.carpbackup'
+	// $pluginparams['interface'] contains the affected interface
+
+	/* If there is no OSPF config, then stop */
+	if(is_array($config['installedpackages']['quaggaospfd']['config'])) {
+		$ospfd_conf = &$config['installedpackages']['quaggaospfd']['config'][0];
+	} else {
+		return null;
+	}
+	/* If there is no properly configured CARP status check IP, then stop */
+	if (!is_ipaddr($ospfd_conf['carpstatusip'])) {
+		return null;
+	}
+	list($vhid, $iface) = explode("@", trim($pluginparams['interface']));
+	$friendly = convert_real_interface_to_friendly_interface_name($iface);
+	$carp_iface = "{$friendly}_vip${vhid}";
+
+	/* If this CARP transition is not from the IP address to check, then stop. */
+	if (get_interface_ip($carp_iface) != $ospfd_conf['carpstatusip']) {
+		return null;
+	}
+
+	/* Start or stop the service as needed based on the CARP transition. */
+	if ($pluginparams['event'] == "rc.carpmaster") {
+		start_service("Quagga OSPFd");
+	} elseif ($pluginparams['event'] == "rc.carpbackup") {
+		stop_service("Quagga OSPFd");
+	}
+}
 ?>

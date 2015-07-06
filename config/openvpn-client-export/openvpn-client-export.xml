@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>OpenVPN Client Export</name>
-	<version>1.2.9</version>
+	<version>1.2.16</version>
 	<title>OpenVPN Client Export</title>
 	<include_file>/usr/local/pkg/openvpn-client-export.inc</include_file>
 	<backup_file></backup_file>
@@ -27,7 +27,8 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>https://files.pfsense.org/packages/openvpn-client-export/openvpn-client-export.tgz</item>
+		<item>https://files.pfsense.org/packages/openvpn-client-export/openvpn-client-export-2.3.6.tgz</item>
+		<do_not_add_to_port/>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>

@@ -32,7 +32,12 @@
 	require_once("service-utils.inc");
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
-	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		define('LCDPROC_CONFIG', '/usr/pbi/lcdproc-' . php_uname('m') . '/local/etc/LCDd.conf');
+	} else {
+		define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
+	}
 	define('LCDPROC_HOST','localhost');
 	define('LCDPROC_PORT','13666');
 	define('LCDPROC_SERVICE_NAME','lcdproc');
@@ -58,17 +63,17 @@
 		fclose($handle);
 		chmod($file, 0755);
 	}
-	function before_form_lcdproc($pkg) {
+	function before_form_lcdproc(&$pkg) {
 		global $config;
 		config_lock();
 		config_unlock();
 	}
-	function before_form_lcdproc_screens($pkg) {
+	function before_form_lcdproc_screens(&$pkg) {
 		global $config;
 		config_lock();
 		config_unlock();
 	}
-	function validate_form_lcdproc($post, $input_errors) {
+	function validate_form_lcdproc($post, &$input_errors) {
 		if($post['comport']) {
 			switch($post['comport']) {
 				case "none":
@@ -126,7 +131,7 @@
 			}
 		}		
 	}
-	function validate_form_lcdproc_screens($post, $input_errors) {
+	function validate_form_lcdproc_screens($post, &$input_errors) {
 		// No validation required ?!
 	}
 	function sync_package_lcdproc_screens() {
@@ -308,7 +313,8 @@
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath=/usr/local/lib/lcdproc/\n";
 					$config_text .= "ConnectionType={$lcdproc_config['connection_type']}\n";
-					$config_text .= "Device={$realport}\n";
+					if($lcdproc_config['comport'] != "none")
+						$config_text .= "Device={$realport}\n";
 					$config_text .= "Port=0x378\n"; 
 					$config_text .= "Speed=0\n";
 					$config_text .= "Keypad=yes\n";
@@ -502,7 +508,7 @@ EOD;
 				restart_service(LCDPROC_SERVICE_NAME);
 			}			
 		}
-		if((! $lcdproc_config['driver']) || ($lcdproc_config['comport'] == "none")) {
+		if((! $lcdproc_config['driver']) || (! $lcdproc_config['comport'])) {
 			/* no parameters user does not want lcdproc running */
 			/* lets stop the service and remove the rc file */
 			if(file_exists(LCDPROC_RCFILE)) {

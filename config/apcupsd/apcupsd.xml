@@ -40,7 +40,7 @@
 	<name>Apcupsd</name>
 	<title>Services: Apcupsd (General)</title>
 	<category>Monitoring</category>
-	<version>0.3</version>
+	<version>0.3.5</version>
 	<include_file>/usr/local/pkg/apcupsd.inc</include_file>
 	<addedit_string>Apcupsd has been created/modified.</addedit_string>
 	<delete_string>Apcupsd has been deleted.</delete_string>
@@ -334,12 +334,77 @@ UPSTYPE   DEVICE           Description <br>
 				<option><name>Share</name><value>share</value></option>
 			</options>
 		</field>
+		<field>
+			<name>Notifications</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>E-mail notification</fielddescr>
+			<fieldname>emailnotification</fieldname>
+			<description><![CDATA[Choose how APCUpsd will send email notifications.<br>
+<br>
+<strong>phpMailer</strong>	- In order to receive e-mail notifications through phpMailer, you need 
+to configure SMTP Email Notifications on Advanced/Notifications section, and also, 
+install mailreport package.<br>
+This feature is currently broken on pfSense 2.2, for more info see pfSense forum: 
+<a href="https://forum.pfsense.org/index.php?topic=89901.0">APCupsd package status for pfSense.</a><br>
+<br>
+<strong>SMTP built-in</strong> - A simple SMTP mail client for apcupsd. 
+It does not have smtp authentication of any kind.
+<br>
+			]]></description>
+			<type>select</type>
+			<default_value>phpmailer</default_value>
+			<options>
+				<option><name>phpMailer</name><value>phpmailer</value></option>
+				<option><name>SMTP built-in</name><value>smtpbuiltin</value></option>
+			</options>
+		</field>
+		<field>
+			<name>SMTP built-in</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>SMTP Host</fielddescr>
+			<fieldname>smtphost</fieldname>
+			<description></description>
+         <type>input</type>
+         <size>20</size>
+		</field>
+		<field>
+			<fielddescr>SMTP Port</fielddescr>
+			<fieldname>smtpport</fieldname>
+			<description></description>
+         <type>input</type>
+         <size>5</size>
+		</field>
+		<field>
+			<fielddescr>From</fielddescr>
+			<fieldname>smtpfrom</fieldname>
+			<description></description>
+         <type>input</type>
+         <size>20</size>
+		</field>
+		<field>
+			<fielddescr>To</fielddescr>
+			<fieldname>smtpto</fieldname>
+			<description></description>
+         <type>input</type>
+         <size>20</size>
+		</field>
+		<field>
+			<fielddescr>Cc</fielddescr>
+			<fieldname>smtpcc</fieldname>
+			<description></description>
+         <type>input</type>
+         <size>20</size>
+		</field>
 	</fields>
 	<custom_php_install_command>php_install_apcupsd();</custom_php_install_command>
 	<custom_php_command_before_form></custom_php_command_before_form>
 	<custom_php_after_head_command></custom_php_after_head_command>
 	<custom_php_after_form_command></custom_php_after_form_command>
-	<custom_php_validation_command>validate_input_apcupsd($_POST, &amp;$input_errors);</custom_php_validation_command>
+	<custom_php_validation_command>validate_input_apcupsd($_POST, $input_errors);</custom_php_validation_command>
 	<custom_add_php_command></custom_add_php_command>
 	<custom_php_resync_config_command>sync_package_apcupsd();</custom_php_resync_config_command>
 	<custom_php_deinstall_command>php_deinstall_apcupsd();</custom_php_deinstall_command>

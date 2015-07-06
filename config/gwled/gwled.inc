@@ -36,7 +36,7 @@ function gwled_stop() {
 	exec("/bin/pkill -9 -f gwled");
 }
 
-function validate_form_gwled($post, $input_errors) {
+function validate_form_gwled($post, &$input_errors) {
 	/* Make sure both aren't using the same interface */
 	if (($post['gw_led2']) && ($post['gw_led3']) && 
 	    (($post['enable_led2']) && ($post['enable_led3'])) &&

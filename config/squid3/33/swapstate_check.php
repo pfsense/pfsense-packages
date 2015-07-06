@@ -42,6 +42,8 @@ else
 if ($settings['harddisk_cache_system'] != "null"){
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$swapstate = $cachedir . '/swap.state';
+	if (!file_exists($swapstate))
+		return;
 	$disktotal = disk_total_space(dirname($cachedir));
 	$diskfree = disk_free_space(dirname($cachedir));
 	$diskusedpct = round((($disktotal - $diskfree) / $disktotal) * 100);

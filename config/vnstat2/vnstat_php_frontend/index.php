@@ -17,7 +17,7 @@
     // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     //
     //
-    // see file COPYING or at http://www.gnu.org/licenses/gpl.html 
+    // see file COPYING or at http://www.gnu.org/licenses/gpl.html
     // for more information.
     //
     require 'config.php';
@@ -31,15 +31,20 @@
     function write_side_bar()
     {
         global $iface, $page, $graph, $script, $style;
-        global $iface_list, $iface_title;   
+        global $iface_list, $iface_title;
         global $page_list, $page_title;
-        
+
         $p = "&amp;graph=$graph&amp;style=$style";
 
         print "<ul class=\"iface\">\n";
         foreach ($iface_list as $if)
         {
-            print "<li class=\"iface\">";
+            if ($iface == $if) {
+                print "<li class=\"iface active\">";
+            } else {
+                print "<li class=\"iface\">";
+            }
+            print "<a href=\"$script?if=$if$p\">";
             if (isset($iface_title[$if]))
             {
                 print $iface_title[$if];
@@ -48,17 +53,17 @@
             {
                 print $if;
             }
+            print "</a>";
             print "<ul class=\"page\">\n";
             foreach ($page_list as $pg)
             {
                 print "<li class=\"page\"><a href=\"$script?if=$if$p&amp;page=$pg\">".$page_title[$pg]."</a></li>\n";
             }
             print "</ul></li>\n";
-	    
         }
-        print "</ul>\n"; 
+        print "</ul>\n";
     }
-    
+
 
     function kbytes_to_string($kb)
     {
@@ -70,10 +75,10 @@
         {
             $ui++;
             $scale = $scale / 1024;
-        }   
+        }
         return sprintf("%0.2f %s", ($kb/$scale),$units[$ui]);
     }
-    
+
     function write_summary()
     {
         global $summary,$top,$day,$hour,$month;
@@ -108,8 +113,8 @@
         print "<br/>\n";
         write_data_table(T('Top 10 days'), $top);
     }
-    
-    
+
+
     function write_data_table($caption, $tab)
     {
         print "<table width=\"100%\" cellspacing=\"0\">\n";
@@ -118,7 +123,7 @@
         print "<th class=\"label\" style=\"width:120px;\">&nbsp;</th>";
         print "<th class=\"label\">".T('In')."</th>";
         print "<th class=\"label\">".T('Out')."</th>";
-        print "<th class=\"label\">".T('Total')."</th>";  
+        print "<th class=\"label\">".T('Total')."</th>";
         print "</tr>\n";
 
         for ($i=0; $i<count($tab); $i++)
@@ -148,7 +153,7 @@
     //
     header('Content-type: text/html; charset=utf-8');
     print '<?xml version="1.0"?>';
-?>        
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -168,7 +173,7 @@
         if ($graph_format == 'svg') {
 	     print "<object type=\"image/svg+xml\" width=\"692\" height=\"297\" data=\"graph_svg.php?$graph_params\"></object>\n";
         } else {
-	     print "<img src=\"graph.php?$graph_params\" alt=\"graph\"/>\n";	
+	     print "<img src=\"graph.php?$graph_params\" alt=\"graph\"/>\n";
         }
 
     if ($page == 's')
@@ -176,20 +181,20 @@
         write_summary();
     }
     else if ($page == 'h')
-    {   
-        write_data_table(T('Last 24 hours'), $hour); 
+    {
+        write_data_table(T('Last 24 hours'), $hour);
     }
     else if ($page == 'd')
     {
-        write_data_table(T('Last 30 days'), $day);	
+        write_data_table(T('Last 30 days'), $day);
     }
     else if ($page == 'm')
     {
-        write_data_table(T('Last 12 months'), $month);   
+        write_data_table(T('Last 12 months'), $month);
     }
     ?>
     </div>
-    <div id="footer"><a href="http://www.sqweek.com/">vnStat PHP frontend</a> 1.5.1 - &copy;2006-2010 Bjorge Dijkstra (bjd _at_ jooz.net)</div>
+    <div id="footer"><a href="http://www.sqweek.com/">vnStat PHP frontend</a> 1.5.2 - &copy;2006-2011 Bjorge Dijkstra (bjd _at_ jooz.net)</div>
   </div>
 </div>
 

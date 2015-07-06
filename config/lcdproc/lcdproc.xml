@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
-	<version>0.5.2_1-p12</version>
+	<version>0.5.5 pkg.v.1.0.1</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -363,10 +363,10 @@
 		</field>		
 	</fields>
 	<custom_php_command_before_form>
-		before_form_lcdproc(&amp;$pkg);
+		before_form_lcdproc($pkg);
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		validate_form_lcdproc($_POST, &amp;$input_errors);
+		validate_form_lcdproc($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_lcdproc();

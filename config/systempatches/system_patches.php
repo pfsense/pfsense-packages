@@ -67,7 +67,7 @@ if ($_GET['act'] == "del") {
 }
 
 if (($_GET['act'] == "fetch") && ($a_patches[$_GET['id']])) {
-	$savemsg = patch_fetch(& $a_patches[$_GET['id']]) ? gettext("Patch Fetched Successfully") : gettext("Patch Fetch Failed");
+	$savemsg = patch_fetch($a_patches[$_GET['id']]) ? gettext("Patch Fetched Successfully") : gettext("Patch Fetch Failed");
 }
 if (($_GET['act'] == "test") && ($a_patches[$_GET['id']])) {
 	$savemsg = patch_test_apply($a_patches[$_GET['id']]) ? gettext("Patch can be applied cleanly") : gettext("Patch can NOT be applied cleanly");
@@ -160,7 +160,7 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <form action="system_patches.php" method="post" name="iform">
 <script type="text/javascript" language="javascript" src="/javascript/row_toggle.js"></script>
-<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php if ($savemsg) print_info_box_np($savemsg, "Patches", "Close", false); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="system patches">
 <tr><td><div id="mainarea">
 <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0" summary="main area">

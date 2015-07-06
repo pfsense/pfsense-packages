@@ -15,6 +15,10 @@ max-pending-packets: {$max_pend_pkts}
 # Runmode the engine should use.
 runmode: autofp
 
+# If set to auto, the variable is internally switched to 'router' in IPS 
+# mode and 'sniffer-only' in IDS mode.
+host-mode: auto
+
 # Specifies the kind of flow load balancer used by the flow pinned autofp mode.
 autofp-scheduler: active-packets
 
@@ -29,7 +33,7 @@ default-log-dir: {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}
 # Configure the type of alert (and other) logging.
 outputs:
 
-  # alert_pf blocking plugin
+  # alert-pf blocking plugin
   - alert-pf:
       enabled: {$suri_blockoffenders}
       kill-state: {$suri_killstates}
@@ -55,9 +59,7 @@ outputs:
       enabled: {$http_log_enabled}
       filename: http.log
       append: {$http_log_append}
-      #extended: yes     # enable this for extended logging information
-      #custom: yes       # enabled the custom logging format (defined by customformat)
-      #customformat: "%{%D-%H:%M:%S}t.%z %{X-Forwarded-For}i %H %m %h %u %s %B %a:%p -> %A:%P"
+      extended: {$http_log_extended}
       filetype: regular
 
   - pcap-log:
@@ -82,8 +84,8 @@ outputs:
   - syslog:
       enabled: {$alert_syslog}
       identity: suricata
-      facility: auth
-      level: Info
+      facility: {$alert_syslog_facility}
+      level: {$alert_syslog_priority}
 
   - drop:
       enabled: no
@@ -94,8 +96,8 @@ outputs:
   - file-store:
       enabled: {$file_store_enabled}
       log-dir: files
-      force-magic: no
-      force-md5: no
+      force-magic: {$json_log_magic}
+      force-md5: {$json_log_md5}
       waldo: file.waldo
 
   - file-log:
@@ -105,6 +107,21 @@ outputs:
       filetype: regular
       force-magic: {$json_log_magic}
       force-md5: {$json_log_md5}
+
+  - dns-log:
+      enabled: {$dns_log_enabled}
+      filename: dns.log
+      append: {$dns_log_append}
+      filetype: regular
+
+  - eve-log:
+      enabled: {$enable_eve_log}
+      type: {$eve_output_type}
+      filename: eve.json
+      identity: "suricata"
+      facility: {$eve_systemlog_facility}
+      level: {$eve_systemlog_priority}
+      types: {$eve_out_types}
 
 # Magic file. The extension .mgc is added to the value here.
 magic-file: /usr/share/misc/magic
@@ -208,9 +225,9 @@ reassembly:
 
 # Host table is used by tagging and per host thresholding subsystems.
 host:
-  hash-size: 4096
-  prealloc: 1000
-  memcap: 16777216
+  hash-size: {$host_hash_size}
+  prealloc: {$host_prealloc}
+  memcap: {$host_memcap}
 
 # Host specific policies for defragmentation and TCP stream reassembly.
 host-os-policy:
@@ -233,12 +250,13 @@ logging:
       filename: {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}/suricata.log
   - syslog:
       enabled: {$suricata_use_syslog}
-      facility: auth
+      facility: {$suricata_use_syslog_facility}
       format: "[%i] <%d> -- "
 
 pcap:
   - interface: {$if_real}
     checksum-checks: auto
+    promisc: {$intf_promisc_mode}
 
 # For FreeBSD ipfw(8) divert(4) support.
 #   ipfw add 100 divert 8000 ip from any to any
@@ -268,18 +286,14 @@ vars:
   port-groups:
     {$port_vars}
 
-# Set the order of alerts bassed on actions
+# Set the order of alerts based on actions
 action-order:
   - pass
   - drop
   - reject
   - alert
 
-# IP Reputation
-#reputation-categories-file: {$suricatacfgdir}/iprep/categories.txt
-#default-reputation-path: {$suricatacfgdir}/iprep
-#reputation-files:
-# - reputation.list
+{$iprep_config}
 
 # Limit for the maximum number of asn1 frames to decode (default 256)
 asn1-max-frames: {$asn1_max_frames}
@@ -292,6 +306,47 @@ engine-analysis:
 pcre:
   match-limit: 3500
   match-limit-recursion: 1500
+
+# Holds details on the app-layer. The protocols section details each protocol.
+app-layer:
+  protocols:
+    tls:
+      enabled: {$tls_parser}
+      detection-ports:
+        dp: 443
+      #no-reassemble: yes
+    dcerpc:
+      enabled: {$dcerpc_parser}
+    ftp:
+      enabled: {$ftp_parser}
+    ssh:
+      enabled: {$ssh_parser}
+    smtp:
+      enabled: {$smtp_parser}
+    imap:
+      enabled: {$imap_parser}
+    msn:
+      enabled: {$msn_parser}
+    smb:
+      enabled: {$smb_parser}
+      detection-ports:
+        dp: 139
+    dns:
+      global-memcap: {$dns_global_memcap}
+      state-memcap: {$dns_state_memcap}
+      request-flood: {$dns_request_flood_limit}
+
+      tcp:
+        enabled: {$dns_parser_tcp}
+        detection-ports:
+          dp: 53
+      udp:
+        enabled: {$dns_parser_udp}
+        detection-ports:
+          dp: 53
+    http:
+      enabled: {$http_parser}
+      memcap: {$http_parser_memcap}
 
 ###########################################################################
 # Configure libhtp.

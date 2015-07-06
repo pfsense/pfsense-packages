@@ -70,7 +70,7 @@ class squidstat{
         $this->squidhost = '127.0.0.1';
         $this->squidport = '3128';
 
-        $This->group_by        = 'host';
+        $this->group_by        = 'host';
         $this->resolveip       = true;
         $this->hosts_file      = '';
 	    $this->autorefresh     = 0;
@@ -202,8 +202,12 @@ class squidstat{
 				}
 				if ($connection) {
 					# username field is avaible in Squid 2.6 stable
+					# peer changed to remote in Squid 3.2 or later
+					# me changed to local in Squid 3.2 or later
 					if(substr($v,0,9)  == "username ")  $parsed["con"][$connection]["username"]   = substr($v, 9);
+					if(substr($v,0,7)  == "remote:")    $parsed["con"][$connection]["peer"]       = substr($v, 8);
 					if(substr($v,0,5)  == "peer:")      $parsed["con"][$connection]["peer"]       = substr($v, 6);
+					if(substr($v,0,6)  == "local:")     $parsed["con"][$connection]["me"]         = substr($v, 7);
 					if(substr($v,0,3)  == "me:")        $parsed["con"][$connection]["me"]         = substr($v, 4);
 					if(substr($v,0,4)  == "uri ")       $parsed["con"][$connection]["uri"]        = substr($v, 4);
 					if(substr($v,0,10) == "delay_pool") $parsed["con"][$connection]["delay_pool"] = substr($v, 11);

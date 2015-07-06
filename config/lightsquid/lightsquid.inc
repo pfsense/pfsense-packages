@@ -39,14 +39,18 @@ if (file_exists('squid.inc')) {
 }
 else update_log("File 'squid.inc' not found.");
 
+global $pfs_version;
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
-	case "1.2":
-	case "2.0":
-		define('LIGHTSQUID_BASE','/usr/local');
+	case "2.1":
+		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m"));
+		break;
+	case "2.2":
+		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m") . '/local');
 		break;
 	default:
-		define('LIGHTSQUID_BASE', '/usr/pbi/lightsquid-' . php_uname("m"));
+		define('LIGHTSQUID_BASE','/usr/local');
+		break;
 }
 
 define ('CMD_PKGDELETE', 'pkg_delete lightsquid-1.7.1');
@@ -60,7 +64,7 @@ define('LS_CONFIGPATH',			LIGHTSQUID_BASE . '/etc/lightsquid');
 define('LS_CONFIGFILE',			'lightsquid.cfg');
 define('LS_CONFIGFILE_DIST',		'lightsquid.cfg.dist');
 define('LS_WWWPATH',			LIGHTSQUID_BASE . '/www/lightsquid');
-define('LS_TEMPLATEPATH',		LIGHTSQUID_BASE . '/www/lightsquid/tpl');
+define('LS_TEMPLATEPATH',		LS_WWWPATH . '/tpl');
 define('LS_LANGPATH',			LIGHTSQUID_BASE . '/share/lightsquid/lang');
 define('LS_REPORTPATH',			'/var/lightsquid/report');
 
@@ -112,24 +116,50 @@ define('LS_XML_SHEDULERTIME',		'lightsquid_refreshsheduler_time');
 define('LS_XML_SQUID_SHEDULERTIME',	'lightsquid_squidrotatelog_sheduler_time');
 
 function lightsquid_install() {
+	global $pfs_version;
+
 	update_log("lightsquid_install: started");
 
 	// create lightsquid report catalog
 	if (!file_exists(LS_REPORTPATH)) {
 		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
-		mwexec("mkdir -p " . LS_REPORTPATH);
+		mwexec("/bin/mkdir -p " . LS_REPORTPATH);
 	}
 
-	// install templates
-	$lstpl_file = "/var/tmp/lightsquid_tpl.tbz";
-	if (file_exists($lstpl_file)) {
-		mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
-		update_log("lightsquid_install: Install templates from $lstpl_file");
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		# check perl
+		$perl_path = '/usr/bin/perl';
+
+		/* Clean up a bad perl link. */
+		ls_cleanup_bad_link($perl_path);
+
+		if (!file_exists("/usr/bin/perl")) {
+			if (is_executable('/usr/local/bin/perl')) {
+				symlink('/usr/local/bin/perl', '/usr/bin/perl');
+			} elseif (is_executable(LIGHTSQUID_BASE . '/bin/perl')) {
+				symlink(LIGHTSQUID_BASE . '/bin/perl', '/usr/bin/perl');
+			}
+		}
+		if (!is_dir('/usr/local/lib/perl5') && is_dir(LIGHTSQUID_BASE . '/lib/perl5')) {
+			symlink(LIGHTSQUID_BASE . '/lib/perl5', '/usr/local/lib/perl5');
+		}
+		if (!is_dir('/usr/local/etc/lightsquid') && is_dir(LS_CONFIGPATH)) {
+			symlink(LS_CONFIGPATH, '/usr/local/etc/lightsquid');
+		}
+
+		if (is_dir('/usr/local/www/lightsquid'))
+			$_gc = exec('rm -rf /usr/local/www/lightsquid');
+
+		if (is_dir(LS_WWWPATH)) {
+			symlink(LS_WWWPATH, '/usr/local/www/lightsquid');
+		}
 	}
 
-	# check perl
-	if (!file_exists("/usr/bin/perl"))
-		mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+	foreach (array('novopf', 'novosea') as $tpl) {
+		if (file_exists(LS_TEMPLATEPATH . '/' . $tpl))
+			$_gc = exec('rm -rf ' . LS_TEMPLATEPATH . '/' . $tpl);
+		symlink('/usr/local/share/lightsquid/tpl/' . $tpl, LS_TEMPLATEPATH . '/' . $tpl);
+	}
 
 	update_log("lightsquid_install: stopped");
 }
@@ -145,13 +175,18 @@ function lightsquid_deinstall() {
 }
 
 function lightsquid_resync() {
-	global $config;
+	global $config, $pfs_version;
 	$tm = '';
 	$tm_squid = '';
 
-	# check perl
-	if (!file_exists("/usr/bin/perl"))
-		mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		# check perl
+		if (!file_exists("/usr/bin/perl"))
+			mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+
+		// Fixup library path so GD can find its libraries for graphs.
+		mwexec("/sbin/ldconfig -m " . LIGHTSQUID_BASE . "/lib/");
+	}
 
 	// create lightsquid report catalog
 	if (!file_exists(LS_REPORTPATH)) {
@@ -168,7 +203,9 @@ function lightsquid_resync() {
 
 		// variables for update
 		$lsconf_var[LS_VAR_CFGPATH]	= "\"" . LS_CONFIGPATH . "\"";
-		$lsconf_var[LS_VAR_LOGPATH]	= "\"" . LS_SQUIDLOGPATH . "\"";
+		if (isset($config['installedpackages']['squid']['config'][0])) {
+			$lsconf_var[LS_VAR_LOGPATH]	= "\"" . LS_SQUIDLOGPATH . "\"";
+		}
 		$lsconf_var[LS_VAR_TPLPATH]	= "\"" . LS_TEMPLATEPATH . "\"";
 		$lsconf_var[LS_VAR_LANGPATH]	= "\"" . LS_LANGPATH . "\"";
 		$lsconf_var[LS_VAR_REPORTPATH]	= "\"" . LS_REPORTPATH . "\"";
@@ -413,14 +450,16 @@ function refresh_full() {
 	update_log("refresh_full: execute command '$cmd'");
 	mwexec_bg("$cmd $log_name");
 	// parse access.log.x
-	for ($i=0; $i<100; $i++) {
-		$lg = LS_SQUIDLOG . ".$i";
-		if (file_exists(LS_SQUIDLOGPATH . "/$lg")) {
-			update_log("refresh_full: execute command '$cmd $lg'");
-			mwexec_bg("$cmd $lg");
-		} else
-			// really go <= 10 cycles
-			break;
+	if (isset($config['installedpackages']['squid']['config'][0])) {
+		for ($i=0; $i<100; $i++) {
+			$lg = LS_SQUIDLOG . ".$i";
+			if (file_exists(LS_SQUIDLOGPATH . "/$lg")) {
+				update_log("refresh_full: execute command '$cmd $lg'");
+				mwexec_bg("$cmd $lg");
+			} else
+				// really go <= 10 cycles
+				break;
+		}
 	}
 	update_log("refresh_full: stop");
 }
@@ -434,6 +473,16 @@ function ls_get_real_interface_address($iface)
 	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
 
 	return array($ip, long2ip(hexdec($netmask)));
+}
+
+/* If a path is a symlink but the target is missing, remove the link. */
+function ls_cleanup_bad_link($link) {
+	if (file_exists($link) && is_link($link)) {
+		$target = readlink($link);
+		if (!file_exists($target) || !is_executable($target)) {
+			unlink($link);
+		}
+	}
 }
 
 ?>

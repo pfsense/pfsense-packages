@@ -3,7 +3,7 @@
         <name>havp</name>
         <title>Antivirus: HTTP proxy (havp + clamav)</title>
         <category>Status</category>
-        <version>0.88_03</version>
+        <version>1.02</version>
         <include_file>/usr/local/pkg/havp.inc</include_file>
         <menu>
                 <name>Antivirus</name>
@@ -55,6 +55,10 @@
                         <text>Settings</text>
                         <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
                 </tab>
+                <tab>
+                        <text>HAVP Log</text>
+                        <url>/havp_log.php</url>
+                </tab>
         </tabs>
         <fields>
                 <field>
@@ -62,6 +66,21 @@
                         <fieldname>enable</fieldname>
                         <description>Check this for enable proxy.</description>
                         <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>ClamAV mode</fielddescr>
+                        <fieldname>useclamd</fieldname>
+                        <description>
+                            Select ClamAV running mode:&lt;br&gt;
+                            &lt;b&gt;Daemon&lt;/b&gt; - HAVP will use ClamAV as socket scanner daemon. Default option.&lt;br&gt;
+                            &lt;b&gt;Library&lt;/b&gt; - HAVP will use ClamAV as loaded library scanner. Note: this mode needs much more memory.&lt;br&gt;
+                        </description>
+                        <type>select</type>
+                        <default_value>true</default_value>
+                        <options>
+                                 <option><value>true</value><name>Daemon</name></option>
+                                 <option><value>false</value><name>Library</name></option>
+                        </options>
                 </field>
                 <field>
                         <fielddescr>Proxy mode</fielddescr>
@@ -274,24 +293,24 @@
 						<default_value>on</default_value>
                 </field>				
                 <field>
-                        <fielddescr>Log</fielddescr>
+                        <fielddescr>HAVP Log</fielddescr>
                         <fieldname>log</fieldname>
-                        <description>Check this for enable log.</description>
+                        <description>Check this for enable HAVP log.</description>
                         <type>checkbox</type>
                         <enablefields>syslog</enablefields>
                 </field>
                 <field>
-                        <fielddescr>Syslog</fielddescr>
+                        <fielddescr>HAVP Syslog</fielddescr>
                         <fieldname>syslog</fieldname>
-                        <description>Check this for enable Syslog.</description>
+                        <description>Check this for enable HAVP Syslog.</description>
                         <type>checkbox</type>
                 </field>
         </fields>
         <custom_php_command_before_form>
-            havp_before_form(&amp;$pkg);
+            havp_before_form($pkg);
         </custom_php_command_before_form>
         <custom_php_validation_command>
-            havp_validate_settings($_POST, &amp;$input_errors);
+            havp_validate_settings($_POST, $input_errors);
         </custom_php_validation_command>
         <custom_php_resync_config_command>
             havp_resync();

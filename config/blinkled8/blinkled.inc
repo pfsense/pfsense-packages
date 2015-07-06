@@ -69,7 +69,7 @@ function blinkled_stop() {
 	mwexec("/usr/bin/killall -9 blinkled");
 }
 
-function validate_form_blinkled($post, $input_errors) {
+function validate_form_blinkled($post, &$input_errors) {
 	/* Make sure both aren't using the same interface */
 	if (($post['iface_led2']) && ($post['iface_led3']) && 
 	    (($post['enable_led2']) && ($post['enable_led3'])) &&

@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Interfaces: Assign LEDs</title>
 	<name>blinkled</name>
-	<version>0.4</version>
+	<version>0.4.1</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/blinkled.inc</include_file>
 	<menu>
@@ -15,11 +15,6 @@
 		<item>https://packages.pfsense.org/packages/config/blinkled8/blinkled.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/bin/</prefix>
-		<chmod>0755</chmod>
-		<item>https://packages.pfsense.org/packages/config/blinkled8/binaries/blinkled</item>
 	</additional_files_needed>
 	<service>
 		<name>blinkled</name>
@@ -61,7 +56,7 @@
 		</field>
 	</fields>
 	<custom_php_validation_command>
-		validate_form_blinkled($_POST, &amp;$input_errors);
+		validate_form_blinkled($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_blinkled();

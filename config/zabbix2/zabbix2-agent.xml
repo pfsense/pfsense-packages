@@ -6,7 +6,7 @@
 /* ========================================================================== */
 /*
     zabbix2-agent.xml
-    part of the Zebedee package for pfSense
+    part of the Zabbix package for pfSense
     Copyright (C) 2013 Danilo G. Baio
 	Copyright (C) 2013 Marcello Coutinho
 	
@@ -41,7 +41,7 @@
 	<name>zabbixagent</name>
 	<title>Services: Zabbix-2 Agent</title>
 	<category>Monitoring</category>
-	<version>0.8_1</version>
+	<version>0.8.3</version>
 	<include_file>/usr/local/pkg/zabbix2.inc</include_file>
 	<addedit_string>Zabbix Agent has been created/modified.</addedit_string>
 	<delete_string>Zabbix Agent has been deleted.</delete_string>
@@ -172,7 +172,7 @@
 	<custom_php_command_before_form></custom_php_command_before_form>
 	<custom_php_after_head_command></custom_php_after_head_command>
 	<custom_php_after_form_command></custom_php_after_form_command>
-	<custom_php_validation_command>validate_input_zabbix2($_POST, &amp;$input_errors);</custom_php_validation_command>
+	<custom_php_validation_command>validate_input_zabbix2($_POST, $input_errors);</custom_php_validation_command>
 	<custom_add_php_command></custom_add_php_command>
 	<custom_php_resync_config_command>sync_package_zabbix2();</custom_php_resync_config_command>
 	<custom_php_deinstall_command>php_deinstall_zabbix2_agent();</custom_php_deinstall_command>

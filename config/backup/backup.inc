@@ -32,16 +32,17 @@
 */
 
 
-function byte_convert( $bytes ) {
-	if ($bytes<=0)
-		return '0 Byte';
+if (!function_exists("byte_convert")) {
+	function byte_convert( $bytes ) {
+		if ($bytes<=0)
+			return '0 Byte';
 
-	$convention=1000; //[1000->10^x|1024->2^x]
-	$s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-	$e=floor(log($bytes,$convention));
-	return round($bytes/pow($convention,$e),2).' '.$s[$e];
+		$convention=1000; //[1000->10^x|1024->2^x]
+		$s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
+		$e=floor(log($bytes,$convention));
+		return round($bytes/pow($convention,$e),2).' '.$s[$e];
+	}
 }
-
  
 function backup_sync_package_php()
 {
@@ -78,40 +79,15 @@ function backup_install_command()
 	global $config;
 	conf_mount_rw();
 
-	if (!is_dir('/usr/local/www/packages/')) {
-	   exec("mkdir /usr/local/www/packages/");
-	}
-
-	if (!is_dir('/usr/local/www/packages/backup/')) {
-	   exec("mkdir /usr/local/www/packages/backup/");
-	}
-
 	//create the backup directory
 	if (!is_dir('/root/backup/')) {
-		exec("mkdir /root/backup/");
+		@mkdir("/root/backup/");
 	}
-
-	//rename PHP files from .tmp to .php
-	exec("cp /tmp/backup.tmp /usr/local/www/packages/backup/backup.php");
-	unlink_if_exists("/tmp/backup.tmp");
-
-	exec("cp /tmp/backup_edit.tmp /usr/local/www/packages/backup/backup_edit.php");
-	unlink_if_exists("/tmp/backup_edit.tmp");
 
 	backup_sync_package();
 
 	conf_mount_ro();
   
-}
-
-
-function backup_deinstall_command()
-{
-	conf_mount_rw();
-	unlink_if_exists("/usr/local/pkg/backup.xml");
-	unlink_if_exists("/usr/local/pkg/backup.inc");
-	exec("rm /usr/local/www/packages/backup/");
-	conf_mount_ro();
 }
 
 ?>

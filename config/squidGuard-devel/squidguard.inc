@@ -101,12 +101,12 @@ sg_init(convert_pfxml_to_sgxml());
 # ==============================================================================
 # Validations
 # ==============================================================================
-function squidguard_validate($post, $input_errors)
+function squidguard_validate($post, &$input_errors)
 {
     $submit = isset($_GET['submit']) ? $_GET['submit'] : $_POST['submit'];
 
     # check config if 'Apply'
-    if ($submit === APPLY_BTN)  sg_check_config_data(&$input_errors);
+    if ($submit === APPLY_BTN)  sg_check_config_data($input_errors);
 }
 
 # ------------------------------------------------------------------------------
@@ -114,13 +114,13 @@ function squidguard_validate($post, $input_errors)
 # ------------------------------------------------------------------------------
 function squidguard_validate_default($post, $input_errors)
 {
-    squidguard_validate_acl($post, &$input_errors);
+    squidguard_validate_acl($post, $input_errors);
 }
 
 # ------------------------------------------------------------------------------
 # validate acl
 # ------------------------------------------------------------------------------
-function squidguard_validate_acl($post, $input_errors)
+function squidguard_validate_acl(&$post, &$input_errors)
 {
     $pass_up = array();
     $deny_up = array();
@@ -134,7 +134,7 @@ function squidguard_validate_acl($post, $input_errors)
     $name = trim($post[F_NAME]);
     if(!empty($name)) {
         # validate name format
-        check_name_format($name, &$input_errors);
+        check_name_format($name, $input_errors);
 
         # check unique name
         if (!sg_check_unique_name(F_ACLS, $name))
@@ -148,7 +148,7 @@ function squidguard_validate_acl($post, $input_errors)
         $sgx = array();
         $sgx[F_NAME] = $post[F_NAME];
         $sgx[F_SOURCE] = $post[F_SOURCE];
-        sg_check_src($sgx, &$input_errors);
+        sg_check_src($sgx, $input_errors);
     }
 
     # store destinations to 'dest' value
@@ -192,7 +192,7 @@ function squidguard_validate_acl($post, $input_errors)
 
     # check redirect
     $errmsg = '';
-    if (!sg_check_redirect($post[F_RMOD], $post[F_REDIRECT], &$errmsg)) {
+    if (!sg_check_redirect($post[F_RMOD], $post[F_REDIRECT], $errmsg)) {
          $input_errors[] = "Redirect info error. $errmsg";
     }
 }
@@ -203,14 +203,14 @@ function squidguard_validate_acl($post, $input_errors)
 #    date:   <date(or range)><time (or range)> -- days not parsed (reset to *)
 #    weekly: <day or *><time or range>         -- dates not parsed (reset to '')
 # ------------------------------------------------------------------------------
-function squidguard_validate_times($post, $input_errors)
+function squidguard_validate_times(&$post, &$input_errors)
 {
     $id = get_item_id();
 
     # check name
     $name = trim($post[F_NAME]);
     if(!empty($name)) {
-        check_name_format($name, &$input_errors);
+        check_name_format($name, $input_errors);
 
         # check unique name
         if (!sg_check_unique_name(F_TIMES, $name))
@@ -246,18 +246,18 @@ function squidguard_validate_times($post, $input_errors)
         $sgx[F_ITEM][] = $sgx_row;
     }
     #
-    sg_check_time($sgx, &$input_errors);
+    sg_check_time($sgx, $input_errors);
 
 }
 
 # ------------------------------------------------------------------------------
 # validate destinations
 # ------------------------------------------------------------------------------
-function squidguard_validate_destination($post, $input_errors) {
+function squidguard_validate_destination($post, &$input_errors) {
     # check name
     $name = trim($post[F_NAME]);
     if(!empty($name)) {
-        check_name_format($name, &$input_errors);
+        check_name_format($name, $input_errors);
 
         # check unique name
         if (!sg_check_unique_name(F_DESTINATIONS, $name))
@@ -277,18 +277,18 @@ function squidguard_validate_destination($post, $input_errors) {
     $sgx[F_RMOD]        = $post[F_RMOD];
     $sgx[F_REDIRECT]    = $post[F_REDIRECT];
     #
-    sg_check_dest($sgx, &$input_errors);
+    sg_check_dest($sgx, $input_errors);
 }
 
 # ------------------------------------------------------------------------------
 # validate rewrites
 # ------------------------------------------------------------------------------
-function squidguard_validate_rewrite($post, $input_errors) {
+function squidguard_validate_rewrite($post, &$input_errors) {
          # check name
          $name = trim($post[F_NAME]);
          if(!empty($name)) {
             # check name format <char><symbols without space> - Ab123
-            check_name_format($name, &$input_errors);
+            check_name_format($name, $input_errors);
 
             # check unique name
             if (!sg_check_unique_name(F_REWRITES, $name))
@@ -447,7 +447,7 @@ function get_sgconf_items_list($data_group, $fieldname) {
 # ==============================================================================
 # squidguard_before_form
 # ------------------------------------------------------------------------------
-function squidguard_before_form($pkg) {
+function squidguard_before_form(&$pkg) {
     $i=0;
 
     foreach($pkg['fields']['field'] as $field) {
@@ -470,7 +470,7 @@ function squidguard_before_form($pkg) {
 # -----------------------------------------------------------------------------
 # squidguard_before_form_acl
 # -----------------------------------------------------------------------------
-function squidguard_before_form_acl($pkg, $is_acl=true) {
+function squidguard_before_form_acl(&$pkg, $is_acl=true) {
     global $g;
     global $squidguard_config;
 
@@ -638,7 +638,7 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
 # -----------------------------------------------------------------------------
 # squidguard_before_form_dest
 # -----------------------------------------------------------------------------
-function squidguard_before_form_dest($pkg) {
+function squidguard_before_form_dest(&$pkg) {
 	global $g, $squidguard_config;
 	$destination_items = get_sgconf_items_list(F_DESTINATIONS, 'name');
 //var_dump($squidguard_config);
@@ -1301,12 +1301,12 @@ function squidguard_adt_rewrite_safesrch()
     $res[F_NAME] = SAFESEARCH;
     $res[F_DESCRIPTION] = "Google, Yandex safesearch";
     $res[F_LOG]         = 'on';
-    squidguard_adt_safesrch_add(&$res[F_ITEM]);
+    squidguard_adt_safesrch_add($res[F_ITEM]);
 
     return $res;
 }
 
-function squidguard_adt_safesrch_add($rewrite_item)
+function squidguard_adt_safesrch_add(&$rewrite_item)
 {
     if (!is_array($rewrite_item)) $rewrite_item = array();
 
@@ -1331,7 +1331,7 @@ function squidguard_adt_safesrch_add($rewrite_item)
 }
 
 # log dump
-function squidguard_logdump($filename, $lnoffset, $lncount, $reverse)
+function squidguard_logdump($filename, &$lnoffset, $lncount, $reverse)
 {
     define('LOGSHOW_BUFSIZE', '262144');
     $cnt = '';
@@ -1371,10 +1371,10 @@ function squidguard_logdump($filename, $lnoffset, $lncount, $reverse)
 }
 
 # dump SG log
-function squidguard_filterdump($lnoffset, $lncount, $reverse)
+function squidguard_filterdump(&$lnoffset, $lncount, $reverse)
 {
     $res  = array();
-    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/squidGuard.log', &$lnoffset, $lncount, $reverse);
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/squidGuard.log', $lnoffset, $lncount, $reverse);
 
     foreach($cont as $cn) {
         $cn = explode(" ", trim($cn), 4);
@@ -1385,10 +1385,10 @@ function squidguard_filterdump($lnoffset, $lncount, $reverse)
 }
 
 # dump SG Gui log
-function squidguard_guidump($lnoffset, $lncount, $reverse)
+function squidguard_guidump(&$lnoffset, $lncount, $reverse)
 {
     $res  = array();
-    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . SQUIDGUARD_CONFLOGFILE, &$lnoffset, $lncount, $reverse);
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . SQUIDGUARD_CONFLOGFILE, $lnoffset, $lncount, $reverse);
 
     foreach($cont as $cn) {
         $cn = explode(" ", trim($cn), 4);
@@ -1399,10 +1399,10 @@ function squidguard_guidump($lnoffset, $lncount, $reverse)
 }
 
 # dump SG blocked
-function squidguard_blockdump($lnoffset, $lncount, $reverse)
+function squidguard_blockdump(&$lnoffset, $lncount, $reverse)
 {
     $res  = array();
-    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/' . SQUIDGUARD_LOGFILE, &$lnoffset, $lncount, $reverse);
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/' . SQUIDGUARD_LOGFILE, $lnoffset, $lncount, $reverse);
 
     foreach($cont as $cn) {
         $cn = explode(" ", trim($cn), 9);

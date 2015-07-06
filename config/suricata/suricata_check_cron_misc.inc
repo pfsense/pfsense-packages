@@ -66,13 +66,13 @@ function suricata_check_dir_size_limit($suricataloglimitsize) {
 		conf_mount_rw();
 
 		// Truncate the Rules Update Log file if it exists
-		if (file_exists(RULES_UPD_LOGFILE)) {
+		if (file_exists(SURICATA_RULES_UPD_LOGFILE)) {
 			log_error(gettext("[Suricata] Truncating the Rules Update Log file..."));
-			@file_put_contents(RULES_UPD_LOGFILE, "");
+			@file_put_contents(SURICATA_RULES_UPD_LOGFILE, "");
 		}
 
 		// Initialize an array of the log files we want to prune
-		$logs = array ( "alerts.log", "http.log", "files-json.log", "tls.log", "stats.log" );
+		$logs = array ( "alerts.log", "block.log", "dns.log", "eve.json", "http.log", "files-json.log", "sid_changes.log", "stats.log", "tls.log" );
 
 		// Clean-up the logs for each configured Suricata instance
 		foreach ($config['installedpackages']['suricata']['rule'] as $value) {
@@ -93,8 +93,19 @@ function suricata_check_dir_size_limit($suricataloglimitsize) {
 				}
 			}
 
+			// Cleanup any rotated logs
+			log_error(gettext("[Suricata] Deleting any rotated log files for {$value['descr']} ({$if_real})..."));
+			unlink_if_exists("{$suricata_log_dir}/*.log.*");
+
+			// Cleanup any rotated pcap logs
+			log_error(gettext("[Suricata] Deleting any rotated pcap log files for {$value['descr']} ({$if_real})..."));
+			unlink_if_exists("{$suricata_log_dir}/log.pcap.*");
+
 			// Check for any captured stored files and clean them up
 			unlink_if_exists("{$suricata_log_dir}/files/*");
+
+			// Check for any captured stored TLS certs and clean them up
+			unlink_if_exists("{$suricata_log_dir}/certs/*");
 
 			// This is needed if suricata is run as suricata user
 			mwexec('/bin/chmod 660 /var/log/suricata/*', true);
@@ -126,8 +137,10 @@ function suricata_check_rotate_log($log_file, $log_limit, $retention) {
 	// Check the current log to see if it needs rotating.
 	// If it does, rotate it and put the current time
 	// on the end of the filename as UNIX timestamp.
+	if (!file_exists($log_file))
+		return;
 	if (($log_limit > 0) && (filesize($log_file) >= $log_limit)) {
-		$newfile = $log_file . "." . strval(time());
+		$newfile = $log_file . "." . date('Y_md_Hi');
 		try {
 			copy($log_file, $newfile);
 			file_put_contents($log_file, "");
@@ -168,10 +181,18 @@ $logs = array ();
 // Build an arry of files to check and limits to check them against from our saved configuration
 $logs['alerts.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'];
 $logs['alerts.log']['retention'] = $config['installedpackages']['suricata']['config'][0]['alert_log_retention'];
+$logs['block.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['block_log_limit_size'];
+$logs['block.log']['retention'] = $config['installedpackages']['suricata']['config'][0]['block_log_retention'];
+$logs['dns.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'];
+$logs['dns.log']['retention'] = $config['installedpackages']['suricata']['config'][0]['dns_log_retention'];
+$logs['eve.json']['limit'] = $config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'];
+$logs['eve.json']['retention'] = $config['installedpackages']['suricata']['config'][0]['eve_log_retention'];
 $logs['files-json.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'];
 $logs['files-json.log']['retention'] = $config['installedpackages']['suricata']['config'][0]['files_json_log_retention'];
 $logs['http.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['http_log_limit_size'];
 $logs['http.log']['retention'] = $config['installedpackages']['suricata']['config'][0]['http_log_retention'];
+$logs['sid_changes.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'];
+$logs['sid_changes.log']['retention'] = $config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'];
 $logs['stats.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['stats_log_limit_size'];
 $logs['stats.log']['retention'] = $config['installedpackages']['suricata']['config'][0]['stats_log_retention'];
 $logs['tls.log']['limit'] = $config['installedpackages']['suricata']['config'][0]['tls_log_limit_size'];
@@ -190,24 +211,70 @@ if ($config['installedpackages']['suricata']['config'][0]['enable_log_mgmt'] == 
 		    $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] > 0) {
 			$now = time();
 			$files = glob("{$suricata_log_dir}/barnyard2/archive/unified2.alert.*");
+			$prune_count = 0;
 			foreach ($files as $f) {
-				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] * 3600))
+				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] * 3600)) {
+					$prune_count++;
 					unlink_if_exists($f);
+				}
 			}
+			if ($prune_count > 0)
+				log_error(gettext("[Suricata] Barnyard2 archived logs cleanup job removed {$prune_count} file(s) from {$suricata_log_dir}/barnyard2/archive/..."));
+			unset($files);
 		}
-		unset($files);
 
 		// Prune aged-out File Store files if any exist
 		if (is_dir("{$suricata_log_dir}/files") &&
 		    $config['installedpackages']['suricata']['config'][0]['file_store_retention'] > 0) {
 			$now = time();
 			$files = glob("{$suricata_log_dir}/files/file.*");
+			$prune_count = 0;
 			foreach ($files as $f) {
-				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['file_store_retention'] * 3600))
+				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['file_store_retention'] * 3600)) {
+					$prune_count++;
 					unlink_if_exists($f);
+				}
 			}
+			if ($prune_count > 0)
+				log_error(gettext("[Suricata] File Store cleanup job removed {$prune_count} file(s) from {$suricata_log_dir}/files/..."));
+			unset($files);
 		}
-		unset($files);
+
+		// Prune aged-out TLS Certs Store files if any exist
+		if (is_dir("{$suricata_log_dir}/certs") &&
+		    $config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] > 0) {
+			$now = time();
+			$files = glob("{$suricata_log_dir}/certs/*.*");
+			$prune_count = 0;
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($f);
+				}
+			}
+			if ($prune_count > 0)
+				log_error(gettext("[Suricata] TLS Certs Store cleanup job removed {$prune_count} file(s) from {$suricata_log_dir}/certs/..."));
+			unset($files);
+		}
+
+		// Prune any pcap log files over configured limit
+		$files = glob("{$suricata_log_dir}/log.pcap.*");
+		if (count($files) > $value['max_pcap_log_files']) {
+			$over = count($files) - $value['max_pcap_log_files'];
+			$remove_files = array();
+			while ($over > 0) {
+				$remove_files[] = array_shift($files);
+				$over--;
+			}
+			$prune_count = 0;
+			foreach ($remove_files as $f) {
+				$prune_count++;
+				unlink_if_exists($f);
+			}
+			if ($prune_count > 0)
+				log_error(gettext("[Suricata] Packet Capture log cleanup job removed {$prune_count} file(s) from {$suricata_log_dir}/..."));
+			unset($files, $remove_files);
+		}
 	}
 }
 

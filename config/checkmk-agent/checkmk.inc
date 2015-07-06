@@ -39,7 +39,7 @@ define('ETC_RC_CONF','/etc/rc.conf.local');
 function checkmk_install() {
 	// Download latest check_mk version from head repo
 	$checkmk_bin="/usr/local/bin/check_mk_agent";
-	mwexec("fetch -o {$checkmk_bin} 'http://git.mathias-kettner.de/git/?p=check_mk.git;a=blob_plain;f=agents/check_mk_agent.freebsd;hb=HEAD'");
+	mwexec("fetch -o {$checkmk_bin} 'http://git.mathias-kettner.de/git/?p=check_mk.git;a=blob_plain;f=agents/check_mk_agent.freebsd;hb=refs/heads/1.2.6'");
 	chmod($checkmk_bin,0755);
 	sync_package_checkmk();
 }
@@ -69,7 +69,7 @@ function sync_package_checkmk() {
 	$checkmk_bin="/usr/local/bin/check_mk_agent";
 	if (!file_exists($checkmk_bin) && $mk_config['checkmkenable']=="on"){
 		$error = "Check_mk-agent Binary file not found";
-		log_error($error." You can manually download it using this cmd: fetch -o {$checkmk_bin} 'http://git.mathias-kettner.de/git/?p=check_mk.git;a=blob_plain;f=agents/check_mk_agent.freebsd;hb=HEAD'");
+		log_error($error." You can manually download it using this cmd: fetch -o {$checkmk_bin} 'http://git.mathias-kettner.de/git/?p=check_mk.git;a=blob_plain;f=agents/check_mk_agent.freebsd;hb=refs/heads/1.2.6'");
 		file_notice("Check_mk-agent", $error, "checkmk save config", "");
 		return;
 		}

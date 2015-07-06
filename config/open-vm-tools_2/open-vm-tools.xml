@@ -8,13 +8,9 @@
 	/*
 	    open-vm-tools.xml
 	    part of pfSense (http://www.pfSense.org)
-	    Copyright (C) 2008 BSD Perimeter LLC
+	    Copyright (C) 2008-2015 Electric Sheep Fencing LP
 	    All rights reserved.
 
-	    Based on m0n0wall (http://m0n0.ch/wall)
-	    Copyright (C) 2003-2008 Manuel Kasper <mk@neon1.net>.
-	    All rights reserved.
-	                                                                              */
 	/* ========================================================================== */
 	/*
     Redistribution and use in source and binary forms, with or without
@@ -55,13 +51,11 @@
 		conf_mount_rw();
 		open_vm_tools_install();
 		exec("/usr/local/etc/rc.d/vmware-guestd.sh start");
-		exec("/usr/local/etc/rc.d/vmware-kmod.sh start");
 		conf_mount_ro();
     </custom_php_install_command>
     <custom_php_deinstall_command>
 		conf_mount_rw();
 		exec("/usr/local/etc/rc.d/vmware-guestd.sh stop");
-		exec("/usr/local/etc/rc.d/vmware-kmod.sh stop");
 		open_vm_tools_deinstall();
 		conf_mount_ro();
     </custom_php_deinstall_command>

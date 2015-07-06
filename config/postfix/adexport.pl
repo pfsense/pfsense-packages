@@ -1,9 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/local/bin/perl -w
 ##############################################################################
 #
 # Script to export a list of all email addresses from Active Directory
 # Brian Landers <brian@packetslave.com>
-# 
+#
 # This code is in the public domain.  Your use of this code is at your own
 # risk, and no warranty is implied.  The author accepts no liability for any
 # damages or risks incurred by its use.
@@ -42,7 +42,7 @@ use Net::LDAP;
 use Net::LDAP::Control::Paged;
 use Net::LDAP::Constant qw( LDAP_CONTROL_PAGED );
 
-#our ($cn,$passwd,$base); 
+#our ($cn,$passwd,$base);
 #($cn,$passwd,$base)=@_ARGV;
 #print "$cn \n $passwd \n $base";
 #exit;
@@ -74,10 +74,10 @@ foreach( @servers ) {
 # 1000 records by default.  We have to use paging to get the full list.
 
 my $page = Net::LDAP::Control::Paged->new( size => 100 );
- 
+
 # Try to bind (login) to the server now that we're connected
-my $msg = $ldap->bind( dn       => $bind, 
-                       password => $passwd 
+my $msg = $ldap->bind( dn       => $bind,
+                       password => $passwd
                      );
 
 # If we can't bind, we can't continue
@@ -122,7 +122,7 @@ if( $cookie ) {
 }
 
 # Finally, unbind from the server
-$ldap->unbind; 
+$ldap->unbind;
 
 # ------------------------------------------------------------------------
 # Callback function that gets called for each record we get from the server
@@ -131,16 +131,16 @@ $ldap->unbind;
 #
 
 sub handle_object {
-  
+
   my $msg  = shift;       # Net::LDAP::Message object
   my $data = shift;       # May be Net::LDAP::Entry or Net::LDAP::Reference
-  
+
   # Only process if we actually got data
   return unless $data;
-  
+
   return handle_entry( $msg, $data )     if $data->isa("Net::LDAP::Entry");
   return handle_reference( $msg, $data ) if $data->isa("Net::LDAP::Reference");
-  
+
   # If we get here, it was something we're not prepared to handle,
   # so just return silently.
 
@@ -153,35 +153,35 @@ sub handle_object {
 # ones we haven't seen before.
 
 sub handle_entry {
-  
+
   my $msg  = shift;
   my $data = shift;
-  
+
   # Extract the email addressess, selecting only the SMTP ones, and
   # filter them so that we only get unique addresses
 
-  my @mails = grep { /^smtp:/i && !$gSeen{$_}++ } 
+  my @mails = grep { /^smtp:/i && !$gSeen{$_}++ }
                    $data->get_value( "proxyAddresses" );
- 
-  # If we found any, strip off the SMTP: identifier and print them out 
+
+  # If we found any, strip off the SMTP: identifier and print them out
   if( @mails ) {
     print map { s/^smtp:(.+)$/\L$1\n/i; $_ } @mails;
   }
 }
 
 # ------------------------------------------------------------------------
-# Handler for a Net::LDAP::Reference object.  This is a 'redirect' to 
+# Handler for a Net::LDAP::Reference object.  This is a 'redirect' to
 # another portion of the directory.  We simply extract the references
 # from the object and resubmit them to the handle_object function for
 # processing.
 
 sub handle_reference {
-  
+
   my $msg  = shift;
   my $data = shift;
-  
+
   foreach my $obj( $data->references() ) {
-  
+
     # Oooh, recursion!  Might be a reference to another reference, after all
     return handle_object( $msg, $obj );
   }

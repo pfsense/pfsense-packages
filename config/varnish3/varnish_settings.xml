@@ -9,7 +9,7 @@
     varnish_settings.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2014 Marcello Coutinho
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -223,7 +223,7 @@
 		<field>
 			<fielddescr>Foward client IP</fielddescr>
 			<fieldname>xforward</fieldname>
-			<description>Select how to forward clients real IP.</description>
+			<description><![CDATA[Select how to forward clients real IP.]]></description>
 			<type>select</type>
 			<options>
 				<option><name>set X-Forwarded-For</name><value>set</value></option>
@@ -232,6 +232,15 @@
 				<option><name>Unset</name><value>unset</value></option>
 			</options>
 		</field>
+		<field>
+			<fielddescr>SSL Offload server ACL</fielddescr>
+			<fieldname>ssloffload</fieldname>
+			<description><![CDATA[Use <b>x-forwarded-for</b> var instead of <b>client.ip</b> to set <b>X-Forwarded-Varnish</b> on Forward<br>
+							SSL offload servers must be configured to forward client info. if not set you can get a blank var forwarded to backend.<br>
+							use space to specify more then one host or network.]]></description>
+			<type>input</type>
+	    	<size>30</size>
+	    </field>
 		<field>
 			<fielddescr>Fetch Grace</fielddescr>
 			<fieldname>grace</fieldname>
@@ -274,12 +283,15 @@
 			<encoding>base64</encoding>
 		</field>
 	</fields>
+	<custom_php_command_before_form>
+	varnish_check_config();
+	</custom_php_command_before_form>
+	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
 		create_varnish_rcd_file();
-		varnish_start();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		varnish_settings_post_validate($_POST, &amp;$input_errors);
+		varnish_settings_post_validate($_POST, $input_errors);
 	</custom_php_validation_command>
 </packagegui>

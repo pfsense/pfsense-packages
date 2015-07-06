@@ -33,7 +33,12 @@
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
 	define('LCDPROC_CLIENT', '/tmp/lcdclient.sh');
-	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		define('LCDPROC_CONFIG', '/usr/pbi/lcdproc-' . php_uname('m') . '/local/etc/LCDd.conf');
+	} else {
+		define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
+	}
 	define('LCDPROC_HOST','localhost');
 	define('LCDPROC_PORT','13666');
 
@@ -72,7 +77,7 @@
 		chmod($file, 0755);
 	}
 
-	function before_form_lcdproc($pkg) {
+	function before_form_lcdproc(&$pkg) {
 		global $config;
 
 		config_lock();		
@@ -80,7 +85,7 @@
 		config_unlock();
 	}
 
-	function before_form_lcdproc_screens($pkg) {
+	function before_form_lcdproc_screens(&$pkg) {
 		global $config;
 
 		config_lock();		
@@ -88,7 +93,7 @@
 		config_unlock();
 	}
 
-	function validate_form_lcdproc($post, $input_errors) {
+	function validate_form_lcdproc($post, &$input_errors) {
 		if($post['comport']) {
 			switch($post['comport']) {
 				case "none":
@@ -155,7 +160,7 @@
 			}
 		}
 	}
-	function validate_form_lcdproc_screens($post, $input_errors) {
+	function validate_form_lcdproc_screens($post, &$input_errors) {
 		// No validation required ?!
 	}
 

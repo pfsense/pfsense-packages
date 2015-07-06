@@ -31,12 +31,17 @@
 // Check pfSense version
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
-  case "1.2":
-  case "2.0":
-    define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+  case "2.1":
+    define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
+    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
+    break;
+  case "2.2":
+    define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/local/bandwidthd');
+    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', 'LD_LIBRARY_PATH=/usr/pbi/bandwidthd-' . php_uname("m") . '/local/lib');
     break;
   default:
-    define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
+    define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
  }
 // End: Check pfSense version
 
@@ -63,6 +68,7 @@ function bandwidthd_install_config() {
 	/* the conf file must be ./etc/bandwidthd.conf relative to the current dir */
 	$bandwidthd_base_dir = PKG_BANDWIDTHD_BASE;
 	$bandwidthd_config_dir = PKG_BANDWIDTHD_BASE . "/etc";
+	$bandwidthd_runtime_library_env = PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV;
 
 	conf_mount_rw();
 	config_lock();
@@ -336,12 +342,14 @@ if [ ! -f "{$bandwidthd_htdocs_dir}/logo.gif" ] ; then
 	/bin/cp {$bandwidthd_base_dir}/htdocs/logo.gif {$bandwidthd_htdocs_dir}
 fi
 cd {$bandwidthd_nano_dir}
-{$bandwidthd_nano_dir}/bandwidthd
+{$bandwidthd_runtime_library_env} {$bandwidthd_nano_dir}/bandwidthd
 cd -
 EOD;
 		} else {
 			$rc['start'] = <<<EOD
-/usr/local/bandwidthd/bandwidthd
+cd {$bandwidthd_base_dir}
+{$bandwidthd_runtime_library_env} {$bandwidthd_base_dir}/bandwidthd
+cd -
 EOD;
 		}
 	} else {

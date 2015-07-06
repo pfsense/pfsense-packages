@@ -29,7 +29,7 @@
 
 require("globals.inc");
 require("guiconfig.inc");
-require("/usr/local/pkg/autoconfigbackup.inc");
+require("autoconfigbackup.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version < 2.0)
@@ -48,7 +48,9 @@ if($_POST) {
 	else 
 		write_config("Backup invoked via Auto Config Backup.");
 	$config = parse_config(true);
-	exec("echo > /cf/conf/lastpfSbackup.txt");
+	conf_mount_rw();
+	@unlink("/cf/conf/lastpfSbackup.txt", "");
+	conf_mount_ro();
 	upload_config($_REQUEST['reason']);
 	$savemsg = "Backup completed successfully.";
 	$donotshowheader=true;
@@ -100,14 +102,6 @@ include("head.inc");
 								</td>
 								<td>
 									<input name="reason" id="reason" size="80">
-								</td>
-							</tr>
-							<tr>
-								<td align="right">
-									Do not overwrite previous backups for this hostname:
-								</td>
-								<td>
-									<input type="checkbox" name="nooverwrite">
 								</td>
 							</tr>
 							<tr>

@@ -76,14 +76,14 @@
 		<item>https://packages.pfsense.org/packages/config/cron/cron.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/www/packages/cron/</prefix>
 		<chmod>0755</chmod>		
-		<item>https://packages.pfsense.org/packages/config/cron/cron.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/cron/cron.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/usr/local/www/packages/cron/</prefix>
 		<chmod>0755</chmod>		
-		<item>https://packages.pfsense.org/packages/config/cron/cron_edit.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/cron/cron_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/packages/cron/</prefix>

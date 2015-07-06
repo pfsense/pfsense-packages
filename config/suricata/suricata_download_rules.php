@@ -101,7 +101,7 @@ include("head.inc");
 <?php
 
 $suricata_gui_include = true;
-include("/usr/local/www/suricata/suricata_check_for_rule_updates.php");
+include("/usr/local/pkg/suricata/suricata_check_for_rule_updates.php");
 
 /* hide progress bar and lets end this party */
 echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";

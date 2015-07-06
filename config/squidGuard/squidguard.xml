@@ -6,7 +6,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardgeneral</name>
-	<version>1.4_4 pkg v.1.9.3</version>
+	<version>1.4_7 pkg v.1.9.14</version>
 	<title>Proxy filter SquidGuard: General settings</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<!-- Installation -->
@@ -239,10 +239,10 @@
 	</fields>
 	<custom_add_php_command/>
 	<custom_php_validation_command>
-                squidguard_validate(&amp;$_POST, &amp;$input_errors);
+                squidguard_validate($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_command_before_form>
-                squidguard_before_form(&amp;$pkg);
+                squidguard_before_form($pkg);
 	</custom_php_command_before_form>
 	<custom_php_after_form_command>
 		squidGuard_print_javascript();
