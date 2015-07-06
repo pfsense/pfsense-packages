@@ -38,16 +38,18 @@
 /* ========================================================================== */
  require_once("config.inc");
  require_once("util.inc");
- 
+
  $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0)
 	define('BACULA_LOCALBASE', '/usr/pbi/bacula-' . php_uname("m"));
 else
-  define('BACULA_LOCALBASE','/usr/local');
-  
+	define('BACULA_LOCALBASE','/usr/local');
+
+define('BACULA_STARTUP_SCRIPT', '/usr/local/etc/rc.d/bacula-fd.sh');
+
 function baculaclient_custom_php_install_command(){
 	global $g, $config;
-	baculaclient_custom_php_write_config();	
+	baculaclient_custom_php_write_config();
 }
 
 function baculaclient_custom_php_deinstall_command(){
@@ -56,10 +58,10 @@ function baculaclient_custom_php_deinstall_command(){
 	conf_mount_rw();
 
 	// 1. Delete our config file
-	unlink_if_exists(BACULA_LOCALBASE."/etc/bacula-fd.conf");
+	unlink_if_exists(BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf");
 
 	// 2. Re-run sshd config generation script
-	exec("/usr/local/etc/rc.d/bacula-fd.sh stop");
+	exec(BACULA_STARTUP_SCRIPT . " stop");
 	conf_mount_ro();
 }
 
@@ -67,14 +69,15 @@ function baculaclient_custom_php_write_config(){
 	global $g, $config;
 	conf_mount_rw();
 	//check config_file
-	$startup_file="/usr/local/etc/rc.d/bacula-fd";
+	$startup_file=BACULA_LOCALBASE . "/etc/rc.d/bacula-fd";
 	if (file_exists($startup_file)){
 		$startup_script=file_get_contents($startup_file);
 		$startup_script=preg_replace("/NO/","YES",$startup_script);
-		$startup_script=preg_replace("@/usr/local/etc/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula-fd.conf",$startup_script);
-		file_put_contents("{$startup_file}.sh",$startup_script,LOCK_EX);
+		$startup_script=preg_replace("@/usr/local/etc/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf",$startup_script);
+		$startup_script=preg_replace("@/usr/local/etc/bacula/bacula-fd.conf@",BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf",$startup_script);
+		file_put_contents(BACULA_STARTUP_SCRIPT,$startup_script,LOCK_EX);
 		// Ensure bacula-fd has a+rx
-		exec("chmod a+rx {$startup_file}.sh");
+		exec("chmod a+rx " . BACULA_STARTUP_SCRIPT);
 		}
 
 	//check config
@@ -84,34 +87,39 @@ function baculaclient_custom_php_write_config(){
 			// create Director
 			switch ($bc['type']){
 			case "Director":
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n"; 
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-dir #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n}\n";
 				Break;
 			case "Monitor":
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-mon #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n\tMonitor = yes\n}\n";
 				break;
 			case "Local":
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-dir #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t}\n";
-				$baculaclient_conf .= "Director { \n\t Name = {$bc['director']}-mon #{$bc['description']}\n\t Password = \"{$bc['password']}\"\n\t Monitor = yes\n\t}\n";
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-dir #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n}\n";
+				$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-mon #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n\tMonitor = yes\n}\n";
 				$LocalDirector = $bc['director'];
 				}
-				
+
 			}
-		
+
 		// create Messages
-		$baculaclient_conf .= "Messages { \n\t Name = Standard \n\t director  = {$LocalDirector}-dir = all, !skipped, !restored\n\t}\n";
+		if (!empty($LocalDirector)) {
+			$baculaclient_conf .= "Messages { \n\tName = Standard \n\tdirector  = {$LocalDirector}-dir = all, !skipped, !restored\n}\n";
+		}
 		// create FielDaemon
-			
+
 		if (is_array($config['installedpackages']['baculaclientfd']['config'])){
 			$port = $config['installedpackages']['baculaclientfd']['config'][0]['port'];
 			$jobs = $config['installedpackages']['baculaclientfd']['config'][0]['jobs'];
 			}
 		else{
 			$port="9102";
-			$jobs="20";	
+			$jobs="20";
 			}
-		$baculaclient_conf .= "FileDaemon { \n\t Name = {$LocalDirector}-fd #\n\t FDport = {$port}\n\t WorkingDirectory = /var/db/bacula\n\t Pid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n\t}\n";
-		file_put_contents(BACULA_LOCALBASE."/etc/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
-		exec("/usr/local/etc/rc.d/bacula-fd.sh restart");
+		if (!empty($LocalDirector)) {
+			$baculaclient_conf .= "FileDaemon { \n\tName = {$LocalDirector}-fd #\n\tFDport = {$port}\n\tWorkingDirectory = /var/db/bacula\n\tPid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n}\n";
+		}
+
+		file_put_contents(BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf",$baculaclient_conf,LOCK_EX);
+		exec(BACULA_STARTUP_SCRIPT . " restart");
 		// Mount Read-only
 		conf_mount_ro();
 		}

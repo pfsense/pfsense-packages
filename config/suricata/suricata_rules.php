@@ -436,15 +436,6 @@ $pgtitle = gettext("Suricata: Interface {$if_friendly} - Rules: {$currentruleset
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-/* Display error or save messages if present */
-if ($input_errors) {
-        print_input_errors($input_errors); // TODO: add checks
-}
-
-if ($savemsg) {
-        print_info_box($savemsg);
-}
-
 ?>
 
 <form action='/suricata/suricata_rules.php' method='post' name='iform' id='iform'>
@@ -456,6 +447,16 @@ if ($savemsg) {
 <?php if (is_subsystem_dirty('suricata_rules')): ?><p>
 <?php print_info_box_np(gettext("A change has been made to a rule state.") . "<br/>" . gettext("Click APPLY when finished to send the changes to the running configuration."));?>
 <?php endif; ?>
+<?php
+/* Display error or save messages if present */
+if ($input_errors) {
+        print_input_errors($input_errors);
+}
+
+if ($savemsg) {
+        print_info_box($savemsg);
+}
+?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tbody>
@@ -473,6 +474,7 @@ if ($savemsg) {
 		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 		$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 		$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+		$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 		display_top_tabs($tab_array, true);
 		echo '</td></tr>';
 		echo '<tr><td class="tabnavtbl">';
@@ -485,6 +487,7 @@ if ($savemsg) {
 		$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
 		display_top_tabs($tab_array, true);
 	?>
 	</td></tr>

@@ -115,6 +115,28 @@ function validate_input_apcupsd($post,&$input_errors){
 			}	
 		}
 
+		if ($post['emailnotification'] == 'smtpbuiltin') {
+
+			if (empty($post['smtphost'])) {
+					$input_errors[]='SMTP Host cannot be empty if SMTP builtin is enabled.';
+			}
+
+			if (empty($post['smtpport'])) {
+					$input_errors[]='SMTP Port cannot be empty if SMTP builtin is enabled.';
+			}elseif(!is_port($post['smtpport'])){
+					$input_errors[]='SMTP Port is not a valid port.';
+			}
+
+			if (empty($post['smtpfrom'])) {
+					$input_errors[]='From field cannot be empty if SMTP builtin is enabled.';
+			}
+
+			if (empty($post['smtpto'])) {
+					$input_errors[]='To field cannot be empty if SMTP builtin is enabled..';
+			}
+
+		}
+
 	} // apcupsdenabled
 }
 
@@ -154,6 +176,7 @@ function sync_package_apcupsd(){
 			$upsclass=$apcupsd_config['upsclass'];
 			$upsmode=$apcupsd_config['upsmode'];
 			$lockfile=($apcupsd_config['lockfile'] != ''? $apcupsd_config['lockfile'] : "/var/tmp");
+			$emailnotification=$apcupsd_config['emailnotification'];
 	
 			include("/usr/local/pkg/apcupsd.conf.php");
 			file_put_contents(APCUPSD_BASE . "/etc/apcupsd/apcupsd.conf", $apcupsdconf, LOCK_EX);
@@ -167,9 +190,7 @@ function sync_package_apcupsd(){
 		$apcupsd_start .= "	if [ ! -d {$lockfile} ]; then \n";
 		$apcupsd_start .= "		/bin/mkdir -p {$lockfile} \n";
 		$apcupsd_start .= "	fi \n";
-		$apcupsd_start .= "	if [ -f {$lockfile}/LCK.. ]; then \n";
-		$apcupsd_start .= "		/bin/rm -f {$lockfile}/LCK.. \n";
-		$apcupsd_start .= "	fi \n";
+		$apcupsd_start .= "	/bin/rm -f {$lockfile}/*LCK* 2>/dev/null \n";
 		if ($apcupsd_config['killonpowerfail']=="on"){
 			$apcupsd_start .= "	" . APCUPSD_BASE . "/sbin/apcupsd --kill-on-powerfail";
 		}else{
@@ -195,10 +216,12 @@ function sync_package_apcupsd(){
 		}
 	}
 
+	apccontrol_scripts_install($emailnotification);
 	conf_mount_ro();
 }
 
-function apccontrol_scripts_install(){
+function apccontrol_scripts_install($emailnotification){
+	global $config, $g;
 
 	// check pfsense version
 	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
@@ -209,10 +232,52 @@ function apccontrol_scripts_install(){
 		define('APCUPSD_BASE', '/usr/local');
 	}
 
+	$apcstatus['commfailure'] = "\$HOSTNAME - Communications with UPS \$1 lost";
+	$apcstatus['commok'] = "\$HOSTNAME - Communications with UPS \$1 restored";
+	$apcstatus['onbattery'] = "\$HOSTNAME - Power failure. Running on UPS \$1 batteries";
+	$apcstatus['offbattery'] = "\$HOSTNAME - UPS \$1 Power has returned...";
+	$apcstatus['changeme'] = "\$HOSTNAME - Emergency! UPS batteries have failed. Change them NOW";
+
 	$apccontrol_scripts = array("offbattery","onbattery","commfailure","commok","changeme");
 	foreach($apccontrol_scripts as $apccontrol_script) {
 
-		$apccontrol_script_file=<<<EOF
+		if ($emailnotification == "smtpbuiltin"){
+
+			if (is_array($config['installedpackages']['apcupsd'])){
+				$apcupsd_config = $config['installedpackages']['apcupsd']['config'][0];
+				if ($apcupsd_config['apcupsdenabled']=="on"){
+					$smtphost=($apcupsd_config['smtphost'] != ''? $apcupsd_config['smtphost'] : "0.0.0.0");
+					$smtpport=($apcupsd_config['smtpport'] != ''? $apcupsd_config['smtpport'] : "25");
+					$smtpfrom=$apcupsd_config['smtpfrom'];
+					$smtpto=$apcupsd_config['smtpto'];
+					$smtpcc=$apcupsd_config['smtpcc'];
+					if(empty($smtpcc)){
+						$smtpcc_cmd = "";
+					}else{
+						$smtpcc_cmd = "-c {$smtpcc}";
+					}
+				}
+			}
+
+			$pfSense_hostname = gethostname();
+
+			$apccontrol_script_file=<<<EOF
+#!/bin/sh
+
+HOSTNAME="{$pfSense_hostname}"
+MSG="{$apcstatus["{$apccontrol_script}"]}"
+#
+(
+   echo " "
+   echo "\$MSG"
+   echo " "
+   /usr/local/sbin/apcaccess status
+) | /usr/local/sbin/smtp -s "\$MSG" -h {$smtphost}:{$smtpport} -f {$smtpfrom} {$smtpcc_cmd} {$smtpto}
+exit 0
+
+EOF;
+		}else{
+			$apccontrol_script_file=<<<EOF
 #!/bin/sh
 
 /usr/local/bin/php -f /usr/local/pkg/apcupsd_mail.php {$apccontrol_script} > /dev/null
@@ -220,10 +285,51 @@ function apccontrol_scripts_install(){
 exit 0
 
 EOF;
+		}
 
 		file_put_contents(APCUPSD_BASE . "/etc/apcupsd/" . $apccontrol_script, $apccontrol_script_file, LOCK_EX);
 	}
 
+}
+
+function check_nis_running_apcupsd(){
+   global $config, $g;
+
+   if (is_array($config['installedpackages']['apcupsd'])){
+      $apcupsd_config = $config['installedpackages']['apcupsd']['config'][0];
+
+      if ($apcupsd_config['apcupsdenabled']=="on" && $apcupsd_config['netserver']=="on" )
+         return(true);
+   }
+
+   return(false);
+}
+
+
+function check_nis_ip_apcupsd(){
+   global $config, $g;
+
+   if (is_array($config['installedpackages']['apcupsd'])){
+      $apcupsd_config = $config['installedpackages']['apcupsd']['config'][0];
+
+      if ($apcupsd_config['apcupsdenabled']=="on" && $apcupsd_config['netserver']=="on" )
+         return($apcupsd_config['nisip']);
+   }
+
+   return(false);
+}
+
+function check_nis_port_apcupsd(){
+   global $config, $g;
+
+   if (is_array($config['installedpackages']['apcupsd'])){
+      $apcupsd_config = $config['installedpackages']['apcupsd']['config'][0];
+
+      if ($apcupsd_config['apcupsdenabled']=="on" && $apcupsd_config['netserver']=="on" )
+         return($apcupsd_config['nisport']);
+   }
+
+   return(false);
 }
 
 ?>

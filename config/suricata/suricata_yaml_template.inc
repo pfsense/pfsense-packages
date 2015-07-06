@@ -225,9 +225,9 @@ reassembly:
 
 # Host table is used by tagging and per host thresholding subsystems.
 host:
-  hash-size: 4096
-  prealloc: 1000
-  memcap: 16777216
+  hash-size: {$host_hash_size}
+  prealloc: {$host_prealloc}
+  memcap: {$host_memcap}
 
 # Host specific policies for defragmentation and TCP stream reassembly.
 host-os-policy:
@@ -286,18 +286,14 @@ vars:
   port-groups:
     {$port_vars}
 
-# Set the order of alerts bassed on actions
+# Set the order of alerts based on actions
 action-order:
   - pass
   - drop
   - reject
   - alert
 
-# IP Reputation
-#reputation-categories-file: {$iprep_path}/categories.txt
-#default-reputation-path: {$iprep_path}
-#reputation-files:
-# - reputation.list
+{$iprep_config}
 
 # Limit for the maximum number of asn1 frames to decode (default 256)
 asn1-max-frames: {$asn1_max_frames}

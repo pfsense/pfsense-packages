@@ -105,14 +105,6 @@ include("head.inc");
 								</td>
 							</tr>
 							<tr>
-								<td align="right">
-									Do not overwrite previous backups for this hostname:
-								</td>
-								<td>
-									<input type="checkbox" name="nooverwrite">
-								</td>
-							</tr>
-							<tr>
 								<td>
 									&nbsp;
 								</td>

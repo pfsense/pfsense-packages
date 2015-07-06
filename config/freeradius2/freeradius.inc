@@ -48,15 +48,18 @@ require_once("services.inc");
 
 // Check pfSense version
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
+if ($pfs_version == "2.1" || $pfs_version == "2.2")
+	define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
+else
+	define('FREERADIUS_BASE', '/usr/local');
 $bash_path = FREERADIUS_BASE . "/bin/bash";
 
-if ($pfs_version == "2.1") {
-	define('FREERADIUS_LIB', FREERADIUS_BASE . '/lib');
-	define('FREERADIUS_ETC', FREERADIUS_BASE . '/etc');
-} else {
+if ($pfs_version == "2.2") {
 	define('FREERADIUS_LIB', FREERADIUS_BASE . '/local/lib');
 	define('FREERADIUS_ETC', FREERADIUS_BASE . '/local/etc');
+} else {
+	define('FREERADIUS_LIB', FREERADIUS_BASE . '/lib');
+	define('FREERADIUS_ETC', FREERADIUS_BASE . '/etc');
 }
 
 // Check freeradius lib version
@@ -65,11 +68,11 @@ if ($pfs_version == "2.1") {
 		$libfiles = scandir(FREERADIUS_LIB);
 		foreach ($libfiles as $libfile){
 			if (preg_match("/freeradius-/",$libfile))
-				$frlib=FREERADIUS_BASE . "/lib/{$libfile}";
+				$frlib=FREERADIUS_LIB . '/' . $libfile;
 		}
 	}
 	if ($frlib == ""){
-		log_error("freeRADIUS - No freeradius lib found on ".FREERADIUS_BASE."/lib");
+		log_error("freeRADIUS - No freeradius lib found on ".FREERADIUS_LIB);
 	}
 	
 function freeradius_deinstall_command() {
@@ -92,7 +95,9 @@ function freeradius_install_command() {
 	@symlink(FREERADIUS_ETC . "/raddb", "/usr/local/etc/raddb");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
-	exec("chown -R root:wheel " . FREERADIUS_ETC . "/raddb && chown -R root:wheel {$frlib} && chown -R root:wheel /var/log/radacct");
+	exec("chown -R root:wheel " . FREERADIUS_ETC . "/raddb /var/log/radacct");
+	if (file_exists($frlib))
+		exec("chown -R root:wheel {$frlib}");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
 	if (!file_exists(FREERADIUS_ETC . "/raddb/policy.conf.backup")) {
@@ -134,7 +139,42 @@ function freeradius_install_command() {
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = FREERADIUS_ETC . '/rc.d/radiusd onestart';
+	$freeradius_etc_dir = FREERADIUS_ETC;
+	$rcfile['start'] = <<<EOD
+SERVICENAME="radiusd"
+	LOCKFILE="/tmp/\${SERVICENAME}_start.lock"
+	PIDFILE="/var/run/\${SERVICENAME}.pid"
+
+	# prevent this part of script from running in parallel
+	if ( set -o noclobber; echo "\$\$" > "\$LOCKFILE") 2> /dev/null; then
+		# make sure lock file is removed even if script is terminated
+		trap 'rm -f "\$LOCKFILE"; exit \$?' INT TERM EXIT
+
+		{$freeradius_etc_dir}/rc.d/radiusd onestart
+
+		# try to wait until the service starts
+		if [ ! -f "\$PIDFILE" ]; then
+			echo "\$SERVICENAME.sh: PID file was not found"
+
+			for i in 1 2 3 4 5; do
+				if [ -f "\$PIDFILE" ]; then
+					echo "\$SERVICENAME.sh: Service started PID: `cat \$PIDFILE`"
+					break
+				else
+					echo "\$SERVICENAME.sh: Waiting 0.5 seconds"
+					sleep 0.5
+				fi
+			done
+		else
+			echo "\$SERVICENAME.sh: Service running PID: `cat \$PIDFILE`"
+		fi
+
+		rm -f "\$LOCKFILE"
+		trap - INT TERM EXIT
+	else
+		echo "\$SERVICENAME.sh: Cannot continue at this moment, this script is already trying to start service PID: \$(cat \$LOCKFILE)"
+	fi
+EOD;
 	$rcfile['stop'] = FREERADIUS_ETC . '/rc.d/radiusd onestop';
 	write_rcfile($rcfile);
 		conf_mount_ro();

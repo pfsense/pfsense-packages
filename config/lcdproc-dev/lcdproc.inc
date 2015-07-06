@@ -32,7 +32,12 @@
 	require_once("service-utils.inc");
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
-	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		define('LCDPROC_CONFIG', '/usr/pbi/lcdproc-' . php_uname('m') . '/local/etc/LCDd.conf');
+	} else {
+		define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
+	}
 	define('LCDPROC_HOST','localhost');
 	define('LCDPROC_PORT','13666');
 	define('LCDPROC_SERVICE_NAME','lcdproc');

@@ -89,6 +89,29 @@ if (isset($id) && $a_nat[$id]) {
 }
 
 if ($_POST['save']) {
+
+	// If disabling Barnyard2 on the interface, stop any
+	// currently running instance, then save the disabled
+	// state and exit so as to preserve settings.
+	if ($_POST['barnyard_enable'] != 'on') {
+		$a_nat[$id]['barnyard_enable'] = 'off';
+		write_config("Suricata pkg: modified Barnyard2 settings.");
+		suricata_barnyard_stop($a_nat[$id], get_real_interface($a_nat[$id]['interface']));
+
+		// No need to rebuild rules for Barnyard2 changes
+		$rebuild_rules = false;
+		conf_mount_rw();
+		sync_suricata_package_config();
+		conf_mount_ro();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /suricata/suricata_barnyard.php");
+		exit;
+	}
+
 	// Check that at least one output plugin is enabled
 	if ($_POST['barnyard_mysql_enable'] != 'on' && $_POST['barnyard_syslog_enable'] != 'on' &&
 	    $_POST['barnyard_bro_ids_enable'] != 'on' && $_POST['barnyard_enable'] == "on")
@@ -167,11 +190,13 @@ if ($_POST['save']) {
 		if ($_POST['barnconfigpassthru']) $natent['barnconfigpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['barnconfigpassthru'])); else unset($natent['barnconfigpassthru']);
 
 		$a_nat[$id] = $natent;
-		write_config();
+		write_config("Suricata pkg: modified Barnyard2 settings.");
 
 		// No need to rebuild rules for Barnyard2 changes
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		// If disabling Barnyard2 on the interface, stop any
 		// currently running instance.  If an instance is
@@ -204,8 +229,10 @@ include_once("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); 
+<?php include("fbegin.inc"); ?>
 
+<form action="suricata_barnyard.php" method="post" name="iform" id="iform">
+<?php
 	/* Display Alert message */
 	if ($input_errors) {
 		print_input_errors($input_errors);
@@ -214,10 +241,7 @@ include_once("head.inc");
 	if ($savemsg) {
 		print_info_box($savemsg);
 	}
-
 ?>
-
-<form action="suricata_barnyard.php" method="post" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>
@@ -234,6 +258,7 @@ include_once("head.inc");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -246,6 +271,7 @@ include_once("head.inc");
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), true, "/suricata/suricata_barnyard.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -606,11 +632,11 @@ function enable_change(enable_change) {
 	document.iform.barnconfigpassthru.disabled = endis;
 }
 
-enable_change(false);
 toggle_mySQL();
 toggle_syslog();
 toggle_local_syslog();
 toggle_bro_ids();
+enable_change(false);
 
 </script>
 

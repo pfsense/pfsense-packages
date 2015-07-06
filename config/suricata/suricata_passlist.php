@@ -87,7 +87,9 @@ if ($_POST['del'] && is_numericint($_POST['list_id'])) {
 		if (!$input_errors) {
 			unset($a_passlist[$_POST['list_id']]);
 			write_config("Suricata pkg: deleted PASS LIST.");
+			conf_mount_rw();
 			sync_suricata_package_config();
+			conf_mount_ro();
 			header("Location: /suricata/suricata_passlist.php");
 			exit;
 		}
@@ -102,7 +104,11 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
+?>
 
+<form action="/suricata/suricata_passlist.php" method="post">
+<input type="hidden" name="list_id" id="list_id" value=""/>
+<?php
 /* Display Alert message */
 if ($input_errors) {
 	print_input_errors($input_errors);
@@ -111,9 +117,6 @@ if ($savemsg) {
 	print_info_box($savemsg);
 }
 ?>
-
-<form action="/suricata/suricata_passlist.php" method="post">
-<input type="hidden" name="list_id" id="list_id" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
 <tr><td>
@@ -130,6 +133,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	?>
 	</td>

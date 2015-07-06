@@ -452,7 +452,7 @@ if ($savemsg) {
 					<tr>
 						<td width="5%" class="listr" style="text-align: center;">
 						<img src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" title="<?=gettext("Auto-managed by settings on SID Mgmt tab");?>" /></td>
-						<td colspan="5" class="listr"><a href='suricata_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?=gettext("{$msg_community}");?></a></td>
+						<td colspan="5" class="listr"><a href='snort_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?=gettext("{$msg_community}");?></a></td>
 					</tr>
 				<?php else: ?>
 					<tr>
@@ -465,7 +465,7 @@ if ($savemsg) {
 			<tr>
 				<td width="5%" class="listr" style="text-align: center;">
 				<input type="checkbox" name="toenable[]" value="<?=$community_rules_file;?>" checked="checked"/></td>
-				<td colspan="5" class="listr"><a href='suricata_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?php echo gettext("{$msg_community}"); ?></a></td>
+				<td colspan="5" class="listr"><a href='snort_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?php echo gettext("{$msg_community}"); ?></a></td>
 			</tr>
 			<?php else: ?>
 			<tr>
@@ -531,7 +531,7 @@ if ($savemsg) {
 				sort($snortrules);
 				$i = count($emergingrules);
 				if ($i < count($snortsorules))
-					$i = count(snortsorules);
+					$i = count($snortsorules);
 				if ($i < count($snortrules))
 					$i = count($snortrules);
 

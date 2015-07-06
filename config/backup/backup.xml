@@ -75,14 +75,14 @@
 		<item>https://packages.pfsense.org/packages/config/backup/backup.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
+		<prefix>/usr/local/www/packages/backup/</prefix>
 		<chmod>0755</chmod>
-		<item>https://packages.pfsense.org/packages/config/backup/backup.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/backup/backup.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
+		<prefix>/usr/local/www/packages/backup/</prefix>
 		<chmod>0755</chmod>
-		<item>https://packages.pfsense.org/packages/config/backup/backup_edit.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/backup/backup_edit.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -109,7 +109,4 @@
 	<custom_php_install_command>
 		backup_install_command();
 	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		backup_deinstall_command();
-	</custom_php_deinstall_command>
 </packagegui>

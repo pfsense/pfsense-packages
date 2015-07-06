@@ -43,6 +43,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
+global $g, $config;
 $supplist = array();
 $suri_pf_table = SURICATA_PF_TABLE;
 $filterlogentries = FALSE;
@@ -127,7 +128,9 @@ function suricata_add_supplist_entry($suppress) {
 	/* and return true; otherwise return false.                             */
 	if ($found_list) {
 		write_config();
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		return true;
 	}
 	else
@@ -232,6 +235,7 @@ if ($_POST['filterlogentries_submit']) {
 
 if ($_POST['filterlogentries_clear']) {
 	$filterfieldsarray = array();
+	$filterlogentries = TRUE;
 }
 
 if ($_POST['save']) {
@@ -377,11 +381,11 @@ if ($_POST['delete']) {
 }
 
 if ($_POST['download']) {
-	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$save_date = date("Y-m-d-H-i-s");
 	$file_name = "suricata_logs_{$save_date}_{$if_real}.tar.gz";
-	exec("cd {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} && /usr/bin/tar -czf /tmp/{$file_name} *");
+	exec("cd {$suricatalogdir}suricata_{$if_real}{$suricata_uuid} && /usr/bin/tar -czf {$g['tmp_path']}/{$file_name} *");
 
-	if (file_exists("/tmp/{$file_name}")) {
+	if (file_exists("{$g['tmp_path']}/{$file_name}")) {
 		ob_start(); //important or other posts will fail
 		if (isset($_SERVER['HTTPS'])) {
 			header('Pragma: ');
@@ -391,13 +395,13 @@ if ($_POST['download']) {
 			header("Cache-Control: private, must-revalidate");
 		}
 		header("Content-Type: application/octet-stream");
-		header("Content-length: " . filesize("/tmp/{$file_name}"));
+		header("Content-length: " . filesize("{$g['tmp_path']}/{$file_name}"));
 		header("Content-disposition: attachment; filename = {$file_name}");
 		ob_end_clean(); //important or other post will fail
-		readfile("/tmp/{$file_name}");
+		readfile("{$g['tmp_path']}/{$file_name}");
 
 		// Clean up the temp file
-		@unlink("/tmp/{$file_name}");
+		unlink_if_exists("{$g['tmp_path']}/{$file_name}");
 	}
 	else
 		$savemsg = gettext("An error occurred while creating archive");
@@ -420,20 +424,21 @@ if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/suricata/suricata_alerts.php?instance={$instanceid}\" />\n";
 ?>
 
-<?php
-/* Display Alert message */
-if ($input_errors) {
-	print_input_errors($input_errors); // TODO: add checks
-}
-if ($savemsg) {
-	print_info_box($savemsg);
-}
-?>
 <form action="/suricata/suricata_alerts.php" method="post" id="formalert">
 <input type="hidden" name="sidid" id="sidid" value=""/>
 <input type="hidden" name="gen_id" id="gen_id" value=""/>
 <input type="hidden" name="ip" id="ip" value=""/>
 <input type="hidden" name="descr" id="descr" value=""/>
+
+<?php
+/* Display Alert message */
+if ($input_errors) {
+	print_input_errors($input_errors);
+}
+if ($savemsg) {
+	print_info_box($savemsg);
+}
+?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
@@ -451,6 +456,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -578,7 +584,7 @@ if ($savemsg) {
 					</table>
 				</td>
 			</tr>
-		<?php if ($filterlogentries) : ?>
+		<?php if ($filterlogentries && count($filterfieldsarray)) : ?>
 			<tr>
 				<td colspan="2" class="listtopic"><?php printf(gettext("Last %s Alert Entries"), $anentries); ?>&nbsp;&nbsp;
 				<?php echo gettext("(Most recent listed first)  ** FILTERED VIEW **  clear filter to see all entries"); ?></td>
@@ -622,9 +628,9 @@ if ($savemsg) {
 	<?php
 
 /* make sure alert file exists */
-if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log")) {
-	exec("tail -{$anentries} -r /var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/alerts_suricata{$suricata_uuid}");
-	if (file_exists("/tmp/alerts_suricata{$suricata_uuid}")) {
+if (file_exists("{$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log")) {
+	exec("tail -{$anentries} -r {$g['varlog_path']}/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > {$g['tmp_path']}/alerts_suricata{$suricata_uuid}");
+	if (file_exists("{$g['tmp_path']}/alerts_suricata{$suricata_uuid}")) {
 		$tmpblocked = array_flip(suricata_get_blocked_ips());
 		$counter = 0;
 
@@ -638,7 +644,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 		/*              0          1           2   3   4    5                         6                 7                                       */
 		/************** *************************************************************************************************************************/
 
-		$fd = fopen("/tmp/alerts_suricata{$suricata_uuid}", "r");
+		$fd = fopen("{$g['tmp_path']}/alerts_suricata{$suricata_uuid}", "r");
 		$buf = "";
 		while (($buf = fgets($fd)) !== FALSE) {
 			$fields = array();
@@ -834,7 +840,7 @@ if (file_exists("/var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.lo
 		}
 		unset($fields, $buf, $tmp);
 		fclose($fd);
-		@unlink("/tmp/alerts_suricata{$suricata_uuid}");
+		unlink_if_exists("{$g['tmp_path']}/alerts_suricata{$suricata_uuid}");
 	}
 }
 ?>

@@ -470,7 +470,7 @@
 		<field>
 			<fielddescr>Microsoft Statement of Health (SoH) Support</fielddescr>
 			<fieldname>vareapconfpeapsohenable</fieldname>
-			<description><![CDATA[You can accept/reject clients based on Microsoft's Statement of Health, such as if they are missing Windows updates, don't have a firewall enabled, antivirus not in line with policy, etc. You need to change server-file for your needs. It cannot be changed from GUI and will be deleted after package reinstallation. (/usr/local/etc/raddb/sites-available/soh). (Default: no)]]></description>
+			<description><![CDATA[You can accept/reject clients based on Microsoft's Statement of Health, such as if they are missing Windows updates, don't have a firewall enabled, antivirus not in line with policy, etc. You need to change server-file for your needs. It cannot be changed from GUI and will be deleted after package reinstallation. (/usr/local/etc/raddb/sites-available/soh). (Default: Disable)]]></description>
 			<type>select</type>
 			<default_value>Disable</default_value>
 					<options>

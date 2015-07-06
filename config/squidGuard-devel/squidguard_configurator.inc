@@ -93,10 +93,10 @@ define('CONFIG_SG_HEADER', "
 # squid config options
 # ------------------------------------------------------------------------------
 define('REDIRECTOR_OPTIONS_REM',   '# squidGuard options');
-define('REDIRECTOR_PROGRAM_OPT',   'redirect_program');
-define('REDIRECT_BYPASS_OPT',      'redirector_bypass');
+define('REDIRECTOR_PROGRAM_OPT',   'url_rewrite_program');
+define('REDIRECT_BYPASS_OPT',      'url_rewrite_bypass');
 define('REDIRECT_CHILDREN_OPT',    'url_rewrite_children');
-define('REDIRECTOR_PROCESS_COUNT', '5'); # redirector processes count will started
+define('REDIRECTOR_PROCESS_COUNT', '16 startup=8 idle=4 concurrency=0'); # redirector processes count will started
 
 # ------------------------------------------------------------------------------
 # squidguard config options

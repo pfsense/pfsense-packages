@@ -39,24 +39,29 @@ require_once("util.inc");
 require_once("pfsense-utils.inc");
 
 global $current_openvpn_version, $current_openvpn_version_rev;
-$current_openvpn_version     = "2.3.5";
-$current_openvpn_version_rev = "01";
+$current_openvpn_version     = "2.3.6";
+$current_openvpn_version_rev = "03";
 
 function openvpn_client_export_install() {
-	conf_mount_rw();
-	$tarpath = "/usr/local/pkg/openvpn-client-export.tgz";
-	$phpfile = "vpn_openvpn_export.php";
-	$ovpndir = "/usr/local/share/openvpn";
-	$workdir = "{$ovpndir}/client-export";
+	global $current_openvpn_version;
 
-	if (!is_dir($workdir))
-		mkdir($workdir, 0777, true);
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		conf_mount_rw();
+		$tarpath = "/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz";
+		$ovpndir = "/usr/local/share/openvpn";
+		$workdir = "{$ovpndir}/client-export";
 
-	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
-	conf_mount_ro();
+		if (!is_dir($workdir))
+			mkdir($workdir, 0777, true);
+
+		exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
+		conf_mount_ro();
+	}
 }
 
 function openvpn_client_export_deinstall() {
+	global $current_openvpn_version;
 	conf_mount_rw();
 	$phpfile = "vpn_openvpn_export.php";
 	$phpfile2 = "vpn_openvpn_export_shared.php";
@@ -65,6 +70,7 @@ function openvpn_client_export_deinstall() {
 
 	unlink_if_exists("/usr/local/www/{$phpfile}");
 	unlink_if_exists("/usr/local/www/{$phpfile2}");
+	unlink_if_exists("/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz");
 	exec("/bin/rm -r {$workdir}");
 	conf_mount_ro();
 }

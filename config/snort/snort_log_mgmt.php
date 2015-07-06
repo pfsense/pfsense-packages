@@ -57,6 +57,8 @@ $pconfig['sid_changes_log_limit_size'] = $config['installedpackages']['snortglob
 $pconfig['sid_changes_log_retention'] = $config['installedpackages']['snortglobal']['sid_changes_log_retention'];
 $pconfig['event_pkts_log_limit_size'] = '0';
 $pconfig['event_pkts_log_retention'] = $config['installedpackages']['snortglobal']['event_pkts_log_retention'];
+$pconfig['appid_stats_log_limit_size'] = $config['installedpackages']['snortglobal']['appid_stats_log_limit_size'];
+$pconfig['appid_stats_log_retention'] = $config['installedpackages']['snortglobal']['appid_stats_log_retention'];
 
 // Load up some arrays with selection values (we use these later).
 // The keys in the $retentions array are the retention period
@@ -86,6 +88,8 @@ if (!isset($pconfig['sid_changes_log_retention']))
 	$pconfig['sid_changes_log_retention'] = "336";
 if (!isset($pconfig['event_pkts_log_retention']))
 	$pconfig['event_pkts_log_retention'] = "336";
+if (!isset($pconfig['appid_stats_log_retention']))
+	$pconfig['appid_stats_log_retention'] = "168";
 
 // Set default log file size limits
 if (!isset($pconfig['alert_log_limit_size']))
@@ -94,6 +98,8 @@ if (!isset($pconfig['stats_log_limit_size']))
 	$pconfig['stats_log_limit_size'] = "500";
 if (!isset($pconfig['sid_changes_log_limit_size']))
 	$pconfig['sid_changes_log_limit_size'] = "250";
+if (!isset($pconfig['appid_stats_log_limit_size']))
+	$pconfig['appid_stats_log_limit_size'] = "1000";
 
 if ($_POST['ResetAll']) {
 
@@ -102,11 +108,13 @@ if ($_POST['ResetAll']) {
 	$pconfig['stats_log_retention'] = "168";
 	$pconfig['sid_changes_log_retention'] = "336";
 	$pconfig['event_pkts_log_retention'] = "336";
+	$pconfig['appid_stats_log_retention'] = "168";
 
 	$pconfig['alert_log_limit_size'] = "500";
 	$pconfig['stats_log_limit_size'] = "500";
 	$pconfig['sid_changes_log_limit_size'] = "250";
 	$pconfig['event_pkts_log_limit_size'] = "0";
+	$pconfig['appid_stats_log_limit_size'] = "1000";
 
 	/* Log a message at the top of the page to inform the user */
 	$savemsg = gettext("All log management settings on this page have been reset to their defaults.  Click APPLY if you wish to keep these new settings.");
@@ -148,6 +156,8 @@ if ($_POST["save"] || $_POST['apply']) {
 		$config['installedpackages']['snortglobal']['sid_changes_log_retention'] = $_POST['sid_changes_log_retention'];
 		$config['installedpackages']['snortglobal']['event_pkts_log_limit_size'] = $_POST['event_pkts_log_limit_size'];
 		$config['installedpackages']['snortglobal']['event_pkts_log_retention'] = $_POST['event_pkts_log_retention'];
+		$config['installedpackages']['snortglobal']['appid_stats_log_limit_size'] = $_POST['appid_stats_log_limit_size'];
+		$config['installedpackages']['snortglobal']['appid_stats_log_retention'] = $_POST['appid_stats_log_retention'];
 
 		write_config("Snort pkg: saved updated configuration for LOGS MGMT.");
 		conf_mount_rw();
@@ -307,7 +317,26 @@ if ($savemsg) {
 					</td>
 					<td class="listbg"><?=gettext("Snort alerts and event details");?></td>
 				</tr>
-
+				<tr>
+					<td class="listbg">appid-stats</td>
+					<td class="listr" align="center"><select name="appid_stats_log_limit_size" class="formselect" id="appid_stats_log_limit_size">
+						<?php foreach ($log_sizes as $k => $l): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['appid_stats_log_limit_size']) echo " selected"; ?>>
+								<?=htmlspecialchars($l);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listr" align="center"><select name="appid_stats_log_retention" class="formselect" id="appid_stats_log_retention">
+						<?php foreach ($retentions as $k => $p): ?>
+							<option value="<?=$k;?>"
+							<?php if ($k == $pconfig['appid_stats_log_retention']) echo " selected"; ?>>
+								<?=htmlspecialchars($p);?></option>
+						<?php endforeach; ?>
+						</select>
+					</td>
+					<td class="listbg"><?=gettext("Application ID statistics");?></td>
+				</tr>
 				<tr>
 					<td class="listbg">event pcaps</td>
 					<td class="listr" align="center"><select name="event_pkts_log_limit_size" class="formselect" id="event_pkts_log_limit_size">
@@ -324,7 +353,6 @@ if ($savemsg) {
 					</td>
 					<td class="listbg"><?=gettext("Snort alert related packet captures");?></td>
 				</tr>
-
 				<tr>
 					<td class="listbg">sid_changes</td>
 					<td class="listr" align="center"><select name="sid_changes_log_limit_size" class="formselect" id="sid_changes_log_limit_size">

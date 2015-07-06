@@ -183,9 +183,9 @@
 					</options>
 		</field>
 		<field>
-			<fielddescr>Log Bad Authentication Attempts</fielddescr>
+			<fielddescr>Log Password on Authentication Failure</fielddescr>
 			<fieldname>varsettingsauthbadpass</fieldname>
-			<description><![CDATA[If an authentication fails then it will log the username and <b>wrong</b> password visible in syslog. Logging must be enabled. (Default: no)]]></description>
+			<description><![CDATA[Log the <b>password</b> of failed authentication attempts to syslog. Not recommended for security reasons. Logging must be enabled. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>
@@ -204,9 +204,9 @@
 			<size>80</size>
 		</field>
 		<field>
-			<fielddescr>Log good authentication attempts?</fielddescr>
+			<fielddescr>Log Password on Authentication Success</fielddescr>
 			<fieldname>varsettingsauthgoodpass</fieldname>
-			<description><![CDATA[If an authentication succeeds then it will log the username and <b>correct</b> password visible in syslog. Logging must be enabled. (Default: no)]]></description>
+			<description><![CDATA[Log the <b>password</b> of successful authentication attempts to syslog. Not recommended for security reasons. Logging must be enabled. (Default: no)]]></description>
 			<type>select</type>
 			<default_value>no</default_value>
 					<options>

@@ -71,12 +71,118 @@ if ($config['installedpackages']['suricata']['config'][0]['suricata_config_ver']
 /**********************************************************/
 /* Create new Auto SID Mgmt settings if not set           */
 /**********************************************************/
-	if (empty($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'])) {
-		$config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] = "off";
-		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'] = "250";
-		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = "336";
-		$updated_cfg = true;
-	}
+if (empty($config['installedpackages']['suricata']['config'][0]['auto_manage_sids'])) {
+	$config['installedpackages']['suricata']['config'][0]['auto_manage_sids'] = "off";
+	$config['installedpackages']['suricata']['config'][0]['sid_changes_log_limit_size'] = "250";
+	$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = "336";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
+/* Create new Auto GeoIP update setting if not set        */
+/**********************************************************/
+if (empty($config['installedpackages']['suricata']['config'][0]['autogeoipupdate'])) {
+	$config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] = "on";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
+/* Create new ET IQRisk IP Reputation setting if not set  */
+/**********************************************************/
+if (empty($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'])) {
+	$config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] = "off";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
+/* Set default log size and retention limits if not set   */
+/**********************************************************/
+if (!isset($config['installedpackages']['suricata']['config'][0]['alert_log_retention']) && $config['installedpackages']['suricata']['config'][0]['alert_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['alert_log_retention'] = "336";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['alert_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['alert_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['block_log_retention']) && $config['installedpackages']['suricata']['config'][0]['block_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['block_log_retention'] = "336";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['block_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['block_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['block_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['dns_log_retention']) && $config['installedpackages']['suricata']['config'][0]['dns_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['dns_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['dns_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'] = "750";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['eve_log_retention']) && $config['installedpackages']['suricata']['config'][0]['eve_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['eve_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['eve_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'] = "5000";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['files_json_log_retention']) && $config['installedpackages']['suricata']['config'][0]['files_json_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['files_json_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['files_json_log_limit_size'] = "1000";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['http_log_retention']) && $config['installedpackages']['suricata']['config'][0]['http_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['http_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['http_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['http_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['http_log_limit_size'] = "1000";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['stats_log_retention']) && $config['installedpackages']['suricata']['config'][0]['stats_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['stats_log_retention'] = "168";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['stats_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['stats_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['stats_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['tls_log_retention']) && $config['installedpackages']['suricata']['config'][0]['tls_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['tls_log_retention'] = "336";
+	$updated_cfg = true;
+}
+if (!isset($config['installedpackages']['suricata']['config'][0]['tls_log_limit_size']) && $config['installedpackages']['suricata']['config'][0]['tls_log_limit_size'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['tls_log_limit_size'] = "500";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['file_store_retention']) && $config['installedpackages']['suricata']['config'][0]['file_store_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['file_store_retention'] = "168";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention']) && $config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] = "168";
+	$updated_cfg = true;
+}
+
+if (!isset($config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention']) && $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] != '0') {
+	$config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] = "168";
+	$updated_cfg = true;
+}
 
 // Now process the interface-specific settings
 foreach ($rule as &$r) {
@@ -180,87 +286,88 @@ foreach ($rule as &$r) {
 	}
 
 	/******************************************************************/
-	/* Create default log size and retention limits if not set        */
+	/* Remove per interface default log size and retention limits     */ 
+	/* if they were set by early bug.                                 */
 	/******************************************************************/
-	if (!isset($pconfig['alert_log_retention']) && $pconfig['alert_log_retention'] != '0') {
-		$pconfig['alert_log_retention'] = "336";
+	if (isset($pconfig['alert_log_retention'])) {
+		unset($pconfig['alert_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['alert_log_limit_size']) && $pconfig['alert_log_limit_size'] != '0') {
-		$pconfig['alert_log_limit_size'] = "500";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['block_log_retention']) && $pconfig['block_log_retention'] != '0') {
-		$pconfig['block_log_retention'] = "336";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['block_log_limit_size']) && $pconfig['block_log_limit_size'] != '0') {
-		$pconfig['block_log_limit_size'] = "500";
+	if (isset($pconfig['alert_log_limit_size'])) {
+		unset($pconfig['alert_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['dns_log_retention']) && $pconfig['dns_log_retention'] != '0') {
-		$pconfig['dns_log_retention'] = "168";
+	if (isset($pconfig['block_log_retention'])) {
+		unset($pconfig['block_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['dns_log_limit_size']) && $pconfig['dns_log_limit_size'] != '0') {
-		$pconfig['dns_log_limit_size'] = "750";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['eve_log_retention']) && $pconfig['eve_log_retention'] != '0') {
-		$pconfig['eve_log_retention'] = "168";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['eve_log_limit_size']) && $pconfig['eve_log_limit_size'] != '0') {
-		$pconfig['eve_log_limit_size'] = "5000";
+	if (isset($pconfig['block_log_limit_size'])) {
+		unset($pconfig['block_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['files_json_log_retention']) && $pconfig['files_json_log_retention'] != '0') {
-		$pconfig['files_json_log_retention'] = "168";
+	if (isset($pconfig['dns_log_retention'])) {
+		unset($pconfig['dns_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['files_json_log_limit_size']) && $pconfig['files_json_log_limit_size'] != '0') {
-		$pconfig['files_json_log_limit_size'] = "1000";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['http_log_retention']) && $pconfig['http_log_retention'] != '0') {
-		$pconfig['http_log_retention'] = "168";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['http_log_limit_size']) && $pconfig['http_log_limit_size'] != '0') {
-		$pconfig['http_log_limit_size'] = "1000";
+	if (isset($pconfig['dns_log_limit_size'])) {
+		unset($pconfig['dns_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['stats_log_retention']) && $pconfig['stats_log_retention'] != '0') {
-		$pconfig['stats_log_retention'] = "168";
+	if (isset($pconfig['eve_log_retention'])) {
+		unset($pconfig['eve_log_retention']);
 		$updated_cfg = true;
 	}
-	if (!isset($pconfig['stats_log_limit_size']) && $pconfig['stats_log_limit_size'] != '0') {
-		$pconfig['stats_log_limit_size'] = "500";
-		$updated_cfg = true;
-	}
-
-	if (!isset($pconfig['tls_log_retention']) && $pconfig['tls_log_retention'] != '0') {
-		$pconfig['tls_log_retention'] = "336";
-		$updated_cfg = true;
-	}
-	if (!isset($pconfig['tls_log_limit_size']) && $pconfig['tls_log_limit_size'] != '0') {
-		$pconfig['tls_log_limit_size'] = "500";
+	if (isset($pconfig['eve_log_limit_size'])) {
+		unset($pconfig['eve_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['file_store_retention']) && $pconfig['file_store_retention'] != '0') {
-		$pconfig['file_store_retention'] = "168";
+	if (isset($pconfig['files_json_log_retention'])) {
+		unset($pconfig['files_json_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['files_json_log_limit_size'])) {
+		unset($pconfig['files_json_log_limit_size']);
 		$updated_cfg = true;
 	}
 
-	if (!isset($pconfig['u2_archive_log_retention']) && $pconfig['u2_archive_log_retention'] != '0') {
-		$pconfig['u2_archive_log_retention'] = "168";
+	if (isset($pconfig['http_log_retention'])) {
+		unset($pconfig['http_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['http_log_limit_size'])) {
+		unset($pconfig['http_log_limit_size']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['stats_log_retention'])) {
+		unset($pconfig['stats_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['stats_log_limit_size'])) {
+		unset($pconfig['stats_log_limit_size']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['tls_log_retention'])) {
+		unset($pconfig['tls_log_retention']);
+		$updated_cfg = true;
+	}
+	if (isset($pconfig['tls_log_limit_size'])) {
+		unset($pconfig['tls_log_limit_size']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['file_store_retention'])) {
+		unset($pconfig['file_store_retention']);
+		$updated_cfg = true;
+	}
+
+	if (isset($pconfig['u2_archive_log_retention'])) {
+		unset($pconfig['u2_archive_log_retention']);
 		$updated_cfg = true;
 	}
 
@@ -336,6 +443,26 @@ foreach ($rule as &$r) {
 		$updated_cfg = true;
 	}
 
+	/**********************************************************/
+	/* Create interface IP Reputation settings if not set     */
+	/**********************************************************/
+	if (empty($pconfig['enable_iprep'])) {
+		$pconfig['enable_iprep'] = "off";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_memcap'])) {
+		$pconfig['host_memcap'] = "16777216";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_hash_size'])) {
+		$pconfig['host_hash_size'] = "4096";
+		$updated_cfg = true;
+	}
+	if (empty($pconfig['host_prealloc'])) {
+		$pconfig['host_prealloc'] = "1000";
+		$updated_cfg = true;
+	}
+
 	// Save the new configuration data into the $config array pointer
 	$r = $pconfig;
 }
@@ -343,12 +470,8 @@ foreach ($rule as &$r) {
 unset($r);
 
 // Write out the new configuration to disk if we changed anything
-if ($updated_cfg) {
-	$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.0.2";
-	log_error("[Suricata] Saving configuration settings in new format...");
-	write_config("Suricata pkg: migrate existing settings to new format during package upgrade.");
+if ($updated_cfg)
 	log_error("[Suricata] Settings successfully migrated to new configuration format...");
-}
 else
 	log_error("[Suricata] Configuration version is current...");
 

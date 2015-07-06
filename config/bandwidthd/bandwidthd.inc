@@ -31,18 +31,17 @@
 // Check pfSense version
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
-  case "1.2":
-  case "2.0":
-    define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
-    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
-    break;
   case "2.1":
     define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
     define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
     break;
-  default:
+  case "2.2":
     define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/local/bandwidthd');
     define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', 'LD_LIBRARY_PATH=/usr/pbi/bandwidthd-' . php_uname("m") . '/local/lib');
+    break;
+  default:
+    define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
  }
 // End: Check pfSense version
 

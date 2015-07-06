@@ -28,6 +28,7 @@
 */
 
 require("guiconfig.inc");
+require_once("apcupsd.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version < 2.0)
@@ -37,6 +38,9 @@ $pgtitle = "Services: Apcupsd (Status)";
 include("head.inc");
 
 function puts( $arg ) { echo "$arg\n"; }	
+
+if (isset($_GET['strapcaccess']))
+   $strapcaccess = trim($_GET['strapcaccess']);
 
 ?>
 
@@ -98,14 +102,66 @@ pre {
 
 <div id="mainarea" style="padding-top: 0px; padding-bottom: 0px; ">
 	<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
-		<tr><td>
+		<form name="frm_apcupsd_status" method="GET">
+			<tr>
+				<td width="14%" valign="top" class="vncellreq">Host:</td>
+				<td width="86%" class="vtable">
+					<input name="strapcaccess" type="text" class="formfld unknown" id="strapcaccess" size="22" value="<? echo "{$strapcaccess}"; ?>">
+					<br/>
+					<span class="vexpl">
+     Default: <b>localhost</b><br/>
+     apcaccess uses apcupsd's inbuilt Network Information Server (NIS) to obtain the current status information <br/>
+     from the UPS on the local or remote computer. It is therefore necessary to have the following configuration directives: <br/>
+     NETSERVER on<br/>
+     NISPORT 3551<br/>
+					<br/>
+					<?php if ($pf_version < 2.2): ?>
+						<input type="Submit" value="Execute" class="formbtn" disabled/>
+					<?php else: ?>
+						<input type="Submit" value="Execute" class="formbtn"/>
+					<?php endif; ?>
+					</span>
+				</td>
+			</tr>
+		</form>
+			<tr><td colspan="2">
 <?php
-   puts("<pre>");
-   putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
-   $ph = popen('apcaccess 2>&1', "r" );
-   while ($line = fgets($ph)) echo htmlspecialchars($line);
-   pclose($ph);
-   puts("</pre>");
+	$nis_server = check_nis_running_apcupsd();
+
+	if ($pf_version >= 2.2){
+		if($strapcaccess) {
+			echo "Running: apcaccess -h {$strapcaccess} <br/>";
+			puts("<pre>");
+			putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
+			$ph = popen("apcaccess -h {$strapcaccess} 2>&1", "r" );
+			while ($line = fgets($ph)) echo htmlspecialchars($line);
+			pclose($ph);
+			puts("</pre>");
+		}elseif($nis_server){
+			$nisip=(check_nis_ip_apcupsd() != ''? check_nis_ip_apcupsd() : "0.0.0.0");
+			$nisport=(check_nis_port_apcupsd() != ''? check_nis_port_apcupsd() : "3551");
+			echo "Running: apcaccess -h {$nisip}:{$nisport} <br/>";
+			puts("<pre>");
+			putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
+			$ph = popen("apcaccess -h localhost 2>&1", "r" );
+			while ($line = fgets($ph)) echo htmlspecialchars($line);
+			pclose($ph);
+			puts("</pre>");
+		}else
+			echo "Network Information Server (NIS) not running, in order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
+   }else{
+		echo "pfSense version prior to 2.2 runs APCupsd 3.14.10 and apcaccess doesn't accept host parameter. <br/>";
+		if ($nis_server){
+			puts("<pre>");
+			putenv("PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin");
+			$ph = popen("apcaccess 2>&1", "r" );
+			while ($line = fgets($ph)) echo htmlspecialchars($line);
+			pclose($ph);
+			puts("</pre>");
+		}else
+			echo "Network Information Server (NIS) not running, in order to run apcaccess on localhost, you need to enable it on APCupsd General settings. <br/>";
+   }
+
 ?>
 		</td></tr>
 	</table>

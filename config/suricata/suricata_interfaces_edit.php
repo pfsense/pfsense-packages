@@ -223,7 +223,9 @@ if ($_POST["save"] && !$input_errors) {
 		suricata_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
 		write_config("Suricata pkg: disabled Suricata on " . convert_friendly_interface_to_friendly_descr($a_rule[$id]['interface']));
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -305,6 +307,12 @@ if ($_POST["save"] && !$input_errors) {
 		if ($_POST['intf_promisc_mode'] == "on") { $natent['intf_promisc_mode'] = 'on'; }else{ $natent['intf_promisc_mode'] = 'off'; }
 		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['configpassthru'])); else unset($natent['configpassthru']);
 
+		// Check if EVE OUTPUT TYPE is 'syslog' and auto-enable Suricata syslog output if true.
+		if ($natent['eve_output_type'] == "syslog" && $natent['alertsystemlog'] == "off") {
+			$natent['alertsystemlog'] = "on";
+			$savemsg = gettext("EVE Output to syslog requires Suricata alerts to be copied to the system log, so 'Send Alerts to System Log' has been auto-enabled.");
+		}
+
 		$if_real = get_real_interface($natent['interface']);
 		if (isset($id) && $a_rule[$id] && $action == '') {
 			// See if moving an existing Suricata instance to another physical interface
@@ -316,9 +324,9 @@ if ($_POST["save"] && !$input_errors) {
 				}
 				else
 					$suricata_start = false;
-				exec("mv -f {$suricatalogdir}suricata_{$oif_real}" . $a_rule[$id]['uuid'] . " {$suricatalogdir}suricata_{$if_real}" . $a_rule[$id]['uuid']);
+				@rename("{$suricatalogdir}suricata_{$oif_real}{$a_rule[$id]['uuid']}", "{$suricatalogdir}suricata_{$if_real}{$a_rule[$id]['uuid']}");
 				conf_mount_rw();
-				exec("mv -f {$suricatadir}suricata_" . $a_rule[$id]['uuid'] . "_{$oif_real} {$suricatadir}suricata_" . $a_rule[$id]['uuid'] . "_{$if_real}");
+				@rename("{$suricatadir}suricata_{$a_rule[$id]['uuid']}_{$oif_real}", "{$suricatadir}suricata_{$a_rule[$id]['uuid']}_{$if_real}");
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
@@ -392,6 +400,11 @@ if ($_POST["save"] && !$input_errors) {
 			$natent['smb_parser'] = "yes";
 			$natent['msn_parser'] = "detection-only";
 
+			$natent['enable_iprep'] = "off";
+			$natent['host_memcap'] = "16777216";
+			$natent['host_hash_size'] = "4096";
+			$natent['host_prealloc'] = "1000";
+
 			$default = array( "name" => "default", "bind_to" => "all", "policy" => "bsd" );
 			if (!is_array($natent['host_os_policy']['item']))
 				$natent['host_os_policy']['item'] = array();
@@ -423,15 +436,12 @@ if ($_POST["save"] && !$input_errors) {
 		write_config("Suricata pkg: modified interface configuration for " . convert_friendly_interface_to_friendly_descr($natent['interface']));
 
 		// Update suricata.conf and suricata.sh files for this interface
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
-		header("Location: /suricata/suricata_interfaces.php");
-		exit;
+		// Refresh page fields with just-saved values
+		$pconfig = $natent;
 	} else
 		$pconfig = $_POST;
 }
@@ -443,7 +453,13 @@ include_once("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc");
+<?php include("fbegin.inc");?>
+
+<form action="suricata_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
+<input name="id" type="hidden" value="<?=$id;?>"/>
+<input name="action" type="hidden" value="<?=$action;?>"/>
+
+<?php
 /* Display Alert message */
 if ($input_errors) {
 	print_input_errors($input_errors);
@@ -452,10 +468,6 @@ if ($savemsg) {
 	print_info_box($savemsg);
 }
 ?>
-
-<form action="suricata_interfaces_edit.php<?php echo "?id=$id";?>" method="post" name="iform" id="iform">
-<input name="id" type="hidden" value="<?=$id;?>"/>
-<input name="action" type="hidden" value="<?=$action;?>"/>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tbody>
@@ -473,6 +485,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -485,6 +498,7 @@ if ($savemsg) {
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -705,7 +719,7 @@ if ($savemsg) {
 				?> 
 				</select>&nbsp;&nbsp;
 				<?php echo gettext("Select EVE log output destination."); ?><br/>
-				<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing FILE is suggested, and it is the default value."); ?><br/>
+				<span class="red"><?php echo gettext("Hint:") . "</span>&nbsp;" . gettext("Choosing FILE is suggested, and is the default value."); ?><br/>
 			</td>
 		</tr>
 		<tr id="eve_systemlog_facility_row">

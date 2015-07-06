@@ -36,11 +36,8 @@ require_once("pkg-utils.inc");
 require_once("globals.inc");
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
-	if ($pfs_version == 2.2)
-		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m")."/local");
-	else
-		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
 } else {
 	define('POSTFIX_LOCALBASE','/usr/local');
 }
@@ -731,6 +728,12 @@ MASTEREOF2;
 
 	conf_mount_rw();
 
+	//check postfix etc dir on 2.2
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	$postfix_etc_lnk="/usr/local/etc/postfix";
+	if ($pfs_version == 2.2 && !is_dir($postfix_etc_lnk))
+		@symlink(POSTFIX_LOCALBASE.'/etc/postfix',$postfix_etc_lnk);
+
 	log_error("Writing out configuration");
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/main.cf", $postfix_main, LOCK_EX);
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/master.cf", $postfix_master, LOCK_EX);
@@ -763,6 +766,8 @@ MASTEREOF2;
 			}
 	if (!file_exists("/etc/mail/aliases"))
 		touch("/etc/mail/aliases");
+	if (!file_exists("/etc/aliases"))
+		@symlink("/etc/mail/aliases", "/etc/aliases");
 	exec("/usr/local/bin/newaliases");
 	postfix_start();
 
@@ -843,6 +848,7 @@ function postfix_php_deinstall_command() {
 	sync_package_postfix();
 	conf_mount_rw();
 	unlink_if_exists("/usr/local/etc/rc.d/postfix.sh");
+	unlink_if_exists("/etc/aliases");
 	conf_mount_ro();
 }
 

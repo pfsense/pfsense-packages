@@ -75,13 +75,18 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 				@file_put_contents("{$snort_log_dir}/alert", "");
 			}
 
-			// Cleanup any rotated perfmon stats logs
+			// Cleanup any perfmon stats logs
 			$files = array();
 			$list = glob("{$snort_log_dir}/*");
 			foreach ($list as $file) {
-				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.]?[\d+]?)/', basename($file), $matches))
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.\d+]*)/', basename($file), $matches))
 					$files[] = $snort_log_dir . "/" . $matches[1];
 			}
+			foreach ($files as $file)
+				unlink_if_exists($file);
+
+			// Cleanup any AppID stats logs
+			$files = glob("{$snort_log_dir}/appid-stats.log.*");
 			foreach ($files as $file)
 				unlink_if_exists($file);
 
@@ -214,7 +219,7 @@ if ($config['installedpackages']['snortglobal']['enable_log_mgmt'] == 'on') {
 			$files = array();
 			$list = glob("{$snort_log_dir}/*");
 			foreach ($list as $file) {
-				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.]?[\d+]?)/', basename($file), $matches))
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.\d+]*)/', basename($file), $matches))
 					$files[] = $snort_log_dir . "/" . $matches[1];
 			}
 			$prune_count = 0;
@@ -227,6 +232,22 @@ if ($config['installedpackages']['snortglobal']['enable_log_mgmt'] == 'on') {
 			unset($list, $files);
 			if ($prune_count > 0)
 				log_error(gettext("[Snort] perfmon stats logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/..."));
+		}
+
+		// Prune any aged-out AppID stats logs if any exist
+		if ($value['appid_stats_log_retention'] > 0) {
+			$now = time();
+			$files = glob("{$snort_log_dir}/app-stats.log.*");
+			$prune_count = 0;
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($value['appid_stats_log_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($f);
+				}
+			}
+			unset($files);
+			if ($prune_count > 0)
+				log_error(gettext("[Snort] AppID stats logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/..."));
 		}
 	}
 }

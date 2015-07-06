@@ -35,11 +35,8 @@ if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if (is_dir('/usr/pbi/postfix-' . php_uname("m"))) {
-	if ($pfs_version == 2.2)
-		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m")."/local");
-	else
-		define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+	define('POSTFIX_LOCALBASE', '/usr/pbi/postfix-' . php_uname("m"));
 } else {
 	define('POSTFIX_LOCALBASE','/usr/local');
 }
@@ -231,7 +228,7 @@ else{
 			//prevent multiple instances
 			if ($('run').value=="show queue" || loop== 'running'){
 				$('run').value="running...";
-				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop seach, change update frequency to Never.</strong>";
+				$('search_help').innerHTML ="<br><strong>You can change options while running.<br>To Stop search, change update frequency to Never.</strong>";
 				var q_args=loopSelected('qshape');
 				var pars = 'cmd='+$('cmd').options[$('cmd').selectedIndex].value;
 				var pars = pars + '&qshape='+q_args;

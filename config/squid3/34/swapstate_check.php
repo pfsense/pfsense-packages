@@ -30,17 +30,6 @@ require_once('config.inc');
 require_once('util.inc');
 require_once('squid.inc');
 
-$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if (is_dir('/usr/pbi/squid-' . php_uname("m"))) {
-	if ($pfs_version == 2.2)
-		define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m")."/local");
-	else
-		define('SQUID_LOCALBASE', '/usr/pbi/squid-' . php_uname("m"));
-} else {
-	define('SQUID_LOCALBASE','/usr/local');
-}
-
-
   $settings = $config['installedpackages']['squidcache']['config'][0];
 // Only check the cache if Squid is actually caching.
 // If there is no cache then quietly do nothing.

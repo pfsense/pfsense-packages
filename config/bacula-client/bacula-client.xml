@@ -132,7 +132,7 @@
 			<fieldname>password</fieldname>
 			<type>password</type>
 			<size>30</size>
-			<description><![CDATA[Enter password for Diector use to Access.]]></description>
+			<description><![CDATA[Enter password for Director use to Access.]]></description>
 		</field>
 		<field>
 			<fielddescr>Director type</fielddescr>

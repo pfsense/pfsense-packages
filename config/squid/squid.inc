@@ -94,7 +94,7 @@ function squid_dash_z() {
 
 	if(!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir $cachedir");
-		make_dirs($cachedir);
+		@mkdir($cachedir, 0755, true);
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
 	}
@@ -223,7 +223,7 @@ function squid_install_command() {
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 			SQUID_BASE ) as $dir) {
-		make_dirs($dir);
+		@mkdir($dir, 0755, true);
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
@@ -1153,7 +1153,7 @@ function squid_resync() {
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 			SQUID_BASE ) as $dir) {
-		make_dirs($dir);
+		@mkdir($dir, 0755, true);
 		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
@@ -1163,7 +1163,7 @@ function squid_resync() {
 
 	if(!is_dir($log_dir)) {
 		log_error("Creating squid log dir $log_dir");
-		make_dirs($log_dir);
+		@mkdir($log_dir, 0755, true);
 		squid_chown_recursive($log_dir, 'proxy', 'proxy');
 	}
 

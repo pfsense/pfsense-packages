@@ -201,7 +201,7 @@ function stunnel_install() {
 	safe_mkdir("/usr/local/etc/stunnel");
 	system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out /usr/local/etc/stunnel/stunnel.pem -keyout /usr/local/etc/stunnel/stunnel.pem 2>/dev/null");
 	chmod("/usr/local/etc/stunnel/stunnel.pem", 0600);
-	make_dirs("/var/tmp/stunnel/var/tmp/run/stunnel");
+	@mkdir("/var/tmp/stunnel/var/tmp/run/stunnel", 0755, true);
 	system("/usr/sbin/chown -R stunnel:stunnel /var/tmp/stunnel");
 	$_rcfile['file']='stunnel.sh';
 	$_rcfile['start'].="/usr/local/bin/stunnel /usr/local/etc/stunnel/stunnel.conf \n\t";

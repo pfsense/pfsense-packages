@@ -36,6 +36,7 @@ require_once("/usr/local/pkg/snort/snort.inc");
 global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
+$snortbindir = SNORT_PBI_BINDIR;
 $rules_map = array();
 $categories = array();
 $pconfig = array();
@@ -400,7 +401,7 @@ elseif ($_POST['save']) {
 	$rebuild_rules = false;
 	$output = "";
 	$retcode = "";
-	exec("/usr/local/bin/snort -T -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf 2>&1", $output, $retcode);
+	exec("{$snortbindir}snort -T -c {$snortdir}/snort_{$snort_uuid}_{$if_real}/snort.conf 2>&1", $output, $retcode);
 	if (intval($retcode) != 0) {
 		$error = "";
 		$start = count($output);
@@ -412,8 +413,7 @@ elseif ($_POST['save']) {
 	else {
 		/* Soft-restart Snort to live-load new rules */
 		snort_reload_config($a_rule[$id]);
-		$savemsg = gettext("Custom rules validated successfully and have been saved to the Snort configuration files. ");
-		$savemsg .= gettext("Any active Snort process on this interface has been signalled to live-load the new rules.");
+		$savemsg = gettext("Custom rules validated successfully and any active Snort process on this interface has been signalled to live-load the new rules.");
 	}
 
 	clear_subsystem_dirty('snort_rules');
@@ -443,6 +443,9 @@ else if ($_POST['apply']) {
 
 	// Sync to configured CARP slaves if any are enabled
 	snort_sync_on_changes();
+
+	if (snort_is_running($snort_uuid, $if_real))
+		$savemsg = gettext("Snort is 'live-reloading' the new rule set.");
 }
 
 include_once("head.inc");

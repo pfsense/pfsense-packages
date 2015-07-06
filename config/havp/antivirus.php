@@ -176,6 +176,11 @@ if ($_POST['startupdate'] != '') {
 #    else echo "No 'start_antivirus_scanner' function found.";
 }
 
+/* Clear havp access log */
+if ($_POST['clearlog_x'] != '') {
+    file_put_contents(HVDEF_HAVP_ACCESSLOG, '');
+}
+
 # ------------------------------------------------------------------------------
 ?>
 
@@ -199,6 +204,7 @@ if (pfsense_version_A() == '1') {
 	$tab_array[] = array(gettext("General page"), true, "antivirus.php");
 	$tab_array[] = array(gettext("HTTP proxy"), false, "pkg_edit.php?xml=havp.xml&amp;id=0");
 	$tab_array[] = array(gettext("Settings"), false, "pkg_edit.php?xml=havp_avset.xml&amp;id=0");
+	$tab_array[] = array(gettext("HAVP Log"), false, "havp_log.php");
 
 	display_top_tabs($tab_array);
 ?>
@@ -356,7 +362,7 @@ if (pfsense_version_A() == '1') {
                   }
                   else echo "<tr><td $stl>Not found</td></tr>";
               ?>              
-              <tr class="listr"><td class="listr" colspan="4"><?php echo get_av_statistic(); ?></td></tr>	              
+              <tr class="listr"><td class="listr" colspan="4"><?php echo get_av_statistic(); ?><?php echo "<div style='float:right;'><input title='Clear antivirus log' name='clearlog' type='image' value='havp' border=0 src='./themes/".$g['theme']."/images/icons/icon_x.gif'>"; ?><font size="-1">&nbsp;Clear log</font></div></td></tr>	              
             </tbody></table>
           </td>
         </tr>

@@ -105,6 +105,11 @@
 			<url>/openbgpd_status.php</url>
 		</tab>
 	</tabs>
+	<plugins>
+		<item>
+			<type>plugin_carp</type>
+		</item>
+	</plugins>
 	<fields>
 		<field>
 			<fielddescr>Autonomous Systems (AS) Number</fielddescr>
@@ -143,8 +148,13 @@
 			<description>Set the router ID to the given IP address, which must be local to the machine.</description>
 			<type>input</type>
 		</field>
-
-
+		<field>
+			<fielddescr>CARP Status IP</fielddescr>
+			<fieldname>carpstatusip</fieldname>
+			<description>IP address used to determine the CARP status. When the VIP is in BACKUP status, bgpd will not be started. &lt;br/&gt;NOTE: On 2.1.x and before this requires changes to /etc/rc.carpmaster to start bgpd and /etc/rc.carpbackup to stop bgpd or it will not be fully effective. On pfSense 2.2.x and later, full support is automatic.</description>
+			<type>input</type>
+			<size>25</size>
+		</field>
 		<field>
 			<fielddescr>Networks</fielddescr>
 			<fieldname>network</fieldname>

@@ -53,13 +53,6 @@ foreach ($config_files as $file) {
 		@copy("{$suricatadir}{$file}", "{$suricatacfgdir}/{$file}");
 }
 
-// Create required files if they don't exist
-$suricata_files = array( "{$suricatacfgdir}/magic" );
-foreach ($suricata_files as $file) {
-	if (!file_exists($file))
-		file_put_contents($file, "\n");
-}
-
 // Read the configuration parameters for the passed interface
 // and construct appropriate string variables for use in the
 // suricata.yaml template include file.
@@ -540,9 +533,10 @@ else
 
 // Add the OS-specific host policies if configured, otherwise
 // just set default to BSD for all networks.
+$host_os_policy = "";
 if (!is_array($suricatacfg['host_os_policy']['item']))
 	$suricatacfg['host_os_policy']['item'] = array();
-if (empty($suricatacfg['host_os_policy']['item']))
+if (count($suricatacfg['host_os_policy']['item']) < 1)
 	$host_os_policy = "bsd: [0.0.0.0/0]";
 else {
 	foreach ($suricatacfg['host_os_policy']['item'] as $k => $v) {
@@ -580,10 +574,12 @@ else {
 
 // Add the HTTP Server-specific policies if configured, otherwise
 // just set default to IDS for all networks.
+$http_hosts_policy = "";
+$http_hosts_default_policy = "";
 if (!is_array($suricatacfg['libhtp_policy']['item']))
 	$suricatacfg['libhtp_policy']['item'] = array();
-if (empty($suricatacfg['libhtp_policy']['item'])) {
-	$http_hosts_default_policy = "default-config:\n     personality: IDS\n     request-body-limit: 4096\n     response-body-limit: 4096\n";
+if (count($suricatacfg['libhtp_policy']['item']) < 1) {
+	$http_hosts_default_policy = "     personality: IDS\n     request-body-limit: 4096\n     response-body-limit: 4096\n";
 	$http_hosts_default_policy .= "     double-decode-path: no\n     double-decode-query: no\n     uri-include-all: no\n";
 }
 else {
@@ -705,15 +701,41 @@ else
 	$http_parser_memcap = "67108864";
 
 /* Configure the IP REP section */
-$iprep_path = rtrim(IPREP_PATH, '/');
+$iprep_path = rtrim(SURICATA_IPREP_PATH, '/');
+$iprep_config = "# IP Reputation\n";
+if ($suricatacfg['enable_iprep'] == "on") {
+	$iprep_config .= "default-reputation-path: {$iprep_path}\n";
+	$iprep_config .= "reputation-categories-file: {$iprep_path}/{$suricatacfg['iprep_catlist']}\n";
+	$iprep_config .= "reputation-files:";
+
+	if (!is_array($suricatacfg['iplist_files']['item']))
+		$suricatacfg['iplist_files']['item'] = array();
+
+	foreach ($suricatacfg['iplist_files']['item'] as $f)
+		$iprep_config .= "\n  - $f";
+}
+
+/* Configure Host Table settings */
+if (!empty($suricatacfg['host_memcap']))
+	$host_memcap = $suricatacfg['host_memcap'];
+else
+	$host_memcap = "16777216";
+if (!empty($suricatacfg['host_hash_size']))
+	$host_hash_size = $suricatacfg['host_hash_size'];
+else
+	$host_hash_size = "4096";
+if (!empty($suricatacfg['host_prealloc']))
+	$host_prealloc = $suricatacfg['host_prealloc'];
+else
+	$host_prealloc = "1000";
 
 // Create the rules files and save in the interface directory
 suricata_prepare_rule_files($suricatacfg, $suricatacfgdir);
 
 // Check and configure only non-empty rules files for the interface
 $rules_files = "";
-if (filesize("{$suricatacfgdir}/rules/".ENFORCING_RULES_FILENAME) > 0)
-	$rules_files .= ENFORCING_RULES_FILENAME;
+if (filesize("{$suricatacfgdir}/rules/".SURICATA_ENFORCING_RULES_FILENAME) > 0)
+	$rules_files .= SURICATA_ENFORCING_RULES_FILENAME;
 if (filesize("{$suricatacfgdir}/rules/".FLOWBITS_FILENAME) > 0)
 	$rules_files .= "\n - " . FLOWBITS_FILENAME;
 if (filesize("{$suricatacfgdir}/rules/custom.rules") > 0)

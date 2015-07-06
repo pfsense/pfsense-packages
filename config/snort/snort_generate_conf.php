@@ -64,9 +64,9 @@ $snort_dirs = array( $snortdir, $snortcfgdir, "{$snortcfgdir}/rules",
 	"{$snortlogdir}/snort_{$if_real}{$snort_uuid}",
 	"{$snortlogdir}/snort_{$if_real}{$snort_uuid}/barnyard2", 
 	"{$snortcfgdir}/preproc_rules", 
-	"dynamicrules" => "{$snortlibdir}/dynamicrules",
-	"dynamicengine" => "{$snortlibdir}/dynamicengine",
-	"dynamicpreprocessor" => "{$snortcfgdir}/dynamicpreprocessor"
+	"dynamicrules" => "{$snortlibdir}/snort_dynamicrules",
+	"dynamicengine" => "{$snortlibdir}/snort_dynamicengine",
+	"dynamicpreprocessor" => "{$snortcfgdir}/snort_dynamicpreprocessor"
 );
 foreach ($snort_dirs as $dir) {
 	if (!is_dir($dir))
@@ -82,7 +82,7 @@ foreach ($snort_dirs as $dir) {
 /* put in place by the rules update process.                        */
 /********************************************************************/
 $snort_files = array("gen-msg.map", "classification.config", "reference.config", "attribute_table.dtd", 
-		"sid-msg.map", "unicode.map", "threshold.conf", "preproc_rules/preprocessor.rules",
+		"sid-msg.map", "unicode.map", "file_magic.conf", "threshold.conf", "preproc_rules/preprocessor.rules",
 		"preproc_rules/decoder.rules", "preproc_rules/sensitive-data.rules"
 	);
 foreach ($snort_files as $file) {
@@ -126,6 +126,10 @@ if ($snortcfg['barnyard_enable'] == "on") {
 		$snortunifiedlog_type .= ", vlan_event_types";
 	if ($snortcfg['barnyard_log_mpls_events'] == 'on')
 		$snortunifiedlog_type .= ", mpls_event_types";
+
+	// If AppID detector is enabled, add it to unified2 logging
+	if ($snortcfg['appid_preproc'] == 'on' )
+		$snortunifiedlog_type .= ", appid_event_types";
 }
 
 /* define spoink */
@@ -872,9 +876,9 @@ if (is_array($snortcfg['wlist_files']['item'])) {
 	}
 }
 if (!empty($blist_files))
-	$ip_lists = $blist_files;
+	$ip_lists = ", \\ \n\t" . $blist_files;
 if (!empty($wlist_files))
-	$ip_lists .= ", \\ \n" . $wlist_files;
+	$ip_lists .= ", \\ \n\t" . $wlist_files;
 if ($snortcfg['iprep_scan_local'] == 'on')
 	$ip_lists .= ", \\ \n\tscan_local";	
 
@@ -884,8 +888,24 @@ preprocessor reputation: \
 	memcap {$snortcfg['iprep_memcap']}, \
 	priority {$snortcfg['iprep_priority']}, \
 	nested_ip {$snortcfg['iprep_nested_ip']}, \
-	white {$snortcfg['iprep_white']}, \
-	{$ip_lists}
+	white {$snortcfg['iprep_white']}{$ip_lists}
+
+EOD;
+
+/* def AppID preprocessor */
+$appid_memcap = $snortcfg['sf_appid_mem_cap'] * 1024 * 1024;
+$appid_params = "app_detector_dir " . rtrim(SNORT_APPID_ODP_PATH, '/') . ", \\\n\tmemcap {$appid_memcap}";
+if ($snortcfg['sf_appid_statslog'] == "on") {
+	$appid_params .= ", \\\n\tapp_stats_filename app-stats.log";
+	$appid_params .= ", \\\n\tapp_stats_period {$snortcfg['sf_appid_stats_period']}";
+	$appid_params .= ", \\\n\tapp_stats_rollover_size " . strval($config['installedpackages']['snortglobal']['appid_stats_log_limit_size'] * 1024);
+	$appid_params .= ", \\\n\tapp_stats_rollover_time 86400";
+}
+
+$appid_preproc = <<<EOD
+# AppID preprocessor #
+preprocessor appid: \
+	{$appid_params}
 
 EOD;
 
@@ -920,14 +940,14 @@ $snort_preproc_libs = array(
 	"dce_rpc_2" => "dce2_preproc", "dns_preprocessor" => "dns_preproc", "ftp_preprocessor" => "ftptelnet_preproc", "imap_preproc" => "imap_preproc",
 	"pop_preproc" => "pop_preproc", "reputation_preproc" => "reputation_preproc", "sensitive_data" => "sdf_preproc", 
 	"sip_preproc" => "sip_preproc", "gtp_preproc" => "gtp_preproc", "smtp_preprocessor" => "smtp_preproc", "ssh_preproc" => "ssh_preproc", 
-	"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc"
+	"ssl_preproc" => "ssl_preproc", "dnp3_preproc" => "dnp3_preproc", "modbus_preproc" => "modbus_preproc", "appid_preproc" => "appid_preproc"
 );
 $snort_preproc = array (
 	"perform_stat", "other_preprocs", "ftp_preprocessor", "smtp_preprocessor", "ssl_preproc", "sip_preproc", "gtp_preproc", "ssh_preproc", "sf_portscan", 
-	"dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc", "reputation_preproc"
+	"dce_rpc_2", "dns_preprocessor", "sensitive_data", "pop_preproc", "imap_preproc", "dnp3_preproc", "modbus_preproc", "reputation_preproc", "appid_preproc"
 );
 $default_disabled_preprocs = array(
-	"sf_portscan", "gtp_preproc", "sensitive_data", "dnp3_preproc", "modbus_preproc", "reputation_preproc", "perform_stat" 
+	"sf_portscan", "gtp_preproc", "sensitive_data", "dnp3_preproc", "modbus_preproc", "reputation_preproc", "perform_stat", "appid_preproc"
 );
 $snort_preprocessors = "";
 foreach ($snort_preproc as $preproc) {
@@ -941,8 +961,8 @@ foreach ($snort_preproc as $preproc) {
 		if (!empty($snort_preproc_libs[$preproc])) {
 			$preproclib = "libsf_" . $snort_preproc_libs[$preproc];
 			if (!file_exists($snort_dirs['dynamicpreprocessor'] . "{$preproclib}.so")) {
-				if (file_exists("{$snortlibdir}/dynamicpreprocessor/{$preproclib}.so")) {
-					@copy("{$snortlibdir}/dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
+				if (file_exists("{$snortlibdir}/snort_dynamicpreprocessor/{$preproclib}.so")) {
+					@copy("{$snortlibdir}/snort_dynamicpreprocessor/{$preproclib}.so", "{$snort_dirs['dynamicpreprocessor']}/{$preproclib}.so");
 					$snort_preprocessors .= $$preproc;
 					$snort_preprocessors .= "\n";
 				} else

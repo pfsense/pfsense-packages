@@ -48,7 +48,7 @@ if(!function_exists("filter_configure"))
 define('HV_DEBUG',             'false');
 
 # use Clamd daemon (another - use libclam)
-define('HV_USE_CLAMD',         'true');
+# define('HV_USE_CLAMD',         'true');
 define('HV_CLAMD_TCPSOCKET',   'true');
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -151,6 +151,7 @@ define('HV_SCANTEMPFILE',	 'hv_scan_tempfile');
 # XML fields
 # ------------------------------------------------------------------------------
 define('F_ENABLE',              'enable');
+define('F_USECLAMD',            'useclamd');
 define('F_PROXYMODE',           'proxymode');
 define('F_PROXYINTERFACE',      'proxyinterface');
 define('F_PROXYBINDIFACE',      'proxybindiface');  # internal var
@@ -515,6 +516,8 @@ function havp_convert_pfxml_xml()
 
     # === GUI Fields ===
     $havp_config[F_ENABLE]          = ( $pfconf[F_ENABLE] === 'on' ? 'true' : 'false' );
+    # ClamAV mode
+    $havp_config[F_USECLAMD]        = $pfconf[F_USECLAMD];
     # proxy
     $havp_config[F_PROXYMODE]       = ( !empty($pfconf[F_PROXYMODE]) ? $pfconf[F_PROXYMODE] : 'standard' );
 # ToDo: add check squid transparent
@@ -630,7 +633,7 @@ function havp_config_havp()
     # log
     $conf[] = "\n# log ";
     $conf[] = "ACCESSLOG      " . HVDEF_HAVP_ACCESSLOG;
-    $conf[] = "ERRORLOG       " . HVDEF_HAVP_ERRORLOG;
+    $conf[] = "ERRORLOG       " . ($havp_config[F_LOG] === 'true' ? HVDEF_HAVP_ERRORLOG : "/dev/null");
     # syslog
     $conf[] = "\n# syslog";
     $conf[] = "USESYSLOG      {$havp_config[F_SYSLOG]}";
@@ -710,9 +713,9 @@ function havp_config_havp()
     $conf[] = "MAXDOWNLOADSIZE {$havp_config[F_MAXDOWNLOADSIZE]}";
     #
     $conf[] = "\n# ClamAV Library Scanner (libclamav) ";
-    $conf[] = "ENABLECLAMLIB        " . (HV_USE_CLAMD !== 'true' ? "true" : "false");
+    $conf[] = "ENABLECLAMLIB        " . ($havp_config[F_USECLAMD] !== 'true' ? "true" : "false");
     # use clamd, if configured
-    if (HV_USE_CLAMD === 'true') {
+    if ($havp_config[F_USECLAMD] === 'true') {
         $conf[] = "\n# Clamd scanner (Clam daemon)";
         $conf[] = "ENABLECLAMD          true";
         # clamd socket
@@ -1342,7 +1345,7 @@ function havp_startup_script()
 
     $s[] = "\t# start";
     $s[] = "\tif [ -z \"`{$havpchk}`\" ];then";
-    if (HV_USE_CLAMD === 'true') {
+    if ($havp_config[F_USECLAMD] === 'true') {
         $clampid_dir = HVDEF_CLAM_RUNDIR;
         $s[] = "\t\t# start clamd before (to be sure)";
         $s[] = "\t\t" . HVDEF_CLAM_STARTUP_SCRIPT . " start";
@@ -1563,7 +1566,7 @@ function start_antivirus_scanner($filename)
     $param[] = "--max-dir-recursion=255";                                       # Maximum directory recursion level
 
     $param = implode(" ", $param);
-    if (HV_USE_CLAMD === 'true')
+    if ($havp_config[F_USECLAMD] === 'true')
          $param = "clamdscan $param $filename"; # use clamd daemon (more quickly)
     else $param = "clamscan  $param $filename";
 
@@ -1702,7 +1705,7 @@ function havp_get_av_viruslog()
         $log   = explode("\n", $log);
         $count = 0;
         foreach($log as $ln) {
-            if (substr_count(strtolower($ln), "virus clamd:"))
+            if (substr_count(strtolower($ln), "virus clam"))
                 $s[] = $ln;
         }
     }
@@ -1716,7 +1719,7 @@ function havp_get_av_statistic()
     if (file_exists(HVDEF_HAVP_ACCESSLOG)) {
         $log   = file_get_contents(HVDEF_HAVP_ACCESSLOG);
 
-        $count = substr_count(strtolower($log), "virus clamd:");
+        $count = substr_count(strtolower($log), "virus clam");
         $s     = "Found $count viruses (total).";
     }
 

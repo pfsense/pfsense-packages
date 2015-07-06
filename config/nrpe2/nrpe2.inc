@@ -25,11 +25,19 @@
 
 require_once('filter.inc');
 
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+
+if ($pfs_version == "2.0") {
 	define('NRPE_BASE', '/usr/local');
 } else {
 	define('NRPE_BASE', '/usr/pbi/nrpe-' . php_uname("m"));
 }
+
+if ($pfs_version == "2.1")
+	define('NRPE_BINARY', NRPE_BASE . "/sbin/nrpe2");
+else
+	define('NRPE_BINARY', "/usr/local/sbin/nrpe2");
+
 define('NRPE_CONFIG_DIR', NRPE_BASE . '/etc');
 define('NRPE_RCFILE', '/usr/local/etc/rc.d/nrpe2.sh');
 
@@ -94,6 +102,7 @@ function nrpe2_custom_php_install_command() {
 		);
 	}
 	unlink_if_exists(NRPE_CONFIG_DIR . '/rc.d/nrpe2');
+	$nrpe2_binary = NRPE_BINARY;
 	$fd = fopen(NRPE_RCFILE, 'w');
 	$rc_file = <<<EOD
 #!/bin/sh
@@ -118,9 +127,9 @@ function nrpe2_custom_php_install_command() {
 
 nrpe2_enable=\${nrpe2_enable-"YES"}
 name="nrpe2"
-rcvar=`set_rcvar`
+rcvar="\${name}_enable"
 
-command="{$NRPE_BASE}/sbin/nrpe2"
+command="{$nrpe2_binary}"
 command_args="-d"
 extra_commands="reload"
 

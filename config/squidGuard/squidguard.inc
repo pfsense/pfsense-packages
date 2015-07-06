@@ -502,12 +502,13 @@ function squidguard_before_form_acl(&$pkg, $is_acl=true) {
             }
         }
         # order
-        if (is_array($source_items) && $field['fieldname'] == 'order') {
+        if ($field['fieldname'] == 'order') {
             $fld = &$pkg['fields']['field'][$i];
-            foreach($source_items as $nmkey => $nm)
-            	$fld['options']['option'][] = array('name'=>$nm, 'value'=>$nmkey);
-           	$fld['options']['option'][] = array('name'=>'--- Last ---', 'value'=>'9999');
-           	$fld['options']['option'][] = array('name'=>'-----', 'value'=>''); # ! this is must be last !
+            if (is_array($source_items))
+                foreach($source_items as $nmkey => $nm)
+            	    $fld['options']['option'][] = array('name'=>$nm, 'value'=>$nmkey);
+            $fld['options']['option'][] = array('name'=>'--- Last ---', 'value'=>'9999');
+            $fld['options']['option'][] = array('name'=>'-----', 'value'=>''); # ! this is must be last !
         }
         $i++;
     }

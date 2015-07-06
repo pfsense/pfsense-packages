@@ -67,6 +67,7 @@ $pconfig['tls_log_retention'] = $config['installedpackages']['suricata']['config
 $pconfig['unified2_log_limit'] = $config['installedpackages']['suricata']['config'][0]['unified2_log_limit'];
 $pconfig['u2_archive_log_retention'] = $config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'];
 $pconfig['file_store_retention'] = $config['installedpackages']['suricata']['config'][0]['file_store_retention'];
+$pconfig['tls_certs_store_retention'] = $config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'];
 $pconfig['dns_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'];
 $pconfig['dns_log_retention'] = $config['installedpackages']['suricata']['config'][0]['dns_log_retention'];
 $pconfig['eve_log_limit_size'] = $config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'];
@@ -112,6 +113,8 @@ if (!isset($pconfig['u2_archive_log_retention']))
 	$pconfig['u2_archive_log_retention'] = "168";
 if (!isset($pconfig['file_store_retention']))
 	$pconfig['file_store_retention'] = "168";
+if (!isset($pconfig['tls_certs_store_retention']))
+	$pconfig['tls_certs_store_retention'] = "168";
 if (!isset($pconfig['eve_log_retention']))
 	$pconfig['eve_log_retention'] = "168";
 if (!isset($pconfig['sid_changes_log_retention']))
@@ -151,6 +154,7 @@ if ($_POST['ResetAll']) {
 	$pconfig['tls_log_retention'] = "336";
 	$pconfig['u2_archive_log_retention'] = "168";
 	$pconfig['file_store_retention'] = "168";
+	$pconfig['tls_certs_store_retention'] = "168";
 	$pconfig['eve_log_retention'] = "168";
 	$pconfig['sid_changes_log_retention'] = "336";
 
@@ -173,7 +177,9 @@ if ($_POST["save"] || $_POST['apply']) {
 	if ($_POST['enable_log_mgmt'] != 'on') {
 		$config['installedpackages']['suricata']['config'][0]['enable_log_mgmt'] = $_POST['enable_log_mgmt'] ? 'on' :'off';
 		write_config("Suricata pkg: saved updated configuration for LOGS MGMT.");
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -214,6 +220,7 @@ if ($_POST["save"] || $_POST['apply']) {
 		$config['installedpackages']['suricata']['config'][0]['unified2_log_limit'] = $_POST['unified2_log_limit'];
 		$config['installedpackages']['suricata']['config'][0]['u2_archive_log_retention'] = $_POST['u2_archive_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['file_store_retention'] = $_POST['file_store_retention'];
+		$config['installedpackages']['suricata']['config'][0]['tls_certs_store_retention'] = $_POST['tls_certs_store_retention'];
 		$config['installedpackages']['suricata']['config'][0]['dns_log_limit_size'] = $_POST['dns_log_limit_size'];
 		$config['installedpackages']['suricata']['config'][0]['dns_log_retention'] = $_POST['dns_log_retention'];
 		$config['installedpackages']['suricata']['config'][0]['eve_log_limit_size'] = $_POST['eve_log_limit_size'];
@@ -222,7 +229,9 @@ if ($_POST["save"] || $_POST['apply']) {
 		$config['installedpackages']['suricata']['config'][0]['sid_changes_log_retention'] = $_POST['sid_changes_log_retention'];
 
 		write_config("Suricata pkg: saved updated configuration for LOGS MGMT.");
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -274,6 +283,7 @@ if ($savemsg) {
 	$tab_array[] = array(gettext("Logs Mgmt"), true, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -580,6 +590,19 @@ if ($savemsg) {
 		</select>&nbsp;<?=gettext("Choose retention period for captured files in File Store. Default is ") . "<strong>" . gettext("7 days."). "</strong>";?><br/><br/>
 		<?=gettext("When file capture and store is enabled, Suricata captures downloaded files from HTTP sessions and stores them, along with metadata, ") . 
 		gettext("for later analysis.  This setting determines how long files remain in the File Store folder before they are automatically deleted.");?>
+	</td>
+</tr>
+<tr>
+	<td class="vncell" width="22%" valign="top"><?=gettext("Captured TLS Certs Retention Period");?></td>
+	<td width="78%" class="vtable"><select name="tls_certs_store_retention" class="formselect" id="tls_certs_store_retention">
+		<?php foreach ($retentions as $k => $p): ?>
+			<option value="<?=$k;?>"
+			<?php if ($k == $pconfig['tls_certs_store_retention']) echo "selected"; ?>>
+				<?=htmlspecialchars($p);?></option>
+		<?php endforeach; ?>
+		</select>&nbsp;<?=gettext("Choose retention period for captured TLS Certs. Default is ") . "<strong>" . gettext("7 days."). "</strong>";?><br/><br/>
+		<?=gettext("When custom rules with tls.store are enabled, Suricata captures Certificates, along with metadata, ") . 
+		gettext("for later analysis.  This setting determines how long files remain in the Certs folder before they are automatically deleted.");?>
 	</td>
 </tr>
 <tr>

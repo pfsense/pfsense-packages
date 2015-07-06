@@ -266,8 +266,14 @@ function quagga_ospfd_install_conf() {
 
 	$carp_ip_status_check = "";
 	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
-		$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
-		$carp_ip_status_check = <<<EOF
+
+		$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+		switch ($pfs_version) {
+			case "2.0":
+			case "2.1":
+				/* Check for 2.1 and before */
+				$carpcheckinterface = trim(find_carp_interface($ospfd_conf['carpstatusip']));
+				$carp_ip_status_check = <<<EOF
 
 CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep carp: | /usr/bin/awk '{print \$2;}'`
 if [ \${CARP_STATUS} != "MASTER" ]; then
@@ -275,6 +281,27 @@ if [ \${CARP_STATUS} != "MASTER" ]; then
 fi
 
 EOF;
+				break;
+			case "2.2":
+			default:
+				/* Check for 2.2 and later */
+				if (is_array($config['virtualip']['vip'])) {
+					foreach ($config['virtualip']['vip'] as $vip) {
+						if (($vip['mode'] == "carp") && ($vip['subnet'] == $ospfd_conf['carpstatusip'])) {
+							$carpcheckinterface = escapeshellarg(get_real_interface($vip['interface']));
+							$vhid = escapeshellarg($vip['vhid']);
+							$carp_ip_status_check = <<<EOF
+
+CARP_STATUS=`/sbin/ifconfig {$carpcheckinterface} | /usr/bin/grep 'carp:' | /usr/bin/grep 'vhid {$vhid}' | /usr/bin/awk '{print \$2;}'`
+if [ \${CARP_STATUS} != "MASTER" ]; then
+	exit;
+fi
+EOF;
+						}
+					}
+				}
+				break;
+		}
 	}
 
 
@@ -395,4 +422,37 @@ function quagga_get_carp_status_by_ip($ipaddr) {
 	return $status;
 }
 
+function quagga_ospfd_plugin_carp($pluginparams) {
+	global $config;
+	require_once("service-utils.inc");
+	// Called when a CARP interface changes state
+	// $pluginparams['event'] either 'rc.carpmaster' or 'rc.carpbackup'
+	// $pluginparams['interface'] contains the affected interface
+
+	/* If there is no OSPF config, then stop */
+	if(is_array($config['installedpackages']['quaggaospfd']['config'])) {
+		$ospfd_conf = &$config['installedpackages']['quaggaospfd']['config'][0];
+	} else {
+		return null;
+	}
+	/* If there is no properly configured CARP status check IP, then stop */
+	if (!is_ipaddr($ospfd_conf['carpstatusip'])) {
+		return null;
+	}
+	list($vhid, $iface) = explode("@", trim($pluginparams['interface']));
+	$friendly = convert_real_interface_to_friendly_interface_name($iface);
+	$carp_iface = "{$friendly}_vip${vhid}";
+
+	/* If this CARP transition is not from the IP address to check, then stop. */
+	if (get_interface_ip($carp_iface) != $ospfd_conf['carpstatusip']) {
+		return null;
+	}
+
+	/* Start or stop the service as needed based on the CARP transition. */
+	if ($pluginparams['event'] == "rc.carpmaster") {
+		start_service("Quagga OSPFd");
+	} elseif ($pluginparams['event'] == "rc.carpbackup") {
+		stop_service("Quagga OSPFd");
+	}
+}
 ?>

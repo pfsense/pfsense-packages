@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	freeradius.xml
+	part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2007 to whom it may belong
+	All rights reserved.
+
+	Based on m0n0wall (http://m0n0.ch/wall)
+	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	All rights reserved.
+									      */
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+									      */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>freeradius</name>
+	<version>1.1.2</version>
+	<title>FreeRADIUS: Users</title>
+	<include_file>/usr/local/pkg/freeradius.inc</include_file>
+	<menu>
+		<name>FreeRADIUS</name>
+		<tooltiptext>Modify FreeRADIUS users, clients, and settings.</tooltiptext>
+		<section>Services</section>
+		<url>/pkg.php?xml=freeradius.xml</url>
+	</menu>
+	<service>
+		<name>FreeRADIUS</name>
+		<rcfile>radiusd.sh</rcfile>
+		<executable>radiusd</executable>
+		<description>The FreeRADIUS daemon.</description>
+	</service>
+
+	<tabs>
+		<tab>
+			<text>Users</text>
+			<url>/pkg.php?xml=freeradius.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Clients</text>
+			<url>/pkg.php?xml=freeradiusclients.xml</url>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>IP address</fielddescr>
+			<fieldname>ip</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Subnet Mask</fielddescr>
+			<fieldname>subnetmask</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Multiple Connection</fielddescr>
+			<fieldname>multiconnect</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Expiration</fielddescr>
+			<fieldname>expiration</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Session time</fielddescr>
+			<fieldname>sessiontime</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Online time</fielddescr>
+			<fieldname>onlinetime</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>VLAN ID</fielddescr>
+			<fieldname>vlanid</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0775</chmod>
+		<item>https://packages.pfsense.org/packages/config/freeradius/freeradiusclients.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0775</chmod>
+		<item>https://packages.pfsense.org/packages/config/freeradius/freeradiussettings.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0775</chmod>
+		<item>https://packages.pfsense.org/packages/config/freeradius/freeradius.inc</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
+			<description>Enter the username.</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password for this username.</description>
+			<type>password</type>
+			<required/>
+		</field>
+		<field>
+			<fieldname>ip</fieldname>
+			<fielddescr>IP address</fielddescr>
+			<description><![CDATA[Framed-IP-Address. If you want this user to be assigned a specific IP address from radius, enter the IP
+address here. Continuous IP address is available with "+" suffix(example:192.168.1.5+. It may help for assigning the
+different IP address to multiple simultaneous connections).   IMPORTANT, you MUST enter an IP address here if you checked
+"RADIUS issued IP" on vpn pptp or vpn pppoe configuration.]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>subnetmask</fieldname>
+			<fielddescr>subnetmask</fielddescr>
+			<description>Framed-IP-Netmask. Needs support of the NAS (Switch) Example: 255.255.255.0</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>gateway</fieldname>
+			<fielddescr>gateway</fielddescr>
+			<description>Framed-Route. Needs support of the NAS (Switch). Order is: Subnet Gateway Metric Example: 192.168.10.0 192.168.10.1 1</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>multiconnect</fieldname>
+			<fielddescr>Number of Multiple connection</fielddescr>
+			<description>The available number of multiple simultaneous connections with this username.</description>
+			<required/>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>expiration</fieldname>
+			<fielddescr>Expiration</fielddescr>
+			<description>You may enter the date that this account will stop working here.use Mmm dd yyyy example: 01 Jan 2007  will be Jan 01 2007</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>sessiontime</fieldname>
+			<fielddescr>Session time</fielddescr>
+			<description>Time this user has until relogin in seconds</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>onlinetime</fieldname>
+			<fielddescr>Online time</fielddescr>
+			<description><![CDATA[A time string may be a list of simple time strings separated with vertical bars `|' or commas `,'.
+
+Each simple time string must begin either with a day-of-week abbreviation (one of `Su', `Mo', `Tu', `We', `Th', `Fr', `Sa'), or `Wk' for any day from Monday to Friday inclusive, or `Any' or `Al' for any day.
+
+Following the day may be a range of hours separated with a hyphen, using 24-hour time. The range of hours may cross 0; for example `2300-0700' means any time except 7 AM to 11 PM. If no time is given, calls may be made at any time on the specified day(s).
+
+The time string may also be the single word `Never', which does not match any time.
+
+Here are a few sample time strings with an explanation of what they mean.
+
+`Wk2305-0855,Sa,Su2305-1655'
+
+    This means weekdays before 8:55 AM or after 11:05 PM, any time Saturday, or Sunday before 4:55 PM or after 11:05 PM. These are approximately the times during which night rates apply to phone calls in the U.S.A. Note that this time string uses, for example, `2305' rather than `2300'; this will ensure a cheap rate even if the computer clock is running up to five minutes ahead of the real time.
+
+`Wk0905-2255,Su1705-2255'
+
+    This means weekdays from 9:05 AM to 10:55 PM, or Sunday from 5:05 PM to 10:55 PM. This is approximately the opposite of the previous example.
+
+`Any'
+
+    This means any day. Since no time is specified, it means any time on any day.]]></description>
+
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>description</fieldname>
+			<fielddescr>Description</fielddescr>
+			<description>You may enter a description here for your reference (not parsed).</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>vlanid</fieldname>
+			<fielddescr>VLAN ID</fielddescr>
+			<description><![CDATA[
+	Enter the VLAN ID (integer from 1-4095) OR the VLAN name that this user/device should be assigned. In general, this parameter is used in conjunction with switches and access points that support mac-based authentication.<br><br>
+
+	This setting can be used for switches/wireless access points that support the following radius parameters:<br>
+	  Tunnel-Type = VLAN<br>
+	  Tunnel-Medium-Type = IEEE-802<br>
+	  Tunnel-Private-Group-ID = "insert vlan identifier here"<br><br>
+
+	This was implemented and tested with HP Procurve Switches (3500yl, and 2626). HP Procurve switches support using either the VLAN ID or the VLAN name, while other switches will only work using the VLAN ID.
+	]]>
+			</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>additionaloptions</fieldname>
+			<fielddescr>Additional RADIUS Options</fielddescr>
+			<description><![CDATA[
+	Experts only.<br>
+	You may append extra custom RADIUS options to this user account (separated by commas).<br>
+	IMPORTANT: If you don't format this field correctly, FreeRADIUS may not properly start because the users file will contain a syntax error.
+	]]>
+			</description>
+			<type>textarea</type>
+			<rows>10</rows>
+			<cols>75</cols>
+		</field>
+	</fields>
+	<custom_delete_php_command>
+		freeradius_users_resync();
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+		freeradius_users_resync();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		freeradius_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		freeradius_deinstall_command();
+	</custom_php_deinstall_command>
+</packagegui>

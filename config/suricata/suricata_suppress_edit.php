@@ -143,16 +143,14 @@ include_once("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php
-include("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-
-if ($input_errors) print_input_errors($input_errors);
-if ($savemsg)
-	print_info_box($savemsg);
-
-?>
+<?php include("fbegin.inc"); ?>
 <form action="/suricata/suricata_suppress_edit.php" name="iform" id="iform" method="post">
+
+<?php
+if ($input_errors) print_input_errors($input_errors);
+if ($savemsg) print_info_box($savemsg);
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -168,6 +166,7 @@ if ($savemsg)
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
 	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
         display_top_tabs($tab_array, true);
 ?>
 </td></tr>

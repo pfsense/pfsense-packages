@@ -30,20 +30,10 @@
 */
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-switch ($pfs_version) {
-	case "1.2":
-	case "2.0":
-		define('AVAHI_BASE', '/usr/local');
-		define('AVAHI_LOCALBASE', AVAHI_BASE);
-		break;
-	case "2.1":
-		define('AVAHI_BASE', '/usr/pbi/avahi-' . php_uname("m"));
-		define('AVAHI_LOCALBASE', AVAHI_BASE);
-		break;
-	default:
-		define('AVAHI_BASE', '/usr/pbi/avahi-' . php_uname("m"));
-		define('AVAHI_LOCALBASE', AVAHI_BASE . '/local');
-}
+if ($pfs_version == "2.1" || $pfs_version == "2.2")
+	define('AVAHI_BASE', '/usr/pbi/avahi-' . php_uname("m"));
+else
+	define('AVAHI_BASE', '/usr/local');
 
 function avahi_start() {
 	 mwexec_bg("/usr/local/etc/rc.d/avahi-daemon.sh start");
@@ -54,27 +44,11 @@ function avahi_stop() {
 }
 
 function avahi_install() {
-	global $g, $config, $pfs_version;
+	global $g, $config;
 	conf_mount_rw();
 
-	// This old hacky install code should only happen on 1.x
-	if (php_uname("m") == "i386")
-		$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "1") ? "avahi.tar.gz" : "";
-	// Extract out libraries and avahi-daemon
-	if(!empty($archive) && file_exists("/root/{$archive}")) {
-		exec("mkdir -p " . AVAHI_LOCALBASE . "/etc/avahi/services/");
-		exec("mv " . AVAHI_LOCALBASE . "/etc/avahi/*.service " . AVAHI_LOCALBASE . "/etc/avahi/services/");
-		exec("/usr/bin/tar xzPUf /root/{$archive} -C /");
-		unlink("/root/{$archive}");
-		// Make sure everthing was extracted
-		if(!file_exists(AVAHI_BASE . "/sbin/avahi-daemon")) {
-			log_error("Sorry, something went wrong while extract avahi binaries.  Please try the operation again");
-			return;
-		}
-	}
-
-	if ($pfs_version >= 2.2 && !file_exists('/usr/local/etc/gnome.subr')) {
-		@symlink(AVAHI_LOCALBASE . '/etc/gnome.subr', '/usr/local/etc/gnome.subr');
+	if (!file_exists('/usr/local/etc/gnome.subr')) {
+		@symlink(AVAHI_BASE . '/etc/gnome.subr', '/usr/local/etc/gnome.subr');
 	}
 
 	// Add needed users and groups
@@ -168,8 +142,8 @@ rlimit-nproc=3
 EOF;
 
 	/* Write out .conf file */
-	safe_mkdir(AVAHI_LOCALBASE . "/etc/avahi");
-	$fd = fopen(AVAHI_LOCALBASE . "/etc/avahi/avahi-daemon.conf", "w");
+	safe_mkdir(AVAHI_BASE . "/etc/avahi");
+	$fd = fopen(AVAHI_BASE . "/etc/avahi/avahi-daemon.conf", "w");
 	fwrite($fd, $avahiconfig);
 	fclose($fd);
 	/* Write out rc.d startup file */
@@ -178,19 +152,26 @@ EOF;
 	$start .= "	mkdir -p /proc\n";
 	$start .= "	mount -t procfs procfs /proc\n";
 	$start .= "fi\n";
+	$start .= "if [ ! -f /usr/local/etc/gnome.subr ]; then\n";
+	$start .= "	ln -sf " . AVAHI_BASE . "/etc/gnome.subr /usr/local/etc/gnome.subr\n";
+	$start .= "fi\n";
+	$start .= "if [ ! -d /var/run/dbus ]; then\n";
+	$start .= "        mkdir /var/run/dbus\n";
+	$start .= "        chown messagebus:messagebus /var/run/dbus\n";
+	$start .= "fi\n";
 	$start .= "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
-	if (file_exists(AVAHI_LOCALBASE . "/etc/rc.d/dbus")) {
-		$start .= AVAHI_LOCALBASE . "/etc/rc.d/dbus onestop\n";
+	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
+		$start .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
 		$start .= "rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
-		$start .= AVAHI_LOCALBASE . "/etc/rc.d/dbus onestart\n";
+		$start .= AVAHI_BASE . "/etc/rc.d/dbus onestart\n";
 	}
 	$start .= "sleep 5\n";
 	$start .= AVAHI_BASE . "/sbin/avahi-daemon -D\n";
 	$start .= "/etc/rc.conf_mount_ro\n";
 
 	$stop = "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
-	if (file_exists(AVAHI_LOCALBASE . "/etc/rc.d/dbus")) {
-		$stop .= AVAHI_LOCALBASE . "/etc/rc.d/dbus onestop\n";
+	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
+		$stop .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
 		$stop .= "rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
 	}
 
