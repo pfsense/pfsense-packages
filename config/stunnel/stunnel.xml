@@ -158,7 +158,7 @@
 	</fields>
 	<service>
 	  <name>stunnel</name>
-	  <rcfile>/usr/local/etc/rc.d/stunnel.sh</rcfile>
+	  <rcfile>stunnel.sh</rcfile>
 	  <executable>stunnel</executable>
 	</service>
 	<include_file>/usr/local/pkg/stunnel.inc</include_file>
