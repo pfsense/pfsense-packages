@@ -603,8 +603,8 @@ EOF;
 						}
 	
 						$vh_config.=" <Location ".($backend['sitepath'] ? $backend['sitepath'] : "/").">\n";
-						$vh_config.="  ProxyPass        balancer://{$backend['balancer']}{$backend['backendpath']}\n";
-						$vh_config.="  ProxyPassReverse balancer://{$backend['balancer']}{$backend['backendpath']}\n";
+						$vh_config.="  ProxyPass        balancer://{$backend['balancer']}".($backend['backendpath'] ? $backend['backendpath'] : "/")."\n";
+						$vh_config.="  ProxyPassReverse balancer://{$backend['balancer']}".($backend['backendpath'] ? $backend['backendpath'] : "/")."\n";
 						if ($backend['compress']== "no")
 							$vh_config.="  SetInputFilter   INFLATE\n  SetOutputFilter  INFLATE\n";
 						if ($backend['modsecgroup']!="" && $backend['modsecgroup']!="none" && $mods_settings['enablemodsecurity']=="on"){
