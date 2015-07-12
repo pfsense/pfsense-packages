@@ -81,7 +81,7 @@ function siproxd_generate_rules($type) {
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 	$rtplower = ($siproxd_conf['rtplower'] ? $siproxd_conf['rtplower'] : 7070);
 	$rtpupper = ($siproxd_conf['rtpupper'] ? $siproxd_conf['rtpupper'] : 7079);
-	$port = ($siproxd_conf['proxy_port'] ? $siproxd_conf['proxy_port'] : 5060);
+	$port = ($siproxd_conf['port'] ? $siproxd_conf['port'] : 5060);
 
 	switch($type) {
 	case 'nat':
