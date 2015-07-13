@@ -1163,7 +1163,7 @@ function tinydns_dnscache_forwarding_servers($index) {
 		exec("rm -R {$g['varetc_path']}/dnscache/root/servers/");
 	exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$index}/root/servers/");
 	if (intval($config['version']) >= 6)
-		if (file_exists("{$g['varetc_path']}/nameserver_*")) {
+		if (!empty(glob("{$g['varetc_path']}/nameserver_*"))) {
 			exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
 		} else {
 			$fw = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
