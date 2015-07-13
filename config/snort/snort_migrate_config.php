@@ -541,7 +541,7 @@ unset($r);
 
 // Log a message if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2.5";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2.6";
 	log_error("[Snort] Settings successfully migrated to new configuration format...");
 }
 else
