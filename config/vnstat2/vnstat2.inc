@@ -183,6 +183,7 @@ function vnstat_create_nic_dbs() {
 
 function vnstat_install_config() {
 	$vnstat_db_prefix = "/conf/vnstat";
+	global $config;
 	conf_mount_rw();
 	// Create vnstat database dir where it also will work for nanobsd
 	if (is_dir("/usr/local/pkg/vnstat2/vnstat")) {
