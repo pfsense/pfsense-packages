@@ -2,10 +2,10 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-    <copyright></copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	<copyright></copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>vnstat2</name>
 	<version>1.0</version>
 	<title>Vnstat2</title>
@@ -54,4 +54,3 @@
 	<custom_php_install_command>vnstat_install_config();</custom_php_install_command>
 	<custom_php_deinstall_command>vnstat_install_deinstall();</custom_php_deinstall_command>
 </packagegui>
-
