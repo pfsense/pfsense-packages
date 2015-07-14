@@ -1,30 +1,30 @@
 <?php
 /* $Id$ */
 /*
-    diag_pf_info.php
-    Copyright (C) 2010 Scott Ullrich
-    All rights reserved.
+	diag_pf_info.php
+	Copyright (C) 2010 Scott Ullrich
+	All rights reserved.
 
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-    1. Redistributions of source code must retain the above copyright notice,
-       this list of conditions and the following disclaimer.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    2. Redistributions in binary form must reproduce the above copyright
-       notice, this list of conditions and the following disclaimer in the
-       documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
@@ -44,7 +44,7 @@ require("guiconfig.inc");
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 
 $pgtitle = gettext("Vnstat2 summary ");
-if($_REQUEST['getactivity']) {
+if ($_REQUEST['getactivity']) {
 	$text = `vnstat`;
 	$text .= "<p/>";
 	echo $text;
@@ -80,7 +80,7 @@ include("head.inc");
 	if ($pf_version < 2.0)
 		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
 		echo "<a href=$myurl/pkg_edit.php?xml=vnstatoutput.xml&id=0>Go Back</a><br />";
-	if($savemsg) {
+	if ($savemsg) {
 		echo "<div id='savemsg'>";
 		print_info_box($savemsg);
 		echo "</div>";	
@@ -89,25 +89,27 @@ include("head.inc");
 		print_input_errors($input_errors);
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  
-  <tr>
-    <td>
-	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
-		<tr>
-			<td>
-				<center>
-				<table>
-					<tr><td>
-						<div name='cpuactivitydiv' id='cpuactivitydiv'>
-							<b><?=gettext("Gathering vnstat information, please wait...");?>
-						</div>
-					</td></tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-	</div>
-    </td>
-  </tr>
+	<tr>
+		<td>
+			<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
+				<tr>
+					<td>
+						<center>
+						<table>
+							<tr>
+								<td>
+									<div name='cpuactivitydiv' id='cpuactivitydiv'>
+										<b><?=gettext("Gathering vnstat information, please wait...");?>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+			</div>
+		</td>
+	</tr>
 </table>
 </form>
 <?php include("fend.inc"); ?>

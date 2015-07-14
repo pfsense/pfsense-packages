@@ -14,4 +14,3 @@ echo "<center><p class=\"pgtitle\">{$pgtitle}</p>";
 <center><img src="vnstat2_img.php?image=newpicture3.png" style="border:1px solid black; center;"><br />
 <center><img src="vnstat2_img.php?image=newpicture4.png" style="border:1px solid black; center;"><br />
 <?php include("fend.inc"); ?>
-
