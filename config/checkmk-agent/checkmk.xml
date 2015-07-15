@@ -93,13 +93,12 @@
 			<fieldname>checkmkport</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description>Enter port to listen on. Leave empty to use Default prot 6556</description>
-			<required/>
+			<description>Enter port to listen on. Leave empty to use Default port 6556.</description>
 		</field>
 		<field>
 			<fielddescr>Hosts.allow</fielddescr>
 			<fieldname>checkmkhosts</fieldname>
-			<description>Enter hosts(comma separeted) that can communicate with this agent.</description>
+			<description>Enter hosts (comma separated) that can communicate with this agent.</description>
 			<type>input</type>
 			<size>60</size>
 		</field>	
