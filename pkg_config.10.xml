@@ -201,7 +201,7 @@
 			In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.<br>
 			<b>Backup your location config before updating from 0.2.x to 0.3 package version.</b>]]></descr>
 		<category>Network Management</category>
-		<version>0.43</version>
+		<version>0.44</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_virtualhost.xml</config_file>
