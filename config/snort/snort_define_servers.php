@@ -107,11 +107,15 @@ if ($_POST['save']) {
 
 	foreach ($snort_servers as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
-			$input_errors[] = "Only aliases are allowed";
+			$input_errors[] = "Only aliases are allowed.";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed in Snort.";
 	}
 	foreach ($snort_ports as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
-			$input_errors[] = "Only aliases are allowed";
+			$input_errors[] = "Only aliases are allowed.";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed in Snort.";
 	}
 	/* if no errors write to conf */
 	if (!$input_errors) {
@@ -141,6 +145,9 @@ if ($_POST['save']) {
 
 		/* Soft-restart Snort to live-load new variables. */
 		snort_reload_config($a_nat[$id]);
+
+		/* Sync to configured CARP slaves if any are enabled */
+		snort_sync_on_changes();
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

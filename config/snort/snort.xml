@@ -47,7 +47,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
 	<version>2.9.7.3</version>
-	<title>Services:2.9.7.3 pkg v3.2.5</title>
+	<title>Services:2.9.7.3 pkg v3.2.6</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -92,6 +92,11 @@
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/snort/snort_sync.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/snort/</prefix>
+		<chmod>077</chmod>
+		<item>https://packages.pfsense.org/packages/config/snort/deprecated_rules</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>

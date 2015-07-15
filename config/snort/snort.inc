@@ -43,15 +43,12 @@ require("/usr/local/pkg/snort/snort_defs.inc");
 ini_set("memory_limit", "384M");
 
 // Explicitly declare this as global so it works through function call includes 
-global $g, $config, $rebuild_rules, $pfSense_snort_version;
+global $g, $config, $rebuild_rules;
 
 // Grab the Snort binary version programmatically, but if that fails use a safe default
 $snortver = array();
 $snortbindir = SNORT_PBI_BINDIR;
 exec("{$snortbindir}snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
-
-/* get installed package version for display */
-$snort_package_version = "Snort {$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
 
 /* Rebuild Rules Flag -- if "true", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = false;
@@ -3671,6 +3668,73 @@ function snort_generate_conf($snortcfg) {
 	unset($home_net, $external_net, $ipvardef, $portvardef);
 }
 
+function snort_remove_dead_rules() {
+
+	/********************************************************/
+	/* This function removes dead and deprecated rules      */
+	/* category files from the base Snort rules directory   */
+	/* and from the RULESETS setting of each interface.     */
+	/* The file "deprecated_rules", if it exists, is used   */
+	/* to determine which rules files to remove.            */
+	/********************************************************/
+
+	global $config, $g;
+	$rulesdir = SNORTDIR . "/rules/";
+	$count = 0;
+	$cats = array();
+
+	// If there is no "deprecated_rules" file, then exit
+	if (!file_exists("{$rulesdir}deprecated_rules"))
+		return;
+
+	// Open a SplFileObject to read in deprecated rules
+	$file = new SplFileObject("{$rulesdir}/deprecated_rules");
+	$file->setFlags(SplFileObject::READ_AHEAD | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
+	while (!$file->eof()) {
+		$line = $file->fgets();
+
+		// Skip any lines with just spaces
+		if (trim($line) == "")
+			continue;
+
+		// Skip any comment lines starting with '#'
+		if (preg_match('/^\s*\#+/', $line))
+			continue;
+
+		$cats[] = $line;
+	}
+
+	// Close the SplFileObject since we are finished with it
+	$file = null;
+
+	// Delete any dead rules files from the Snort RULES directory
+	foreach ($cats as $file) {
+		if (file_exists("{$rulesdir}{$file}"))
+			$count++;
+		unlink_if_exists("{$rulesdir}{$file}");
+	}
+
+	// Log how many obsoleted files were removed
+	log_error(gettext("[Snort] Removed {$count} obsoleted rules category files."));
+
+	// Now remove any dead rules files from the interface configurations
+	if (!empty($cats) && is_array($config['installedpackages']['snortglobal']['rule'])) {
+		foreach ($config['installedpackages']['snortglobal']['rule'] as &$iface) {
+			$enabled_rules = explode("||", $iface['rulesets']);
+			foreach ($enabled_rules as $k => $v) {
+				foreach ($cats as $d) {
+					if (strpos(trim($v), $d) !== false)
+						unset($enabled_rules[$k]);
+				}
+			}
+			$iface['rulesets'] = implode("||", $enabled_rules);
+		}
+	}
+
+	// Clean up
+	unset($cats, $enabled_rules);
+}
+
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function snort_sync_on_changes() {
 	global $config, $g;
@@ -3806,6 +3870,38 @@ function snort_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $username,
 
 	if (!empty($sid_files) && $error == "")
 		log_error("[snort] Snort pkg XMLRPC CARP sync auto-SID conf files success with {$url}:{$port} (pfsense.exec_php).");
+
+	/*************************************************/
+	/* Send over any IPREP IP List files             */
+	/*************************************************/
+	$sid_files = glob(SNORT_IPREP_PATH . '*');
+	foreach ($sid_files as $file) {
+		$content = base64_encode(file_get_contents($file));
+		$payload = "@file_put_contents('{$file}', base64_decode('{$content}'));";
+
+		/* assemble xmlrpc payload */
+		$method = 'pfsense.exec_php';
+		$params = array( XML_RPC_encode($password), XML_RPC_encode($payload) );
+	
+		log_error("[snort] Snort XMLRPC CARP sync sending IPREP files to {$url}:{$port}.");
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+		$cli->setCredentials($username, $password);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "";
+		if(!$resp) {
+			$error = "A communications error occurred while attempting Snort XMLRPC CARP sync with {$url}:{$port}.  Failed to transfer file: " . basename($file);
+			log_error($error);
+			file_notice("sync_settings", $error, "Snort Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$error = "An error code was received while attempting Snort XMLRPC CARP sync with {$url}:{$port}. Failed to transfer file: " . basename($file) . " - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "Snort Settings Sync", "");
+		}
+	}
+
+	if (!empty($sid_files) && $error == "")
+		log_error("[snort] Snort pkg XMLRPC CARP sync IPREP files success with {$url}:{$port} (pfsense.exec_php).");
 
 	/**************************************************/
 	/* Send over the <snortglobal> portion of the     */

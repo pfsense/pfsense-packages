@@ -60,6 +60,7 @@ else {
 	$pconfig['clearblocks'] = $config['installedpackages']['snortglobal']['clearblocks'] == "on" ? 'on' : 'off';
 	$pconfig['verbose_logging'] = $config['installedpackages']['snortglobal']['verbose_logging'] == "on" ? 'on' : 'off';
 	$pconfig['openappid_detectors'] = $config['installedpackages']['snortglobal']['openappid_detectors'] == "on" ? 'on' : 'off';
+	$pconfig['hide_deprecated_rules'] = $config['installedpackages']['snortglobal']['hide_deprecated_rules'] == "on" ? 'on' : 'off';
 }
 
 /* Set sensible values for any empty default params */
@@ -100,6 +101,7 @@ if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['clearblocks'] = $_POST['clearblocks'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['verbose_logging'] = $_POST['verbose_logging'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['openappid_detectors'] = $_POST['openappid_detectors'] ? 'on' : 'off';
+		$config['installedpackages']['snortglobal']['hide_deprecated_rules'] = $_POST['hide_deprecated_rules'] ? 'on' : 'off';
 
 		// If any rule sets are being turned off, then remove them
 		// from the active rules section of each interface.  Start
@@ -134,6 +136,12 @@ if (!$input_errors) {
 				}
 				$iface['rulesets'] = implode("||", $enabled_rules);
 			}
+		}
+
+		// If deprecated rules should be removed, then do it
+		if ($config['installedpackages']['snortglobal']['hide_deprecated_rules'] == "on") {
+			log_error(gettext("[Snort] Hide Deprecated Rules is enabled.  Removing obsoleted rules categories."));
+			snort_remove_dead_rules();
 		}
 
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
@@ -332,6 +340,13 @@ if ($input_errors)
 			</tbody>
 		</table>
 	</td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Hide Deprecated Rules Categories"); ?></td>
+	<td width="78%" class="vtable"><input name="hide_deprecated_rules" id="hide_deprecated_rules" type="checkbox" value="yes" 
+		<?php if ($pconfig['hide_deprecated_rules']=="on") echo "checked"; ?> />
+		&nbsp;&nbsp;<?php echo gettext("Hide deprecated rules categories in the GUI and remove them from the configuration.  Default is ") . 
+		"<strong>" . gettext("Not Checked") . "</strong>" . gettext("."); ?></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Rules Update Settings"); ?></td>
