@@ -1,5 +1,13 @@
 <?php
 
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version == "2.1" || $pf_version == "2.2") {
+	define('STUNNEL_LOCALBASE', '/usr/pbi/stunnel-' . php_uname("m"));
+} else {
+	define('STUNNEL_LOCALBASE','/usr/local');
+}
+define('STUNNEL_ETCDIR', STUNNEL_LOCALBASE . "/etc/stunnel");
+
 if(!isset($_GET['id']) and !isset($_POST['id'])) {
 	if($GLOBALS['config']['installedpackages']['stunnelcerts']['savemsg']) {
 		$savemsg=$GLOBALS['config']['installedpackages']['stunnelcerts']['savemsg'];
@@ -105,9 +113,9 @@ function stunnel_disablefields() {
 function stunnel_delete($config) {
 	$cert=$config['installedpackages']['stunnelcerts']['config'][$_GET['id']];
 	if(isset($_GET['id'])) {
-		unlink_if_exists('/usr/local/etc/stunnel/'.$cert['filename'].'pem');
-		unlink_if_exists('/usr/local/etc/stunnel/'.$cert['filename'].'key');
-		unlink_if_exists('/usr/local/etc/stunnel/'.$cert['filename'].'chain');
+		unlink_if_exists(STUNNEL_ETCDIR . '/'.$cert['filename'].'pem');
+		unlink_if_exists(STUNNEL_ETCDIR . '/'.$cert['filename'].'key');
+		unlink_if_exists(STUNNEL_ETCDIR . '/'.$cert['filename'].'chain');
 	}
 }
 
@@ -115,8 +123,10 @@ function stunnel_save($config) {
 	$GLOBALS['config']['installedpackages']['stunnelcerts']['savemsg']='';
 	conf_mount_rw();
 	config_lock();
-	$fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
-	fwrite($fout, "cert = /usr/local/etc/stunnel/stunnel.pem \n");
+	if (!file_exists(STUNNEL_ETCDIR))
+		@mkdir(STUNNEL_ETCDIR, 0755, true);
+	$fout = fopen(STUNNEL_ETCDIR . "/stunnel.conf","w");
+	fwrite($fout, "cert = " . STUNNEL_ETCDIR . "/stunnel.pem \n");
 	fwrite($fout, "chroot = /var/tmp/stunnel \n");
 	fwrite($fout, "setuid = stunnel \n");
 	fwrite($fout, "setgid = stunnel \n");
@@ -125,10 +135,10 @@ function stunnel_save($config) {
 		fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
 		if($pkgconfig['client']) fwrite($fout, "client = yes" . "\n");
 		if($pkgconfig['certificate']) {
-			if(file_exists('/usr/local/etc/stunnel/'.$pkgconfig['certificate'].'.key') and
-			   file_exists('/usr/local/etc/stunnel/'.$pkgconfig['certificate'].'.chain')) {
-				fwrite($fout, "key = /usr/local/etc/stunnel/" . $pkgconfig['certificate'] . ".key\n");
-				fwrite($fout, "cert = /usr/local/etc/stunnel/" . $pkgconfig['certificate'] . ".chain\n");
+			if(file_exists(STUNNEL_ETCDIR . '/'.$pkgconfig['certificate'].'.key') and
+			   file_exists(STUNNEL_ETCDIR . '/'.$pkgconfig['certificate'].'.chain')) {
+				fwrite($fout, "key = " . STUNNEL_ETCDIR . "/" . $pkgconfig['certificate'] . ".key\n");
+				fwrite($fout, "cert = " . STUNNEL_ETCDIR . "/" . $pkgconfig['certificate'] . ".chain\n");
 			}
 		}
 		if($pkgconfig['sourceip']) fwrite($fout, "local = " . $pkgconfig['sourceip'] . "\n");
@@ -161,15 +171,15 @@ function stunnel_save_cert($config) {
 #			echo("</pre>");
 			if($_cert['hash']) {
 				if(openssl_x509_check_private_key($_POST['cert_chain'], $_POST['cert_key'])) {
-					file_put_contents('/usr/local/etc/stunnel/'.$_cert['hash'].'.key',
+					file_put_contents(STUNNEL_ETCDIR . '/'.$_cert['hash'].'.key',
 						$_POST['cert_key']);
-					file_put_contents('/usr/local/etc/stunnel/'.$_cert['hash'].'.chain',
+					file_put_contents(STUNNEL_ETCDIR . '/'.$_cert['hash'].'.chain',
 						$_POST['cert_chain']);
-					file_put_contents('/usr/local/etc/stunnel/'.$_cert['hash'].'.pem',
+					file_put_contents(STUNNEL_ETCDIR . '/'.$_cert['hash'].'.pem',
 						$_POST['cert_key']."\n".$_POST['cert_chain']);
-					system('chown stunnel:stunnel /usr/local/etc/stunnel/*');
-					chmod('/usr/local/etc/stunnel/'.$_cert['hash'].'.key', 0600);
-					chmod('/usr/local/etc/stunnel/'.$_cert['hash'].'.pem', 0600);
+					system('chown stunnel:stunnel ' . STUNNEL_ETCDIR . '/*');
+					chmod(STUNNEL_ETCDIR . '/'.$_cert['hash'].'.key', 0600);
+					chmod(STUNNEL_ETCDIR . '/'.$_cert['hash'].'.pem', 0600);
 
 					$_POST['filename']=$_cert['hash'];
 					$_POST['expiry_raw']=$_cert['validTo_time_t'];
@@ -191,29 +201,29 @@ function stunnel_save_cert($config) {
 		$_POST['cert_chain']=base64_encode($_POST['cert_chain']);
 		$_fname=$GLOBALS['config']['installedpackages']['stunnelcerts']['config'][$_POST['id']]['filename'];
 		if($_fname and $_fname!=$_POST['filename']) {
-			unlink_if_exists('/usr/local/etc/stunnel/'.$_fname.'.chain');
-			unlink_if_exists('/usr/local/etc/stunnel/'.$_fname.'.key');
-			unlink_if_exists('/usr/local/etc/stunnel/'.$_fname.'.pem');
+			unlink_if_exists(STUNNEL_ETCDIR . '/'.$_fname.'.chain');
+			unlink_if_exists(STUNNEL_ETCDIR . '/'.$_fname.'.key');
+			unlink_if_exists(STUNNEL_ETCDIR . '/'.$_fname.'.pem');
 		}
 	}
 }
 
 function stunnel_install() {
-	safe_mkdir("/usr/local/etc/stunnel");
-	system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out /usr/local/etc/stunnel/stunnel.pem -keyout /usr/local/etc/stunnel/stunnel.pem 2>/dev/null");
-	chmod("/usr/local/etc/stunnel/stunnel.pem", 0600);
+	safe_mkdir(STUNNEL_ETCDIR);
+	system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out " . STUNNEL_ETCDIR . "/stunnel.pem -keyout " . STUNNEL_ETCDIR . "/stunnel.pem 2>/dev/null");
+	chmod(STUNNEL_ETCDIR . "/stunnel.pem", 0600);
 	@mkdir("/var/tmp/stunnel/var/tmp/run/stunnel", 0755, true);
 	system("/usr/sbin/chown -R stunnel:stunnel /var/tmp/stunnel");
 	$_rcfile['file']='stunnel.sh';
-	$_rcfile['start'].="/usr/local/bin/stunnel /usr/local/etc/stunnel/stunnel.conf \n\t";
+	$_rcfile['start'].= STUNNEL_LOCALBASE . "/bin/stunnel " . STUNNEL_ETCDIR . "/stunnel.conf \n\t";
 	$_rcfile['stop'].="killall stunnel \n\t";
 	write_rcfile($_rcfile);
 	unlink_if_exists("/usr/local/etc/rc.d/stunnel");
 	
 	conf_mount_rw();
 	config_lock();
-	$fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
-	fwrite($fout, "cert = /usr/local/etc/stunnel/stunnel.pem \n");
+	$fout = fopen(STUNNEL_ETCDIR . "/stunnel.conf","w");
+	fwrite($fout, "cert = " . STUNNEL_ETCDIR . "/stunnel.pem \n");
 	fwrite($fout, "chroot = /var/tmp/stunnel \n");
 	fwrite($fout, "setuid = stunnel \n");
 	fwrite($fout, "setgid = stunnel \n");
@@ -233,7 +243,7 @@ function stunnel_install() {
 
 function stunnel_deinstall() {
 	rmdir_recursive("/var/tmp/stunnel");
-	rmdir_recursive("/usr/local/etc/stunnel*");
+	rmdir_recursive(STUNNEL_ETCDIR);
 	unlink_if_exists("/usr/local/etc/rc.d/stunnel.sh");
 }
 

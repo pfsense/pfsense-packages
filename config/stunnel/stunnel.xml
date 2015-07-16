@@ -116,7 +116,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Client Mode?</fielddescr>
+			<fielddescr>Client Mode</fielddescr>
 			<fieldname>client</fieldname>
 			<description>Use client mode for this tunnel (i.e. connect to an SSL server, do not act as an SSL server)</description>
 			<type>checkbox</type>
