@@ -930,7 +930,7 @@
 		<descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
 		<category>Network Management</category>
 		<depends_on_package_pbi>stunnel-5.07-##ARCH##.pbi</depends_on_package_pbi>
-		<version>5.07</version>
+		<version>5.07.1</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>2.2</required_version>

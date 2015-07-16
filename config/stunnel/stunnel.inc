@@ -123,6 +123,7 @@ function stunnel_save($config) {
 	if(!is_array($config['installedpackages']['stunnel']['config'])) { $config['installedpackages']['stunnel']['config']=Array(); }
 	foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
 		fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
+		if($pkgconfig['client']) fwrite($fout, "client = yes" . "\n");
 		if($pkgconfig['certificate']) {
 			if(file_exists('/usr/local/etc/stunnel/'.$pkgconfig['certificate'].'.key') and
 			   file_exists('/usr/local/etc/stunnel/'.$pkgconfig['certificate'].'.chain')) {
