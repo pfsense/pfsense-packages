@@ -71,7 +71,7 @@ uasort($a_pools, haproxy_compareByName);
 global $simplefields;
 $simplefields = array('name','desc','status','secondary','primary_frontend','type','forwardfor','httpclose','extaddr','backend_serverpool',
 	'max_connections','client_timeout','port','advanced_bind',
-	'ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadacladditional','sslclientcert-none','sslclientcert-invalid',
+	'ssloffloadcert','dcertadv','ssloffload','ssloffloadacl','ssloffloadacladditional','sslclientcert-none','sslclientcert-invalid','sslocsp',
 	'socket-stats',
 	'dontlognull','dontlog-normal','log-separate-errors','log-detailed');
 
@@ -787,6 +787,12 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 				<input id="ssloffloadacl" name="ssloffloadacl" type="checkbox" value="yes" <?php if ($pconfig['ssloffloadacl']=='yes') echo "checked";?> onclick="updatevisibility();" />Add ACL for certificate CommonName. (host header matches the 'CN' of the certificate)<br/>
 			</td>
 		</tr>
+		<tr class="haproxy_ssloffloading_enabled" align="left">
+			<td width="22%" valign="top" class="vncell">OCSP</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input id="sslocsp" name="sslocsp" type="checkbox" value="yes" <?php if ($pconfig['sslocsp']=='yes') echo "checked";?> onclick="updatevisibility();" />Load certificate ocsp responses for easy certificate validation by the client.<br/>
+			</td>
+		</tr>
 		<tr class="haproxy_ssloffloading_enabled">
 			<td width="22%" valign="top" class="vncell">Additional certificates</td>
 			<td width="78%" class="vtable" colspan="2" valign="top">
@@ -805,7 +811,8 @@ $primaryfrontends = get_haproxy_frontends($excludefrontend);
 				<input type='text' name='dcertadv' size="64" id='dcertadv' <?if(isset($pconfig['dcertadv'])) echo 'value="'.htmlspecialchars($pconfig['dcertadv']).'"';?> />
 				<br/>
 				NOTE: Paste additional ssl options(without commas) to include on ssl listening options.<br/>
-				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets
+				some options: force-sslv3, force-tlsv10 force-tlsv11 force-tlsv12 no-sslv3 no-tlsv10 no-tlsv11 no-tlsv12 no-tls-tickets<br/>
+				Example: no-sslv3 ciphers EECDH+aRSA+AES:TLSv1+kRSA+AES:TLSv1+kRSA+3DES
 			</td>
 		</tr>
 		<tr class="haproxy_ssloffloading_enabled haproxy_primary">
