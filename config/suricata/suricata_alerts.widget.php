@@ -124,7 +124,10 @@ function suricata_widget_get_alerts() {
 				/*              0          1           2   3   4    5                         6                 7                                       */
 				/************** *************************************************************************************************************************/
 
-				$fd = fopen("/tmp/surialerts_{$suricata_uuid}", "r");
+				if (!$fd = fopen("/tmp/surialerts_{$suricata_uuid}", "r")) {
+					log_error(gettext("[Suricata Widget] Failed to open file /tmp/surialerts_{$suricata_uuid}"));
+					continue;
+				}
 				$buf = "";
 				while (($buf = fgets($fd)) !== FALSE) {
 					$fields = array();
