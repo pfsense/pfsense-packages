@@ -2493,10 +2493,10 @@ function squid_unbreak_captiveportal_inc() {
 		that the broken code failed to undo the damages when switching the option off.
 		*/
 		copy('/root/'.$pfsense_version.'.captiveportal.inc.backup',$cp_file);
-		echo "WARNING: Patch Captive Portal feature was removed - see Bug #4583!";
-		echo "WARNING: Found and restored a previous backup of {$cp_file}.";
-		echo "WARNING: Double-check {$cp_file} contents for sanity!";
-		echo "WARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository if needed.";
+		echo "\nWARNING: Patch Captive Portal feature was removed - see Bug #4583!";
+		echo "\nWARNING: Found and restored a previous backup of {$cp_file}.";
+		echo "\nWARNING: Double-check {$cp_file} contents for sanity!";
+		echo "\nWARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository if needed.";
 		/* Remove the backup and unset the config option to avoid running this again in future. */
 		unlink('/root/'.$pfsense_version.'.captiveportal.inc.backup');
 		if (isset($squid_conf['patch_cp'])) {
@@ -2504,9 +2504,9 @@ function squid_unbreak_captiveportal_inc() {
 		}
 	/* ... and at least warn the users if it does not and provide some help. */
 	} else if (isset($squid_conf['patch_cp'])) {
-		echo "WARNING: Patch Captive Portal feature was removed - see Bug #4583!";
-		echo "WARNING: Failed to find a backup of {$cp_file}!";
-		echo "WARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository!";
+		echo "\nWARNING: Patch Captive Portal feature was removed - see Bug #4583!";
+		echo "\nWARNING: Failed to find a backup of {$cp_file}!";
+		echo "\nWARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository!";
 		/* Unset the config option to avoid running this again in future. */
 		unset($squid_conf['patch_cp']);
 	}
