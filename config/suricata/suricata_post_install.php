@@ -130,6 +130,10 @@ if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] ==
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, "*/6", "*", "*", "*", "root");
 }
 
+// Move deprecated_rules file to SURICATADIR/rules directory
+@rename("/usr/local/pkg/suricata/deprecated_rules", "{$suricatadir}rules/deprecated_rules");
+
+
 /*********************************************************/
 /* START OF BUG FIX CODE                                 */
 /*                                                       */

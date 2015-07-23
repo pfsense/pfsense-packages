@@ -95,6 +95,14 @@ if (empty($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enabl
 }
 
 /**********************************************************/
+/* Create new HIDE_DEPRECATED_RULES setting if not set    */
+/**********************************************************/
+if (empty($config['installedpackages']['suricata']['config'][0]['hide_deprecated_rules'])) {
+	$config['installedpackages']['suricata']['config'][0]['hide_deprecated_rules'] = "off";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
 /* Set default log size and retention limits if not set   */
 /**********************************************************/
 if (!isset($config['installedpackages']['suricata']['config'][0]['alert_log_retention']) && $config['installedpackages']['suricata']['config'][0]['alert_log_retention'] != '0') {

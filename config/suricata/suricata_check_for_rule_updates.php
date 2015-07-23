@@ -604,6 +604,12 @@ if ($snortcommunityrules == 'on') {
 	}
 }
 
+// If removing deprecated rules categories, then do it
+if ($config['installedpackages']['suricata']['config'][0]['hide_deprecated_rules'] == "on") {
+	log_error(gettext("[Suricata] Hide Deprecated Rules is enabled.  Removing obsoleted rules categories."));
+	suricata_remove_dead_rules();
+}
+
 function suricata_apply_customizations($suricatacfg, $if_real) {
 
 	global $vrt_enabled, $rebuild_rules;

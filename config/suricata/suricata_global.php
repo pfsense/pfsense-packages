@@ -67,6 +67,7 @@ else {
 	$pconfig['snortcommunityrules'] = $config['installedpackages']['suricata']['config'][0]['snortcommunityrules'];
 	$pconfig['snort_rules_file'] = $config['installedpackages']['suricata']['config'][0]['snort_rules_file'];
 	$pconfig['autogeoipupdate'] = $config['installedpackages']['suricata']['config'][0]['autogeoipupdate'];
+	$pconfig['hide_deprecated_rules'] = $config['installedpackages']['suricata']['config'][0]['hide_deprecated_rules'] == "on" ? 'on' : 'off';
 }
 
 // Do input validation on parameters
@@ -99,6 +100,7 @@ if (!$input_errors) {
 		$config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'] = $_POST['enable_etopen_rules'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'] = $_POST['enable_etpro_rules'] ? 'on' : 'off';
 		$config['installedpackages']['suricata']['config'][0]['autogeoipupdate'] = $_POST['autogeoipupdate'] ? 'on' : 'off';
+		$config['installedpackages']['suricata']['config'][0]['hide_deprecated_rules'] = $_POST['hide_deprecated_rules'] ? 'on' : 'off';
 
 		// If any rule sets are being turned off, then remove them
 		// from the active rules section of each interface.  Start
@@ -133,6 +135,12 @@ if (!$input_errors) {
 				}
 				$iface['rulesets'] = implode("||", $enabled_rules);
 			}
+		}
+
+		// If deprecated rules should be removed, then do it
+		if ($config['installedpackages']['suricata']['config'][0]['hide_deprecated_rules'] == "on") {
+			log_error(gettext("[Suricata] Hide Deprecated Rules is enabled.  Removing obsoleted rules categories."));
+			suricata_remove_dead_rules();
 		}
 
 		$config['installedpackages']['suricata']['config'][0]['snort_rules_file'] = $_POST['snort_rules_file'];
@@ -327,6 +335,13 @@ if ($input_errors)
 			</tr>
 			</tbody>
 		</table></td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Hide Deprecated Rules Categories"); ?></td>
+	<td width="78%" class="vtable"><input name="hide_deprecated_rules" id="hide_deprecated_rules" type="checkbox" value="yes" 
+		<?php if ($pconfig['hide_deprecated_rules']=="on") echo "checked"; ?> />
+		&nbsp;&nbsp;<?php echo gettext("Hide deprecated rules categories in the GUI and remove them from the configuration.  Default is ") . 
+		"<strong>" . gettext("Not Checked") . "</strong>" . gettext("."); ?></td>
 </tr>
 <tr>
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Rules Update Settings"); ?></td>
