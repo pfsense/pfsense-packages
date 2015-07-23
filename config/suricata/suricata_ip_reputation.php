@@ -163,6 +163,9 @@ if ($_POST['save'] || $_POST['apply']) {
 		// Soft-restart Suricata to live-load new variables
 		suricata_reload_config($a_nat[$id]);
 
+		// Sync to configured CARP slaves if any are enabled
+		suricata_sync_on_changes();
+
 		// We have saved changes and done a soft restart, so clear "dirty" flag
 		clear_subsystem_dirty('suricata_iprep');
 	}
