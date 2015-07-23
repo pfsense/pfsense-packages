@@ -2130,48 +2130,7 @@ function squid_generate_rules($type) {
 	global $config;
 
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	//check captive portal option
-	$cp_file='/etc/inc/captiveportal.inc';
-	$pfsense_version=preg_replace("/\s/","",file_get_contents("/etc/version"));
-	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
-	$cp_inc = file($cp_file);
-	$new_cp_inc="";
-	$found_rule=0;
-	foreach ($cp_inc as $line) {
-		$new_line=$line;
-		//remove applied squid patch
-		if (preg_match('/skipto 65314 ip/',$line)) {
-			$found_rule++;
-			$new_line ="";
-		}
-
-		if (substr($pfsense_version,0,3) > 2.0) {
-			if (preg_match('/255.255.255.255/',$line) && $squid_conf['patch_cp']) {
-				$found_rule++;
-				$new_line .= "\t".'$cprules .= "add {$rulenum} skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
-				$new_line .= "\t".'$cprules .= "add {$rulenum} skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
-			}
-		} else {
-			//add squid patch option based on current config
-			if (preg_match('/set 1 pass ip from any to/',$line) && $squid_conf['patch_cp']) {
-				$found_rule++;
-				$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
-				$new_line .= $line;
-			}
-			if (preg_match('/set 1 pass ip from {/',$line) && $squid_conf['patch_cp']) {
-				$found_rule++;
-				$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
-				$new_line .= $line;
-			}
-		}
-		$new_cp_inc .= $new_line;
-	}
-	if (!file_exists('/root/'.$pfsense_version.'.captiveportal.inc.backup')) {
-		copy ($cp_file,'/root/'.$pfsense_version.'.captiveportal.inc.backup');
-	}
-	if ($found_rule > 0) {
-		file_put_contents($cp_file,$new_cp_inc, LOCK_EX);
-	}
+	
 	//normal squid rule check
 	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
