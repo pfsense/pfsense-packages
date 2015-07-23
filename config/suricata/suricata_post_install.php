@@ -268,8 +268,8 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Starting Suricata using rebuilt configuration..."));
 			update_output_window(gettext("Please wait while Suricata is started..."));
-			mwexec("{$rcdir}suricata.sh start");
-			update_output_window(gettext("Suricata has been started using the rebuilt configuration..."));
+			mwexec_bg("{$rcdir}suricata.sh start");
+			update_output_window(gettext("Suricata is starting as a background task using the rebuilt configuration..."));
 		}
 		else
 			mwexec_bg("{$rcdir}suricata.sh start");
