@@ -283,13 +283,6 @@
 			<default_value>on</default_value>
 		</field>
 		<field>
-			<fielddescr>Patch captive portal</fielddescr>
-			<fieldname>patch_cp</fieldname>
-			<description><![CDATA[Enable this option to force captive portal to non transparent proxy users.<br>
-						<strong>NOTE:</strong> You may need to reapply captive portal config after changing this option.]]></description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fielddescr>Resolv dns v4 first</fielddescr>
 			<fieldname>dns_v4_first</fieldname>
 			<description><![CDATA[Enable this option to force dns v4 lookup first. This option is very usefull if you have problems to access https sites.]]></description>
