@@ -2472,4 +2472,44 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	}
 }
 
+function squid_unbreak_captiveportal_inc() {
+	/*
+	Attempt to undo the damage caused by previous Squid3 package versions.
+	See https://redmine.pfsense.org/issues/4583 for reference.
+	*/
+	global $config;
+	$squid_conf = $config['installedpackages']['squid']['config'][0];
+	
+	/*
+	Use the original version check here. If it was buggy previously, we still
+	need it to remain buggy for the below code to hopefully find the backup file.
+	*/
+	$pfsense_version=preg_replace("/\s/","",file_get_contents("/etc/version"));
+	$cp_file='/etc/inc/captiveportal.inc';
+	/* Restore existing backup if it exists ... */
+	if (file_exists('/root/'.$pfsense_version.'.captiveportal.inc.backup')) {
+		/*
+		Run this whether the patch_cp option is set or not since chances are high
+		that the broken code failed to undo the damages when switching the option off.
+		*/
+		copy('/root/'.$pfsense_version.'.captiveportal.inc.backup',$cp_file);
+		echo "WARNING: Patch Captive Portal feature was removed - see Bug #4583!";
+		echo "WARNING: Found and restored a previous backup of {$cp_file}.";
+		echo "WARNING: Double-check {$cp_file} contents for sanity!";
+		echo "WARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository if needed.";
+		/* Remove the backup and unset the config option to avoid running this again in future. */
+		unlink('/root/'.$pfsense_version.'.captiveportal.inc.backup');
+		if (isset($squid_conf['patch_cp'])) {
+			unset($squid_conf['patch_cp']);
+		}
+	/* ... and at least warn the users if it does not and provide some help. */
+	} else if (isset($squid_conf['patch_cp'])) {
+		echo "WARNING: Patch Captive Portal feature was removed - see Bug #4583!";
+		echo "WARNING: Failed to find a backup of {$cp_file}!";
+		echo "WARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository!";
+		/* Unset the config option to avoid running this again in future. */
+		unset($squid_conf['patch_cp']);
+	}
+}
+
 ?>
