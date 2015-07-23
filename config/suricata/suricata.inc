@@ -481,7 +481,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 		// iterate all vips and add to passlist
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
 			foreach($config['virtualip']['vip'] as $vip) {
-				if ($vip['subnet'] && $vip['mode'] != 'proxyarp') {
+				if ($vip['subnet']) {
 					if (!in_array("{$vip['subnet']}/{$vip['subnet_bits']}", $home_net))
 						$home_net[] = "{$vip['subnet']}/{$vip['subnet_bits']}";
 				}
