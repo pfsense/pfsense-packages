@@ -156,7 +156,15 @@
 		safe_mkdir("/var/db/ntopng/rrd/graphics", 0755, true);
 		system("/bin/chmod -R 755 /var/db/ntopng");
 		system("/usr/sbin/chown -R nobody:nobody /var/db/ntopng");
-		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version == "2.2") {
+			$fonts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/lib/X11/fonts";
+		} else if ($pf_version == "2.1") {
+			$fonts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/lib/X11/fonts";
+		} else {
+			$fonts_path = "/usr/local/lib/X11/fonts";
+		}
+		system("/bin/cp -Rp {$fonts_path}/webfonts/ {$fonts_path}/TTF/");
 		$first = 0;
 		foreach($ntopng_config['interface_array'] as $iface) {
 			$if = convert_friendly_interface_to_real_interface_name($iface);
