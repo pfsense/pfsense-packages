@@ -160,7 +160,7 @@
 		if ($pf_version == "2.2") {
 			$fonts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/lib/X11/fonts";
 		} else if ($pf_version == "2.1") {
-			$fonts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/lib/X11/fonts";
+			$fonts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/lib/X11/fonts";
 		} else {
 			$fonts_path = "/usr/local/lib/X11/fonts";
 		}
