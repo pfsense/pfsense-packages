@@ -254,12 +254,23 @@
 		config_unlock();
 	}
 	function ntopng_update_geoip() {
+		$fetchcmd = "/usr/bin/fetch";
+		$geolite_city = "https://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
+		$geolite_city_v6 = "https://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz";
+		$geoip_asnum = "https://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz";
+		$geoip_asnum_v6 = "https://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz";
 		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($pf_version == "2.1" || $pf_version == "2.2") {
-			mwexec("/usr/pbi/ntopng-" . php_uname("m") . "/bin/ntopng-geoipupdate.sh");
+			$output_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng";
 		} else {
-			mwexec("/usr/local/bin/ntopng-geoipupdate.sh");
+			$output_dir = "/usr/local/share/ntopng";
 		}
+		
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geolite_city}");
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geolite_city_v6}");
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geoip_asnum}");
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geoip_asnum_v6}");
+		
 		ntopng_fixup_geoip();
 		restart_service("ntopng");
 	}
