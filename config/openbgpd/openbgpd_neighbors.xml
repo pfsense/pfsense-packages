@@ -153,6 +153,7 @@
 						<option><name>set nexthop reject</name><value>set nexthop reject</value></option>	
 						<option><name>set nexthop no-modify</name><value>set nexthop no-modify</value></option>	
 						<option><name>set nexthop self</name><value>set nexthop self</value></option>	
+						<option><name>set prepend self X</name><value>set prepend-self</value></option>
 					</options>
 				</rowhelperfield>
 				<rowhelperfield>
