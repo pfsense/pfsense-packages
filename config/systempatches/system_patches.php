@@ -180,11 +180,11 @@ include("head.inc");
 <td width="5%" class="list">&nbsp;</td>
 <td width="5%" class="listhdrr"><?=gettext("Description");?></td>
 <td width="60%" class="listhdrr"><?=gettext("URL/ID");?></td>
+<td width="5%" class="listhdrr"><?=gettext("Status");?></td>
 <td width="5%" class="listhdrr"><?=gettext("Fetch");?></td>
-<td width="5%" class="listhdrr"><?=gettext("Test");?></td>
-<td width="5%" class="listhdrr"><?=gettext("Apply");?></td>
-<td width="5%" class="listhdr"><?=gettext("Revert");?></td>
+<td width="5%" class="listhdrr"><?=gettext("Apply");?>/<br /><?=gettext("Revert");?></td>
 <td width="5%" class="listhdr"><?=gettext("Auto Apply");?></td>
+<td width="5%" class="listhdrr"><?=gettext("Test");?></td>
 <td width="5%" class="list">
 <table border="0" cellspacing="0" cellpadding="1" summary="buttons">
 	<tr><td width="17">
@@ -213,38 +213,49 @@ foreach ($a_patches as $thispatch):
 		<?=$thispatch['descr'];?>
 	</td>
 	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-		
 		<?php
-		if (!empty($thispatch['location']))
-			echo $thispatch['location'];
-		elseif (!empty($thispatch['patch']))
-			echo gettext("Saved Patch");
+			if (!empty($thispatch['location']))
+				echo $thispatch['location'];
+			elseif (!empty($thispatch['patch'])) {
+				// saved patch with no location => manually entered/user defined
+				echo gettext("User-defined");
+			}
 		?>
 	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-	<?php if (empty($thispatch['patch'])): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=fetch"><?php echo gettext("Fetch"); ?></a>
-	<?php elseif (!empty($thispatch['location'])): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=fetch"><?php echo gettext("Re-Fetch"); ?></a>
-	<?php endif; ?>
+
+	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';" nowrap>
+		<?php
+			if ($can_apply) {
+				echo gettext("Valid, not applied");
+			} elseif ($can_revert) {
+				echo gettext("Valid, applied");
+			} elseif (empty($thispatch['patch'])) {
+				echo gettext("Unknown, no code stored");
+			} else {
+				echo gettext("Not valid, does not match");
+			}
+		?>
 	</td>
+
 	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-	<?php if (!empty($thispatch['patch'])): ?>
-		<a href="system_patches.php?id=<?=$i;?>&amp;act=test"><?php echo gettext("Test"); ?></a>
+	<?php if (!empty($thispatch['location'])): ?>
+	 <a href="system_patches.php?id=<?=$i;?>&amp;act=fetch"><?php echo gettext(empty($thispatch['patch']) ? "Fetch" : "Re-Fetch"); ?></a>
 	<?php endif; ?>
 	</td>
 	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
 	<?php if ($can_apply): ?>
 		<a href="system_patches.php?id=<?=$i;?>&amp;act=apply"><?php echo gettext("Apply"); ?></a>
-	<?php endif; ?>
-	</td>
-	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
-	<?php if ($can_revert): ?>
+	<?php elseif ($can_revert): ?>
 		<a href="system_patches.php?id=<?=$i;?>&amp;act=revert"><?php echo gettext("Revert"); ?></a>
 	<?php endif; ?>
 	</td>
 	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
 		<?= isset($thispatch['autoapply']) ? "Yes" : "No" ?>
+	</td>
+	<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
+	<?php if (!empty($thispatch['patch'])): ?>
+		<a href="system_patches.php?id=<?=$i;?>&amp;act=test"><?php echo gettext("Test"); ?></a>
+	<?php endif; ?>
 	</td>
 	<td valign="middle" class="list" nowrap>
 		<table border="0" cellspacing="0" cellpadding="1" summary="edit">
