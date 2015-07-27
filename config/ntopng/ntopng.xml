@@ -284,6 +284,8 @@
 			$source_dir = "/usr/local/share/ntopng";
 		}
 
+		safe_mkdir($target_dir, 0755);
+
 		foreach(glob("{$source_dir}/Geo*.dat*") as $geofile) {
 			/* Decompress if needed. */
 			if (substr($geofile, -3, 3) == ".gz") {
