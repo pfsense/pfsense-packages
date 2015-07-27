@@ -145,8 +145,9 @@ if ($_POST['toggle']) {
 	header("Location: /suricata/suricata_interfaces.php");
 	exit;
 }
+$suri_bin_ver = SURICATA_BIN_VERSION;
 $suri_pkg_ver = SURICATA_PKG_VER;
-$pgtitle = "Services: {$suri_pkg_ver} - Intrusion Detection System";
+$pgtitle = "Services: Suricata {$suri_bin_ver} pkg v{$suri_pkg_ver} - Intrusion Detection System";
 include_once("head.inc");
 
 ?>

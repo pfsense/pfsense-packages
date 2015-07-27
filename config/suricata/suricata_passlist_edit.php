@@ -154,10 +154,12 @@ if ($_POST['save']) {
 		}
 	}
 
-	if ($_POST['address'])
+	if ($_POST['address']) {
 		if (!is_alias($_POST['address']))
 			$input_errors[] = gettext("A valid alias must be provided");
-
+		if (is_alias($_POST['address']) && trim(filter_expand_alias($_POST['address'])) == "")
+			$input_errors[] = gettext("FQDN aliases are not supported in Suricata.");
+	}
 	if (!$input_errors) {
 		$p_list = array();
 		/* post user input */

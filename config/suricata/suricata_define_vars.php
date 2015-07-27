@@ -101,10 +101,14 @@ if ($_POST) {
 	foreach ($suricata_servers as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
 			$input_errors[] = "Only aliases are allowed";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed for IP variables in Suricata.";
 	}
 	foreach ($suricata_ports as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
 			$input_errors[] = "Only aliases are allowed";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed for port variables in Suricata.";
 	}
 	/* if no errors write to suricata.yaml */
 	if (!$input_errors) {

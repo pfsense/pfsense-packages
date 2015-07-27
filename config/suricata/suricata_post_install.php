@@ -130,6 +130,10 @@ if ($config['installedpackages']['suricata']['config'][0]['et_iqrisk_enable'] ==
 	install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_etiqrisk_update.php", TRUE, 0, "*/6", "*", "*", "*", "root");
 }
 
+// Move deprecated_rules file to SURICATADIR/rules directory
+@rename("/usr/local/pkg/suricata/deprecated_rules", "{$suricatadir}rules/deprecated_rules");
+
+
 /*********************************************************/
 /* START OF BUG FIX CODE                                 */
 /*                                                       */
@@ -264,8 +268,8 @@ if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] =
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Starting Suricata using rebuilt configuration..."));
 			update_output_window(gettext("Please wait while Suricata is started..."));
-			mwexec("{$rcdir}suricata.sh start");
-			update_output_window(gettext("Suricata has been started using the rebuilt configuration..."));
+			mwexec_bg("{$rcdir}suricata.sh start");
+			update_output_window(gettext("Suricata is starting as a background task using the rebuilt configuration..."));
 		}
 		else
 			mwexec_bg("{$rcdir}suricata.sh start");
@@ -281,8 +285,8 @@ if (empty($config['installedpackages']['suricata']['config'][0]['forcekeepsettin
 conf_mount_ro();
 
 // Update Suricata package version in configuration
-$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = "2.1.5";
-write_config("Suricata pkg v2.1.5: post-install configuration saved.");
+$config['installedpackages']['suricata']['config'][0]['suricata_config_ver'] = $config['installedpackages']['package'][get_pkg_id("suricata")]['version'];
+write_config("Suricata pkg v{$config['installedpackages']['package'][get_pkg_id("suricata")]['version']}: post-install configuration saved.");
 
 // Done with post-install, so clear flag
 unset($g['suricata_postinstall']);
