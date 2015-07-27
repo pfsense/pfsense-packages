@@ -36,24 +36,38 @@ require_once("config.inc");
 class haproxy_utils {
 	public static $pf_version;
 
-	public function query_dns($host, $querytype="A,AAAA", $dnsserver = "127.0.0.1") {
+	public function query_dns($host, $querytype="A,AAAA") {
 		$result = array();
-		$host = trim($host, " \t\n\r\0\x0B[];\"'");
-		$host_esc = escapeshellarg($host);
 		$types = explode(',',$querytype);
+		$recordtype = 0;
 		foreach($types as $type){
-			$resolved = gethostbyname($host);
-			if($resolved) {
-				$resolved = array();
-				if (haproxy_utils::$pf_version < '2.2')
-					exec("/usr/bin/dig   {$host_esc} $type @$dnsserver | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
-				else
-					exec("/usr/bin/drill {$host_esc} $type @$dnsserver | /usr/bin/grep {$host_esc} | /usr/bin/grep -v ';' | /usr/bin/awk '{ print $5 }'", $resolved);
-				foreach($resolved as $item) {
-					$newitem = array();
-					$newitem["typeid"] = $type;
-					$newitem["data"] = $item;
-					$result[] = $newitem;
+			switch ($type) {
+				case 'A': 
+					$recordtype = DNS_A; 
+					break;
+				case 'AAAA': 
+					$recordtype = DNS_AAAA; 
+					break;
+			}
+			if ($recordtype != 0) {
+				//query one type at a time, querying multiple types in one call dns_get_record fails if one is not present..
+				$errreporting = error_reporting();
+				error_reporting($errreporting & ~E_WARNING);// dns_get_record throws a warning if nothing is resolved..
+				$dnsresult = dns_get_record($host, $recordtype);
+				error_reporting($errreporting);
+				if (is_array($dnsresult)) {
+					foreach($dnsresult as $item) {
+						$newitem["typeid"] = $item['type'];
+						switch ($item['type']) {
+							case 'A':
+								$newitem["data"] = $item['ip']; 
+								break;
+							case 'AAAA':
+								$newitem["data"] = $item['ipv6']; 
+								break;
+						}
+						$result[] = $newitem;
+					}
 				}
 			}
 		}
