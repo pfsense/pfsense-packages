@@ -165,7 +165,7 @@ function syslogng_install_cron($should_install) {
 				$cron_item['month'] = "*";
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/logrotate /usr/local/etc/logrotate.conf";
+				$cron_item['command'] = "/usr/bin/nice -n20 " . SYSLOGNG_BASEDIR .  "local/sbin/logrotate /usr/local/etc/logrotate.conf";
 				$config['cron']['item'][] = $cron_item;
 				$need_write = true;
 			}
