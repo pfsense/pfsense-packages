@@ -69,6 +69,7 @@ function syslogng_deinstall_command() {
 	if (is_link("/usr/local/lib/syslog-ng"))
 		unlink_if_exists("/usr/local/lib/syslog-ng");
 	syslogng_install_cron(false);
+	unlink_if_exists("/usr/local/etc/logrotate.conf");
 	conf_mount_ro();
 	filter_configure();
 }
