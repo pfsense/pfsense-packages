@@ -224,7 +224,7 @@ function show_advanced_config() {
             <tr>
               <td width="25%" valign="top" class="vncellreq">Command</td>
               <td width="75%" class="vtable">
-                <input name="command" type="text" class="formfld" id="command" size="40" value="<?=htmlspecialchars($pconfig['command']);?>">
+                <input name="command" type="text" class="formfld unknown" id="command" size="40" value="<?=htmlspecialchars($pconfig['command']);?>">
               </td>
             </tr>
 
@@ -232,8 +232,8 @@ function show_advanced_config() {
               <td width="25%" valign="top" class="vncellreq">Type</td>
               <td width="75%" class="vtable">
 				<?php                
-				echo "              <select name='t' class='formfld'>\n";
-				echo "                <option></option>\n";
+				echo "              <select name='t' class='formfld unknown'>\n";
+				echo "                <option value=''>(please select)</option>\n";
 				switch (htmlspecialchars($type)) {
 				case "earlyshellcmd":
 					echo "              <option value='earlyshellcmd' selected='yes'>earlyshellcmd</option>\n";
@@ -251,7 +251,6 @@ function show_advanced_config() {
 					//echo "              <option value='afterfilterchangeshellcmd' selected='yes'>afterfilterchangeshellcmd</option>\n";
 					break;					
 				default:
-					echo "              <option value=''></option>\n";				
 					echo "              <option value='earlyshellcmd'>earlyshellcmd</option>\n";
 					echo "              <option value='shellcmd'>shellcmd</option>\n";
 					//echo "              <option value='afterfilterchangeshellcmd'>afterfilterchangeshellcmd</option>\n";
