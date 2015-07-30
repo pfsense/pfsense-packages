@@ -230,7 +230,7 @@
 						"stop" => "/usr/bin/killall -9 softflowd"
 					)
 				);
-				restart_service("softflowd");
+				restart_service_if_running("softflowd");
 			}
 			conf_mount_ro();
 			config_unlock();
