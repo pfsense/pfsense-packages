@@ -1,6 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	softflowd.xml
+	part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2013-2015 ESF, LLC
+	All rights reserved.
+*/
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	 1. Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
+
+	 2. Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+	]]>
+	</copyright>
 	<name>softflowd</name>
-	<version>0.9.8_2 pkg v1.1</version>
+	<version>1.2</version>
 	<title>softflowd: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=softflowd.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -50,7 +89,7 @@
 		<field>
 			<fielddescr>Hop Limit</fielddescr>
 			<fieldname>hoplimit</fieldname>
-			<description>Set the IPv4 TTL or the IPv6 hop limit to hoplimit.  softflowd will use the default system TTL when exporting flows to a unicast host.  When exporting to a multicast group, the default TTL will be 1 (i.e. link-local).</description>
+			<description>Set the IPv4 TTL or the IPv6 hop limit to hoplimit. softflowd will use the default system TTL when exporting flows to a unicast host. When exporting to a multicast group, the default TTL will be 1 (i.e. link-local).</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -76,7 +115,7 @@
 		<field>
 			<fielddescr>Flow Tracking Level</fielddescr>
 			<fieldname>flowtracking</fieldname>
-			<description>Specify which flow elements softflowd should be used to define a flow.  track_level may be one of: &quot;full&quot; (track everything in the flow, the default), &quot;proto&quot; (track source and destination addresses and protocol), or &quot;ip&quot; (only track source and destination addresses).  Selecting either of the latter options will produce flows with less information in them (e.g. TCP/UDP ports will not be recorded).  This will cause flows to be consolidated, reducing the quantity of output and CPU load that softflowd will place on the system at the cost of some detail being lost.</description>
+			<description>Specify which flow elements softflowd should be used to define a flow. track_level may be one of: &quot;full&quot; (track everything in the flow, the default), &quot;proto&quot; (track source and destination addresses and protocol), or &quot;ip&quot; (only track source and destination addresses). Selecting either of the latter options will produce flows with less information in them (e.g. TCP/UDP ports will not be recorded). This will cause flows to be consolidated, reducing the quantity of output and CPU load that softflowd will place on the system at the cost of some detail being lost.</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -106,13 +145,13 @@
 		<field>
 			<fielddescr>Maximum Lifetime</fielddescr>
 			<fieldname>timeout-maxlife</fieldname>
-			<description>(Seconds) This is the maximum lifetime that a flow may exist for.  All flows are forcibly expired when they pass maxlife seconds.  To disable this feature, specify a maxlife of 0.</description>
+			<description>(Seconds) This is the maximum lifetime that a flow may exist for.  All flows are forcibly expired when they pass maxlife seconds. To disable this feature, specify a maxlife of 0.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Expire Interval</fielddescr>
 			<fieldname>timeout-expint</fieldname>
-			<description>(Seconds) Specify the interval between expiry checks.  Increase this to group more flows into a NetFlow packet.  To disable this feature, specify a expint of 0.</description>
+			<description>(Seconds) Specify the interval between expiry checks. Increase this to group more flows into a NetFlow packet. To disable this feature, specify a expint of 0.</description>
 			<type>input</type>
 		</field>
 		<field>
