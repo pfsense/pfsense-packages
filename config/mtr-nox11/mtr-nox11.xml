@@ -107,8 +107,8 @@
 	<custom_add_php_command>
 	<![CDATA[
 	/* Do some basic input validation/sanitation here */
-	$int_count = (is_numeric($_POST['count']) ? (int)$_POST['count'] : 10);
-	$int_interval = (is_numeric($_POST['interval']) ? (int)$_POST['interval'] : 1);
+	$int_count = (is_numeric($_POST['count']) ? (abs(intval($_POST['count']))) : 10);
+	$int_interval = (is_numeric($_POST['interval']) ? (abs(intval($_POST['interval']))) : 1);
 
 	if (!is_hostname($_POST['hostname']) && !is_ipaddr($_POST['hostname'])) {
 		echo "<div class=\"errmsg\">ERROR: No valid IP or Hostname given. Fix this and try again!</div>";
