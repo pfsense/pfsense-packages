@@ -191,36 +191,49 @@
 				$cf['host'] = is_ipaddrv6($cf['host']) ? "[{$cf['host']}]" : $cf['host'];
 				$start = "/usr/bin/killall -9 softflowd";
 				foreach ($interface_list as $interface_friendly) {
-					if (empty($interface_friendly))
+					if (empty($interface_friendly)) {
 						continue;
+					}
 					$interface = get_real_interface($interface_friendly);
-					if (empty($interface))
+					if (empty($interface)) {
 						continue;
+					}
 					$start .= "\n\t/usr/local/sbin/softflowd ";
 					$start .= " -i " . escapeshellarg($interface);
 					$start .= " -n " . escapeshellarg("{$cf['host']}:{$cf['port']}");
-					if (is_numeric($cf['maxflows']))
+					if (is_numeric($cf['maxflows'])) {
 						$start .= " -m " . escapeshellarg($cf['maxflows']);
-					if (is_numeric($cf['hoplimit']))
+					}
+					if (is_numeric($cf['hoplimit'])) {
 						$start .= " -L " . escapeshellarg($cf['hoplimit']);
-					if ($cf['version'] != "") 
+					}
+					if ($cf['version'] != "") {
 						$start .= " -v " . escapeshellarg($cf['version']);
-					if ($cf['flowtracking'] != "")
+					}
+					if ($cf['flowtracking'] != "") {
 						$start .= " -T " . escapeshellarg($cf['flowtracking']);
-					if (is_numeric($cf['timeout-general']))
+					}
+					if (is_numeric($cf['timeout-general'])) {
 						$start .= " -t " . escapeshellarg("general={$cf['timeout-general']}");
-					if (is_numeric($cf['timeout-maxlife']))
+					}
+					if (is_numeric($cf['timeout-maxlife'])) {
 						$start .= " -t " . escapeshellarg("maxlife={$cf['timeout-maxlife']}");
-					if (is_numeric($cf['timeout-expint']))
+					}
+					if (is_numeric($cf['timeout-expint'])) {
 						$start .= " -t " . escapeshellarg("expint={$cf['timeout-expint']}");
-					if (is_numeric($cf['timeout-tcp']))
+					}
+					if (is_numeric($cf['timeout-tcp'])) {
 						$start .= " -t " . escapeshellarg("tcp={$cf['timeout-tcp']}");
-					if (is_numeric($cf['timeout-tcp-rst']))
+					}
+					if (is_numeric($cf['timeout-tcp-rst'])) {
 						$start .= " -t " . escapeshellarg("tcp.rst={$cf['timeout-tcp-rst']}");
-					if (is_numeric($cf['timeout-tcp-fin']))
+					}
+					if (is_numeric($cf['timeout-tcp-fin'])) {
 						$start .= " -t " . escapeshellarg("tcp.fin={$cf['timeout-tcp-fin']}");
-					if (is_numeric($cf['timeout-udp']))
+					}
+					if (is_numeric($cf['timeout-udp'])) {
 						$start .= " -t " . escapeshellarg("udp={$cf['timeout-udp']}");
+					}
 					$start .= " -p " . escapeshellarg("/var/run/softflowd.{$interface}.pid");
 					$start .= " -c " . escapeshellarg("/var/run/softflowd.{$interface}.ctl");
 				}
