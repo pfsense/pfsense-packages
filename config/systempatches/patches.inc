@@ -35,6 +35,9 @@ $patch_suffix = ".patch";
 $patch_dir = "/var/patches";
 $patch_cmd = "/usr/bin/patch";
 
+if (isset($config['installedpackages']['patches']))
+	$patches_config = &$config['installedpackages']['patches'];
+
 function patch_package_install() {
 	patch_add_shellcmd();
 }
@@ -97,6 +100,22 @@ function patch_fetch(& $patch) {
 	}
 }
 
+function rewrite_patch_paths(&$patch) {
+	global $patches_config;
+	$pathrewrites = base64_decode($patches_config['pathrewrites']);
+	$filepathrewrites = explode("\n", $pathrewrites);
+	foreach($filepathrewrites as $changeitem) {
+		$oldnew = explode("|",$changeitem);
+
+		$search = preg_quote($oldnew[0],"/");
+		$replace = $oldnew[1];
+		
+		$search = "/^((---)|(\+\+\+)) ((a\/)|(b\/))?$search/m";
+		$replace = "$1 $4$replace";
+		$patch = preg_replace($search, $replace, $patch);
+	}
+}
+
 /* Write a patch file out to $patch_dir */
 function patch_write($patch) {
 	global $patch_dir, $patch_suffix;
@@ -107,6 +126,8 @@ function patch_write($patch) {
 		return false;
 	} else {
 		$text = base64_decode($patch['patch']);
+		if (isset($patch['rewritepaths']))
+			rewrite_patch_paths($text);
 		$filename = $patch_dir . '/' . $patch['uniqid'] . $patch_suffix;
 		return (file_put_contents($filename, $text) > 0);
 	}

@@ -62,6 +62,7 @@ if (isset($id) && $a_patches[$id]) {
 	$pconfig['basedir'] = $a_patches[$id]['basedir'];
 	$pconfig['ignorewhitespace'] = isset($a_patches[$id]['ignorewhitespace']);
 	$pconfig['autoapply'] = isset($a_patches[$id]['autoapply']);
+	$pconfig['rewritepaths'] = isset($a_patches[$id]['rewritepaths']);
 	$pconfig['uniqid'] = $a_patches[$id]['uniqid'];
 } else {
 	$pconfig['pathstrip'] = 1;
@@ -118,6 +119,7 @@ if ($_POST) {
 		$thispatch['basedir'] = empty($_POST['basedir']) ? "/" : $_POST['basedir'];
 		$thispatch['ignorewhitespace'] = isset($_POST['ignorewhitespace']);
 		$thispatch['autoapply'] = isset($_POST['autoapply']);
+		$thispatch['rewritepaths'] = isset($_POST['rewritepaths']);
 		if (empty($_POST['uniqid'])) {
 			$thispatch['uniqid'] = uniqid();
 		} else {
@@ -147,8 +149,8 @@ $pgtitle = array(gettext("System"),gettext("Patches"), gettext("Edit"));
 include("head.inc");
 
 ?>
-<link type="text/css" rel="stylesheet" href="/pfCenter/javascript/chosen/chosen.css" />
-<script src="/pfCenter/javascript/chosen/chosen.proto.js" type="text/javascript"></script>
+<link type="text/css" rel="stylesheet" href="/javascript/chosen/chosen.css" />
+<script src="/javascript/chosen/chosen.proto.js" type="text/javascript"></script>
 </head>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -208,6 +210,14 @@ include("head.inc");
 		<input name="autoapply" type="checkbox" id="autoapply" value="yes" <?php if ($pconfig['autoapply']) echo "checked=\"checked\""; ?> />
 		<strong><?=gettext("Auto-Apply Patch"); ?></strong><br />
 		<span class="vexpl"><?=gettext("Set this option to apply the patch automatically when possible, useful for patches to survive after firmware updates."); ?></span>
+	</td>
+</tr>
+<tr>
+	<td width="22%" valign="top" class="vncell"><?=gettext("Rewrite file paths"); ?></td>
+	<td width="78%" class="vtable">
+		<input name="rewritepaths" type="checkbox" id="rewritepaths" value="yes" <?php if ($pconfig['rewritepaths']) echo "checked=\"checked\""; ?> />
+		<strong><?=gettext("Rewrite file paths"); ?></strong><br />
+		<span class="vexpl"><?=gettext("Set this option for patches that need to apply to a different folder structure than they have on git."); ?></span>
 	</td>
 </tr>
 <tr>
