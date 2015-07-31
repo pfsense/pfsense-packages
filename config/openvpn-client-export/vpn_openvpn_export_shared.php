@@ -1,9 +1,10 @@
 <?php 
 /*
 	vpn_openvpn_export_shared.php
-
+	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2008 Shrew Soft Inc.
 	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2011-2015 ESF, LLC
 	All rights reserved. 
 
 	Redistribution and use in source and binary forms, with or without
@@ -36,26 +37,30 @@ require("openvpn-client-export.inc");
 
 $pgtitle = array("OpenVPN", "Client Export Utility");
 
-if (!is_array($config['openvpn']['openvpn-server']))
+if (!is_array($config['openvpn']['openvpn-server'])) {
 	$config['openvpn']['openvpn-server'] = array();
+}
 
 $a_server = $config['openvpn']['openvpn-server'];
 
 $ras_server = array();
 foreach($a_server as $sindex => $server) {
-	if (isset($server['disable']))
+	if (isset($server['disable'])) {
 		continue;
+	}
 	$ras_user = array();
-	if ($server['mode'] != "p2p_shared_key")
+	if ($server['mode'] != "p2p_shared_key") {
 		continue;
-
+	}
 	$ras_serverent = array();
 	$prot = $server['protocol'];
 	$port = $server['local_port'];
-	if ($server['description'])
+	if ($server['description']) {
 		$name = "{$server['description']} {$prot}:{$port}";
-	else
+	}
+	else {
 		$name = "Shared Key Server {$prot}:{$port}";
+	}
 	$ras_serverent['index'] = $sindex;
 	$ras_serverent['name'] = $name;
 	$ras_serverent['mode'] = $server['mode'];
@@ -63,12 +68,14 @@ foreach($a_server as $sindex => $server) {
 }
 
 $id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id'])) {
 	$id = $_POST['id'];
+}
 
 $act = $_GET['act'];
-if (isset($_POST['act']))
+if (isset($_POST['act'])) {
 	$act = $_POST['act'];
+}
 
 $error = false;
 
@@ -82,8 +89,9 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 	if (empty($_GET['useaddr'])) {
 		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
+	} else {
 		$useaddr = $_GET['useaddr'];
+	}
 
 	$proxy = "";
 	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
@@ -91,32 +99,37 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 		if (empty($_GET['proxy_addr'])) {
 			$error = true;
 			$input_errors[] = "You need to specify an address for the proxy port.";
-		} else
+		} else {
 			$proxy['ip'] = $_GET['proxy_addr'];
+		}
 		if (empty($_GET['proxy_port'])) {
 			$error = true;
 			$input_errors[] = "You need to specify a port for the proxy ip.";
-		} else
+		} else {
 			$proxy['port'] = $_GET['proxy_port'];
+		}
 		$proxy['proxy_type'] = $_GET['proxy_type'];
 		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
 		if ($_GET['proxy_authtype'] != "none") {
 			if (empty($_GET['proxy_user'])) {
 				$error = true;
 				$input_errors[] = "You need to specify a username with the proxy config.";
-			} else
+			} else {
 				$proxy['user'] = $_GET['proxy_user'];
+			}
 			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
 				$error = true;
 				$input_errors[] = "You need to specify a password with the proxy user.";
-			} else
+			} else {
 				$proxy['password'] = $_GET['proxy_password'];
+			}
 		}
 	}
 
 	$exp_name = openvpn_client_export_prefix($srvid);
-	if ($act == "skzipconf")
+	if ($act == "skzipconf") {
 		$zipconf = true;
+	}
 	$exp_data = openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipconf);
 	if (!$exp_data) {
 		$input_errors[] = "Failed to export config files!";
@@ -136,10 +149,11 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
-		if ($zipconf)
+		if ($zipconf) {
 			readfile("{$g['tmp_path']}/{$exp_data}");
-		else
+		} else {
 			echo $exp_data;
+		}
 
 		@unlink("{$g['tmp_path']}/{$exp_data}");
 		exit;
@@ -276,10 +290,12 @@ function useproxy_changed(obj) {
 //]]>
 </script>
 <?php
-	if ($input_errors)
+	if ($input_errors) {
 		print_input_errors($input_errors);
-	if ($savemsg)
+	}
+	if ($savemsg) {
 		print_info_box($savemsg);
+	}
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="openvpn export shared">
  	<tr>
