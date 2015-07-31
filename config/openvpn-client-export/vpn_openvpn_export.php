@@ -1,9 +1,11 @@
 <?php
 /*
 	vpn_openvpn_export.php
-
+	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2008 Shrew Soft Inc.
 	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2011-2015 Jim Pingle
+	Copyright (C) 2011-2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -138,8 +140,9 @@ if (!empty($act)) {
 		$useaddr = trim($_GET['useaddr']);
 
 	if (!(is_ipaddr($useaddr) || is_hostname($useaddr) ||
-	    in_array($useaddr, array("serveraddr", "servermagic", "servermagichost", "serverhostname"))))
+	    in_array($useaddr, array("serveraddr", "servermagic", "servermagichost", "serverhostname")))) {
 		$input_errors[] = "You need to specify an IP or hostname.";
+	}
 
 	$advancedoptions = $_GET['advancedoptions'];
 	$openvpnmanager = $_GET['openvpnmanager'];
@@ -147,36 +150,43 @@ if (!empty($act)) {
 	$verifyservercn = $_GET['verifyservercn'];
 	$randomlocalport = $_GET['randomlocalport'];
 	$usetoken = $_GET['usetoken'];
-	if ($usetoken && (substr($act, 0, 10) == "confinline"))
+	if ($usetoken && (substr($act, 0, 10) == "confinline")) {
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
-	if ($usetoken && (($act == "conf_yealink_t28") || ($act == "conf_yealink_t38g") || ($act == "conf_yealink_t38g2") || ($act == "conf_snom")))
+	}
+	if ($usetoken && (($act == "conf_yealink_t28") || ($act == "conf_yealink_t38g") || ($act == "conf_yealink_t38g2") || ($act == "conf_snom"))) {
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with a Yealink or SNOM configuration.";
+	}
 	$password = "";
-	if ($_GET['password'])
+	if ($_GET['password']) {
 		$password = $_GET['password'];
+	}
 
 	$proxy = "";
 	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
 		$proxy = array();
 		if (empty($_GET['proxy_addr'])) {
 			$input_errors[] = "You need to specify an address for the proxy port.";
-		} else
+		} else {
 			$proxy['ip'] = $_GET['proxy_addr'];
+		}
 		if (empty($_GET['proxy_port'])) {
 			$input_errors[] = "You need to specify a port for the proxy ip.";
-		} else
+		} else {
 			$proxy['port'] = $_GET['proxy_port'];
+		}
 		$proxy['proxy_type'] = $_GET['proxy_type'];
 		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
 		if ($_GET['proxy_authtype'] != "none") {
 			if (empty($_GET['proxy_user'])) {
 				$input_errors[] = "You need to specify a username with the proxy config.";
-			} else
+			} else {
 				$proxy['user'] = $_GET['proxy_user'];
+			}
 			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
 				$input_errors[] = "You need to specify a password with the proxy user.";
-			} else
+			} else {
 				$proxy['password'] = $_GET['proxy_password'];
+			}
 		}
 	}
 
@@ -572,10 +582,12 @@ function useproxy_changed(obj) {
 //]]>
 </script>
 <?php
-	if ($input_errors)
+	if ($input_errors) {
 		print_input_errors($input_errors);
-	if ($savemsg)
+	}
+	if ($savemsg) {
 		print_info_box($savemsg);
+	}
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="openvpn export">
  	<tr>
