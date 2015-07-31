@@ -1,7 +1,7 @@
 <?php
 /*
 	ftpproxy.inc
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
