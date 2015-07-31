@@ -1674,7 +1674,7 @@
 		<internal_name>FTP_Client_Proxy</internal_name>
 		<descr><![CDATA[Basic FTP Client Proxy using ftp-proxy from FreeBSD]]></descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.2</version>
+		<version>0.2.1</version>
 		<category>Services</category>
 		<status>Beta</status>
 		<port_category>ftp</port_category>
