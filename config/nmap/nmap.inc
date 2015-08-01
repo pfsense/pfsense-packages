@@ -105,7 +105,7 @@ function nmap_custom_add_php_command() {
 	}
 
 	$nmap_options .= " " . escapeshellarg($_POST['hostname']);
-	echo "<strong>Running: /usr/local/bin/nmap {$nmap_options}</strong></br>";
+	echo "<strong>Running: /usr/local/bin/nmap {$nmap_options}</strong><br />";
 	system("/usr/local/bin/nmap" . $nmap_options);
 	echo "<br /><br /><input class=\"formbtn\" type=\"button\" value=\"Back to NMap\" onclick=\"history.back()\" />";
 }
