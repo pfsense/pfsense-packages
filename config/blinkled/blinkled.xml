@@ -56,11 +56,12 @@
 		<item>https://packages.pfsense.org/packages/config/blinkled/blinkled.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 	</additional_files_needed>
+	<!-- TODO: Make the blinkled.sh script really usable for start/stop/restart -->
 	<service>
 		<name>blinkled</name>
 		<rcfile>blinkled.sh</rcfile>
 		<executable>blinkled</executable>
-		<description>Blinks LEDs to indicate network activity</description>
+		<description>Network Activity LED Indicator Daemon</description>
 	</service>
 	<fields>
 		<field>
