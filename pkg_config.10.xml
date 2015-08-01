@@ -1210,7 +1210,7 @@
 		<name>gwled</name>
 		<descr>Allows you to use LEDs for gateway status on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
 		<category>System</category>
-		<version>0.2.1</version>
+		<version>0.2.2</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<port_category>sysutils</port_category>
