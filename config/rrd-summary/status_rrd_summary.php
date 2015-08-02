@@ -1,7 +1,10 @@
 <?php
 /*
 	rrd_summary.php
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2010 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -37,9 +40,9 @@ $lastmonth = fetch_rrd_summary($rrd, $lastmonth, $start, 720*60);
 
 function fetch_rrd_summary($rrd, $start, $end, $resolution=3600) {
 	$traffic = array();
-	$rrd   = escapeshellarg("/var/db/rrd/{$rrd}");
+	$rrd = escapeshellarg("/var/db/rrd/{$rrd}");
 	$start = escapeshellarg($start);
-	$end   = escapeshellarg($end);
+	$end = escapeshellarg($end);
 	exec("/usr/local/bin/rrdtool fetch {$rrd} AVERAGE -r {$resolution} -s {$start} -e {$end} | grep -v nan | awk '{ sum1 += $2/(1024*1024); sum2 += $3/(1024*1024) } END { printf \"%u|%u\", sum1*{$resolution}, sum2*{$resolution}; }'", $traffic);
 	return explode('|', trim($traffic[0]));
 }
@@ -55,19 +58,20 @@ function print_rrd_summary_table($data) { ?>
 }
 
 $pgtitle = "Status: RRD Summary";
-include("head.inc");
-include("fbegin.inc");
+include_once("head.inc");
+echo "<body link=\"#0000CC\" vlink=\"#0000CC\" alink=\"#0000CC\">";
+include_once("fbegin.inc");
 
 $rrds = glob("/var/db/rrd/*-traffic.rrd");
 
 ?>
-<form name="form1" action="status_rrd_summary.php" method="POST">
-	RRD Database: 
+<form name="form1" action="status_rrd_summary.php" method="post">
+	RRD Database:&nbsp;
 	<select name="rrd" class="formselect" onchange="document.form1.submit()">
 	<?php
 	foreach ($rrds as $r) {
 		$r = basename($r);
-		$selected = ($r == $rrd) ? " selected" : "";
+		$selected = ($r == $rrd) ? ' selected="selected"' : '';
 		print "<option value=\"{$r}\"{$selected}>{$r}</option>";
 	} ?>
 	</select>
@@ -75,7 +79,7 @@ $rrds = glob("/var/db/rrd/*-traffic.rrd");
 	<select name="startday" class="formselect" onchange="document.form1.submit()">
 	<?php
 	for ($day=1; $day < 29; $day++) {
-		$selected = ($day == $startday) ? " selected" : "";
+		$selected = ($day == $startday) ? ' selected="selected"' : "";
 		print "<option value=\"{$day}\"{$selected}>{$day}</option>";
 	} ?>
 	</select>
@@ -87,4 +91,6 @@ This Month (to date, does not include this hour, starting at day <?php echo $sta
 Last Month:
 <?php print_rrd_summary_table($lastmonth); ?>
 
-<?php include("fend.inc"); ?>
+<?php include_once("fend.inc"); ?>
+</body>
+</html>
