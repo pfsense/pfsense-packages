@@ -62,8 +62,8 @@
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
-			<name>Enable Filer configuration sync.</name>
-		</field>		
+			<name>Enable Filer configuration sync</name>
+		</field>
 		<field>
 			<fielddescr>Automatically sync Filer configuration changes.</fielddescr>
 			<fieldname>synconchanges</fieldname>
@@ -102,9 +102,9 @@
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
-		filer_sync_on_changes();		
+		filer_sync_on_changes();
 	</custom_php_resync_config_command>
-	<custom_php_command_before_form>	
+	<custom_php_command_before_form>
 		unset($_POST['temp']);
 	</custom_php_command_before_form>
 </packagegui>
