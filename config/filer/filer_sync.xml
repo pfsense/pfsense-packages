@@ -2,48 +2,49 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
-/* ========================================================================== */
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
 /*
-    filer_sync.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2008 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Brian Scholer
-    Copyright (C) 2012 Marcello Coutinho
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	filer_sync.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+	Copyright (C) 2011 Brian Scholer
+	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>filersync</name>
-	<version>1.1</version>
+	<version>1.2</version>
 	<title>Filer: Sync</title>
 	<include_file>/usr/local/pkg/filer.inc</include_file>
 	<tabs>
@@ -61,12 +62,12 @@
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
-			<name>Enable Filer configuration sync</name>
+			<name>Enable Filer configuration sync.</name>
 		</field>		
 		<field>
-			<fielddescr>Automatically sync Filer configuration changes</fielddescr>
+			<fielddescr>Automatically sync Filer configuration changes.</fielddescr>
 			<fieldname>synconchanges</fieldname>
-			<description>pfSense will automatically sync changes to the hosts defined below. Blank user assumes 'admin'.</description>
+			<description>pfSense will automatically sync changes to the hosts defined below. (Leave blank to use 'admin'.)</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -77,7 +78,7 @@
 			<rowhelperfield>
 				<fielddescr>IP Address</fielddescr>
 				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
+				<description>IP Address of remote server.</description>
 				<type>input</type>
 				<size>20</size>
 				<required/>
@@ -85,7 +86,7 @@
 			<rowhelperfield>
 				<fielddescr>User Name</fielddescr>
 				<fieldname>username</fieldname>
-				<description>user name of remote server</description>
+				<description>user name of remote server.</description>
 				<type>input</type>
 				<size>20</size>
 			</rowhelperfield>
