@@ -67,10 +67,8 @@ function nmap_custom_php_validation_command($post, &$input_errors) {
 function nmap_custom_add_php_command() {
 	$nmap_options = "";
 
-	if (function_exists("is_ipaddrv6") && function_exists("is_subnetv6")) {
-		if (is_ipaddrv6($_POST['hostname']) || is_subnetv6($_POST['hostname'])) {
+	if (is_ipaddrv6($_POST['hostname']) || is_subnetv6($_POST['hostname'])) {
 			$nmap_options .= " -6";
-		}
 	}
 
 	switch($_POST['scanmethod']) {
