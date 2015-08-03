@@ -63,7 +63,7 @@ function validate_form_gwled($post, &$input_errors) {
 	if (($post['gw_led2']) && ($post['gw_led3']) &&
 	    (($post['enable_led2']) && ($post['enable_led3'])) &&
 	    ($post['gw_led2'] == $post['gw_led3'])) {
-			$input_errors[] = 'You cannot set two LEDs for a single gateway. Please choose seperate interfaces.';
+		$input_errors[] = 'You cannot set two LEDs for a single gateway. Please choose seperate interfaces.';
 	}
 }
 
