@@ -1,8 +1,9 @@
 <?php
 /*
 	sudo.inc
-
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2013 Jim Pingle (jpingle@gmail.com)
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -32,7 +33,7 @@ global $pfs_version;
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 switch ($pfs_version) {
 	case "2.1":
-		// Hackish way to detect if someone manually did pkg_add rather than use pbi.
+		/* Hackish way to detect if someone manually did pkg_add rather than use pbi. */
 		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
 			define('SUDO_BASE', '/usr/pbi/sudo-' . php_uname("m"));
 			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/');
@@ -43,7 +44,7 @@ switch ($pfs_version) {
 		break;
 	case "2.2":
 		define('SUDO_BASE','/usr/local');
-		// Hackish way to detect if someone manually did pkg_add rather than use pbi.
+		/* Hackish way to detect if someone manually did pkg_add rather than use pbi. */
 		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
 			define('SUDO_LIBEXEC_DIR', '/usr/pbi/sudo-' . php_uname("m") . '/local/libexec/sudo');
 		} else {
@@ -132,16 +133,19 @@ function sudo_write_config() {
 	conf_mount_ro();
 }
 
-/* Get a list of users and groups in a format we can use to make proper sudoers entries.
+/*
+Get a list of users and groups in a format we can use to make proper sudoers entries.
 Optionally include "ALL" as a user (for use by the Run As list)
  */
 function sudo_get_users($list_all_user = false) {
 	global $config;
-	if (!is_array($config['system']['user'])) 
+	if (!is_array($config['system']['user'])) {
 		$config['system']['user'] = array();
+	}
 	$a_user = &$config['system']['user'];
-	if (!is_array($config['system']['group']))
+	if (!is_array($config['system']['group'])) {
 		$config['system']['group'] = array();
+	}
 	$a_group = &$config['system']['group'];
 	$users = array();
 
@@ -174,8 +178,9 @@ function sudo_get_users($list_all_user = false) {
 
 	foreach ($a_group as $group) {
 		/* The "all" group is internal and doesn't make sense to use here. */
-		if ($group['name'] == "all")
+		if ($group['name'] == "all") {
 			continue;
+		}
 		$tmpgroup = array();
 		$tmpgroup["name"] = "group:{$group['name']}";
 		$tmpgroup["descr"] = "Group: {$group['name']}";
@@ -185,20 +190,23 @@ function sudo_get_users($list_all_user = false) {
 	return $users;
 }
 
-/* Make sure commands passed in are valid executables to help ensure a valid sudoers file and expected behavior.
-   This also forces the user to give full paths to executables, which they should be doing anyhow.
+/*
+Make sure commands passed in are valid executables to help ensure a valid sudoers file and expected behavior.
+This also forces the user to give full paths to executables, which they should be doing anyhow.
  */
 function sudo_validate_commands(&$input_errors) {
 	$idx = 0;
 	while(isset($_POST["cmdlist{$idx}"])) {
 		$commands = $_POST["cmdlist" . $idx++];
-		if (strtoupper($commands) == "ALL")
+		if (strtoupper($commands) == "ALL") {
 			continue;
+		}
 		$commands = explode(",", $commands);
 		foreach ($commands as $command) {
 			list($cmd, $params) = explode(" ", trim($command), 2);
-			if (!is_executable($cmd))
+			if (!is_executable($cmd)) {
 				$input_errors[] = htmlspecialchars($cmd) . " is not an executable command.";
+			}
 		}
 	}
 }
