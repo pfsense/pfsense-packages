@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -9,7 +9,7 @@
 /*
 	e2guardian.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -38,9 +38,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardian</name>
 	<version>1.0</version>
 	<title>Services: E2guardian</title>
@@ -60,12 +57,10 @@
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian.php</item>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_ldap.php</item>
@@ -75,112 +70,90 @@
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_ldap.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_limits.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_ips_header.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_users_header.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_users_footer.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_about.php</item>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_config.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardianfx.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_url_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_site_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_search_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_pics_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_phrase_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_log.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_header_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_groups.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_file_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_content_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_blacklist.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_antivirus_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/e2guardian_rc.template</item>
@@ -190,7 +163,6 @@
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/e2guardian/pkg_e2guardian.inc</item>
 		<prefix>/usr/local/www/shortcuts/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<tabs>
 		<tab>
@@ -242,7 +214,7 @@
 			<text>Help</text>
 			<url>/e2guardian_about.php</url>
 		</tab>
-</tabs>
+	</tabs>
 	<fields>
 		<field>
 			<name>Listening Settings</name>
@@ -257,7 +229,7 @@
 		<field>
 			<fielddescr>Listen Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
-			<description><![CDATA[Default: <strong>LAN/loopback</strong><br>Select interface(s) that you want to e2guardian to listen on.<br>
+			<description><![CDATA[Default: <strong>LAN/loopback</strong><br/>Select interface(s) that you want to e2guardian to listen on.<br/>
 				<strong>Note: Do NOT select more then one interface if you plan to use more then one authentication plugin.</strong>]]></description>
 			<type>interfaces_selection</type>
 			<required/>
@@ -268,7 +240,7 @@
 			<fieldname>filterports</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>8080</strong><br>The port(s) that DansGuardian listens to.]]></description>
+			<description><![CDATA[Default: <strong>8080</strong><br/>The port(s) that DansGuardian listens to.]]></description>
 		</field>
 		<field>
 			<fielddescr>Daemon Options</fielddescr>
@@ -287,9 +259,9 @@
 			<fieldname>children</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>8/120</strong><br>
-				Sets the minimun and maximum number of processes to spawn to handle the incoming connections.<br>
-				Max value usually 250 depending on OS.<br>
+			<description><![CDATA[Default: <strong>8/120</strong><br/>
+				Sets the minimun and maximum number of processes to spawn to handle the incoming connections.<br/>
+				Max value usually 250 depending on OS.<br/>
 				On large sites you might want to try 32/180.]]></description>
 		</field>
 			<field>
@@ -297,8 +269,8 @@
 			<fieldname>sparechildren</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>4/32</strong><br>
-				Sets the minimum and maximum number of processes to be kept ready to handle connections.<br>
+			<description><![CDATA[Default: <strong>4/32</strong><br/>
+				Sets the minimum and maximum number of processes to be kept ready to handle connections.<br/>
 				On large sites you might want to try 8/64.]]></description>
 		</field>
 		<field>
@@ -306,7 +278,7 @@
 			<fieldname>preforkchildren</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[sets the minimum number of processes to spawn when it runs out<br>
+			<description><![CDATA[sets the minimum number of processes to spawn when it runs out<br/>
 				On large sites you might want to try 10]]></description>
 		</field>
 		<field>
@@ -314,9 +286,9 @@
 			<fieldname>maxagechildren</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>500</strong><br>
-				Sets the maximum age of a child process before it croaks it.<br>
-				This is the number of connections they handle before exiting.<br>
+			<description><![CDATA[Default: <strong>500</strong><br/>
+				Sets the maximum age of a child process before it croaks it.<br/>
+				This is the number of connections they handle before exiting.<br/>
 				On large sites you might want to try 10000.]]></description>
 		</field>
 		<field>
@@ -324,9 +296,9 @@
 			<fieldname>maxips</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>0</strong><br>
-				Sets the maximum number of client IP addresses allowed to connect at once.<br>
-				Use this to set a hard limit on the number of users allowed to concurrently<br>
+			<description><![CDATA[Default: <strong>0</strong><br/>
+				Sets the maximum number of client IP addresses allowed to connect at once.<br/>
+				Use this to set a hard limit on the number of users allowed to concurrently<br/>
 				browse the web. Set to 0 for no limit, and to disable the IP cache process.]]></description>
 		</field>
 		<field>
@@ -338,7 +310,7 @@
 			<fieldname>proxyip</fieldname>
 			<type>input</type>
 			<size>20</size>
-			<description><![CDATA[Default: <strong>127.0.0.1</strong><br>
+			<description><![CDATA[Default: <strong>127.0.0.1</strong><br/>
 				Sets ip address for proxy server(usually squid).]]></description>
 		</field>
 		<field>
@@ -346,7 +318,7 @@
 			<fieldname>proxyport</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>3128</strong><br>
+			<description><![CDATA[Default: <strong>3128</strong><br/>
 				Sets port number for proxy server.]]></description>
 		</field>
 		<field>
@@ -372,7 +344,7 @@
 	</custom_php_command_before_form>
 	<custom_php_install_command>
 		update_status("Checking E2guardian Blacklists... One moment please...");
-		update_output_window("This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.");
+		update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
 		e2guardian_php_install_command(false,true);
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
