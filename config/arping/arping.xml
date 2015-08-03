@@ -51,7 +51,7 @@
 		<name>ARPing</name>
 		<tooltiptext>The arping utility sends ARP and/or ICMP requests to the specified host and displays the replies.</tooltiptext>
 		<section>Diagnostics</section>
-		<url>/pkg_edit.php?xml=arping.xml&amp;id=0></url>
+		<url>/pkg_edit.php?xml=arping.xml&amp;id=0</url>
 	</menu>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
