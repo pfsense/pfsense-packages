@@ -1,7 +1,7 @@
 <?php
 /*
 	openvpn-client-export.inc
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>
 	Copyright (C) 2008 Shrew Soft Inc
 	Copyright (C) 2010 Ermal Luci
