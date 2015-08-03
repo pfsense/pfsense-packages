@@ -31,19 +31,15 @@
 require_once("config.inc");
 require_once("functions.inc");
 
-function blinkled_running () {
-	return ((int)exec('/bin/pgrep blinkled | /usr/bin/wc -l') > 0);
-}
-
 function sync_package_blinkled() {
 	global $config;
 	$blinkled_config = $config['installedpackages']['blinkled']['config'][0];
 	/* Kill all instances of blinkled */
-	if (blinkled_running()) {
-		blinkled_stop();
+	if (is_process_running("blinkled")) {
+		mwexec("/usr/bin/killall -9 blinkled");
 	}
 	/* If blinkled is not running, start it */
-	if (!blinkled_running()) {
+	if (!is_process_running("blinkled")) {
 		blinkled_start();
 	}
 }
@@ -65,10 +61,6 @@ function blinkled_start() {
 	if (($blinkled_config['enable_led3']) && ($blinkled_config['iface_led3'])) {
 		blinkled_launch(convert_friendly_interface_to_real_interface_name($blinkled_config['iface_led3']), 3);
 	}
-}
-
-function blinkled_stop() {
-	mwexec("/usr/bin/killall -9 blinkled");
 }
 
 function validate_form_blinkled($post, &$input_errors) {
