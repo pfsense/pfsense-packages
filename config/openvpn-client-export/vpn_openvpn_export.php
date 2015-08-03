@@ -146,6 +146,7 @@ if (!empty($act)) {
 
 	$verifyservercn = $_GET['verifyservercn'];
 	$randomlocalport = $_GET['randomlocalport'];
+	$usevpndescription = $_GET['usevpndescription'];
 	$usetoken = $_GET['usetoken'];
 	if ($usetoken && (substr($act, 0, 10) == "confinline"))
 		$input_errors[] = "You cannot use Microsoft Certificate Storage with an Inline configuration.";
@@ -180,7 +181,7 @@ if (!empty($act)) {
 		}
 	}
 
-	$exp_name = openvpn_client_export_prefix($srvid, $usrid, $crtid);
+	$exp_name = openvpn_client_export_prefix($srvid, $usrid, $crtid, $usevpndescription);
 
 	if(substr($act, 0, 4) == "conf") {
 		switch ($act) {
@@ -220,17 +221,17 @@ if (!empty($act)) {
 				$exp_name = urlencode($exp_name."-config.ovpn");
 				$expformat = "baseconf";
 		}
-		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
+		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usevpndescription, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
 	}
 
 	if($act == "visc") {
 		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
+		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usevpndescription, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
 	}
 
 	if(substr($act, 0, 4) == "inst") {
 		$exp_name = urlencode($exp_name."-install.exe");
-		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usevpndescription, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
 
 	if (!$exp_path) {
@@ -317,6 +318,9 @@ function download_begin(act, i, j) {
 	var randomlocalport = 0;
 	if (document.getElementById("randomlocalport").checked)
 		randomlocalport = 1;
+	var usevpndescription = 0;
+	if (document.getElementById("usevpndescription").checked)
+		usevpndescription = 1;
 	var usetoken = 0;
 	if (document.getElementById("usetoken").checked)
 		usetoken = 1;
@@ -392,6 +396,7 @@ function download_begin(act, i, j) {
 	dlurl += "&useaddr=" + escape(useaddr);
 	dlurl += "&verifyservercn=" + escape(verifyservercn);
 	dlurl += "&randomlocalport=" + escape(randomlocalport);
+	dlurl += "&usevpndescription=" + escape(usevpndescription);
 	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
 	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
@@ -681,6 +686,26 @@ function useproxy_changed(obj) {
 								<tr>
 									<td colspan="2">
 										<span class="vexpl"><br/>NOTE: Not supported on older clients. Automatically disabled for Yealink and Snom configurations.</span>
+									</td>
+								</tr>
+							</table>
+					</tr>
+					<tr>
+						<td width="22%" valign="top" class="vncell">Use VPN description for export</td>
+						<td width="78%" class="vtable">
+							 <table border="0" cellpadding="2" cellspacing="0" summary="use vpn description">
+								<tr>
+									<td valign=top>
+										<input name="usevpndescription" id="usevpndescription" type="checkbox" value="yes" checked="CHECKED" />
+									</td>
+									<td>
+										<span class="vexpl">
+										Use the VPN description (as defined in VPN settings) as the prefix for exported configuration files, rather than an auto-generated combination of hostname, protocol, and port. This makes the client install package more consistent and user-friendly. The username or certificate name will still be appended to the generated filename, e.g. <i><b>acme-inc-wiley.ovpn</b></i></span>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<span class="vexpl"><br/>NOTE: Non-alphanumeric characters will be stripped from the description prior to export.</span>
 									</td>
 								</tr>
 							</table>
