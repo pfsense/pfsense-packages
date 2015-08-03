@@ -1,7 +1,7 @@
 <?php 
 /*
 	vpn_openvpn_export_shared.php
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org)
 	Copyright (C) 2008 Shrew Soft Inc.
 	Copyright (C) 2010 Ermal Luçi
 	Copyright (C) 2011-2015 ESF, LLC
