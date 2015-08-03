@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 	<![CDATA[
@@ -8,7 +8,7 @@
 /* ========================================================================== */
 /*
 	ntopng.xml
-	part of pfSense (https://www.pfsense.org/)
+	part of pfSense (http://www.pfSense.com)
 	Copyright (C) 2014 ESF, LLC
 	All rights reserved.
 */
@@ -146,7 +146,7 @@
 		config_lock();
 		global $config;
 		global $input_errors;
-		global $pf_version;
+		global $pf_version, $scripts_path, $fonts_path;
 		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($_POST) {
 			$config['installedpackages']['ntopng']['config'] = array();
@@ -271,7 +271,7 @@
 		$geolite_city_v6 = "https://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz";
 		$geoip_asnum = "https://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz";
 		$geoip_asnum_v6 = "https://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz";
-		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+
 		if ($pf_version == "2.1" || $pf_version == "2.2") {
 			$output_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng";
 		} else {
@@ -287,7 +287,6 @@
 		restart_service("ntopng");
 	}
 	function ntopng_fixup_geoip() {
-		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($pf_version == "2.1" || $pf_version == "2.2") {
 			$target_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/local/share/ntopng/httpdocs/geoip";
 			$source_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng";
@@ -330,7 +329,6 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		exec("rm /usr/local/etc/rc.d/ntopng*");
-		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($pf_version == "2.1" || $pf_version == "2.2") {
 			if (is_dir("/usr/local/share/ntopng/")) {
 				exec("rm -rf /usr/local/share/ntopng/");
