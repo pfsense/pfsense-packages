@@ -1,7 +1,7 @@
 <?php
 /*
 	openvpnexport.inc
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	Copyright (C) 2011 Marcello Coutinho
 	All rights reserved.
 
