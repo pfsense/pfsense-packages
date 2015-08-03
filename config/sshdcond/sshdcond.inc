@@ -68,10 +68,8 @@ function sshdcond_custom_php_write_config() {
 	global $g, $config, $pkg_interface;
 
 	/* Detect boot process, do nothing during boot. */
-	if ($g['booting']) {
-		if ($pkg_interface == "console") {
+	if (platform_booting()) {
 			return;
-		}
 	}
 
 	conf_mount_rw();
