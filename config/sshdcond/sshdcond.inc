@@ -69,7 +69,7 @@ function sshdcond_custom_php_write_config() {
 
 	/* Detect boot process, do nothing during boot. */
 	if (platform_booting()) {
-			return;
+		return;
 	}
 
 	conf_mount_rw();
