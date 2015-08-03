@@ -184,7 +184,7 @@
 		function sync_package_softflowd() {
 			conf_mount_rw();
 			config_lock();
-			global $config, $g;
+			global $config;
 			$cf = $config['installedpackages']['softflowd']['config'][0];
 			$interface_list = explode(",", $cf['interface']);
 			if (!empty($cf['host']) && !empty($interface_list)) {
