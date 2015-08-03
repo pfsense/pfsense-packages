@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ====================================================================================== */
 /*
-	checkmk.xml
+	checkmk_sync.xml
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2013 Marcello Coutinho
 	Copyright (C) 2015 ESF, LLC
