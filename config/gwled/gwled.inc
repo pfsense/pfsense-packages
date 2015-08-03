@@ -30,17 +30,13 @@
 
 require_once("functions.inc");
 
-function gwled_running () {
-	return ((int)exec('/bin/pgrep -f gwled | /usr/bin/wc -l') > 0);
-}
-
 function sync_package_gwled() {
 	global $config;
 	$gwled_config = $config['installedpackages']['gwled']['config'][0];
 	led_normalize();
 	/* Kill all instances of gwled */
-	if (gwled_running()) {
-		gwled_stop();
+	if (is_process_running("gwled")) {
+		mwexec("/bin/pkill -9 -f gwled");
 	}
 	gwled_start();
 }
@@ -60,10 +56,6 @@ function gwled_start() {
 		mwexec("/usr/local/bin/minicron {$interval} /var/run/gwled.pid /usr/local/bin/gwled.php");
 		mwexec_bg("/usr/local/bin/gwled.php");
 	}
-}
-
-function gwled_stop() {
-	exec("/bin/pkill -9 -f gwled");
 }
 
 function validate_form_gwled($post, &$input_errors) {
