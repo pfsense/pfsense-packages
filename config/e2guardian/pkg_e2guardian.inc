@@ -1,9 +1,8 @@
 <?php
-
 /*
 	pkg_e2guardianfx.inc
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */

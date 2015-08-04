@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -8,7 +8,7 @@
 /*
 	e2guardian_url_acl.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -37,9 +37,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianurlacl</name>
 	<version>1.0</version>
 	<title>Services: E2guardian - Access Lists</title>
@@ -165,7 +162,7 @@
 			<size>25</size>
 		</field>
 		<field>
-			<fielddescr>description</fielddescr>
+			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<type>input</type>
 			<size>80</size>
@@ -183,7 +180,7 @@
 		<field>
 			<fielddescr>Include</fielddescr>
 			<fieldname>banned_includes</fieldname>
-			<description><![CDATA[Select Include files to URL phrase filter.]]></description>
+			<description>Select Include files to URL phrase filter.</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['e2guardianblacklistsurls']['config']]]></source>
 			<source_name>descr</source_name>
@@ -194,18 +191,26 @@
 			<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>banned_urllist</fieldname>
-			<description><![CDATA[Enter Banned Url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Banned URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>Regexp</fielddescr>
+			<fielddescr>RegExp</fielddescr>
 			<fieldname>bannedregexp_urllist</fieldname>
-			<description><![CDATA[Enter Banned Regex Url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Banned Regex URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -224,8 +229,12 @@
 		<field>
 			<fielddescr>Grey</fielddescr>
 			<fieldname>grey_urllist</fieldname>
-			<description><![CDATA[Enter Gray url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Grey URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -244,7 +253,7 @@
 		<field>
 			<fielddescr>Include</fielddescr>
 			<fieldname>exception_includes</fieldname>
-			<description><![CDATA[Select Include files to exception url lists.]]></description>
+			<description>Select Include files to exception URL lists.</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['e2guardianwhitelistsurls']['config']]]></source>
 			<source_name>descr</source_name>
@@ -255,8 +264,12 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>exception_urllist</fieldname>
-			<description><![CDATA[Enter exception url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Exception URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -265,8 +278,12 @@
 		<field>
 			<fielddescr>regexp</fielddescr>
 			<fieldname>exceptionregexp_urllist</fieldname>
-			<description><![CDATA[Enter exception regex url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Exception regexp URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -275,8 +292,12 @@
 		<field>
 			<fielddescr>file</fielddescr>
 			<fieldname>exceptionfile_urllist</fieldname>
-			<description><![CDATA[Enter exception file url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Exception File URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -293,10 +314,14 @@
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>config</fielddescr>
+			<fielddescr>Config</fielddescr>
 			<fieldname>modify_urllist</fieldname>
-			<description><![CDATA[Enter 'Modify URL List' for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Modify URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -313,10 +338,14 @@
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>config</fielddescr>
+			<fielddescr>Config</fielddescr>
 			<fieldname>log_urllist</fieldname>
-			<description><![CDATA[Enter log only url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Log Only URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -325,8 +354,12 @@
 		<field>
 			<fielddescr>regexp</fielddescr>
 			<fieldname>logregexp_urllist</fieldname>
-			<description><![CDATA[Enter log only regexp url List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Log Only regexp URL List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
