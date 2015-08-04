@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -9,7 +9,7 @@
 /*
 	e2guardian_limits.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -38,9 +38,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianlimits</name>
 	<version>1.0</version>
 	<title>Services: E2guardian</title>
@@ -102,67 +99,94 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Max upload size</fielddescr>
+			<fielddescr>Max. Upload Size</fielddescr>
 			<fieldname>maxuploadsize</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[POST protection (web upload and forms) does not block forms without any file upload, i.e. this is just for blocking or limiting uploads measured in kilobytes after MIME encoding and header bump<br>
-				use 0 for a complete block<br>
-				use higher (e.g. 512 = 512Kbytes) for limiting<br>
-				use -1 for no blocking(default)]]></description>
+			<description>
+				<![CDATA[
+				POST protection (web upload and forms) does not block forms without any file upload, i.e. this is just for blocking or limiting uploads.<br/>
+				Measured in kibibytes (KiB) after MIME encoding and header bump.<br/>
+				Use 0 for a complete block.<br/>
+				Use a higher value (e.g. 512 = 512KiB) for limiting.<br/>
+				Use -1 for no blocking (default).<br/>
+				Leave empty to use global 'Max. Upload Size Limit' value.
+				]]>
+			</description>
 		</field>
 		<field>
-			<fielddescr>Max content filter size</fielddescr>
+			<fielddescr>Max. Content Filter Size</fielddescr>
 			<fieldname>maxcontentfiltersize</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[<strong>Default is 256</strong><br>Sometimes web servers label binary files as text which can be very large which causes a huge drain on memory and cpu resources.<br>
-				To counter this, you can limit the size of the document to be filtered and get it to just pass it straight through.<br>
-				This setting also applies to content regular expression modification.<br>
-				The value must not be higher than maxcontentramcachescansize<br>
-				The size is in Kibibytes - eg 2048 = 2Mb<br>
-				use 0 to set it to maxcontentramcachescansize]]></description>
+			<description>
+				<![CDATA[
+				Sometimes web servers serve binary files as plaintext MIME type. These can be very large and may cause a huge drain on memory and CPU resources.<br/>
+				To counter this, you can limit the size of the document to be filtered and get it to just pass straight through.<br/>
+				This setting also applies to content regular expression modification.<br/><br/>
+				The value must not be higher than 'Max. Content RAM Cache Scan Size'.<br/>
+				The size is in kibibytes; e.g. 2048 = 2MiB.<br/>
+				Use 0 to set it to 'Max. Content RAM Cache Scan Size'.<br/>
+				<strong>Default is 256.</strong>
+				]]>
+			</description>
 		</field>
 		<field>
-			<fielddescr>Max content ram cache scan size</fielddescr>
+			<fielddescr>Max. Content RAM Cache Scan Size</fielddescr>
 			<fieldname>maxcontentramcachescansize</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[<strong>Default is 2000</strong><br>
-				This is only used if you use a content scanner plugin such as AV. This is the max size of file that E2guardian will download and cache in RAM.<br>
-				After this limit is reached it will cache to disk. This value must be less than or equal to maxcontentfilecachescansize.<br>
-				The size is in Kibibytes - eg 10240 = 10Mb<br>
-				use 0 to set it to maxcontentfilecachescansize<br>
-				This option may be ignored by the configured download manager.]]></description>
+			<description>
+				<![CDATA[
+				Only used if you use a content scanner plugin, such as AV. This is the max. size of a file that E2guardian will download and cache in RAM.<br/>
+				After this limit is reached, E2guardian will cache to disk. This value must be less than or equal to 'Max. Content File Cache Scan Size'.<br/><br/>
+				The size is in kibibytes; e.g. 10240 = 10MiB.<br/>
+				Use 0 to set it to 'Max. Content File Cache Scan Size'.<br/>
+				This option may be ignored by the configured download manager.<br/>
+				<strong>Default is 2000.</strong>
+				]]>
+			</description>
 		</field>
 		<field>
-			<fielddescr>Max content file cache scan size</fielddescr>
+			<fielddescr>Max. Content File Cache Scan Size</fielddescr>
 			<fieldname>maxcontentfilecachescansize</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[<strong>Default is 2000</strong><br>
-				This is only used if you use a content scanner plugin such as AV. This is the max size file that E2guardian will download so that it can be scanned or virus checked.<br>
-				This value must be greater or equal to maxcontentramcachescansize.<br>
-				The size is in Kibibytes - eg 10240 = 10Mb]]></description>
+			<description>
+				<![CDATA[
+				Only used if you use a content scanner plugin, such as AV. This is the max. size of file that E2guardian will download so that it can be scanned or virus checked.<br/>
+				This value must be greater or equal to 'Max. Content RAM Cache Scan Size'.<br/>
+				The size is in kibibytes - e.g. 10240 = 10MiB.<br/>
+				<strong>Default is 2000.</strong>
+				]]>
+			</description>
 		</field>
 		<field>
-			<fielddescr>Initial Trickle delay</fielddescr>
+			<fielddescr>Initial Trickle Delay</fielddescr>
 			<fieldname>initialtrickledelay</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[<strong>Default is 20</strong><br>
-				This is the number of seconds a browser connection is left waiting before first being sent *something* to keep it alive.<br>
-				Do not choose a value too low or normal web pages will be affected. A value between 20 and 110 would be sensible<br>
-				This may be ignored by the configured download manager.]]></description>
+			<description>
+				<![CDATA[
+				Number of seconds a browser connection is left waiting before being sent some packets to keep it alive for the first time.<br/>
+				Do not choose a value too low, or normal web pages will be affected. A value between 20 and 110 would be sensible.<br/>
+				Depends on the download manager chosen. This may be ignored by the configured download manager.<br/>
+				<strong>Default is 20.</strong>
+				]]>
+			</description>
 		</field>
 		<field>
-			<fielddescr>Trickle delay</fielddescr>
+			<fielddescr>Trickle Delay</fielddescr>
 			<fieldname>trickledelay</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[<strong>Default is 20</strong><br>
-				This is the number of seconds a browser connection is left waiting before being sent more *something* to keep it alive.<br>
-				This may be ignored by the configured download manager.]]></description>
+			<description>
+				<![CDATA[
+				Number of seconds a browser connection is left waiting before being sent more packets to keep it alive.<br/>
+				Depends on the download manager chosen. This may be ignored by the configured download manager.<br/>
+				<strong>Default is 20.</strong>
+				]]>
+			</description>
 		</field>
 	</fields>
 	<custom_php_command_before_form>
