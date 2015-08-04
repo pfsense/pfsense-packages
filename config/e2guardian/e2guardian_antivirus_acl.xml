@@ -151,8 +151,12 @@
 		<field>
 			<fielddescr>config</fielddescr>
 			<fieldname>extension_list</fieldname>
-			<description><![CDATA[Enter extension exception virus scanner list.<br/>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter extension exceptions virus scanner list.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -171,8 +175,12 @@
 		<field>
 			<fielddescr>config</fielddescr>
 			<fieldname>mime_list</fieldname>
-			<description><![CDATA[Enter mime type exception virus scanner list.<br/>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter MIME type exceptions virus scanner list.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -191,8 +199,11 @@
 		<field>
 			<fielddescr>config</fielddescr>
 			<fieldname>site_list</fieldname>
-			<description><![CDATA[Enter site exception virus scanner list.<br/>
-				Leave empty to load e2guardian defaults]]></description>
+			<description><![CDATA[
+				Enter site exceptions virus scanner list.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -211,8 +222,12 @@
 		<field>
 			<fielddescr>config</fielddescr>
 			<fieldname>url_list</fieldname>
-			<description><![CDATA[Enter url exception virus scanner list.<br/>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter URL exceptions virus scanner list.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
