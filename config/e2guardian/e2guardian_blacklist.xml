@@ -95,18 +95,22 @@
 	</tabs>
 	<fields>
 		<field>
-			<name>Blacklist options</name>
+			<name>Blacklist Options</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>List on</fielddescr>
 			<fieldname>liston</fieldname>
-			<description><![CDATA[Select where to list categories extracted from downloaded file.<br/>
-				List on Banned and Exception is useful if you want to whitelist any category downloaded from url.]]></description>
+			<description>
+				<![CDATA[
+				Select where to list categories extracted from downloaded file.<br/>
+				List on Banned and Exception is useful if you want to whitelist any category downloaded from url.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option>
-					<name>Banned only</name>
+					<name>Banned Only</name>
 					<value>banned</value>
 				</option>
 				<option>
@@ -116,10 +120,14 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Update frequency</fielddescr>
+			<fielddescr>Update Frequency</fielddescr>
 			<fieldname>cron</fieldname>
-			<description><![CDATA[Default:<strong>&nbsp;Never</strong><br/>
-				Select how often pfsense will re-download Blacklist files.]]></description>
+			<description>
+				<![CDATA[
+				Default:<strong>&nbsp;Never</strong><br/>
+				Select how often pfsense will re-download Blacklist files.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -139,11 +147,11 @@
 					<value>week</value>
 				</option>
 				<option>
-					<name>Download and update Now</name>
+					<name>Download and update NOW</name>
 					<value>force_download</value>
 				</option>
 				<option>
-					<name>Reapply downloaded list Now</name>
+					<name>Reapply downloaded list NOW</name>
 					<value>force_update</value>
 				</option>
 			</options>
@@ -151,13 +159,17 @@
 		<field>
 			<fielddescr>Blacklist URL</fielddescr>
 			<fieldname>url</fieldname>
-			<description><![CDATA[Enter FTP, HTTP or LOCAL (pfSense) URL blacklist archive.<br/>
-				File must be in tar.gz or tgz format.]]></description>
+			<description>
+				<![CDATA[
+				Enter FTP, HTTP or LOCAL (pfSense) URL blacklist archive.<br/>
+				File must be in tar.gz or tgz format.
+				]]>
+			</description>
 			<type>input</type>
 			<size>80</size>
 		</field>
 		<field>
-			<name>Custom update script</name>
+			<name>Custom Update Script</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -166,10 +178,14 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>script</fielddescr>
+			<fielddescr>Script Contents</fielddescr>
 			<fieldname>update_script</fieldname>
-			<description><![CDATA[Enter custom script to update Blacklists.<br/>
-				This script will be called by update frequency schedule.]]></description>
+			<description>
+				<![CDATA[
+				Enter custom script to update Blacklists.<br/>
+				This script will be called by update frequency schedule.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>15</rows>
