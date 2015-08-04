@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -8,7 +8,7 @@
 /*
 	e2guardian_file_acl.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -37,9 +37,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianfileacl</name>
 	<version>1.0</version>
 	<title>Services: E2guardian - Access Lists</title>
@@ -143,7 +140,7 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Group name</fielddescr>
+			<fielddescr>Group Name</fielddescr>
 			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
@@ -165,7 +162,7 @@
 			<size>25</size>
 		</field>
 		<field>
-			<fielddescr>description</fielddescr>
+			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<type>input</type>
 			<size>80</size>
@@ -183,18 +180,26 @@
 		<field>
 			<fielddescr>Extension</fielddescr>
 			<fieldname>banned_extensionlist</fieldname>
-			<description><![CDATA[Enter banned extension List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter banned extensions list for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>Mime</fielddescr>
+			<fielddescr>MIME</fielddescr>
 			<fieldname>banned_mimetypelist</fieldname>
-			<description><![CDATA[Enter banned mimetype List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter banned MIME types list for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -213,18 +218,25 @@
 		<field>
 			<fielddescr>Extension</fielddescr>
 			<fieldname>exception_extensionlist</fieldname>
-			<description><![CDATA[Enter exception extension List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description><![CDATA[
+				Enter exception extensions list for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>Mime</fielddescr>
+			<fielddescr>MIME</fielddescr>
 			<fieldname>exception_mimetypelist</fieldname>
-			<description><![CDATA[Enter exception mimetype List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter exception MIME types list for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
