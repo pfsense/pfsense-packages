@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -8,7 +8,7 @@
 /*
 	e2guardian_search_acl.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -37,9 +37,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardiansearchacl</name>
 	<version>1.0</version>
 	<title>Services: E2guardian - Access Lists</title>
@@ -165,7 +162,7 @@
 			<size>25</size>
 		</field>
 		<field>
-			<fielddescr>description</fielddescr>
+			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<type>input</type>
 			<size>80</size>
@@ -183,7 +180,7 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>banned_searchtermlist</fieldname>
-			<description><![CDATA[Enter banned Search engine regexp List for this group.]]></description>
+			<description>Enter Banned Search Engine regexp List for this group.</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -200,9 +197,9 @@
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>config</fielddescr>
+			<fielddescr>Config</fielddescr>
 			<fieldname>exception_searchtermlist</fieldname>
-			<description><![CDATA[Enter exception search term List for this group.]]></description>
+			<description>Enter Exceptions Search Term List for this group.</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -221,7 +218,7 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>weighted_searchtermlist</fieldname>
-			<description><![CDATA[Enter Search engine weighted List for this group.]]></description>
+			<description>Enter Search Engine Weighted List for this group.</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -240,7 +237,7 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>searchengineregexplist</fieldname>
-			<description><![CDATA[Enter Search engine regexp List for this group.]]></description>
+			<description>Enter Search Engine regexp List for this group.</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
