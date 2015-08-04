@@ -2,7 +2,7 @@
 /*
 	e2guardian.conf.template
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -30,516 +30,603 @@
 */
 /* ========================================================================== */
 
-#create e2guardian.conf
+/* Create e2guardian.conf */
 	$dg=<<<EOF
 # E2guardian config file for version 3.1.2
 
-# removido
 # Web Access Denied Reporting (does not affect logging)
 #
-# -1 = log, but do not block - Stealth mode
-#  0 = just say 'Access Denied'
-#  1 = report why but not what denied phrase
-#  2 = report fully
-#  3 = use HTML template file (accessdeniedaddress ignored) - recommended
-#
+# -1 = Log, but do not block - Stealth mode
+#  0 = Just say 'Access Denied'
+#  1 = Report why but not what denied phrase
+#  2 = Report fully
+#  3 = Use HTML template file (accessdeniedaddress ignored) - recommended
 #reportinglevel = {$reportlevel}
 
-# Language dir where languages are stored for internationalisation.
+
+# Language Directory
+#
+# Directory where languages are stored for internationalisation.
 # The HTML template within this dir is only used when reportinglevel
 # is set to 3. When used, E2guardian will display the HTML file instead of
-# using the perl cgi script.  This option is faster, cleaner
-# and easier to customise the access denied page.
-# The language file is used no matter what setting however.
-#
+# using the perl CGI script. This option is faster, cleaner
+# and easier to use in order to customise the access denied page.
+# However, the language file is used no matter what setting.
 languagedir = '{$e2_dir}/share/e2guardian/languages'
 
-# language to use from languagedir.
+
+# Language to Use from Language Dir
 language = '{$reportlanguage}'
+
 
 # Logging Settings
 #
-# 0 = none  1 = just denied  2 = all text based  3 = all requests
+# 0 = none
+# 1 = just denied
+# 2 = all text based
+# 3 = all requests
 loglevel = {$loglevel}
 
+
 # Log Exception Hits
-# Log if an exception (user, ip, URL, phrase) is matched and so
-# the page gets let through.  Can be useful for diagnosing
+#
+# Log if an exception (user, IP, URL, phrase) is matched and so
+# the page gets let through. Can be useful for diagnosing
 # why a site gets through the filter.
+#
 # 0 = never log exceptions
 # 1 = log exceptions, but do not explicitly mark them as such
 # 2 = always log & mark exceptions (default)
 logexceptionhits = {$logexceptionhits}
 
+
 # Log File Format
+#
 # 1 = E2guardian format (space delimited)
 # 2 = CSV-style format
 # 3 = Squid Log File Format
 # 4 = Tab delimited
 logfileformat = {$logfileformat}
 
-# truncate large items in log lines
+
+# Truncate Large Items in Log Lines.
+#
 # 0 = no truncating (default)
 #maxlogitemlength = 0
 
-# anonymize logs (blank out usernames & IPs)
+
+# Anonymize Logs (Blank out Usernames and IPs)
 anonymizelogs = {$anonymizelogs}
 
 
-# Syslog logging
+# Syslog Logging
 #
-# Use syslog for access logging instead of logging to the file
-# at the defined or built-in "loglocation"
+# Use syslog for access logging, instead of logging to the file
+# at the defined or built-in loglocation.
 #logsyslog = off
 
-# Log file location
+
+# Log File Location
 #
 # Defines the log directory and filename.
 loglocation = '/var/log/e2guardian/access.log'
 
-# POST protection (web upload and forms)
-# does not block forms without any file upload, i.e. this is just for
-# blocking or limiting uploads
-# measured in kibibytes after MIME encoding and header bumph
-# use 0 for a complete block
-# use higher (e.g. 512 = 512Kbytes) for limiting
-# use -1 for no blocking
+
+# POST Protection (Web Upload and Forms)
+#
+# Does not block forms without any file upload, i.e. this is just for
+# blocking or limiting uploads.
+# Measured in kibibytes (KiB) after MIME encoding and header bump.
+#
+# Use 0 for a complete block.
+# Use a higher value (e.g. 512 = 512KiB) for limiting.
+# Use -1 for no blocking.
 #maxuploadsize = 512
 #maxuploadsize = 0
 maxuploadsize = {$maxuploadsize}
 
-# Statistics log file location
+
+# Statistics Log File Location
 #
 # Defines the stat file directory and filename.
-# Only used in conjunction with maxips > 0
-# Once every 3 minutes, the current number of IPs in the cache, and the most
-# that have been in the cache since the daemon was started, are written to this
+# Only used in conjunction with maxips > 0.
+#
+# Every 3 minutes, the current number of IPs in the cache, and the most used files
+# that have been in the cache since the daemon was started are written to this
 # file. IPs persist in the cache for 7 days.
 statlocation = '/var/log/e2guardian/stats'
 
 
 # Network Settings
+
+# E2guarding IPs
 #
-# the IP that E2guardian listens on.  If left blank E2guardian will
-# listen on all IPs.  That would include all NICs, loopback, modem, etc.
-# Normally you would have your firewall protecting this, but if you want
-# you can limit it to a certain IP. To bind to multiple interfaces,
+# The IP that E2guardian listens on. If left blank, E2guardian will
+# listen on all IPs. That would include all NICs, loopback, PPPoE, etc.
+# Normally you would have your firewall protecting this, but you can
+# limit this to a certain IP if desired. To bind to multiple interfaces,
 # specify each IP on an individual filterip line.
 # You can have the same IP twice so long as it has a different port.
 {$filterip}
 
-# the ports that E2guardian listens to.  Specify one line per filterip
-# line.  You can specify different authentication mechanisms per port but
-# only if the mechanisms can co-exist (e.g. basic/proxy auth can't)
+
+# E2guardian Ports
+#
+# Specify one line per filterip line.
+# You can specify different authentication mechanisms per port but
+# only if the mechanisms can co-exist. (E.g., basic and proxy auth can't.)
 #filterports = 8080
 #filterports = 8081
 {$filterports}
 
-# Map ports to IPs
-# If enabled map filterports to filterip - number of filterports must then be same as
-# number of filterip
-# If disabled will listen on all filterports on all filterips.
+
+# Map Ports to IPs
+#
+# If enabled, map filterports to filterip - number of filterports must
+# be the same as number of filterip.
+#
+# If disabled, E2guardian will listen on all filterports on all filterips.
 # on (default) | off
 #mapportstoips= off
 
 
-# the ip of the proxy (default is the loopback - i.e. this server)
+# Proxy IP
+#
+# Default is loopback {i.e., this server).
 proxyip = {$proxyip}
 
-# the port E2guardian connects to proxy on
+
+# Proxy Port
+#
+# The port E2guardian connects to the proxy on
 proxyport = {$proxyport}
 
+
+# Proxy Timeout
+#
+# Timeout Between the Proxy and E2guardian
 proxytimeout = {$proxytimeout}
 
-# Proxy header exchange
-# Set timeout between the Proxy and E2guardian
+
+# Proxy Header Exchange
+#
 # Min 20 - Max 300
 proxyexchange = 20
 
-# Pconn timeout
-# how long a persistent connection will wait for other requests
-# squid apparently defaults to 1 minute (persistent_request_timeout),
-# so wait slightly less than this to avoid duff pconns.
+
+# Persistent Connection Timeout
+#
+# How long a persistent connection will wait for other requests.
+# Squid apparently defaults to 1 minute (persistent_request_timeout),
+# so let's wait slightly less than this to avoid duff pconns.
 # Min 5 - Max 300
 pcontimeout = 55
 
+
+# Retrieve Original Destination IP
+#
 # Whether to retrieve the original destination IP in transparent proxy
 # setups and check it against the domain pulled from the HTTP headers.
 #
 # Be aware that when visiting sites which use a certain type of round-robin
-# DNS for load balancing, DG may mark requests as invalid unless DG gets
-# exactly the same answers to its DNS requests as clients.  The chances of
-# this happening can be increased if all clients and servers on the same LAN
+# DNS for load balancing, E2guardian may mark requests as invalid unless it gets
+# exactly the same answers to its DNS requests as clients. The chances of
+# this happening can increase if all clients and servers on the same LAN
 # make use of a local, caching DNS server instead of using upstream DNS
 # directly.
 #
 # See http://www.kb.cert.org/vuls/id/435052
-# on (default) | off
+# on | off (default = on)
 #!! Not compiled !! originalip = on
 
-# accessdeniedaddress is the address of your web server to which the cgi
-# e2guardian reporting script was copied. Only used in reporting levels 1 and 2.
+# Access Denied Script URL
+#
+# accessdeniedaddress is the address of your web server to which the E2guardian's
+# CGI reporting script was copied. Only used with reporting levels 1 and 2.
 #
 # This webserver must be either:
-#  1. Non-proxied. Either a machine on the local network, or listed as an exception
-#     in your browser's proxy configuration.
-#  2. Added to the exceptionsitelist. Option 1 is preferable; this option is
-#     only for users using both transparent proxying and a non-local server
-#     to host this script.
+# 1. Non-proxied. Either a machine on the local network, or listed as an exception
+#    in your browser's proxy configuration.
+# 2. Added to the exceptionsitelist.
+#
+# Option 1 is preferable; option 2 is only for users using both transparent
+# proxying and a non-local server to host this script.
 #
 # Individual filter groups can override this setting in their own configuration.
-#
 #accessdeniedaddress = 'http://YOURSERVER.YOURDOMAIN/cgi-bin/e2guardian.pl'
 {$accessdeniedaddress}
 
-# Non standard delimiter (only used with accessdeniedaddress)
-# To help preserve the full banned URL, including parameters, the variables
-# passed into the access denied CGI are separated using non-standard
+
+# Non-Standard Delimiter
+#
+# Only used with accessdeniedaddress.
+#
+# To help preserve the full banned URL including parameters, the variables
+# passed to the access denied CGI script are separated using non-standard
 # delimiters. This can be useful to ensure correct operation of the filter
 # bypass modes. Parameters are split using "::" in place of "&", and "==" in
 # place of "=".
-# Default is enabled, but to go back to the standard mode, disable it.
+#
+# Default is enabled, disable to go back to the standard mode.
 nonstandarddelimiter = {$nonstandarddelimiter}
 
 
-
-# Banned image replacement
-# Images that are banned due to domain/url/etc reasons including those
-# in the adverts blacklists can be replaced by an image.  This will,
-# for example, hide images from advert sites and remove broken image
-# icons from banned domains.
-# on (default) | off
+# Banned Image Replacement
+#
+# Images that are banned due to domain/URL etc. reasons - including those
+# in the adverts blacklists - can be replaced by an image. This will hide
+# images from advert sites and remove broken image icons from banned domains.
+# on | off (default = on)
 usecustombannedimage = {$usecustombannedimage}
 custombannedimagefile = '{$e2_dir}/share/e2guardian/transparent1x1.gif'
 
 
-#Banned flash replacement
+# Banned Flash Replacement
 usecustombannedflash = {$usecustombannedflash}
 {$custombannedflashfile}
 
-# Filter groups options
+
+# Filter Groups Options
+#
 # filtergroups sets the number of filter groups. A filter group is a set of content
-# filtering options you can apply to a group of users.  The value must be 1 or more.
+# filtering options you can apply to a group of users. The value must be 1 or more.
 # E2guardian will automatically look for e2guardianfN.conf where N is the filter
-# group.  To assign users to groups use the filtergroupslist option.  All users default
-# to filter group 1.  You must have some sort of authentication to be able to map users
-# to a group.  The more filter groups the more copies of the lists will be in RAM so
-# use as few as possible.
+# group. Use the filtergroupslist option to assign users to groups. All users default
+# to filter group 1. You must have some sort of authentication to be able to map users
+# to a group. The more filter groups, the more copies of the lists will be in RAM.
+# Use as few as possible.
 filtergroups = {$filtergroups}
 filtergroupslist = '{$e2guardian_dir}/lists/filtergroupslist'
 
 
-
-# Authentication files location
+# Authentication Files Location
 bannediplist = '{$e2guardian_dir}/lists/bannediplist'
 exceptioniplist = '{$e2guardian_dir}/lists/exceptioniplist'
 
-# Per-Room blocking definition directory
+
+# Per-Room Blocking Definition Directory
+#
 # A directory containing text files containing the room's name followed by IPs or ranges
-# Think of it as bannediplist on crack
+# Think of it as bannediplist on crack.
 perroomblockingdirectory = '{$e2guardian_dir}/lists/bannedrooms/'
 
-# Show weighted phrases found
-# If enabled then the phrases found that made up the total which excedes
-# the naughtyness limit will be logged and, if the reporting level is
-# high enough, reported. on | off
+
+# Show Weighted Phrases Found
+#
+# If enabled, the phrases found that made up the total which exceeds
+# the naughtiness limit will be logged, and - if the reporting level is
+# high enough - also reported.
+# on | off
 showweightedfound = {$showweightedfound}
 
-# Weighted phrase mode
+
+# Weighted Phrase Mode
+#
 # There are 3 possible modes of operation:
 # 0 = off = do not use the weighted phrase feature.
 # 1 = on, normal = normal weighted phrase operation.
 # 2 = on, singular = each weighted phrase found only counts once on a page.
 #
 # IMPORTANT: Note that setting this to "0" turns off all features which
-# extract phrases from page content, including banned & exception
+# extract phrases from page content, including banned and exception
 # phrases (not just weighted), search term filtering, and scanning for
 # links to banned URLs.
-#
 weightedphrasemode = {$weightedphrasemode}
 
 
-
-# Positive (clean) result caching for URLs
+# Positive (Clean) Result Caching for URLs
+#
 # Caches good pages so they don't need to be scanned again.
 # It also works with AV plugins.
+#
 # 0 = off (recommended for ISPs with users with disimilar browsing)
 # 1000 = recommended for most users
-# 5000 = suggested max upper limit
+# 5000 = suggested max. upper limit
 # If you're using an AV plugin then use at least 5000.
 urlcachenumber = {$urlcachenumber}
+
+
+# URL Cache Age
 #
-# Age before they are stale and should be ignored in seconds
-# 0 = never
-# 900 = recommended = 15 mins
+# Age (in seconds) before the cached good pages should be considered stale
+# and ignored.
+#
+# 0 = Never
+# 900 = 15 mins (recommended)
 urlcacheage ={$urlcacheage}
 
 
-
-# Cache for content (AV) scan results as 'clean'
-# By default, to save CPU, files scanned and found to be
-# clean are inserted into the clean cache and NOT scanned
-# again for a while.  If you don't like this then choose
-# to disable it.
+# Scan Clean Cache
+#
+# Cache for 'clean' content (AV) scan results.
+# By default, files scanned and found to be clean are inserted
+# into the clean cache and NOT scanned again for a while in order to
+# save CPU. If you don't like this, you can disable this behaviour.
+#
 # on = cache results; do not re-scan
 # off = do not cache; always re-scan
-# (on|off) default = on.
+# on | off (default = on)
 scancleancache = {$scancleancache}
 
-
-
-# Smart, Raw and Meta/Title phrase content filtering options
-# Smart is where the multiple spaces and HTML are removed before phrase filtering
-# Raw is where the raw HTML including meta tags are phrase filtered
-# Meta/Title is where only meta and title tags are phrase filtered (v. quick)
-# CPU usage can be effectively halved by using setting 0 or 1 compared to 2
+# Phrase Filter Mode
+#
+# This settings affects phrase content filtering options.
+# Smart - multiple spaces and HTML are removed before phrase filtering.
+# Raw - the raw HTML including meta tags are phrase filtered.
+# Meta/Title - only meta and title tags are phrase filtered (very fast).
+# CPU usage can be effectively halved by using setting 0 or 1 compared to 2.
+#
 # 0 = raw only
 # 1 = smart only
 # 2 = both of the above (default)
 # 3 = meta/title
 phrasefiltermode = {$phrasefiltermode}
 
-# Lower casing options
-# When a document is scanned the uppercase letters are converted to lower case
-# in order to compare them with the phrases.  However this can break Big5 and
-# other 16-bit texts.  If needed preserve the case.  As of version 2.7.0 accented
-# characters are supported.
+
+# Lower Casing Options
+#
+# When a document is scanned, the uppercase letters are converted to lowercase
+# in order to compare them with the phrases. However, this can break Big5 and
+# other 16-bit texts. If needed, preserve the case. (As of version 2.7.0, accented
+# characters are supported.)
+#
 # 0 = force lower case (default)
 # 1 = do not change case
 # 2 = scan first in lower case, then in original case
 preservecase = {$preservecase}
 
+
 # Note:
-# If phrasefiltermode and preserve case are both 2, this equates to 4 phrase
+# If phrasefiltermode and preserve case are both set to 2, this equates to 4 phrase
 # filtering passes. If you have a large enough userbase for this to be a
-# worry, and need to filter pages in exotic character encodings, it may be
-# better to run two instances on separate servers: one with preservecase 1
+# worry and need to filter pages in exotic character encodings, it may be
+# better to run two instances on separate servers: one with preservecase 1 set
 # (and possibly forcequicksearch 1) and non ASCII/UTF-8 phrase lists, and one
 # with preservecase 0 and ASCII/UTF-8 lists.
 
 
-
-# Hex decoding options
-# When a document is scanned it can optionally convert %XX to chars.
-# If you find documents are getting past the phrase filtering due to encoding
-# then enable.  However this can break Big5 and other 16-bit texts.
-# off = disabled (default)
-# on = enabled
+# HEX Decoding Options
+#
+# Optionally convert %XX to chars when a document is scanned.
+# Enable if you find documents are getting past the phrase filtering due to encoding.
+# However, this can break Big5 and other 16-bit texts.
+#
+# on | off (default = off)
 hexdecodecontent = {$hexdecodecontent}
 
 
-
-# Force Quick Search rather than DFA search algorithm
+# Force Quick Search
+#
+# Force Quick Search rather than DFA search algorithm.
 # The current DFA implementation is not totally 16-bit character compatible
-# but is used by default as it handles large phrase lists much faster.
-# If you wish to use a large number of 16-bit character phrases then
+# but it is used by default as it handles large phrase lists much faster.
+#
+# If you wish to use a large number of 16-bit character phrases,
 # enable this option.
 # off (default) | on (Big5 compatible)
 forcequicksearch = {$forcequicksearch}
 
 
-
-# Reverse lookups for banned site and URLs.
-# If set to on, E2guardian will look up the forward DNS for an IP URL
-# address and search for both in the banned site and URL lists.  This would
-# prevent a user from simply entering the IP for a banned address.
-# It will reduce searching speed somewhat so unless you have a local caching
-# DNS server, leave it off and use the Blanket IP Block option in the
+# Reverse Lookups for Banned Sites and URLs
+#
+# If set to on, E2guardian will query DNS for URL's IP address and search
+# for both in the banned site and URL lists. This would prevent a user
+# from simply entering the IP for a banned address.
+#
+# This will somewhat reduce searching speed; unless you have a local caching
+# DNS server, leave this off and use the Blanket IP Block option in the
 # bannedsitelist file instead.
 reverseaddresslookups = {$reverseaddresslookups}
 
 
-
-# Reverse lookups for banned and exception IP lists.
-# If set to on, E2guardian will look up the forward DNS for the IP
-# of the connecting computer.  This means you can put in hostnames in
+# Reverse Client IP Lookups
+#
+# If set to on, E2guardian will query client's hostname in DNS for the IP
+# of the connecting computer. This means you can put in hostnames in
 # the exceptioniplist and bannediplist.
+#
 # If a client computer is matched against an IP given in the lists, then the
-# IP will be recorded in any log entries; if forward DNS is successful and a
+# IP will be recorded in any log entries; if DNS query is successful and a
 # match occurs against a hostname, the hostname will be logged instead.
-# It will reduce searching speed somewhat so unless you have a local DNS server,
+#
+# This will somewhat reduce searching speed; unless you have a local DNS server,
 # leave it off.
 reverseclientiplookups = {$reverseclientiplookups}
 
 
-# Perform reverse lookups on client IPs for successful requests.
-# If set to on, E2guardian will look up the forward DNS for the IP
-# of the connecting computer, and log host names (where available) rather than
+# Log Client Hostname
+#
+# If set to on, E2guardian will query client's IP in DNS for the hostname
+# of the connecting computer and log hostnames (where available) rather than
 # IPs against requests.
-# This is not dependent on reverseclientiplookups being enabled; however, if it
-# is, enabling this option does not incur any additional forward DNS requests.
+#
+# This is not dependent on reverseclientiplookups being enabled. However, if
+# reverseclientiplookups is enabled, enabling this option does not incur
+# any additional DNS queries.
 logclienthostnames = {$logclienthostnames}
 
 
-# Build bannedsitelist and bannedurllist cache files.
-# This will compare the date stamp of the list file with the date stamp of
-# the cache file and will recreate as needed.
-# If a .processed file exists for an item (e.g. domain/URL) list, then that
-# will be used instead, if it is up to date (i.e. newer than the unprocessed
+# Build bannedsitelist and bannedurllist Cache Files
+#
+# This will compare the time stamp of the list file with the time stamp of
+# the cache file and will recreate them as needed.
+#
+# If a .processed file exists for an item (e.g. domain/URL list), it
+# will be used instead if up-to-date (i.e., newer than the unprocessed
 # list file).
+#
 # This can increase process start speed on slow computers.
 # Fast computers do not need this option.
-# on | off, default = on
+# on | off (default = on)
 createlistcachefiles = {$createlistcachefiles}
 
 
-# Prefer cached list files
-# If enabled, E2guardian will always prefer to load ".processed" versions of
+# Prefer Cached List Files
+#
+# If enabled, E2guardian will always prefer loading ".processed" versions of
 # list files, regardless of their time stamps relative to the original
-# unprocessed lists.  This is not generally useful unless you have a specific
-# list update process which results in - for example - up-to-date, pre-sorted
+# unprocessed lists. This is not generally useful unless you have a specific
+# list update process which results in up-to-date, pre-sorted
 # ".processed" list files with dummy unprocessed files.
-# on | off, default = off
+# on | off (default = off)
 prefercachedlists = {$prefercachedlists}
 
-# Max content filter size
-# Sometimes web servers label binary files as text which can be very
-# large which causes a huge drain on memory and cpu resources.
+# Maximum Content Filter Size
+#
+# Sometimes web servers serve binary files as plaintext MIME type. These can
+# be very large and may cause a huge drain on memory and CPU resources.
 # To counter this, you can limit the size of the document to be
-# filtered and get it to just pass it straight through.
+# filtered and get it to just pass straight through.
+#
 # This setting also applies to content regular expression modification.
-# The value must not be higher than maxcontentramcachescansize
-# The size is in Kibibytes - eg 2048 = 2Mb
-# use 0 to set it to maxcontentramcachescansize
+# The value must not be higher than maxcontentramcachescansize,
+# The size is in kibibytes; e.g. 2048 = 2MiB.
+# Use 0 to set it to maxcontentramcachescansize.
 maxcontentfiltersize = {$maxcontentfiltersize}
 
 
-
-# Max content ram cache scan size
-# This is only used if you use a content scanner plugin such as AV
-# This is the max size of file that DG will download and cache
-# in RAM.  After this limit is reached it will cache to disk
+# Maximum Content RAM Cache Scan Size
+#
+# Only used if you use a content scanner plugin, such as AV.
+# This is the max. size of a file that E2guardian will download and cache
+# in RAM. After this limit is reached, E2guarding will cache to disk.
 # This value must be less than or equal to maxcontentfilecachescansize.
-# The size is in Kibibytes - eg 10240 = 10Mb
-# use 0 to set it to maxcontentfilecachescansize
+#
+# The size is in kibibytes; e.g. 10240 = 10MiB.
+# Use 0 to set it to maxcontentfilecachescansize
 # This option may be ignored by the configured download manager.
 maxcontentramcachescansize = {$maxcontentramcachescansize}
 
 
-
-# Max content file cache scan size
-# This is only used if you use a content scanner plugin such as AV
-# This is the max size file that DG will download
+# Maximum Content File Cache Scan Size
+#
+# Only used if you use a content scanner plugin, such as AV.
+# This is the max. size of file that E2guardian will download
 # so that it can be scanned or virus checked.
+#
 # This value must be greater or equal to maxcontentramcachescansize.
-# The size is in Kibibytes - eg 10240 = 10Mb
+# The size is in Kibibytes - eg 10240 = 10MiB.
 maxcontentfilecachescansize = {$maxcontentfilecachescansize}
 
 
-
-# File cache dir
-# Where DG will download files to be scanned if too large for the
-# RAM cache.
+# File Cache Directory
+#
+# Directory where E2G will download files to be scanned if their size is
+# too large for the RAM cache.
 filecachedir = '/tmp'
 
 
-
-# Delete file cache after user completes download
-# When a file gets save to temp it stays there until it is deleted.
-# You can choose to have the file deleted when the user makes a sucessful
-# download.  This will mean if they click on the link to download from
-# the temp store a second time it will give a 404 error.
-# You should configure something to delete old files in temp to stop it filling up.
-# on|off (defaults to on)
+# Delete Downloaded Temporary Files
+#
+# Deletes file cache after user completes download.
+# When a file gets save to temp, it stays there until deleted.
+# You can choose to have the file deleted when the user makes a successful
+# download. If users click on the link to download from the temp store
+# a second time, they will get a 404 error.
+#
+# You should configure something to delete old files in temp to prevent ir
+# from getting filled up.
+# on | off (default = on)
 deletedownloadedtempfiles = {$deletedownloadedtempfiles}
 
 
-
-# Initial Trickle delay
-# This is the number of seconds a browser connection is left waiting
-# before first being sent *something* to keep it alive.  The
-# *something* depends on the download manager chosen.
-# Do not choose a value too low or normal web pages will be affected.
-# A value between 20 and 110 would be sensible
+# Initial Trickle Delay
+#
+# Number of seconds a browser connection is left waiting before
+# being sent some packets to keep it alive for the first time.
+# Depends on the download manager chosen.
+#
+# Do not choose a value too low, or normal web pages will be affected.
+# A value between 20 and 110 would be sensible.
 # This may be ignored by the configured download manager.
 initialtrickledelay = {$initialtrickledelay}
 
 
-
-# Trickle delay
-# This is the number of seconds a browser connection is left waiting
-# before being sent more *something* to keep it alive.  The
-# *something* depends on the download manager chosen.
+# Trickle Delay
+#
+# Number of seconds a browser connection is left waiting
+# before being sent more packets to keep it alive.
+# Depends on the download manager chosen.
+#
 # This may be ignored by the configured download manager.
 trickledelay = {$trickledelay}
 
 
-
 # Download Managers
+#
 # These handle downloads of files to be filtered and scanned.
 # They differ in the method they deal with large downloads.
 # Files usually need to be downloaded 100% before they can be
-# filtered and scanned before being sent on to the browser.
-# Normally the browser can just wait, but with content scanning,
-# for example to AV, the browser may timeout or the user may get
-# confused so the download manager has to do some sort of
-# 'keep alive'.
+# filtered and scanned before being sent back to the browser.
+# Normally the browser can just wait, but with content scanning
+# (for example an AV) the browser may time out or the user may get
+# confused. Therefore, the download manager has to do some sort of
+# 'keepalive'.
 #
 # There are various methods possible but not all are included.
-# The author does not have the time to write them all so I have
-# included a plugin systam.  Also, not all methods work with all
-# browsers and clients.  Specifically some fancy methods don't
-# work with software that downloads updates.  To solve this,
+# The author does not have the time to write them all so a plugin
+# system is included instead. Also, not all methods work with all
+# browsers and clients. Specifically, some fancy methods don't
+# work with software that downloads updates. To solve this,
 # each plugin can support a regular expression for matching
 # the client's user-agent string, and lists of the mime types
 # and extensions it should manage.
 #
-# Note that these are the matching methods provided by the base plugin
-# code, and individual plugins may override or add to them.
+# Note that these are matching methods provided by the base plugin
+# code; individual plugins may override or add to them.
 # See the individual plugin conf files for supported options.
 #
-# The plugins are matched in the order you specify and the last
+# The plugins are matched in the order specified and the last
 # one is forced to match as the default, regardless of user agent
 # and other matching mechanisms.
-#
 downloadmanager = '{$e2guardian_dir}/downloadmanagers/fancy.conf'
 ##!! Not compiled !! downloadmanager = '{$e2guardian_dir}/downloadmanagers/trickle.conf'
 downloadmanager = '{$e2guardian_dir}/downloadmanagers/default.conf'
 
 
-
-# Content Scanners (Also known as AV scanners)
-# These are plugins that scan the content of all files your browser fetches
-# for example to AV scan.  The options are limitless.  Eventually all of
-# E2guardian will be plugin based.  You can have more than one content
+# Content Scanners (a.k.a. AV Scanners)
+#
+# These are plugins that scan the content of all files your browser fetches,
+# for example an AV scan. The options are limitless. Eventually, all of
+# E2guardian will be plugin based. You can have more than one content
 # scanner. The plugins are run in the order you specify.
 # This is one of the few places you can have multiple options of the same name.
 #
-# Some of the scanner(s) require 3rd party software and libraries eg clamav.
+# Some of the scanner(s) require 3rd party software and libraries, e.g. ClamAV.
 # See the individual plugin conf file for more options (if any).
-#
 {$contentscanners}
 
 
-# Content scanner timeout
-# Some of the content scanners support using a timeout value to stop
-# processing (eg AV scanning) the file if it takes too long.
-# If supported this will be used.
+# Content Scanner Timeout
+#
+# Some of the content scanners support setting a timeout value to stop
+# processing (e.g. AV scanning) the file when it takes too long.
+# This will only be used if supported by the content scanner.
+#
 # The default of 60 seconds is probably reasonable.
 contentscannertimeout = {$contentscannertimeout}
 
 
-
-# Content scan exceptions
-# If 'on' exception sites, urls, users etc will be scanned
-# This is probably not desirable behavour as exceptions are
+# Content Scan Exceptions
+#
+# If on, exception sites, URLs, users, etc. will be scanned.
+# This is probably not desirable behaviour, since exceptions are
 # supposed to be trusted and will increase load.
-# Correct use of grey lists are a better idea.
-# (on|off) default = off
+# Correct usage of grey lists is a better idea.
+# on | off (default = off)
 contentscanexceptions = {$contentscanexceptions}
 
 
-
-# Auth plugins
+# Auth Plugins
+#
 # These replace the usernameidmethod* options in previous versions. They
-# handle the extraction of client usernames from various sources, such as
-# Proxy-Authorisation headers and ident servers, enabling requests to be
+# handle the extraction of clients' usernames from various sources, such as
+# Proxy-Authorization headers and ident servers, enabling requests to be
 # handled according to the settings of the user's filter group.
+#
 # Multiple plugins can be specified, and will be used per port in the order
-# filterports are listed.
-#
-# If you do not use multiple filter groups, you need not specify this option.
-#
+# filterports are listed. If you do not use multiple filter groups,
+# you do not have to specify this option.
 #authplugin = '{$e2guardian_dir}/authplugins/proxy-basic.conf'
 #authplugin = '{$e2guardian_dir}/authplugins/proxy-digest.conf'
 #authplugin = '{$e2guardian_dir}/authplugins/proxy-ntlm.conf'
@@ -548,11 +635,13 @@ contentscanexceptions = {$contentscanexceptions}
 {$authplugin}
 
 
-# Re-check replaced URLs
+# Re-Check Replaced URLs
+#
 # As a matter of course, URLs undergo regular expression search/replace (urlregexplist)
 # *after* checking the exception site/URL/regexpURL lists, but *before* checking against
 # the banned site/URL lists, allowing certain requests that would be matched against the
-# latter in their original state to effectively be converted into grey requests.
+# latter in their original state to be effectively converted into grey requests.
+#
 # With this option enabled, the exception site/URL/regexpURL lists are also re-checked
 # after replacement, making it possible for URL replacement to trigger exceptions based
 # on them.
@@ -560,78 +649,97 @@ contentscanexceptions = {$contentscanexceptions}
 recheckreplacedurls = {$recheckreplacedurls}
 
 
+# Misc Options
 
-# Misc settings
-
-# if on it adds an X-Forwarded-For: <clientip> to the HTTP request
-# header.  This may help solve some problem sites that need to know the
-# source ip. on | off
+# Add X-Forwarded-For Header
+#
+# If on, this adds an X-Forwarded-For: <clientip> to the HTTP request
+# header. This may help solve some problem sites that need to know the
+# source ip.
+# on | off
 forwardedfor = {$forwardedfor}
 
 
-# if on it uses the X-Forwarded-For: <clientip> to determine the client
-# IP. This is for when you have squid between the clients and E2guardian.
-# Warning - headers are easily spoofed. on | off
+# Use X-Forwarded-For Header to Determine the Client IP
+#
+# If on, the X-Forwarded-For: <clientip> is used to determine the client
+# IP. This is used when you have Squid between the clients and E2guardian.
+# Warning - headers are easily spoofed.
+# on | off
 usexforwardedfor = {$usexforwardedfor}
 
-
-# if on it logs some debug info regarding fork()ing and accept()ing which
-# can usually be ignored.  These are logged by syslog.  It is safe to leave
-# it on or off
+# Log Connection Handling Errors
+#
+# If on, some debug info regarding fork()ing and accept()ing (which
+# can usually be ignored) is logged. These are logged by syslog.
+# Safe to leave this off.
 logconnectionhandlingerrors = {$logconnectionhandlingerrors}
 
 
+# Fork Pool Options
 
-# Fork pool options
-
-# If on, this causes DG to write to the log file whenever child processes are
-# created or destroyed (other than by crashes). This information can help in
-# understanding and tuning the following parameters, but is not generally
-# useful in production.
+# Log Child Process Handling
+#
+# If on, E2guardian will log child processes created or destroyed (other than by
+# crashes). This information can help in understanding and tuning the following
+# parameters, but is not generally useful in production.
 logchildprocesshandling = {$logchildprocesshandling}
 
-# sets the maximum number of processes to spawn to handle the incoming
-# connections.  Max value usually 250 depending on OS.
-# On large sites you might want to try 180.
+
+# Max. Children
+#
+# Sets the maximum number of processes to spawn to handle the incoming
+# connections. Max value usually 250 depending on OS.
+# On large sites, you might want to try 180.
 maxchildren = {$maxchildren}
 
 
-# sets the minimum number of processes to spawn to handle the incoming connections.
-# On large sites you might want to try 32.
+# Min. Children
+#
+# Sets the minimum number of processes to spawn to handle the incoming
+# connections. On large sites, you might want to try 32.
 minchildren = {$minchildren}
 
 
-# sets the minimum number of processes to be kept ready to handle connections.
-# On large sites you might want to try 8.
+# Min. Spare Children
+#
+# Sets the minimum number of processes to be kept ready to handle connections.
+# On large sites, you might want to try 8.
 minsparechildren = {$minsparechildren}
 
 
-# sets the minimum number of processes to spawn when it runs out
-# On large sites you might want to try 10.
+# Prefork Children
+#
+# Sets the minimum number of processes to spawn when it runs out of inactive
+# processes.
+# On large sites, you might want to try 10.
 preforkchildren = {$preforkchildren}
 
 
-# sets the maximum number of processes to have doing nothing.
-# When this many are spare it will cull some of them.
-# On large sites you might want to try 64.
+# Max. Spare Children
+#
+# Sets the maximum number of processes to have doing nothing.
+# When this many are spare, E2guarding will cull some of them.
+# On large sites, you might want to try 64.
 maxsparechildren = {$maxsparechildren}
 
-
-# sets the maximum age of a child process before it croaks it.
+# Max. Age Children
+#
+# Sets the maximum age of a child process before killing it.
 # This is the number of connections they handle before exiting.
-# On large sites you might want to try 10000.
+# On large sites, you might want to try 10000.
 maxagechildren = {$maxagechildren}
 
-
-# Sets the maximum number client IP addresses allowed to connect at once.
+# Max. IPs
+#
+# Sets the maximum number of client IP addresses allowed to connect at once.
 # Use this to set a hard limit on the number of users allowed to concurrently
-# browse the web. Set to 0 for no limit, and to disable the IP cache process.
+# browse the web. Set to 0 for no limit, this also disables the IP cache process.
 maxips = {$maxips}
 
 
-
 # Process options
-# (Change these only if you really know what you are doing).
+# *** Change these only if you really know what you are doing!!! ***
 # These options allow you to run multiple instances of E2guardian on a single machine.
 # Remember to edit the log file path above also if that is your intention.
 
@@ -640,92 +748,120 @@ maxips = {$maxips}
 # Defines IPC server directory and filename used to communicate with the log process.
 ipcfilename = '/tmp/.dguardianipc'
 
-# URL list IPC filename
+
+# URL List IPC Filename
 #
 # Defines URL list IPC server directory and filename used to communicate with the URL
 # cache process.
 urlipcfilename = '/tmp/.dguardianurlipc'
 
-# IP list IPC filename
+
+# IP List IPC Filename
 #
-# Defines IP list IPC server directory and filename, for communicating with the client
+# Defines IP list IPC server directory and filename for communication with the client
 # IP cache process.
 ipipcfilename = '/tmp/.dguardianipipc'
 
-# PID filename
+
+# PID Filename
 #
 # Defines process id directory and filename.
 #pidfilename = '/var/run/e2guardian.pid'
 
-# Disable daemoning
-# If enabled the process will not fork into the background.
+
+# Disable Daemonize
+#
+# If enabled, the process will not fork into the background.
 # It is not usually advantageous to do this.
-# on|off (defaults to off)
+# on | off (defaults to off)
 nodaemon = {$nodaemon}
 
-# Disable logging process
-# on|off (defaults to off)
+
+# Disable Logging Process
+#
+# on | off (defaults to off)
 nologger = {$nologger}
 
+
 # Enable logging of "ADs" category blocks
-# on|off (defaults to off)
+#
+# on | off (defaults to off)
 logadblocks = {$logadblocks}
 
-# Enable logging of client User-Agent
+
+# Enable Logging of Client User-Agent
+#
 # Some browsers will cause a *lot* of extra information on each line!
-# on|off (defaults to off)
+# on | off (default = off)
 loguseragent = {$loguseragent}
 
-# Daemon runas user and group
-# This is the user that E2guardian runs as.  Normally the user/group nobody.
-# Uncomment to use.  Defaults to the user set at compile time.
+
+# Daemon User and Group
+#
+# This is the user/group that E2guardian runs as. Normally nobody/nobody.
+# Uncomment to use. Defaults to the user set at compile time.
+#
 # Temp files created during virus scanning are given owner and group read
 # permissions; to use content scanners based on external processes, such as
 # clamdscan, the two processes must run with either the same group or user ID.
 daemonuser = '{$daemonuser}'
 daemongroup = '{$daemongroup}'
 
-# Soft restart
-# When on this disables the forced killing off all processes in the process group.
+
+# Soft Restart
+#
+# When on, forced killing off all processes in the process group is disabled.
 # This is not to be confused with the -g run time option - they are not related.
-# on|off (defaults to off)
+# on | off (default = off)
 softrestart = {$softrestart}
 
+
 # Mail program
-# Path (sendmail-compatible) email program, with options.
+#
+# Path to (sendmail-compatible) email program, with options.
 # Not used if usesmtp is disabled (filtergroup specific).
 #!! Not compiled !!mailer = '/usr/sbin/sendmail -t'
 
-#SSL certificate checking path
-#Path to CA certificates used to validate the certificates of https sites.
+
+# SSL certificate checking path
+#
+# Path to CA certificates used to validate the certificates of HTTPS sites.
 sslcertificatepath = '/usr/local/share/certs/'
 
-#SSL man in the middle
-#CA certificate path
-#Path to the CA certificate to use as a signing certificate for
-#generated certificates.
-#cacertificatepath = '/home/stephen/dginstall/ca.pem'
+
+# SSL Man-in-the-Middle Options
+
+# CA Certificate Path
+#
+# Path to the CA certificate to use as a signing certificate for
+# generated certificates.
+#cacertificatepath = '/home/stephen/e2ginstall/ca.pem'
 {$ca_pem}
 
-#CA private key path
-#path to the private key that matches the public key in the CA certificate.
-#caprivatekeypath = '/home/stephen/dginstall/ca.key'
+# CA Private Key Path
+#
+# Path to the private key of the CA certificate.
+#caprivatekeypath = '/home/stephen/e2ginstall/ca.key'
 {$ca_pk}
 
-#Cert private key path
-#The public / private key pair used by all generated certificates
-#certprivatekeypath = '/home/stephen/dginstall/cert.key'
+# Certificate Private Key Path
+#
+# The public / private key pair used by all generated certificates.
+#certprivatekeypath = '/home/stephen/e2ginstall/cert.key'
 {$cert_key}
 
-#Generated cert path
-#The location where generated certificates will be saved for future use.
-#(must be writable by the dg user)
-#generatedcertpath = '/home/stephen/dginstall/generatedcerts/'
+# Generated Cert Path
+#
+# The location where generated certificates will be saved for future use.
+# (Must be writable by daemonuser.)
+#generatedcertpath = '/home/stephen/e2ginstall/generatedcerts/'
 {$generatedcertpath}
-#Generated link path = ''
-#The location where symlinks to certificates will be created.
-#(must be writable by the dg user)
-#generatedlinkpath = '/home/stephen/dginstall/generatedlinks/'
+
+# Generated Link Path
+#
+# The location where symlinks to certificates will be created.
+# (Must be writeable by daemonuser.}
+#generatedlinkpath = '/home/stephen/e2ginstall/generatedlinks/'
 {$generatedlinkpath}
 
 EOF;
