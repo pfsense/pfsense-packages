@@ -4,7 +4,7 @@
 /*
 	e2guardian.php
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -56,7 +56,7 @@ function fetch_blacklist($log_notice = true, $install_process = false) {
 			unlink_if_exists("/usr/local/pkg/blacklist.tgz");
 			exec("/usr/bin/fetch -o /usr/local/pkg/blacklist.tgz " . escapeshellarg($url), $output, $return);
 		} else {
-			//install process
+			// install process
 			if (file_exists("/usr/local/pkg/blacklist.tgz")) {
 				update_output_window("Found previous blacklist database, skipping download...");
 				$return = 0;
@@ -69,9 +69,9 @@ function fetch_blacklist($log_notice = true, $install_process = false) {
 			}
 		}
 		if ($return == 0) {
-			chdir (E2GUARDIAN_DIR . "/etc/e2guardian/lists");
+			chdir(E2GUARDIAN_DIR . "/etc/e2guardian/lists");
 			if (is_dir ("blacklists.old")) {
-				exec ('rm -rf '.E2GUARDIAN_DIR . '/etc/e2guardian/lists/blacklists.old');
+				exec ('/bin/rm -rf '.E2GUARDIAN_DIR . '/etc/e2guardian/lists/blacklists.old');
 			}
 			rename("blacklists", "blacklists.old");
 			exec('/usr/bin/tar -xvzf /usr/local/pkg/blacklist.tgz 2>&1', $output, $return);
@@ -98,21 +98,21 @@ function read_lists($log_notice=true, $uw="") {
 	global $config, $g;
 	$group_type = array();
 	$dir = E2GUARDIAN_DIR . "/etc/e2guardian/lists";
-	// Read e2guardian lists dirs
+	// read e2guardian lists dirs
 	$groups = array("phraselists", "blacklists", "whitelists");
-	// Assigns know list files
+	// assigns know list files
 	$types = array('domains', 'urls', 'banned', 'weighted', 'exception', 'expression');
 
-	// Clean previous xml config for e2guardian lists
+	// clean previous xml config for e2guardian lists
 	foreach ($config['installedpackages'] as $key => $values) {
 		if (preg_match("/e2guardian(phrase|black|white)lists/", $key)) {
 			unset ($config['installedpackages'][$key]);
 		}
 	}
-	//find lists
+	// find lists
 	foreach ($groups as $group) {
 		if (is_dir("$dir/$group/")) {
-			//read dir content and find lists
+			// read dir content and find lists
 			$lists = scandir("$dir/$group/");
 			foreach ($lists as $list) {
 				if (!preg_match ("/^\./", $list) && is_dir("$dir/$group/$list/")) {
@@ -124,7 +124,7 @@ function read_lists($log_notice=true, $uw="") {
 								$subcategory = scandir("$dir/$group/$list/$subdir/");
 								foreach ($subcategory as $file) {
 									if (!preg_match ("/^\./", $file)) {
-										//assign list to array
+										// assign list to array
 										$type = split("_", $file);
 										if (preg_match("/(\w+)/", $type[0], $matches)) {
 											$xml_type = $matches[1];
@@ -136,7 +136,7 @@ function read_lists($log_notice=true, $uw="") {
 									}
 								}
 							} else {
-								//assign list to array
+								// assign list to array
 								$type = split("_", $file);
 								if (preg_match("/(\w+)/", $type[0], $matches)) {
 									$xml_type=$matches[1];
@@ -152,6 +152,7 @@ function read_lists($log_notice=true, $uw="") {
 			}
 		}
 	}
+
 	conf_mount_rw();
 	$files = array("site", "url");
 	foreach ($files as $edit_xml) {
