@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -9,7 +9,7 @@
 /*
 	e2guardian_limits.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -38,9 +38,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianpicsacl</name>
 	<version>1.0</version>
 	<title>Services: E2guardian - Access Lists</title>
@@ -166,7 +163,7 @@
 			<size>25</size>
 		</field>
 			<field>
-			<fielddescr>description</fielddescr>
+			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<type>input</type>
 			<size>80</size>
@@ -178,10 +175,14 @@
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>config</fielddescr>
+			<fielddescr>Config</fielddescr>
 			<fieldname>pics</fieldname>
-			<description><![CDATA[Enter pics config for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter pics config for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>70</rows>
