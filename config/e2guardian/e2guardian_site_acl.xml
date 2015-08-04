@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -8,7 +8,7 @@
 /*
 	e2guardian_site_acl.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -37,9 +37,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardiansiteacl</name>
 	<version>1.0</version>
 	<title>Services: E2guardian - Access Lists</title>
@@ -165,7 +162,7 @@
 			<size>25</size>
 		</field>
 		<field>
-			<fielddescr>description</fielddescr>
+			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<type>input</type>
 			<size>80</size>
@@ -183,7 +180,7 @@
 		<field>
 			<fielddescr>Include</fielddescr>
 			<fieldname>banned_includes</fieldname>
-			<description><![CDATA[Select Include files to banned phrase filter.]]></description>
+			<description>Select Include files to banned phrase filter.</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['e2guardianblacklistsdomains']['config']]]></source>
 			<source_name>descr</source_name>
@@ -194,8 +191,12 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>banned_sitelist</fieldname>
-			<description><![CDATA[Enter Banned Site List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Banned Site List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -214,8 +215,12 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>grey_sitelist</fieldname>
-			<description><![CDATA[Enter Weighted Site List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Weighted Site List for this group.<br/>
+				Leave empty to load e2guardian defaults
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -234,7 +239,7 @@
 		<field>
 			<fielddescr>Include</fielddescr>
 			<fieldname>exception_includes</fieldname>
-			<description><![CDATA[Select Include files to exception site lists.]]></description>
+			<description>Select Include files to exception site lists.</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['e2guardianwhitelistsdomains']['config']]]></source>
 			<source_name>descr</source_name>
@@ -245,8 +250,12 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>exception_sitelist</fieldname>
-			<description><![CDATA[Enter exception Site List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Exception Site List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -255,8 +264,12 @@
 		<field>
 			<fielddescr>File</fielddescr>
 			<fieldname>exceptionfile_sitelist</fieldname>
-			<description><![CDATA[Enter exception File Site List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Exception File Site List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -275,8 +288,12 @@
 		<field>
 			<fielddescr>Config</fielddescr>
 			<fieldname>log_sitelist</fieldname>
-			<description><![CDATA[Enter log only site List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter log only site List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
