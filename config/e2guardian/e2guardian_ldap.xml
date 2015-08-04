@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -8,7 +8,7 @@
 /*
 	e2guardian_ldap.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -37,9 +37,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianldap</name>
 	<version>1.0</version>
 	<title>Services: E2guardian</title>
@@ -97,60 +94,76 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>hostname</fielddescr>
+			<fielddescr>Hostname</fielddescr>
 			<fieldname>dc</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>domain</fielddescr>
+			<fielddescr>Domain</fielddescr>
 			<fieldname>dn</fieldname>
 		</columnitem>
-
 		<columnitem>
-			<fielddescr>username</fielddescr>
+			<fielddescr>Username</fielddescr>
 			<fieldname>username</fieldname>
 		</columnitem>
 		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>Ldap configuration</name>
+			<name>LDAP Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Hostname</fielddescr>
-			<description><![CDATA[LDAP hostname example:<strong>dc1.mysite.com</strong>]]></description>
+			<description>
+				<![CDATA[
+				Example: <strong>dc1.example.com</strong>
+				]]>
+			</description>
 			<fieldname>dc</fieldname>
 			<type>input</type>
 			<size>25</size>
 		</field>
 		<field>
 			<fielddescr>Domain</fielddescr>
-			<description><![CDATA[LDAP Domain example:<strong> dc=mysite,dc=com</strong>]]></description>
+			<description>
+				<![CDATA[
+				Example: <strong>dc=example,dc=com</strong>
+				]]>
+			</description>
 			<fieldname>dn</fieldname>
 			<type>input</type>
 			<size>25</size>
 		</field>
 		<field>
 			<fielddescr>Username</fielddescr>
-			<description><![CDATA[Username Example:<strong>cn=antispam,cn=Users OR username@mysite.com</strong>]]></description>
+			<description>
+				<![CDATA[
+				Example 1: <strong>cn=antispam,cn=Users</strong><br/>
+				Example 2: <strong>username@example.com</strong>
+				]]>
+			</description>
 			<fieldname>username</fieldname>
 			<type>input</type>
 			<size>25</size>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
-			<description><![CDATA[User password]]></description>
+			<description>User password</description>
 			<fieldname>password</fieldname>
 			<type>password</type>
 			<size>10</size>
 		</field>
 		<field>
-			<fielddescr>mask</fielddescr>
-			<description><![CDATA[Default: USER<br>Apply prefix or suffix any info to username extracted.<br>
-				use "," if you need more than one mask for each user<br>
-				<strong>domain\USER #NAME,USER@MYDOMAIN.COM</strong><br>
-				NAME shows user name<br>
-				USER shows user login<br>]]></description>
+			<fielddescr>Mask</fielddescr>
+			<description>
+				<![CDATA[
+				Default: USER<br/>Apply prefix or suffix any info to the username extracted.<br/>
+				Use "," if you need more than one mask for each user.<br/><br/>
+				<strong>domain\USER #NAME,USER@EXAMPLE.COM</strong><br/>
+				NAME shows user name<br/>
+				USER shows user login<br/>
+				]]>
+			</description>
 			<fieldname>mask</fieldname>
 			<type>input</type>
 			<size>50</size>
