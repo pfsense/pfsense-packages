@@ -159,9 +159,6 @@
 			<description>Choose the way script will run.</description>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		filer_install();
-	</custom_php_install_command>
 	<custom_php_validation_command>
 		filer_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
