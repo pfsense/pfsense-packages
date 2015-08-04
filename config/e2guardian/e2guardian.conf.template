@@ -139,7 +139,7 @@ statlocation = '/var/log/e2guardian/stats'
 
 # Network Settings
 
-# E2guarding IPs
+# E2guardian IPs
 #
 # The IP that E2guardian listens on. If left blank, E2guardian will
 # listen on all IPs. That would include all NICs, loopback, PPPoE, etc.
@@ -489,7 +489,7 @@ maxcontentfiltersize = {$maxcontentfiltersize}
 #
 # Only used if you use a content scanner plugin, such as AV.
 # This is the max. size of a file that E2guardian will download and cache
-# in RAM. After this limit is reached, E2guarding will cache to disk.
+# in RAM. After this limit is reached, E2guardian will cache to disk.
 # This value must be less than or equal to maxcontentfilecachescansize.
 #
 # The size is in kibibytes; e.g. 10240 = 10MiB.
@@ -719,7 +719,7 @@ preforkchildren = {$preforkchildren}
 # Max. Spare Children
 #
 # Sets the maximum number of processes to have doing nothing.
-# When this many are spare, E2guarding will cull some of them.
+# When this many are spare, E2guardian will cull some of them.
 # On large sites, you might want to try 64.
 maxsparechildren = {$maxsparechildren}
 
