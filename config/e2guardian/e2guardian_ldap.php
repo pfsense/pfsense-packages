@@ -55,13 +55,13 @@ function get_ldap_members($group, $user, $password) {
 	print "{$ldap_host} {$ldap_dn}\n";
 	$ldap = ldap_connect($ldap_host) or die("Could not connect to LDAP");
 
-	// OPTIONS TO AD
+	// Active Directory options
 	ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
 	ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
 
 	ldap_bind($ldap, $user, $password) or die("Could not bind to LDAP");
 
-	//check if group is just a name or an ldap string
+	// check if group is just a name or an ldap string
 	$group_cn = (preg_match("/cn=/i", $group)? $group : "cn={$group}");
 
 	$results = ldap_search($ldap, $ldap_dn, $group_cn, $LDAPFieldsToFind);
@@ -90,10 +90,7 @@ function get_ldap_members($group, $user, $password) {
 	ldap_unbind($ldap);
 }
 
-// Read Pfsense config
 global $config, $g;
-
-#mount filesystem writable
 conf_mount_rw();
 
 $id = 0;
@@ -102,30 +99,30 @@ if (is_array($config['installedpackages']['e2guardiangroups']['config'])) {
 	foreach ($config['installedpackages']['e2guardiangroups']['config'] as $group) {
 		//ignore default group
 		if ($id > 0) {
-			$ldap_group_source=(preg_match("/description/", $argv[1]) ? "description" : "name");
+			$ldap_group_source = (preg_match("/description/", $argv[1]) ? "description" : "name");
 			if ($argv[2] == $group[$ldap_group_source]) {
 				$members = "";
 				$ldap_servers = explode (',', $group['ldap']);
-				echo  "Group : {$group['name']}({$group['description']})\n";
+				echo "Group : {$group['name']}({$group['description']})\n";
 				if (is_array($config['installedpackages']['e2guardianldap']['config'])) {
 					foreach ($config['installedpackages']['e2guardianldap']['config'] as $server) {
 						if (in_array($server['dc'], $ldap_servers)) {
 							$ldap_dn = $server['dn'];
 							$ldap_host = $server['dc'];
-							$mask = (empty($server['mask'])?"USER":$server['mask']);
+							$mask = (empty($server['mask']) ? "USER" : $server['mask']);
 							if (preg_match("/cn/", $server['username'])) {
 								$ldap_username = $server['username'] . "," . $server['dn'];
 							} else {
 								$ldap_username = $server['username'];
 							}
 							$result = get_ldap_members($group[$ldap_group_source], $ldap_username, $server['password']);
-							if ($group['useraccountcontrol'] !="") {
+							if ($group['useraccountcontrol'] != "") {
 								$valid_account_codes = explode(",", $group['useraccountcontrol']);
 							}
 							foreach ($result as $mvalue) {
 								if (preg_match ("/\w+/", $mvalue[0])) {
-									#var_dump($value);
-									$name= preg_replace("/&([a-z])[a-z]+;/i", "$1", htmlentities($mvalue[1]));//preg_replace('/[^(\x20-\x7F)]*/','', $mvalue[1]);
+									// var_dump($value);
+									$name = preg_replace("/&([a-z])[a-z]+;/i", "$1", htmlentities($mvalue[1])); //preg_replace('/[^(\x20-\x7F)]*/','', $mvalue[1]);
 									$pattern[0] = "/USER/";
 									$pattern[1] = "/,/";
 									$pattern[2] = "/NAME/";
@@ -159,11 +156,12 @@ if (is_array($config['installedpackages']['e2guardiangroups']['config'])) {
 						$apply_config++;
 					}
 				}
-		  }
+			}
 		}
 		$id++;
 	}
 }
+
 if ($apply_config > 0) {
 	print "User list from LDAP is different from current group, applying new configuration...";
 	write_config();
@@ -174,7 +172,6 @@ if ($apply_config > 0) {
 	print "User list from LDAP is already the same as current group, no changes made\n";
 }
 
-#mount filesystem read-only
 conf_mount_ro();
 
 ?>

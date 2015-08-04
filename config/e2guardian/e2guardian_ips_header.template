@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
-	e2guardian_ips.xml
+	e2guardian_ips_header.template
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -38,9 +38,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianips</name>
 	<version>1.0</version>
 	<title>Services: E2guardian</title>
@@ -98,14 +95,18 @@
 	</tabs>
 	<fields>
 		<field>
-			<name>Exception IP list</name>
+			<name>Exceptions IP List</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fieldname>exceptioniplist</fieldname>
-			<fielddescr>Exception Ip List</fielddescr>
-			<description><![CDATA[Include ip addresses and or ip addresses/netmask of computers from which web access should not be filtered.<br>
-								  Leave empty to load e2guardian defaults.]]></description>
+			<fielddescr>Exceptions IP List</fielddescr>
+			<description>
+				<![CDATA[
+				Include IP addresses and or subnets (CIDR notation) of computers from which web access should not be filtered.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>12</rows>

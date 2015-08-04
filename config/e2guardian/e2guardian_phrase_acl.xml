@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -8,7 +8,7 @@
 /*
 	e2guardian_phrase_acl.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -37,9 +37,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianphraseacl</name>
 	<version>1.0</version>
 	<title>Services: E2guardian - Access Lists</title>
@@ -143,7 +140,7 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Access List name</fielddescr>
+			<fielddescr>Access List Name</fielddescr>
 			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
@@ -183,7 +180,7 @@
 		<field>
 			<fielddescr>Include</fielddescr>
 			<fieldname>banned_includes</fieldname>
-			<description><![CDATA[Select Include files to banned phrase filter.]]></description>
+			<description>Select Include files to banned phrase filter.</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['e2guardianphraselistsbanned']['config']]]></source>
 			<source_name>descr</source_name>
@@ -192,10 +189,14 @@
 			<size>10</size>
 		</field>
 		<field>
-			<fielddescr>Config file</fielddescr>
+			<fielddescr>Config File</fielddescr>
 			<fieldname>banned_phraselist</fieldname>
-			<description><![CDATA[Enter Banned Phrase List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Banned Phrase List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -214,7 +215,7 @@
 		<field>
 			<fielddescr>Include</fielddescr>
 			<fieldname>weighted_includes</fieldname>
-			<description><![CDATA[Select Include files to weighted phrase filter.]]></description>
+			<description>Select Include files to weighted phrase filter.</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['e2guardianphraselistsweighted']['config']]]></source>
 			<source_name>descr</source_name>
@@ -223,10 +224,14 @@
 			<size>20</size>
 		</field>
 		<field>
-			<fielddescr>Config file</fielddescr>
+			<fielddescr>Config File</fielddescr>
 			<fieldname>weighted_phraselist</fieldname>
-			<description><![CDATA[Enter Weighted Pharase List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Weighted Phrase List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>
@@ -244,10 +249,14 @@
 		</field>
 
 		<field>
-			<fielddescr>Config file</fielddescr>
+			<fielddescr>Config File</fielddescr>
 			<fieldname>exception_phraselist</fieldname>
-			<description><![CDATA[Enter exception Pharase List for this group.<br>
-				Leave empty to load e2guardian defaults]]></description>
+			<description>
+				<![CDATA[
+				Enter Exceptions Phrase List for this group.<br/>
+				Leave empty to load e2guardian defaults.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>80</cols>
 			<rows>10</rows>

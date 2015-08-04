@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -9,7 +9,7 @@
 /*
 	e2guardian_log.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -38,9 +38,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianlog</name>
 	<version>1.0</version>
 	<title>Services: E2guardian</title>
@@ -104,57 +101,156 @@
 		<field>
 			<fielddescr>Reporting Level</fielddescr>
 			<fieldname>report_level</fieldname>
-			<description><![CDATA[Web Access Denied Reporting (does not affect logging)]]></description>
+			<description>Web Access Denied Reporting (does not affect logging)</description>
 			<type>select</type>
 			<options>
-				<option><name>Use HTML template file (accessdeniedaddress ignored) - recommended</name><value>3</value></option>
-				<option><name>Report fully</name><value>2</value></option>
-				<option><name>Report why but not what denied phrase</name><value>1</value></option>
-				<option><name>Just say 'Access Denied'</name><value>0</value></option>
-				<option><name>Log but do not block - Stealth mode</name><value>-1</value></option>
+				<option>
+					<name>Use HTML template file (accessdeniedaddress ignored)</name>
+					<value>3</value>
+				</option>
+				<option>
+					<name>Report fully</name>
+					<value>2</value>
+				</option>
+				<option>
+					<name>Report why but not what denied phrase</name>
+					<value>1</value>
+				</option>
+				<option>
+					<name>Just say 'Access Denied'</name>
+					<value>0</value>
+				</option>
+				<option>
+					<name>Log but do not block - Stealth mode</name>
+					<value>-1</value>
+				</option>
 			</options>
 		</field>
 		<field>
-			<fielddescr>Access Denied cgi</fielddescr>
+			<fielddescr>Access Denied Script URL</fielddescr>
 			<fieldname>reportingcgi</fieldname>
-			<description><![CDATA[While using Report Level (report fully) or (Report why but not what denied phrase), specify here the url link to your access denied cgi script
-				ex:http://YOURSERVER.YOURDOMAIN/cgi-bin/e2guardian.pl]]></description>
+			<description>
+				<![CDATA[
+				While using Report Level 'Report fully' or 'Report why but not what denied phrase', specify the URL to your Access Denied CGI script.<br/>
+				Example: http://YOURSERVER.YOURDOMAIN/cgi-bin/e2guardian.pl
+				]]>
+			</description>
 			<type>input</type>
 			<size>70</size>
 		</field>
 		<field>
 			<fielddescr>Report Language</fielddescr>
 			<fieldname>report_language</fieldname>
-			<description><![CDATA[Language to use in HTML reports]]></description>
+			<description>Language to use in HTML reports</description>
 			<type>select</type>
 			<options>
-				<option><name>ukenglish</name><value>ukenglish</value></option>
-				<option><name>arspanish</name><value>arspanish</value></option>
-				<option><name>bulgarian</name><value>bulgarian</value></option>
-				<option><name>chinesebig5</name><value>chinesebig5</value></option>
-				<option><name>chinesegb2312</name><value>chinesegb2312</value></option>
-				<option><name>czech</name><value>czech</value></option>
-				<option><name>danish</name><value>danish</value></option>
-				<option><name>dutch</name><value>dutch</value></option>
-				<option><name>french</name><value>french</value></option>
-				<option><name>german</name><value>german</value></option>
-				<option><name>hebrew</name><value>hebrew</value></option>
-				<option><name>hungarian</name><value>hungarian</value></option>
-				<option><name>indonesian</name><value>indonesian</value></option>
-				<option><name>italian</name><value>italian</value></option>
-				<option><name>japanese</name><value>japanese</value></option>
-				<option><name>lithuanian</name><value>lithuanian</value></option>
-				<option><name>malay</name><value>malay</value></option>
-				<option><name>mxspanish</name><value>mxspanish</value></option>
-				<option><name>polish</name><value>polish</value></option>
-				<option><name>portuguese</name><value>portuguese</value></option>
-				<option><name>ptbrazilian</name><value>ptbrazilian</value></option>
-				<option><name>russian-1251</name><value>russian-1251</value></option>
-				<option><name>russian-koi8-r</name><value>russian-koi8-r</value></option>
-				<option><name>slovak</name><value>slovak</value></option>
-				<option><name>spanish</name><value>spanish</value></option>
-				<option><name>swedish</name><value>swedish</value></option>
-				<option><name>turkish</name><value>turkish</value></option>
+				<option>
+					<name>English (UK)</name>
+					<value>ukenglish</value>
+				</option>
+				<option>
+					<name>Bulgarian</name>
+					<value>bulgarian</value>
+				</option>
+				<option>
+					<name>Chinese (Big5)</name>
+					<value>chinesebig5</value>
+				</option>
+				<option>
+					<name>Chinese (GB2312)</name>
+					<value>chinesegb2312</value>
+				</option>
+				<option>
+					<name>Czech</name>
+					<value>czech</value>
+				</option>
+				<option>
+					<name>Danish</name>
+					<value>danish</value>
+				</option>
+				<option>
+					<name>Dutch</name>
+					<value>dutch</value>
+				</option>
+				<option>
+					<name>French</name>
+					<value>french</value>
+				</option>
+				<option>
+					<name>German</name>
+					<value>german</value>
+				</option>
+				<option>
+					<name>Hebrew</name>
+					<value>hebrew</value>
+				</option>
+				<option>
+					<name>Hungarian</name>
+					<value>hungarian</value>
+				</option>
+				<option>
+					<name>Indonesian</name>
+					<value>indonesian</value>
+				</option>
+				<option>
+					<name>Italian</name>
+					<value>italian</value>
+				</option>
+				<option>
+					<name>Japanese</name>
+					<value>japanese</value>
+				</option>
+				<option>
+					<name>Lithuanian</name>
+					<value>lithuanian</value>
+				</option>
+				<option>
+					<name>Malay</name>
+					<value>malay</value>
+				</option>
+				<option>
+					<name>Polish</name>
+					<value>polish</value>
+				</option>
+				<option>
+					<name>Portuguese</name>
+					<value>portuguese</value></option>
+				<option>
+					<name>Portuguese (Brasil)</name>
+					<value>ptbrazilian</value>
+				</option>
+				<option>
+					<name>Russian (1251)</name>
+					<value>russian-1251</value>
+				</option>
+				<option>
+					<name>Russian (koi8-r)</name>
+					<value>russian-koi8-r</value>
+				</option>
+				<option>
+					<name>Slovak</name>
+					<value>slovak</value>
+				</option>
+				<option>
+					<name>Spanish</name>
+					<value>spanish</value>
+				</option>
+				<option>
+					<name>Spanish (Argentina)</name>
+					<value>arspanish</value>
+				</option>
+				<option>
+					<name>Spanish (Mexico)</name>
+					<value>mxspanish</value>
+				</option>
+				<option>
+					<name>Swedish</name>
+					<value>swedish</value>
+				</option>
+				<option>
+					<name>Turkish</name>
+					<value>turkish</value>
+				</option>
 			</options>
 		</field>
 		<field>
@@ -163,19 +259,35 @@
 			<description><![CDATA[Reporting options. Default values are in ( )]]></description>
 			<type>select</type>
 			<options>
-				<option><name>Show weighted found (on)</name><value>showweightedfound</value></option>
-				<option><name>Use custom banned flash (off)</name><value>usecustombannedflash</value></option>
-				<option><name>Use custom banned image (on)</name><value>usecustombannedimage</value></option>
-				<option><name>Non standard delimiter (on)</name><value>nonstandarddelimiter</value></option>
+				<option>
+					<name>Show Weighted Phrases Found (on)</name>
+					<value>showweightedfound</value>
+				</option>
+				<option>
+					<name>Custom Banned Flash Replacement (off)</name>
+					<value>usecustombannedflash</value>
+				</option>
+				<option>
+					<name>Custom Banned Image Replacement (on)</name>
+					<value>usecustombannedimage</value>
+				</option>
+				<option>
+					<name>Non-Standard Delimiter (on)</name>
+					<value>nonstandarddelimiter</value>
+				</option>
 			</options>
 			<multiple/>
 			<size>5</size>
 		</field>
 		<field>
-			<fielddescr>Report file</fielddescr>
+			<fielddescr>Report File</fielddescr>
 			<fieldname>report_file</fieldname>
-			<description><![CDATA[E2guardian template.html error page whithout head or html tags<br>
-				Leave empty to load e2guardian default report file]]></description>
+			<description>
+				<![CDATA[
+				E2guardian template.html error page whithout head or html tags<.br/>
+				Leave empty to load e2guardian default report file.
+				]]>
+			</description>
 			<type>textarea</type>
 			<cols>75</cols>
 			<rows>15</rows>
@@ -188,14 +300,29 @@
 		<field>
 			<fielddescr>Logging Options</fielddescr>
 			<fieldname>logging_options</fieldname>
-			<description><![CDATA[Logging options. Default values are in ( )]]></description>
+			<description>Logging options. Default values are in ( ).</description>
 			<type>select</type>
 			<options>
-				<option><name>logchildprocesshandling (off)</name><value>logchildprocesshandling</value></option>
-				<option><name>logconnectionhandlingerrors (on)</name><value>logconnectionhandlingerrors</value></option>
-				<option><name>nologger (off)</name><value>nologger</value></option>
-				<option><name>logadblocks (off)</name><value>logadblocks</value></option>
-				<option><name>Anonymize logs (off)</name><value>anonymizelogs</value></option>
+				<option>
+					<name>Log Child Process Handling (off)</name>
+					<value>logchildprocesshandling</value>
+				</option>
+				<option>
+					<name>Log Connection Handling Errors (on)</name>
+					<value>logconnectionhandlingerrors</value>
+				</option>
+				<option>
+					<name>Disable Logging Process (off)</name>
+					<value>nologger</value>
+				</option>
+				<option>
+					<name>Enable logging of ads category blocks (off)</name>
+					<value>logadblocks</value>
+				</option>
+				<option>
+					<name>Anonymize Logs (Blank out Usernames and IPs) (off)</name>
+					<value>anonymizelogs</value>
+				</option>
 			</options>
 			<multiple/>
 			<size>6</size>
@@ -203,37 +330,74 @@
 		<field>
 			<fielddescr>Log Level</fielddescr>
 			<fieldname>loglevel</fieldname>
-			<description><![CDATA[Web Access Denied Reporting (does not affect logging)]]></description>
+			<description>Logging Level Settings</description>
 			<type>select</type>
 			<options>
-				<option><name>All text based (default)</name><value>2</value></option>
-				<option><name>All requests</name><value>3</value></option>
-				<option><name>Just denied</name><value>1</value></option>
-				<option><name>None</name><value>0</value></option>
+				<option>
+					<name>All text based (default)</name>
+					<value>2</value>
+				</option>
+				<option>
+					<name>All requests</name>
+					<value>3</value>
+				</option>
+				<option>
+					<name>Just denied</name>
+					<value>1</value>
+				</option>
+				<option>
+					<name>None</name>
+					<value>0</value>
+				</option>
 			</options>
 		</field>
 		<field>
-			<fielddescr>Log Exception Hints</fielddescr>
+			<fielddescr>Log Exception Hits</fielddescr>
 			<fieldname>logexceptionhits</fieldname>
-			<description><![CDATA[ Log if an exception (user, ip, URL, phrase) is matched and so the page gets let through.<br>
-				Can be useful for diagnosing why a site gets through the filter.]]></description>
+			<description>
+				<![CDATA[
+				Log if an exception (user, IP, URL, phrase) is matched and so the page gets let through.<br/>
+				Can be useful for diagnosing why a site gets through the filter.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
-				<option><name>always log and mark exceptions (default)</name><value>2</value></option>
-				<option><name>log exceptions, but do not explicitly mark them as such</name><value>1</value></option>
-				<option><name>never log exceptions</name><value>0</value></option>
+				<option>
+					<name>Always log and mark exceptions (default)</name>
+					<value>2</value>
+				</option>
+				<option>
+					<name>Log exceptions, but do not explicitly mark them as such</name>
+					<value>1</value>
+				</option>
+				<option>
+					<name>Never log exceptions</name>
+					<value>0</value>
+				</option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Log File Format</fielddescr>
 			<fieldname>logfileformat</fieldname>
-			<description><![CDATA[ Log File Format.]]></description>
+			<description>Log File Format Settings</description>
 			<type>select</type>
 			<options>
-				<option><name>E2guardian format -space delimited (default)</name><value>1</value></option>
-				<option><name>CSV-style format</name><value>2</value></option>
-				<option><name>Squid Log File Format</name><value>3</value></option>
-				<option><name>Tab delimited</name><value>4</value></option>
+				<option>
+					<name>E2guardian format - space delimited (default)</name>
+					<value>1</value>
+				</option>
+				<option>
+					<name>CSV-style format</name>
+					<value>2</value>
+				</option>
+				<option>
+					<name>Squid Log File Format</name>
+					<value>3</value>
+				</option>
+				<option>
+					<name>Tab delimited</name>
+					<value>4</value>
+				</option>
 			</options>
 		</field>
 	</fields>
