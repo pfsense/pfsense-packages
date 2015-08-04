@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 		<![CDATA[
@@ -9,7 +9,7 @@
 /*
 	e2guardian_blacklist.xml
 	Copyright (C) 2015 Marcello Coutinho
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (http://www.pfSense.org/)
 	All rights reserved.
 */
 /* ========================================================================== */
@@ -38,9 +38,6 @@
 /* ========================================================================== */
 		]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>e2guardianblacklist</name>
 	<version>1.0</version>
 	<title>Services: E2guardian</title>
@@ -104,33 +101,57 @@
 		<field>
 			<fielddescr>List on</fielddescr>
 			<fieldname>liston</fieldname>
-			<description><![CDATA[Select where to list categories extracted from downloaded file<br>
+			<description><![CDATA[Select where to list categories extracted from downloaded file.<br/>
 				List on Banned and Exception is useful if you want to whitelist any category downloaded from url.]]></description>
 			<type>select</type>
 			<options>
-				<option><name>Banned only</name><value>banned</value></option>
-				<option><name>Banned and Exception</name><value>both</value></option>
+				<option>
+					<name>Banned only</name>
+					<value>banned</value>
+				</option>
+				<option>
+					<name>Banned and Exception</name>
+					<value>both</value>
+				</option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Update frequency</fielddescr>
 			<fieldname>cron</fieldname>
-			<description><![CDATA[Default:<strong>Never</strong><br>
-				Select how often pfsense will re download Blacklist files]]></description>
+			<description><![CDATA[Default:<strong>&nbsp;Never</strong><br/>
+				Select how often pfsense will re-download Blacklist files.]]></description>
 			<type>select</type>
 			<options>
-				<option><name>Never</name><value>never</value></option>
-				<option><name>Every day</name><value>day</value></option>
-				<option><name>Every 2 days</name><value>02days</value></option>
-				<option><name>Once a week</name><value>week</value></option>
-				<option><name>Download and update Now</name><value>force_download</value></option>
-				<option><name>Reapply downloaded list Now</name><value>force_update</value></option>
+				<option>
+					<name>Never</name>
+					<value>never</value>
+				</option>
+				<option>
+					<name>Every day</name>
+					<value>day</value>
+				</option>
+				<option>
+					<name>Every 2 days</name>
+					<value>02days</value>
+				</option>
+				<option>
+					<name>Once a week</name>
+					<value>week</value>
+				</option>
+				<option>
+					<name>Download and update Now</name>
+					<value>force_download</value>
+				</option>
+				<option>
+					<name>Reapply downloaded list Now</name>
+					<value>force_update</value>
+				</option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Blacklist URL</fielddescr>
 			<fieldname>url</fieldname>
-			<description><![CDATA[Enter FTP, HTTP or LOCAL (pfSense) URL blacklist archive.<br>
+			<description><![CDATA[Enter FTP, HTTP or LOCAL (pfSense) URL blacklist archive.<br/>
 				File must be in tar.gz or tgz format.]]></description>
 			<type>input</type>
 			<size>80</size>
@@ -147,7 +168,7 @@
 		<field>
 			<fielddescr>script</fielddescr>
 			<fieldname>update_script</fieldname>
-			<description><![CDATA[Enter custom script to update Blacklists<br>
+			<description><![CDATA[Enter custom script to update Blacklists.<br/>
 				This script will be called by update frequency schedule.]]></description>
 			<type>textarea</type>
 			<cols>80</cols>
