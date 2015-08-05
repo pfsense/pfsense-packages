@@ -374,18 +374,18 @@ function sqstat_loadconfig()
     # === load config from pfSense ===
     $iface = '127.0.0.1';
     $iport = 3128;
-    $squid_settings = $config['installedpackages']['squid']['config'][0];
-    if (!empty($squid_settings)) {
-        # squid interface IP & port
-        $realif = array();
-        $iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
-        $iface = explode(",", $iface);
-        foreach ($iface as $i => $if) {
-            $realif[] = sqstat_get_real_interface_address($if);
-            $iface    = $realif[$i][0] ? $realif[$i][0] : '127.0.0.1';
-        }
-        $iport = $squid_settings['proxy_port'] ? $squid_settings['proxy_port'] : 3128;
-    }
+    #?? $squid_settings = $config['installedpackages']['squid']['config'][0];
+    #?? if (!empty($squid_settings)) {
+    #??     # squid interface IP & port
+    #??     $realif = array();
+    #??     $iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
+    #??     $iface = explode(",", $iface);
+    #??     foreach ($iface as $i => $if) {
+    #??         $realif[] = sqstat_get_real_interface_address($if);
+    #??         $iface    = $realif[$i][0] ? $realif[$i][0] : '127.0.0.1';
+    #??     }
+    #??     $iport = $squid_settings['proxy_port'] ? $squid_settings['proxy_port'] : 3128;
+    #?? }
     $squidclass->squidhost = $iface;
     $squidclass->squidport = $iport;
 
