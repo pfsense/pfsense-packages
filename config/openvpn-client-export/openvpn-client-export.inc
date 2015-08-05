@@ -90,10 +90,10 @@ function openvpn_client_export_prefix($srvid, $usrid = null, $crtid = null) {
 	$host = empty($config['system']['hostname']) ? "openvpn" : $config['system']['hostname'];
 	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : $settings['protocol']);
 	$port = $settings['local_port'];
-	
+
 	$filename_addition = "";
 	if ($usrid && is_numeric($usrid)) {
-		$filename_addition = "-".$config['system']['user'][$usrid]['name'];
+		$filename_addition = "-" . $config['system']['user'][$usrid]['name'];
 	} elseif ($crtid && is_numeric($crtid) && function_exists("cert_get_cn")) {
 		$filename_addition = "-" . str_replace(' ', '_', cert_get_cn($config['cert'][$crtid]['crt']));
 	}
@@ -185,9 +185,9 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $openvpnmanager, $advancedoptions = "") {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls = false, $doslines = false, $openvpnmanager, $advancedoptions = "") {
 	global $config, $input_errors, $g;
-	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 
 	$nl = ($doslines) ? "\r\n" : "\n";
 	$conf = "";
@@ -374,7 +374,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		$conf .= "management-forget-disconnect{$nl}";
 		$conf .= $nl;
 	};
-		
+
 	// add advanced options
 	$advancedoptions = str_replace("\r\n", "\n", $advancedoptions);
 	$advancedoptions = str_replace("\n", $nl, $advancedoptions);
@@ -668,12 +668,13 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	}
 
 	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, true, $proxy, "baseconf", $outpass, true, true, $openvpnmanager, $advancedoptions);
-	if (!$conf)
+	if (!$conf) {
 		return false;
+	}
 
 	// We need to nuke the ca line from the above config if it exists.
 	$conf = explode("\n", $conf);
-	for ($i=0; $i < count($conf); $i++) {
+	for ($i = 0; $i < count($conf); $i++) {
 		if ((substr($conf[$i], 0, 3) == "ca ") || (substr($conf[$i], 0, 7) == "pkcs12 ")) {
 			unset($conf[$i]);
 		}
@@ -866,10 +867,11 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		$shkeyfile = "{$tempdir}/{$shkeyfile}";
 		file_put_contents("{$shkeyfile}", base64_decode($settings['shared_key']));
 
-		if(file_exists("/usr/pbi/zip-{$uname_p}/bin/zip"))
+		if (file_exists("/usr/pbi/zip-{$uname_p}/bin/zip")) {
 			exec("cd {$tempdir}/.. && /usr/pbi/zip-{$uname_p}/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
-		else
+		} else {
 			exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+		}
 
 		// Remove temporary directory
 		exec("rm -rf {$tempdir}");
@@ -952,7 +954,7 @@ function openvpn_client_export_find_port_forwards($targetip, $targetport, $targe
 			}
 
 			$dstaddr = trim(filter_generate_address($natent, 'destination', true));
-			if(!$dstaddr) {
+			if (!$dstaddr) {
 				$dstaddr = $FilterIflist[$natif]['ip'];
 			}
 

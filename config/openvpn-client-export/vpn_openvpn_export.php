@@ -40,40 +40,48 @@ global $current_openvpn_version, $current_openvpn_version_rev;
 
 $pgtitle = array("OpenVPN", "Client Export Utility");
 
-if (!is_array($config['openvpn']['openvpn-server']))
+if (!is_array($config['openvpn']['openvpn-server'])) {
 	$config['openvpn']['openvpn-server'] = array();
+}
 
 $a_server = $config['openvpn']['openvpn-server'];
 
-if (!is_array($config['system']['user']))
+if (!is_array($config['system']['user'])) {
 	$config['system']['user'] = array();
+}
 
 $a_user = $config['system']['user'];
 
-if (!is_array($config['cert']))
+if (!is_array($config['cert'])) {
 	$config['cert'] = array();
+}
 
 $a_cert = $config['cert'];
 
 $ras_server = array();
-foreach($a_server as $sindex => $server) {
-	if (isset($server['disable']))
+foreach ($a_server as $sindex => $server) {
+	if (isset($server['disable'])) {
 		continue;
+	}
 	$ras_user = array();
 	$ras_certs = array();
-	if (stripos($server['mode'], "server") === false)
+	if (stripos($server['mode'], "server") === false) {
 		continue;
+	}
 	if (($server['mode'] == "server_tls_user") && ($server['authmode'] == "Local Database")) {
-		foreach($a_user as $uindex => $user) {
-			if (!is_array($user['cert']))
+		foreach ($a_user as $uindex => $user) {
+			if (!is_array($user['cert'])) {
 				continue;
-			foreach($user['cert'] as $cindex => $cert) {
+			}
+			foreach ($user['cert'] as $cindex => $cert) {
 				// If $cert is not an array, it's a certref not a cert.
-				if (!is_array($cert))
+				if (!is_array($cert)) {
 					$cert = lookup_cert($cert);
+				}
 
-				if ($cert['caref'] != $server['caref'])
+				if ($cert['caref'] != $server['caref']) {
 					continue;
+				}
 				$ras_userent = array();
 				$ras_userent['uindex'] = $uindex;
 				$ras_userent['cindex'] = $cindex;
@@ -83,9 +91,10 @@ foreach($a_server as $sindex => $server) {
 			}
 		}
 	} elseif (($server['mode'] == "server_tls") || (($server['mode'] == "server_tls_user") && ($server['authmode'] != "Local Database"))) {
-		foreach($a_cert as $cindex => $cert) {
-			if (($cert['caref'] != $server['caref']) || ($cert['refid'] == $server['certref']))
+		foreach ($a_cert as $cindex => $cert) {
+			if (($cert['caref'] != $server['caref']) || ($cert['refid'] == $server['certref'])) {
 				continue;
+			}
 			$ras_cert_entry['cindex'] = $cindex;
 			$ras_cert_entry['certname'] = $cert['descr'];
 			$ras_cert_entry['certref'] = $cert['refid'];
@@ -96,10 +105,11 @@ foreach($a_server as $sindex => $server) {
 	$ras_serverent = array();
 	$prot = $server['protocol'];
 	$port = $server['local_port'];
-	if ($server['description'])
+	if ($server['description']) {
 		$name = "{$server['description']} {$prot}:{$port}";
-	else
+	} else {
 		$name = "Server {$prot}:{$port}";
+	}
 	$ras_serverent['index'] = $sindex;
 	$ras_serverent['name'] = $name;
 	$ras_serverent['users'] = $ras_user;
@@ -109,12 +119,14 @@ foreach($a_server as $sindex => $server) {
 }
 
 $id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id'])) {
 	$id = $_POST['id'];
+}
 
 $act = $_GET['act'];
-if (isset($_POST['act']))
+if (isset($_POST['act'])) {
 	$act = $_POST['act'];
+}
 
 if (!empty($act)) {
 
@@ -125,19 +137,21 @@ if (!empty($act)) {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-		(($usrid === false) || ($crtid === false))) {
+	    (($usrid === false) || ($crtid === false))) {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	}
 
-	if ($config['openvpn']['openvpn-server'][$srvid]['mode'] == "server_user")
+	if ($config['openvpn']['openvpn-server'][$srvid]['mode'] == "server_user") {
 		$nokeys = true;
-	else
+	} else {
 		$nokeys = false;
+	}
 
 	$useaddr = '';
-	if (isset($_GET['useaddr']) && !empty($_GET['useaddr']))
+	if (isset($_GET['useaddr']) && !empty($_GET['useaddr'])) {
 		$useaddr = trim($_GET['useaddr']);
+	}
 
 	if (!(is_ipaddr($useaddr) || is_hostname($useaddr) ||
 	    in_array($useaddr, array("serveraddr", "servermagic", "servermagichost", "serverhostname")))) {
@@ -192,10 +206,10 @@ if (!empty($act)) {
 
 	$exp_name = openvpn_client_export_prefix($srvid, $usrid, $crtid);
 
-	if(substr($act, 0, 4) == "conf") {
+	if (substr($act, 0, 4) == "conf") {
 		switch ($act) {
 			case "confzip":
-				$exp_name = urlencode($exp_name."-config.zip");
+				$exp_name = urlencode($exp_name . "-config.zip");
 				$expformat = "zip";
 				break;
 			case "conf_yealink_t28":
@@ -215,30 +229,30 @@ if (!empty($act)) {
 				$expformat = "snom";
 				break;
 			case "confinline":
-				$exp_name = urlencode($exp_name."-config.ovpn");
+				$exp_name = urlencode($exp_name . "-config.ovpn");
 				$expformat = "inline";
 				break;
 			case "confinlinedroid":
-				$exp_name = urlencode($exp_name."-android-config.ovpn");
+				$exp_name = urlencode($exp_name . "-android-config.ovpn");
 				$expformat = "inlinedroid";
 				break;
 			case "confinlineios":
-				$exp_name = urlencode($exp_name."-ios-config.ovpn");
+				$exp_name = urlencode($exp_name . "-ios-config.ovpn");
 				$expformat = "inlineios";
 				break;
 			default:
-				$exp_name = urlencode($exp_name."-config.ovpn");
+				$exp_name = urlencode($exp_name . "-config.ovpn");
 				$expformat = "baseconf";
 		}
 		$exp_path = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys, $proxy, $expformat, $password, false, false, $openvpnmanager, $advancedoptions);
 	}
 
-	if($act == "visc") {
-		$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
+	if ($act == "visc") {
+		$exp_name = urlencode($exp_name . "-Viscosity.visc.zip");
 		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
 	}
 
-	if(substr($act, 0, 4) == "inst") {
+	if (substr($act, 0, 4) == "inst") {
 		$exp_name = urlencode($exp_name."-install.exe");
 		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
@@ -316,8 +330,9 @@ function download_begin(act, i, j) {
 			return;
 		}
 		useaddr = document.getElementById("useaddr_hostname").value;
-	} else
+	} else {
 		useaddr = document.getElementById("useaddr").value;
+	}
 
 	advancedoptions = document.getElementById("advancedoptions").value;
 
@@ -325,21 +340,25 @@ function download_begin(act, i, j) {
 	verifyservercn = document.getElementById("verifyservercn").value;
 
 	var randomlocalport = 0;
-	if (document.getElementById("randomlocalport").checked)
+	if (document.getElementById("randomlocalport").checked) {
 		randomlocalport = 1;
+	}
 	var usetoken = 0;
-	if (document.getElementById("usetoken").checked)
+	if (document.getElementById("usetoken").checked) {
 		usetoken = 1;
+	}
 	var usepass = 0;
-	if (document.getElementById("usepass").checked)
+	if (document.getElementById("usepass").checked) {
 		usepass = 1;
+	}
 	var openvpnmanager = 0;
-	if (document.getElementById("openvpnmanager").checked)
+	if (document.getElementById("openvpnmanager").checked) {
 		openvpnmanager = 1;
+	}
 
 	var pass = document.getElementById("pass").value;
 	var conf = document.getElementById("conf").value;
-	if (usepass && (act.substring(0,4) == "inst")) {
+	if (usepass && (act.substring(0, 4) == "inst")) {
 		if (!pass || !conf) {
 			alert("The password or confirm field is empty");
 			return;
@@ -352,8 +371,9 @@ function download_begin(act, i, j) {
 
 	var useproxy = 0;
 	var useproxypass = 0;
-	if (document.getElementById("useproxy").checked)
+	if (document.getElementById("useproxy").checked) {
 		useproxy = 1;
+	}
 
 	var proxyaddr = document.getElementById("proxyaddr").value;
 	var proxyport = document.getElementById("proxyport").value;
@@ -363,8 +383,9 @@ function download_begin(act, i, j) {
 			return;
 		}
 
-		if (document.getElementById("useproxypass").value != 'none')
+		if (document.getElementById("useproxypass").value != 'none') {
 			useproxypass = 1;
+		}
 
 		var proxytype = document.getElementById("useproxytype").value;
 
@@ -404,8 +425,9 @@ function download_begin(act, i, j) {
 	dlurl += "&randomlocalport=" + escape(randomlocalport);
 	dlurl += "&openvpnmanager=" + escape(openvpnmanager);
 	dlurl += "&usetoken=" + escape(usetoken);
-	if (usepass)
+	if (usepass) {
 		dlurl += "&password=" + escape(pass);
+	}
 	if (useproxy) {
 		dlurl += "&proxy_type=" + escape(proxytype);
 		dlurl += "&proxy_addr=" + escape(proxyaddr);
@@ -419,19 +441,20 @@ function download_begin(act, i, j) {
 
 	dlurl += "&advancedoptions=" + escape(advancedoptions);
 
-	window.open(dlurl,"_self");
+	window.open(dlurl, "_self");
 }
 
 function server_changed() {
 
 	var table = document.getElementById("users");
-	while (table.rows.length > 1 )
+	while (table.rows.length > 1 ) {
 		table.deleteRow(1);
+	}
 
 	var index = document.getElementById("server").selectedIndex;
 	var users = servers[index][1];
 	var certs = servers[index][3];
-	for (i=0; i < users.length; i++) {
+	for (i = 0; i < users.length; i++) {
 		var row = table.insertRow(table.rows.length);
 		var cell0 = row.insertCell(0);
 		var cell1 = row.insertCell(1);
@@ -466,7 +489,7 @@ function server_changed() {
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle<\/a>";
 	}
-	for (j=0; j < certs.length; j++) {
+	for (j = 0; j < certs.length; j++) {
 		var row = table.insertRow(table.rows.length);
 		var cell0 = row.insertCell(0);
 		var cell1 = row.insertCell(1);
@@ -555,25 +578,27 @@ function server_changed() {
 
 function useaddr_changed(obj) {
 
-	if (obj.value == "other")
+	if (obj.value == "other") {
 		$('HostName').show();
-	else
+	} else {
 		$('HostName').hide();
+	}
 
 }
 
 function usepass_changed() {
 
-	if (document.getElementById("usepass").checked)
+	if (document.getElementById("usepass").checked) {
 		document.getElementById("usepass_opts").style.display = "";
-	else
+	} else {
 		document.getElementById("usepass_opts").style.display = "none";
+	}
 }
 
 function useproxy_changed(obj) {
 
 	if ((obj.id == "useproxy" && obj.checked) ||
-		(obj.id == "useproxypass" && (obj.value != 'none'))) {
+	    (obj.id == "useproxypass" && (obj.value != 'none'))) {
 		$(obj.id + '_opts').show();
 	} else {
 		$(obj.id + '_opts').hide();
@@ -590,7 +615,7 @@ function useproxy_changed(obj) {
 	}
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="openvpn export">
- 	<tr>
+	<tr>
 		<td>
 			<?php
 				$tab_array = array();
@@ -612,7 +637,7 @@ function useproxy_changed(obj) {
 						<td width="22%" valign="top" class="vncellreq">Remote Access Server</td>
 						<td width="78%" class="vtable">
 							<select name="server" id="server" class="formselect" onchange="server_changed()">
-								<?php foreach($ras_server as & $server): ?>
+								<?php foreach ($ras_server as & $server): ?>
 								<option value="<?=$server['index'];?>"><?=$server['name'];?></option>
 								<?php endforeach; ?>
 							</select>
