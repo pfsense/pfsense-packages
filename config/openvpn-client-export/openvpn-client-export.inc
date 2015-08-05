@@ -40,8 +40,8 @@ require_once("util.inc");
 require_once("pfsense-utils.inc");
 
 global $current_openvpn_version, $current_openvpn_version_rev;
-$current_openvpn_version = "2.3.6";
-$current_openvpn_version_rev = "03";
+$current_openvpn_version = "2.3.8";
+$current_openvpn_version_rev = "01";
 
 function openvpn_client_export_install() {
 	global $current_openvpn_version;
