@@ -30,7 +30,7 @@
 require_once("config.inc");
 
 global $pfs_version;
-$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 switch ($pfs_version) {
 	case "2.1":
 		/* Hackish way to detect if someone manually did pkg_add rather than use pbi. */
@@ -38,7 +38,7 @@ switch ($pfs_version) {
 			define('SUDO_BASE', '/usr/pbi/sudo-' . php_uname("m"));
 			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/');
 		} else {
-			define('SUDO_BASE','/usr/local');
+			define('SUDO_BASE', '/usr/local');
 			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
 		}
 		break;
@@ -66,17 +66,17 @@ function sudo_install() {
 	if (!is_array($config['installedpackages']['sudo']['config'][0]['row'])) {
 		$config['installedpackages']['sudo']['config'][0]['row'] = array(
 			0 => array(
-				"username" => "user:root", 
+				"username" => "user:root",
 				"runas" => "user:root",
 				"cmdlist" => "ALL"
 			),
 			1 => array(
-				"username" => "user:admin", 
+				"username" => "user:admin",
 				"runas" => "user:root",
 				"cmdlist" => "ALL"
 			),
 			2 => array(
-				"username" => "group:admins", 
+				"username" => "group:admins",
 				"runas" => "user:root",
 				"cmdlist" => "ALL"
 			)
@@ -196,7 +196,7 @@ This also forces the user to give full paths to executables, which they should b
  */
 function sudo_validate_commands(&$input_errors) {
 	$idx = 0;
-	while(isset($_POST["cmdlist{$idx}"])) {
+	while (isset($_POST["cmdlist{$idx}"])) {
 		$commands = $_POST["cmdlist" . $idx++];
 		if (strtoupper($commands) == "ALL") {
 			continue;
