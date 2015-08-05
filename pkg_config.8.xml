@@ -1393,7 +1393,7 @@
 	</package>
 	<package>
 		<name>OpenVPN Client Export Utility</name>
-		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
+		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OS X's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>p7zip-9.20.1.tbz</depends_on_package>
