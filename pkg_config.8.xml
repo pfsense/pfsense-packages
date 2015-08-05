@@ -326,7 +326,7 @@
 		<name>Avahi</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/Avahi_package</pkginfolink>
 		<website>http://www.avahi.org/</website>
-		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple MacOS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
+		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple Mac OS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<build_port_path>/usr/ports/net/avahi</build_port_path>
@@ -1393,7 +1393,7 @@
 	</package>
 	<package>
 		<name>OpenVPN Client Export Utility</name>
-		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
+		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OS X's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>p7zip-9.20.1.tbz</depends_on_package>

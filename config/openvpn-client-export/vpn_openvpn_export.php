@@ -462,7 +462,7 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-win6\"," + i + ", -1)'>x86-win6<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-win6\"," + i + ", -1)'>x64-win6<\/a>";
-		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
+		cell2.innerHTML += "<br\/>- Mac OS X:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle<\/a>";
 	}
@@ -501,7 +501,7 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-win6\", -1," + j + ")'>x86-win6<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-win6\", -1," + j + ")'>x64-win6<\/a>";
-		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
+		cell2.innerHTML += "<br\/>- Mac OS X:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle<\/a>";
 		if (servers[index][2] == "server_tls") {
@@ -547,7 +547,7 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x86-win6\"," + i + ")'>x86-win6<\/a>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst-x64-win6\"," + i + ")'>x64-win6<\/a>";
-		cell2.innerHTML += "<br\/>- Mac OSX:<br\/>";
+		cell2.innerHTML += "<br\/>- Mac OS X:<br\/>";
 		cell2.innerHTML += "&nbsp;&nbsp; ";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle<\/a>";
 	}
@@ -914,8 +914,8 @@ function useproxy_changed(obj) {
 						<br/><a href="https://play.google.com/store/apps/details?id=de.blinkt.openvpn"><?= gettext("OpenVPN For Android") ?></a> - <?=gettext("Recommended client for Android")?>
 						<br/><a href="http://www.featvpn.com/"><?= gettext("FEAT VPN For Android") ?></a> - <?=gettext("For older versions of Android")?>
 						<br/><?= gettext("OpenVPN Connect") ?>: <a href="https://play.google.com/store/apps/details?id=net.openvpn.openvpn"><?=gettext("Android (Google Play)")?></a> or <a href="https://itunes.apple.com/us/app/openvpn-connect/id590379981"><?=gettext("iOS (App Store)")?></a> - <?= gettext("Recommended client for iOS") ?>
-						<br/><a href="http://www.sparklabs.com/viscosity/"><?= gettext("Viscosity") ?></a> - <?= gettext("Recommended client for Mac OSX") ?>
-						<br/><a href="http://code.google.com/p/tunnelblick/"><?= gettext("Tunnelblick") ?></a> - <?= gettext("Free client for OSX") ?>
+						<br/><a href="https://www.sparklabs.com/viscosity/"><?= gettext("Viscosity") ?></a> - <?= gettext("Recommended client for Mac OS X") ?>
+						<br/><a href="https://tunnelblick.net"><?= gettext("Tunnelblick") ?></a> - <?= gettext("Free client for OS X") ?>
 						</td>
 					</tr>
 				</table>

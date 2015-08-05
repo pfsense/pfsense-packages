@@ -253,7 +253,7 @@
 		<name>Avahi</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/Avahi_package</pkginfolink>
 		<website>http://www.avahi.org/</website>
-		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple MacOS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
+		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple Mac OS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
 		<category>Network Management</category>
 		<lib_depends>libavahi-core.so:net/avahi-app</lib_depends>
 		<port_category>net</port_category>
@@ -1153,7 +1153,7 @@
 	<package>
 		<name>OpenVPN Client Export Utility</name>
 		<internal_name>openvpn-client-export</internal_name>
-		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
+		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OS X's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_pbi>zip-3.0_1-##ARCH##.pbi p7zip-9.20.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
