@@ -55,7 +55,7 @@ unset($input_errors);
 
 if ($_POST) {
 	if (!is_numeric($_POST['svcid']))
-
+		return;
 
 	if (!isset($system_services[$_POST['svcid']])) {
 		$input_errors[] = gettext("The supplied service appears to be invalid.");
