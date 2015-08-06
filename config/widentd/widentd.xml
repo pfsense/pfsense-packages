@@ -75,7 +75,7 @@
 			<fieldname>username</fieldname>
 			<description>
 				<![CDATA[
-				Enter the username you'd like displayed via widentd. Allowed characters: [a-zA-Z] only.<br />
+				Enter the username you'd like displayed via widentd. Allowed characters: [a-zA-Z] and "." only.<br />
 				(Defaults to 'user' if left empty.)
 				]]>
 			</description>
