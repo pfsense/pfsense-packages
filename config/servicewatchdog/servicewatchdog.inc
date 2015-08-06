@@ -7,23 +7,27 @@ require_once("notices.inc");
 
 function servicewatchdog_service_matches($svc1, $svc2) {
 	/* If the arrays are equal, it must be the same service. */
-	if ($svc1 == $svc2)
+	if ($svc1 == $svc2) {
 		return true;
+	}
 	/* If the names are different, they must not be the same. */
-	if ($svc1['name'] != $svc2['name'])
+	if ($svc1['name'] != $svc2['name']) {
 		return false;
+	}
 	switch ($svc1['name']) {
 		case "openvpn":
-			if (($svc1['mode'] == $svc2['mode']) && ($svc1['vpnid'] == $svc2['vpnid']))
+			if (($svc1['mode'] == $svc2['mode']) && ($svc1['vpnid'] == $svc2['vpnid'])) {
 				return true;
-			else
+			} else {
 				return false;
+			}
 			break;
 		case "captiveportal":
-			if ($svc1['zone'] == $svc2['zone'])
+			if ($svc1['zone'] == $svc2['zone']) {
 				return true;
-			else
+			} else {
 				return false;
+			}
 			break;
 		default:
 			/* Other services must be the same if the name matches. */
@@ -39,12 +43,14 @@ function servicewatchdog_is_service_watched($svc) {
 	$a_pwservices = &$config['installedpackages']['servicewatchdog']['item'];
 	$blacklisted_services = array("cron");
 
-	if (empty($svc['name']) || in_array($svc['name'], $blacklisted_services))
+	if (empty($svc['name']) || in_array($svc['name'], $blacklisted_services)) {
 		return true;
+	}
 
 	foreach ($a_pwservices as $a_svc) {
-		if (servicewatchdog_service_matches($svc, $a_svc))
+		if (servicewatchdog_service_matches($svc, $a_svc)) {
 			return true;
+		}
 	}
 	return false;
 }
@@ -77,8 +83,9 @@ function servicewatchdog_check_services() {
 			$descr = strlen($svc['description']) > 50 ? substr($svc['description'], 0, 50) . "..." : $svc['description'];
 			$error_message = "Service Watchdog detected service {$svc['name']} stopped. Restarting {$svc['name']} ({$descr})";
 			log_error($error_message);
-			if (isset($svc['notify']))
+			if (isset($svc['notify'])) {
 				notify_via_smtp($error_message);
+			}
 			service_control_start($svc['name'], $svc);
 		}
 	}
