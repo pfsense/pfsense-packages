@@ -44,7 +44,7 @@ function sync_package_filer() {
 	if ($config['installedpackages']['filer']['config'] != "") {
 		$count = 0;
 		foreach ($config['installedpackages']['filer']['config'] as $file) {
-			if ($file['filedata']=="" && file_exists($file['fullfile'])) {
+			if ($file['filedata'] == "" && file_exists($file['fullfile'])) {
 				$config['installedpackages']['filer']['config'][$count]['filedata'] = base64_encode(file_get_contents($file['fullfile']));
 				$file['filedata'] = base64_encode(file_get_contents($file['fullfile']));
 				$update_conf++;
@@ -65,10 +65,10 @@ function sync_package_filer() {
 				switch ($file['background']) {
 					case "background":
 						mwexec_bg($file['cmd']);
-					break;
+						break;
 					case "foreground":
 						mwexec($file['cmd']);
-					break;
+						break;
 				}
 			}
 		}
@@ -90,13 +90,13 @@ function filer_validate_input($post, &$input_errors) {
 			continue;
 		}
 		if (substr($key, 0, 3) == "mod" && !preg_match("/^0?[0-7]{3}$/", $value)) {
-				$input_errors[] = "{$value} is not valid permissions mode number.";
+			$input_errors[] = "{$value} is not valid permissions mode number.";
 		}
 		if (substr($key, 0, 11) == "description" && !preg_match("@^[a-zA-Z0-9 _/.-]+$@", $value)) {
-				$input_errors[] = "Do not use special characters in description.";
+			$input_errors[] = "Do not use special characters in description.";
 		}
 		if (substr($key, 0, 8) == "fullfile" && !preg_match("@^[a-zA-Z0-9_/.-]+$@", $value)) {
-				$input_errors[] = "Do not use special characters in filename.";
+			$input_errors[] = "Do not use special characters in filename.";
 		}
 	}
 }

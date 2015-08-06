@@ -44,7 +44,7 @@
 	]]>
 	</copyright>
 	<name>filer</name>
-	<version>0.60.2</version>
+	<version>0.60.4</version>
 	<title>Filer</title>
 	<include_file>/usr/local/pkg/filer.inc</include_file>
 	<additional_files_needed>
@@ -84,14 +84,14 @@
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-		</columnitem>	
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
 			<name>File configuration</name>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>File</fielddescr>
 			<fieldname>fullfile</fieldname>
@@ -129,7 +129,7 @@
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
 			<name>Command to run after file save/sync.</name>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>Script/Command</fielddescr>
 			<fieldname>cmd</fieldname>
@@ -142,7 +142,7 @@
 			<fielddescr>Execute mode</fielddescr>
 			<fieldname>background</fieldname>
 			<type>select</type>
- 				<options>
+				<options>
 					<option>
 						<name>Background (default)</name>
 						<value>background</value>
@@ -164,7 +164,7 @@
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 		sync_package_filer();
-	</custom_delete_php_command>	
+	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		sync_package_filer();
 	</custom_php_resync_config_command>
