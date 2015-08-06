@@ -63,7 +63,7 @@ function sync_package_blinkled() {
 	blinkled_rcfile();
 
 	$blinkled_config = $config['installedpackages']['blinkled']['config'][0];
-	/* If the service is not enabled, do nothing */
+	/* If the service (being) disabled, stop it (if running) and do nothing else */
 	if (!($blinkled_config['enable'])) {
 		if (is_process_running("blinkled")) {
 			stop_service("blinkled");
@@ -74,10 +74,7 @@ function sync_package_blinkled() {
 	if (is_process_running("blinkled")) {
 		stop_service("blinkled");
 	}
-	/* If blinkled is not running, start it */
-	if (!is_process_running("blinkled")) {
-		start_service("blinkled");
-	}
+	start_service("blinkled");
 }
 
 function blinkled_launch($int, $led, $return = false) {
