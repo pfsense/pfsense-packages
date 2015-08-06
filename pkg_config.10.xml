@@ -865,7 +865,7 @@
 		<website>http://www.webweaving.org/widentd</website>
 		<category>Services</category>
 		<depends_on_package_pbi>widentd-1.03_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.03_2</version>
+		<version>1.0.4</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>2.2</required_version>
