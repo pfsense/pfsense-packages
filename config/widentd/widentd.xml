@@ -113,7 +113,7 @@
 			"stop" => $stop
 			)
 		);
-		
+
 		restart_service("widentd");
 		config_unlock();
 		conf_mount_ro();
@@ -133,7 +133,7 @@
 		if (($post['sysname'] != "") && !preg_match("/^[a-zA-Z]+$/", $post['sysname'])) {
 			$input_errors[] .= 'System name may only contain uppercase and lowercase letters [a-zA-Z].';
 		}
-		
+
 		/* Check for IPv6-only interfaces */
 		$int = convert_friendly_interface_to_real_interface_name($post['interface']);
 		$ip = find_interface_ip($int);
