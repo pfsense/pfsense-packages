@@ -1,4 +1,4 @@
-<?php 
+<?php
 /* $Id$ */
 /*
 
@@ -66,7 +66,7 @@ if ($_POST) {
 
 	unset($input_errors);
 	$pconfig = $_POST;
-  
+
 	if (!$input_errors) {
 
 		$ent = array();
@@ -76,11 +76,10 @@ if ($_POST) {
 		$ent['description'] = $_POST['description'];
 
 		if (isset($id) && $a_backup[$id]) {
-		  	//update
-      		$a_backup[$id] = $ent;
-		}
-		else {
-		  	//add 
+			//update
+			$a_backup[$id] = $ent;
+		} else {
+			//add
 			$a_backup[] = $ent;
 		}
 
@@ -99,7 +98,7 @@ include("head.inc");
 <script type="text/javascript" language="JavaScript">
 
 function show_advanced_config() {
-	document.getElementById("showadvancedbox").innerHTML='';
+	document.getElementById("showadvancedbox").innerHTML = '';
 	aodiv = document.getElementById('showadvanced');
 	aodiv.style.display = "block";
 </script>
@@ -124,87 +123,87 @@ function show_advanced_config() {
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-	 <td class="tabcont" >
+		<td class="tabcont" >
 
-	<!--
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
-	  <tr>
-		<td><p><span class="vexpl"><span class="red"><strong>PHP<br>
-			</strong></span>
-			</p></td>
-	  </tr>
-	</table>
-	-->
-	<br />
-
-		<form action="backup_edit.php" method="post" name="iform" id="iform">
+			<!--
 			<table width="100%" border="0" cellpadding="6" cellspacing="0">
-
-			<tr>
-			  <td width="25%" valign="top" class="vncellreq">Name</td>
-			  <td width="75%" class="vtable"> 
-				<input name="name" type="text" class="formfld" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>">
-			  </td>
-			</tr> 
-
-			<tr>
-				<td width="22%" valign="top" class="vncellreq">Path</td>
-				<td width="78%" class="vtable">
-					<input name="path" type="text" class="formfld" id="path" size="40" value="<?=htmlspecialchars($pconfig['path']);?>">
-				</td>
-			</tr>
-			<tr>
-			  <td width="22%" valign="top" class="vncellreq">Enabled</td>
-			  <td width="78%" class="vtable"> 
-				<?php                
-				echo "              <select name='enabled' class='formfld'>\n";
-				echo "                <option></option>\n";
-				switch (htmlspecialchars($pconfig['enabled'])) {
-				case "true":
-					echo "              <option value='true' selected='yes'>true</option>\n";
-					echo "              <option value='false'>false</option>\n";
-					break;
-				case "false":
-					echo "              <option value='true'>true</option>\n";
-					echo "              <option value='false' selected='yes'>false</option>\n";
-
-					break;
-				default:
-					echo "              <option value='true' selected='yes'>true</option>\n";
-					echo "              <option value='false'>false</option>\n";
-				}
-				echo "              </select>\n";
-				?>          
-			  </td>
-			</tr>
-			<tr>
-			  <td width="25%" valign="top" class="vncellreq">Description</td>
-			  <td width="75%" class="vtable"> 
-				<input name="description" type="text" class="formfld" id="description" size="40" value="<?=htmlspecialchars($pconfig['description']);?>">
-				<br><span class="vexpl">Enter the description here.<br></span>
-			  </td>
-			</tr>
-			
-			<tr>
-			  <td valign="top">&nbsp;</td>
-			  <td>
-				<input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
-				<?php if (isset($id) && $a_backup[$id]): ?>
-				  <input name="id" type="hidden" value="<?=$id;?>">
-				<?php endif; ?>
-			  </td>
-			</tr>
+			  <tr>
+				<td><p><span class="vexpl"><span class="red"><strong>PHP<br>
+					</strong></span>
+					</p></td>
+			  </tr>
 			</table>
-		</form>
+			-->
+			<br />
 
-	  <br>
-	  <br>
-	  <br>
-	  <br>
-	  <br>
-	  <br>
+			<form action="backup_edit.php" method="post" name="iform" id="iform">
+				<table width="100%" border="0" cellpadding="6" cellspacing="0">
 
-	 </td>
+					<tr>
+						<td width="25%" valign="top" class="vncellreq">Name</td>
+						<td width="75%" class="vtable">
+							<input name="name" type="text" class="formfld" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>">
+						</td>
+					</tr>
+
+					<tr>
+						<td width="22%" valign="top" class="vncellreq">Path</td>
+						<td width="78%" class="vtable">
+							<input name="path" type="text" class="formfld" id="path" size="40" value="<?=htmlspecialchars($pconfig['path']);?>">
+						</td>
+					</tr>
+					<tr>
+						<td width="22%" valign="top" class="vncellreq">Enabled</td>
+						<td width="78%" class="vtable">
+							<?php
+							echo "              <select name='enabled' class='formfld'>\n";
+							echo "                <option></option>\n";
+							switch (htmlspecialchars($pconfig['enabled'])) {
+								case "true":
+									echo "              <option value='true' selected='yes'>true</option>\n";
+									echo "              <option value='false'>false</option>\n";
+									break;
+								case "false":
+									echo "              <option value='true'>true</option>\n";
+									echo "              <option value='false' selected='yes'>false</option>\n";
+
+									break;
+								default:
+									echo "              <option value='true' selected='yes'>true</option>\n";
+									echo "              <option value='false'>false</option>\n";
+							}
+							echo "              </select>\n";
+							?>
+						</td>
+					</tr>
+					<tr>
+						<td width="25%" valign="top" class="vncellreq">Description</td>
+						<td width="75%" class="vtable">
+							<input name="description" type="text" class="formfld" id="description" size="40" value="<?=htmlspecialchars($pconfig['description']);?>">
+							<br><span class="vexpl">Enter the description here.<br></span>
+						</td>
+					</tr>
+
+					<tr>
+						<td valign="top">&nbsp;</td>
+						<td>
+							<input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
+							<?php if (isset($id) && $a_backup[$id]): ?>
+								<input name="id" type="hidden" value="<?=$id;?>">
+							<?php endif; ?>
+						</td>
+					</tr>
+				</table>
+			</form>
+
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+			<br>
+
+		</td>
 	</tr>
 </table>
 
