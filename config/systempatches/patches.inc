@@ -55,10 +55,11 @@ function patch_commit($patch, $action, $test=false, $fulldetail=false) {
 	$full_patch_command = "{$patch_cmd} --directory={$directory} {$force} {$pathstrip} {$filename} {$check} {$direction} {$whitespace}";
 	conf_mount_rw();
 	patch_write($patch);
-	if (!$fulldetail)
+	if (!$fulldetail) {
 		$output = (mwexec($full_patch_command, true) == 0);
-	else
+	} else {
 		$output = $full_patch_command . "\n\n" . shell_exec($full_patch_command . ' 2>&1');
+	}
 	patch_erase($patch);
 	conf_mount_ro();
 	return $output;
@@ -158,8 +159,9 @@ function bootup_apply_patches() {
 
 	foreach ($a_patches as $patch) {
 		/* Skip the patch if it should not be automatically applied. */
-		if (!isset($patch['autoapply']))
+		if (!isset($patch['autoapply'])) {
 			continue;
+		}
 		/* If the patch can be reverted it is already applied, so skip it. */
 		if (!patch_test_revert($patch)) {
 			/* Only attempt to apply if it can be applied. */
@@ -173,12 +175,15 @@ function bootup_apply_patches() {
 function patch_add_shellcmd() {
 	global $config;
 	$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
-	if (!is_array($a_earlyshellcmd))
+	if (!is_array($a_earlyshellcmd)) {
 		$a_earlyshellcmd = array();
+	}
 	$found = false;
-	foreach ($a_earlyshellcmd as $idx => $cmd)
-		if (stristr($cmd, "apply_patches.php"))
+	foreach ($a_earlyshellcmd as $idx => $cmd) {
+		if (stristr($cmd, "apply_patches.php")) {
 			$found = true;
+		}
+	}
 	if (!$found) {
 		$a_earlyshellcmd[] = "/usr/local/bin/php -f /usr/local/bin/apply_patches.php";
 		write_config("System Patches package added a shellcmd");
@@ -188,8 +193,9 @@ function patch_add_shellcmd() {
 function patch_remove_shellcmd() {
 	global $config;
 	$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
-	if (!is_array($a_earlyshellcmd))
+	if (!is_array($a_earlyshellcmd)) {
 		$a_earlyshellcmd = array();
+	}
 	$removed = false;
 	foreach ($a_earlyshellcmd as $idx => $cmd) {
 		if (stristr($cmd, "apply_patches.php")) {
@@ -197,8 +203,9 @@ function patch_remove_shellcmd() {
 			$removed = true;
 		}
 	}
-	if ($removed)
+	if ($removed) {
 		write_config("System Patches package removed a shellcmd");
+	}
 }
 
 ?>
