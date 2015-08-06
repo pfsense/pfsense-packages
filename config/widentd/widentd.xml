@@ -58,6 +58,11 @@
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
+			<fielddescr>Enable widentd daemon</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Listening interface</fielddescr>
 			<fieldname>interface</fieldname>
 			<description>
@@ -114,7 +119,15 @@
 			)
 		);
 
-		restart_service("widentd");
+		/* If the service is (being) disabled, stop it (if running) and do nothing else */
+		if (!($config['installedpackages']['widentd']['config'][0][enable])) {
+			if (is_process_running("widentd")) {
+				stop_service("widentd");
+			}
+			return;
+		} else {
+			restart_service("widentd");
+		}
 		config_unlock();
 		conf_mount_ro();
 	}
