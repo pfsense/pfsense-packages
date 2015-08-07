@@ -83,6 +83,16 @@
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
+			<fielddescr>Intercept on interfaces</fielddescr>
+			<fieldname>spamdbinds_array</fieldname>
+			<description>
+				<![CDATA[These are the interfaces spamd will intercept smtp connections on.]]>
+			</description>
+			<type>interfaces_selection</type>
+			<multiple>true</multiple>
+			<hideinterfaceregex>loopback</hideinterfaceregex>
+		</field>
+		<field>
 			<fielddescr>Identifier</fielddescr>
 			<fieldname>identifier</fieldname>
 			<description>The SMTP version banner that is reported upon initial connection.</description>
