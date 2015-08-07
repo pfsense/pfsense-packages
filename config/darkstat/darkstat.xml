@@ -263,7 +263,7 @@
 		function sync_package_darkstat() {
 			conf_mount_rw();
 			config_lock();
-			global $config; $darkstat_config;
+			global $config, $darkstat_config;
 			$darkstat_config =& $config['installedpackages']['darkstat']['config'][0];
 
 			/* Configure capture interface(s) */
