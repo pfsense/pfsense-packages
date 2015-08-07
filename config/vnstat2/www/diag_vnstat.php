@@ -1,8 +1,9 @@
 <?php
-/* $Id$ */
 /*
-	diag_pf_info.php
-	Copyright (C) 2010 Scott Ullrich
+	diag_vnstat.php
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 PerryMason
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,26 +27,10 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-/*
-	pfSense_BUILDER_BINARIES:	/usr/bin/top
-	pfSense_MODULE:	system
-*/
-
-##|+PRIV
-##|*IDENT=page-diag-system-activity
-##|*NAME=Diagnostics: System Activity
-##|*DESCR=Allows access to the 'Diagnostics: System Activity' page
-##|*MATCH=diag_system_activity*
-##|-PRIV
-
-require("guiconfig.inc");
-
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-
-$pgtitle = gettext("Vnstat2 summary ");
+require_once("guiconfig.inc");
+$pgtitle = gettext("Vnstat2 summary");
 if ($_REQUEST['getactivity']) {
-	$text = `vnstat`;
+	$text = shell_exec("/usr/local/bin/vnstat");
 	$text .= "<p/>";
 	echo $text;
 	exit;
@@ -55,8 +40,8 @@ include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
 <script type="text/javascript">
+//<![CDATA[
 	function getcpuactivity() {
 		var url = "/diag_vnstat.php";
 		var pars = 'getactivity=yes';
@@ -69,37 +54,36 @@ include("head.inc");
 			});
 	}
 	function activitycallback(transport) {
-		$('cpuactivitydiv').innerHTML = '<font face="Courier"><font size="2"><b><pre>' + transport.responseText  + '</pre></font>';
-		setTimeout('getcpuactivity()', 2000);		
+		$('cpuactivitydiv').innerHTML = '<font face="Courier"><font size="2"><b><pre>' + transport.responseText + '</pre></font>';
+		setTimeout('getcpuactivity()', 2000);
 	}
-	setTimeout('getcpuactivity()', 5000);	
+	setTimeout('getcpuactivity()', 5000);
+//]]>
 </script>
 <div id='maincontent'>
 <?php
-	include("fbegin.inc"); 
-	if ($pf_version < 2.0)
-		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
-		echo "<a href=$myurl/pkg_edit.php?xml=vnstatoutput.xml&id=0>Go Back</a><br />";
+	include("fbegin.inc");
+
 	if ($savemsg) {
 		echo "<div id='savemsg'>";
 		print_info_box($savemsg);
-		echo "</div>";	
+		echo "</div>";
 	}
-	if ($input_errors)
+	if ($input_errors) {
 		print_input_errors($input_errors);
+	}
 ?>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">  
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
 			<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
 				<tr>
 					<td>
-						<center>
 						<table>
 							<tr>
 								<td>
 									<div name='cpuactivitydiv' id='cpuactivitydiv'>
-										<b><?=gettext("Gathering vnstat information, please wait...");?>
+										<strong><?=gettext("Gathering vnstat information, please wait...");?></strong>
 									</div>
 								</td>
 							</tr>
@@ -107,7 +91,6 @@ include("head.inc");
 					</td>
 				</tr>
 			</table>
-			</div>
 		</td>
 	</tr>
 </table>
