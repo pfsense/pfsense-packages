@@ -1280,7 +1280,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.15_5 v2.2_4</version>
 		<status>Beta</status>
-		<required_version>2.2</required_version>
+		<required_version>2.2.1</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
 		<configurationfile>nrpe2.xml</configurationfile>
 		<maximum_version>2.2.999</maximum_version>
