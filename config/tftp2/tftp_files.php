@@ -1,10 +1,11 @@
 <?php
-/* $Id$ */
 /*
-  tftp_files.php
-  Copyright (C) 2008 Mark J Crane
-  All rights reserved.
-
+	tftp_files.php
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2011 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -27,7 +28,6 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/tftp.inc");
 
@@ -36,9 +36,9 @@ $backup_dir = "/root/backup";
 $backup_filename = "tftp.bak.tgz";
 $backup_path = "{$backup_dir}/{$backup_filename}";
 $files_dir = "/tftpboot";
-
 $filename = $_GET['filename'];
 $download_dir = $files_dir;
+
 if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
 	conf_mount_rw();
 	$filename = $backup_filename;
@@ -46,6 +46,7 @@ if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
 	system("tar -czC / -f {$backup_path} tftpboot");
 	conf_mount_ro();
 }
+
 if (($_GET['a'] == "download") && file_exists("{$download_dir}/{$filename}")) {
 
 	session_cache_limiter('public');
@@ -55,8 +56,10 @@ if (($_GET['a'] == "download") && file_exists("{$download_dir}/{$filename}")) {
 	header("Content-Type: application/download");
 	header("Content-Description: File Transfer");
 	header("Content-Disposition: attachment; filename=\"{$filename}\"");
-	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+	/* HTTP/1.1 */
+	header("Cache-Control: no-cache, must-revalidate");
+	/* Date in the past */
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 	header("Content-Length: " . filesize("{$download_dir}/{$filename}"));
 	fpassthru($fd);
 	exit;
@@ -81,13 +84,15 @@ if ($_GET['a'] == "other") {
 	}
 }
 if ($_POST['submit'] == "Save") {
-	if ($_POST['tftpdinterface']) {
+	if (($_POST['tftpdinterface']) != "") {
 		$config['installedpackages']['tftpd']['config'][0]['tftpdinterface'] = implode(",", $_POST['tftpdinterface']);
 		$pconfig['tftpdinterface'] = $_POST['tftpdinterface'];
 		write_config();
 		send_event("filter reload");
 	} else {
 		unset($config['installedpackages']['tftpd']['config'][0]['tftpdinterface']);
+		write_config();
+		send_event("filter reload");
 	}
 }
 
@@ -122,7 +127,7 @@ include("head.inc");
 <?php
 $savemsg = $_GET["savemsg"];
 if ($savemsg) {
-  print_info_box($savemsg);
+	print_info_box($savemsg);
 }
 ?>
 
@@ -141,78 +146,81 @@ if ($savemsg) {
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-	<td class="tabcont" >
+	<td class="tabcont">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
-
 	<tr>
 		<td width="78%" class="vtable">
-			<form action="tftp_files.php" method="POST" enctype="multipart/form-data" name="frmInterfaces" onSubmit="">
-			<p><span class="vexpl"><strong>TFTP Daemon Interfaces<br/></strong>
+			<form action="tftp_files.php" method="post" enctype="multipart/form-data" name="frmInterfaces" onsubmit="">
+			<p><span class="vexpl"><strong>TFTP Daemon Interfaces</strong></span></p>
 			<?=gettext("Choose the interfaces where you want the TFTP daemon to accept connections.");?><br/><br/>
-			<select name="tftpdinterface[]" multiple="true" class="formselect" size="3">
-<?php
+			<select name="tftpdinterface[]" multiple="multiple" class="formselect" size="3">
+			<?php
 				$ifdescs = get_configured_interface_with_descr();
-				foreach ($ifdescs as $ifent => $ifdesc):
-?>
-					<option value="<?=$ifent;?>" <?php if (in_array($ifent, $pconfig['tftpdinterface'])) echo "selected"; ?>><?=gettext($ifdesc);?></option>
-<?php				endforeach; ?>
-			</select>
-			<br/><input name="submit" type="submit" class="button" id="save" value="Save">
+				foreach ($ifdescs as $ifent => $ifdesc) {
+					$selected = "";
+					if (in_array($ifent, $pconfig['tftpdinterface'])) {
+						$selected = " selected=\"selected\"";
+					}
+					echo "\t\t\t<option value=\"{$ifent}\"{$selected}>" . $ifdesc . "</option>\n";
+				}
+			?>
+			</select><br />
+			<input name="submit" type="submit" class="button" id="save" value="Save" />
 			</form>
 		</td>
 	</tr>
 
 	<tr>
-	<td><p><span class="vexpl"><span class="red"><strong>TFTP files<br />
-	</strong></span>
-	Trivial File Transport Protocol is a very simple file transfer
-	protocol. Use the file upload to add files to the /tftpboot directory.
-	Click on the file from the file list below to download it.
-	</span></p></td>
+		<td>
+			<p><span class="vexpl"><span class="red"><strong>TFTP files</strong></span><br />
+				Trivial File Transport Protocol is a very simple file transfer protocol.<br />
+				Use the file upload to add files to the /tftpboot directory.<br />
+				Click on the file from the file list below to download it.<br />
+			</span></p>
+		</td>
 	</tr>
 	</table>
 	<br />
 	<div id="niftyOutter">
-	<form action="tftp_files.php" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
+	<form action="tftp_files.php" method="post" enctype="multipart/form-data" name="frmUpload" onsubmit="">
 		<table>
 		<tr>
 			<td align="right">File to upload:</td>
 			<td valign="top" class="label">
-			<input name="ulfile" type="file" class="button" id="ulfile"></td>
+				<input name="ulfile" type="file" class="button" id="ulfile" />
+			</td>
 		</tr>
 		<tr>
 			<td valign="top">&nbsp;&nbsp;&nbsp;</td>
 			<td valign="top" class="label">
-			<input name="submit" type="submit"  class="button" id="upload" value="Upload"></td>
+				<input name="submit" type="submit" class="button" id="upload" value="Upload" />
+			</td>
 		</tr>
 		</table>
-	</div>
 	</form>
-
-	<br />
-	<br />
-
-	<?php
-	echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
-	echo "<tr>\n";
-	echo "<td width='80%'>\n";
-	echo "<b>Backup / Restore</b><br />\n";
-	echo "The 'backup' button will tar gzip /tftpboot/ to /root/backup/tftp.bak.tgz it then presents a file to download. \n";
-	echo "If the backup file does not exist in /root/backup/tftp.bak.tgz then the 'restore' button will be hidden. \n";
-	echo "Use Diagnostics->Command->File to upload: to browse to the file and then click on upload it now ready to be restored. \n";
-	echo "<br /><br />\n";
-	echo "</td>\n";
-	echo "<td width='20%' valign='middle' align='right'>\n";
-	echo "  <input type='button' value='backup' onclick=\"document.location.href='tftp_files.php?a=download&t=backup';\" />\n";
-	if (file_exists('/root/backup/tftp.bak.tgz')) {
-		echo "  <input type='button' value='restore' onclick=\"document.location.href='tftp_files.php?a=other&t=restore';\" />\n";
-	}
-	echo "</td>\n";
-	echo "</tr>\n";
-	echo "</table>\n";
-	echo "<br /><br />\n\n";
-	?>
-
+	</div>
+	<br /><br />
+	
+	<table width='690' cellpadding='0' cellspacing='0' border='0'>
+	<tr>
+		<td width='80%'>
+			<strong>Backup / Restore</strong><br />
+			The 'Backup' button compresses /tftpboot/ to /root/backup/tftp.bak.tgz; after that it presents the backup for download.<br />
+			If the backup file does not exist in /root/backup/tftp.bak.tgz then the 'Restore' button will be hidden.<br />
+			Use Diagnostics -> Command -> File to upload: to browse to the file and then click on upload.<br />
+			After that, backup will be ready to be restored.<br /><br />
+		</td>
+		<td width='20%' valign='middle' align='right'>
+			<input type="button" value="Backup" onclick="document.location.href='tftp_files.php?a=download&amp;t=backup'" />
+			<?php
+				if (file_exists('/root/backup/tftp.bak.tgz')) {
+					echo "<input type='button' value='Restore' onclick=\"document.location.href='tftp_files.php?a=other&amp;t=restore';\" />\n";
+				}
+			?>
+		</td>
+	</tr>
+	</table>
+	<br /><br />
 
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
@@ -225,28 +233,33 @@ if ($savemsg) {
 if ($handle = opendir('/tftpboot')) {
 	while (false !== ($file = readdir($handle))) {
 		if ($file != "." && $file != "..") {
-			$tftp_filesize = filesize('/tftpboot/'.$file);
+			$tftp_filesize = filesize("/tftpboot/{$file}");
 			$tftp_filesize = tftp_byte_convert($tftp_filesize);
 			echo "<tr>\n";
-			echo "  <td class=\"listlr\" ondblclick=\"\">\n";
-			echo "	  <a href=\"tftp_files.php?a=download&filename=".$file."\">\n";
-			echo "    	$file";
-			echo "	  </a>";
-			echo "  </td>\n";
-			echo "  <td class=\"listlr\" ondblclick=\"\">\n";
-			echo 		date ("F d Y H:i:s", filemtime('/tftpboot/'.$file));
-			echo "  </td>\n";
-			echo "  <td class=\"listlr\" ondblclick=\"\">\n";
-			echo "	".$tftp_filesize;
-			echo "  </td>\n";
-			echo "  <td valign=\"middle\" nowrap class=\"list\">\n";
-			echo "    <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
-			echo "      <tr>\n";
-			echo "        <td valign=\"middle\"><form method='POST' action='/edit.php' target='_blank'><input type='hidden' name='savetopath' value='/tftpboot/".$file."'><input type='hidden' name='submit' value='Load'><input type='image' src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></form></td>\n";
-			echo "        <td><a href=\"tftp_files.php?type=tftp&act=del&filename=".$file."\" onclick=\"return confirm('Do you really want to delete this file?')\"><img src=\"/themes/". $g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-			echo "      </tr>\n";
-			echo "   </table>\n";
-			echo "  </td>\n";
+			echo "<td class=\"listlr\" ondblclick=\"\">";
+			echo "<a href=\"tftp_files.php?a=download&amp;filename={$file}\">{$file}</a>";
+			echo "</td>\n";
+			echo "<td class=\"listlr\" ondblclick=\"\">";
+			echo "\t\t" . date("F d Y H:i:s", filemtime('/tftpboot/'. $file));
+			echo "</td>\n";
+			echo "<td class=\"listlr\" ondblclick=\"\">";
+			echo "\t\t{$tftp_filesize}";
+			echo "</td>\n";
+			echo "<td valign=\"middle\" nowrap=\"nowrap\" class=\"list\">\n";
+			echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
+			echo "<tr>\n";
+			echo "<td valign=\"middle\">\n";
+			echo "\t<form method=\"post\" action=\"/edit.php\" target=\"_blank\"><input type=\"hidden\" name=\"savetopath\" value=\"/tftpboot/{$file}\" />\n";
+			echo "\t\t<input type=\"hidden\" name=\"submit\" value=\"Load\" />\n";
+			echo "\t\t<input type='image' src=\"/themes/" . $g['theme'] . "/images/icons/icon_e.gif\" />\n";
+			echo "\t</form>\n";
+			echo "</td>\n";
+			echo "<td><a href=\"tftp_files.php?type=tftp&amp;act=del&amp;filename={$file}\" onclick=\"return confirm('Do you really want to delete this file?')\">";
+			echo "<img src=\"/themes/" . $g['theme'] . "/images/icons/icon_x.gif\" alt=\"\" width=\"17\" height=\"17\" border=\"0\" /></a>";
+			echo "</td>\n";
+			echo "</tr>\n";
+			echo "</table>\n";
+			echo "</td>\n";
 			echo "</tr>\n";
 		}
 	}
