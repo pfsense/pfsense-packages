@@ -1,14 +1,11 @@
 <?php
-/* $Id$ */
-/*
-/* ========================================================================== */
 /*
 	backup.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
-*/
-/* ========================================================================== */
-/*
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -30,23 +27,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-
-if (!function_exists("byte_convert")) {
-	function byte_convert( $bytes ) {
-		if ($bytes <= 0) {
-			return '0 Byte';
-		}
-
-		$convention = 1000; //[1000->10^x|1024->2^x]
-		$s = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-		$e = floor(log($bytes, $convention));
-		return round($bytes/pow($convention, $e), 2) . ' ' . $s[$e];
-	}
-}
-
-function backup_sync_package_php() {
-
+function backup_sync_package() {
 	global $config;
 	if ($config['installedpackages']['backup']['config'] != "") {
 		conf_mount_rw();
@@ -65,26 +46,12 @@ function backup_sync_package_php() {
 	}
 }
 
-function backup_sync_package() {
-	global $config;
-	backup_sync_package_php();
-}
-
-
 function backup_install_command() {
-
-	global $config;
 	conf_mount_rw();
-
-	//create the backup directory
-	if (!is_dir('/root/backup/')) {
-		@mkdir("/root/backup/");
-	}
-
+	// Create the backup directory
+	safe_mkdir("/root/backup/");
 	backup_sync_package();
-
 	conf_mount_ro();
-
 }
 
 ?>
