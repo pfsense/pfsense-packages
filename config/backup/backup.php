@@ -32,7 +32,6 @@ require("/usr/local/pkg/backup.inc");
 
 $a_backup = &$config['installedpackages']['backup']['config'];
 
-
 if ($_GET['act'] == "del") {
 	if ($_GET['type'] == 'backup') {
 		if ($a_backup[$_GET['id']]) {
@@ -58,13 +57,13 @@ if ($_GET['a'] == "download") {
 		if (count($a_backup) > 0) {
 			$backup_cmd = 'tar --create --verbose --gzip --file '.$tmp.$filename.' --directory / ';
 			foreach ($a_backup as $ent) {
-				if ($ent['enabled'] =="true"){
+				if ($ent['enabled'] == "true") {
 					//htmlspecialchars($ent['name']);
 					//htmlspecialchars($ent['path']);
 					//htmlspecialchars($ent['description']);
 					$backup_cmd .= htmlspecialchars($ent['path']).' ';
 				}
-				$i++; 
+				$i++;
 			}
 			//echo $backup_cmd; //exit;
 			system($backup_cmd);
@@ -74,7 +73,7 @@ if ($_GET['a'] == "download") {
 		$fd = fopen($tmp.$filename, "rb");
 		header("Content-Type: binary/octet-stream");
 		header("Content-Length: " . filesize($tmp.$filename));
-		header('Content-Disposition: attachment; filename="'.$filename.'"');
+		header('Content-Disposition: attachment; filename="' . $filename . '"');
 		fpassthru($fd);
 
 		conf_mount_ro();
@@ -90,13 +89,12 @@ if ($_GET['a'] == "other") {
 
 		//extract the tgz file
 		if (file_exists('/root/backup/'.$filename)) {
-				//echo "The file $filename exists";
-				system('cd /; tar xvpfz /root/backup/'.$filename.' ');
-				header( 'Location: backup.php?savemsg=Backup+has+been+restored.' ) ;
-		}
-		else {
+			//echo "The file $filename exists";
+			system('cd /; tar xvpfz /root/backup/'.$filename.' ');
+			header( 'Location: backup.php?savemsg=Backup+has+been+restored.' ) ;
+		} else {
 			header( 'Location: backup.php?savemsg=Restore+failed.+Backup+file+not+found.' ) ;
-		}    
+		}
 		conf_mount_ro();
 		exit;
 	}
@@ -110,7 +108,6 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 	system('cd /; tar xvpfz /root/backup/'.$filename.' ');
 	conf_mount_ro();
 }
-
 
 include("head.inc");
 
@@ -210,90 +207,84 @@ echo "  <form action='backup.php' method='post' name='iform' id='iform'>\n";
 
 if ($config_change == 1) {
     write_config();
-    $config_change = 0;  
+    $config_change = 0;
 }
 
-//if ($savemsg) print_info_box($savemsg); 
+//if ($savemsg) print_info_box($savemsg);
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
 //print_info_box_np("This is an info box.");
 //echo"<br />";
-//endif; 
+//endif;
 
 ?>
 
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td width="30%" class="listhdrr">Name</td>
 		<td width="20%" class="listhdrr">Enabled</td>
 		<td width="40%" class="listhdr">Description</td>
 		<td width="10%" class="list">
-
-		<table border="0" cellspacing="0" cellpadding="1">
-		  <tr>
-			<td width="17"></td>
-			<td valign="middle"><a href="backup_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-		  </tr>
-		</table>
-
+			<table border="0" cellspacing="0" cellpadding="1">
+				<tr>
+					<td width="17"></td>
+					<td valign="middle"><a href="backup_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+				</tr>
+			</table>
 		</td>
 	</tr>
 
+	<?php
 
-	<?php 
-    
 	$i = 0;
 	if (count($a_backup) > 0) {
 
 		foreach ($a_backup as $ent) {
 
 	?>
-			<tr>
-			<td class="listr" ondblclick="document.location='backup_edit.php?id=<?=$i;?>';">
-			  <?=$ent['name'];?>&nbsp;
-			</td>
-			<td class="listr" ondblclick="document.location='backup_edit.php?id=<?=$i;?>';">
-			  <?=$ent['enabled'];?>&nbsp;
-			</td>
-			<td class="listbg" ondblclick="document.location='backup_edit.php?id=<?=$i;?>';">
-			  <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
-			</td>
-			<td valign="middle" nowrap class="list">
-			  <table border="0" cellspacing="0" cellpadding="1">
+	<tr>
+		<td class="listr" ondblclick="document.location='backup_edit.php?id=<?=$i;?>';">
+			<?=$ent['name'];?>&nbsp;
+		</td>
+		<td class="listr" ondblclick="document.location='backup_edit.php?id=<?=$i;?>';">
+			<?=$ent['enabled'];?>&nbsp;
+		</td>
+		<td class="listbg" ondblclick="document.location='backup_edit.php?id=<?=$i;?>';">
+			<font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
+		</td>
+		<td valign="middle" nowrap class="list">
+			<table border="0" cellspacing="0" cellpadding="1">
 				<tr>
-				  <td valign="middle"><a href="backup_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-				  <td><a href="backup_edit.php?type=backup&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="backup_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+					<td><a href="backup_edit.php?type=backup&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
 				</tr>
-			 </table>
-			</td>
-			</tr>
-			<?php 
-
-			$i++; 
+			</table>
+		</td>
+	</tr>
+	<?php
+			$i++;
 		}
 	}
 	?>
 
 	<tr>
-	  <td class="list" colspan="3"></td>
-	  <td class="list">          
-		<table border="0" cellspacing="0" cellpadding="1">
-		  <tr>
-			<td width="17"></td>
-			<td valign="middle"><a href="backup_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-		  </tr>
-		</table>
-	</td>
+		<td class="list" colspan="3"></td>
+		<td class="list">
+			<table border="0" cellspacing="0" cellpadding="1">
+				<tr>
+					<td width="17"></td>
+					<td valign="middle"><a href="backup_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+				</tr>
+			</table>
+		</td>
 	</tr>
-
 
 	<tr>
-	   <td class="list" colspan="3"></td>
-	   <td class="list"></td>
+		<td class="list" colspan="3"></td>
+		<td class="list"></td>
 	</tr>
-	</table>
+</table>
 
 </form>
-
 
 <br>
 <br>
@@ -309,7 +300,6 @@ if ($config_change == 1) {
 </table>
 
 </div>
-
 
 <?php include("fend.inc"); ?>
 </body>

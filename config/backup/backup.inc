@@ -3,10 +3,10 @@
 /*
 /* ========================================================================== */
 /*
-    backup.inc
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-                                                                              */
+	backup.inc
+	Copyright (C) 2008 Mark J Crane
+	All rights reserved.
+*/
 /* ========================================================================== */
 /*
 	Redistribution and use in source and binary forms, with or without
@@ -34,28 +34,28 @@
 
 if (!function_exists("byte_convert")) {
 	function byte_convert( $bytes ) {
-		if ($bytes<=0)
+		if ($bytes <= 0) {
 			return '0 Byte';
+		}
 
-		$convention=1000; //[1000->10^x|1024->2^x]
-		$s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-		$e=floor(log($bytes,$convention));
-		return round($bytes/pow($convention,$e),2).' '.$s[$e];
+		$convention = 1000; //[1000->10^x|1024->2^x]
+		$s = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
+		$e = floor(log($bytes, $convention));
+		return round($bytes/pow($convention, $e), 2) . ' ' . $s[$e];
 	}
 }
- 
-function backup_sync_package_php()
-{
 
-	global $config; 
-	if($config['installedpackages']['backup']['config'] != "") {
+function backup_sync_package_php() {
+
+	global $config;
+	if ($config['installedpackages']['backup']['config'] != "") {
 		conf_mount_rw();
-		foreach($config['installedpackages']['backup']['config'] as $rowhelper) {
+		foreach ($config['installedpackages']['backup']['config'] as $rowhelper) {
 			if ($rowhelper['enabled'] != "false") {
 				//$tmp_php = base64_decode($rowhelper['php']);
 				if (strlen($tmp_php) > 0) {
-					$tmp .= "// name: ".$rowhelper['name']." \n";
-					$tmp .= "// description: ".$rowhelper['description']." \n\n";
+					$tmp .= "// name: " . $rowhelper['name'] . " \n";
+					$tmp .= "// description: " . $rowhelper['description'] . " \n\n";
 					$tmp .= base64_decode($rowhelper['php']);
 					$tmp .= "\n";
 				}
@@ -65,16 +65,13 @@ function backup_sync_package_php()
 	}
 }
 
-
-function backup_sync_package()
-{
-	global $config;   
+function backup_sync_package() {
+	global $config;
 	backup_sync_package_php();
 }
 
 
-function backup_install_command()
-{
+function backup_install_command() {
 
 	global $config;
 	conf_mount_rw();
@@ -87,7 +84,7 @@ function backup_install_command()
 	backup_sync_package();
 
 	conf_mount_ro();
-  
+
 }
 
 ?>
