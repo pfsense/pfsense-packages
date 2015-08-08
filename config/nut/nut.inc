@@ -126,7 +126,7 @@
 			if (!$post['remotename']) {
 				$input_errors[] = 'You must specify a name in the \'Remote UPS Name\' field';
 			}
-			if ($post['remotename'] && !preg_match("/^[a-zA-Z0-9-_]+$/", $post['name'])) {
+			if ($post['remotename'] && !preg_match("/^[a-zA-Z0-9-_]+$/", $post['remotename'])) {
 				$input_errors[] = 'Only [Aa-Zz], [0-9], and [-_] accepted in the \'Remote UPS Name\' field';
 			}
 			if (!$post['remoteaddr'] || !is_ipaddr($post['remoteaddr'])) {
