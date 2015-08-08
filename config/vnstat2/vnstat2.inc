@@ -1,15 +1,42 @@
 <?php
+/*
+	vnstat2.inc
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2010 PerryMason
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 require_once("util.inc");
 
 function vnstat_install_deinstall() {
 	conf_mount_rw();
 	global $config;
 	// Remove Vnstat package and files
-	exec("rm -d -R /usr/local/www/vnstat2");
-	exec("rm -d -R /usr/local/www/vnstati");
-	exec("rm -d -R /usr/local/pkg/vnstat2");
-	exec("rm /usr/local/etc/vnstat.conf");
+	exec("/bin/rm -d -R /usr/local/www/vnstat2");
+	exec("/bin/rm -d -R /usr/local/www/vnstati");
+	exec("/bin/rm -d -R /usr/local/pkg/vnstat2");
+	exec("/bin/rm /usr/local/etc/vnstat.conf");
 	// Remove vnstat cron entry from config.xml
 	vnstat2_install_cron(false);
 	conf_mount_ro();
@@ -22,29 +49,29 @@ function vnstat2_install_cron($vnstat_cron_value) {
 		return;
 	}
 	$x=0;
-	foreach($config['cron']['item'] as $item) {
+	foreach ($config['cron']['item'] as $item) {
 		if (strstr($item['command'], "/usr/local/pkg/vnstat2/vnstat2.sh")) {
 			$is_installed = true;
 			break;
 		}
 		$x++;
 	}
-	switch($vnstat_cron_value) {
+	switch ($vnstat_cron_value) {
 		case true:
 			if (!$is_installed) {
 				$cron_item = array();
-				$cron_item['minute']    = "*/1";
-				$cron_item['hour']      = "*";
-				$cron_item['mday']      = "*";
-				$cron_item['month']     = "*";
-				$cron_item['wday']      = "*";
-				$cron_item['who']       = "root";
-				$cron_item['command']   = "/usr/local/pkg/vnstat2/vnstat2.sh";
+				$cron_item['minute'] = "*/1";
+				$cron_item['hour'] = "*";
+				$cron_item['mday'] = "*";
+				$cron_item['month'] = "*";
+				$cron_item['wday'] = "*";
+				$cron_item['who'] = "root";
+				$cron_item['command'] = "/usr/local/pkg/vnstat2/vnstat2.sh";
 				$config['cron']['item'][] = $cron_item;
 				write_config();
 				configure_cron();
 			}
-		break;
+			break;
 		case false:
 			if ($is_installed == true) {
 				if ($x > 0) {
@@ -53,7 +80,7 @@ function vnstat2_install_cron($vnstat_cron_value) {
 				}
 				configure_cron();
 			}
-		break;
+			break;
 	}
 }
 
@@ -61,14 +88,14 @@ function change_vnstat_conf() {
 	conf_mount_rw();
 	global $config;
 	$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = $_POST['monthrotate'];
-	$config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'] = $_POST['vnstat_phpfrontend']; 
+	$config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'] = $_POST['vnstat_phpfrontend'];
 	write_conf_f();
 	write_config();
 
 	if ($config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'] == "on") {
 		vnstat_php_frontend();
 	} else {
-		exec("[ -d /usr/local/www/vnstat2 ] && rm -d -R /usr/local/www/vnstat2");
+		exec("[ -d /usr/local/www/vnstat2 ] && /bin/rm -d -R /usr/local/www/vnstat2");
 	}
 	conf_mount_ro();
 }
@@ -77,9 +104,9 @@ function write_conf_f() {
 	global $config;
 	$monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];
 
-	// ************ Write new vnstat.conf *****************
+	// Write new vnstat.conf
 	$vnstat_conf_file = <<<EOF
-# vnStat 1.10 config file
+# vnStat 1.12 config file
 ##
 
 # location of the database directory
@@ -106,7 +133,7 @@ CRxD            "-"
 CTxD            "-"
 EOF;
 
-	$hf2 = fopen("/usr/local/etc/vnstat.conf","w");
+	$hf2 = fopen("/usr/local/etc/vnstat.conf", "w");
 	if (!$hf2) {
 		log_error("could not open /usr/local/etc/vnstat.conf for writing");
 		exit;
@@ -124,11 +151,11 @@ function create_vnstati_image() {
 	$iface = $_POST['vnstat_interface'];
 	$ifaces_final = convert_friendly_interface_to_real_interface_name($iface);
 	$config['installedpackages']['vnstat2']['config'][0]['vnstat_interface'] = $ifaces_final;
-	@mkdir($vnstat_tmp);
-	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -vs -o {$vnstat_tmp}/newpicture1.png");
-	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -m -o {$vnstat_tmp}/newpicture2.png");
-	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -d -o {$vnstat_tmp}/newpicture3.png");
-	exec("/usr/local/bin/vnstati -i ". escapeshellarg($ifaces_final) ." -t -o {$vnstat_tmp}/newpicture4.png");
+	safe_mkdir($vnstat_tmp);
+	exec("/usr/local/bin/vnstati -i " . escapeshellarg($ifaces_final) . " -vs -o {$vnstat_tmp}/newpicture1.png");
+	exec("/usr/local/bin/vnstati -i " . escapeshellarg($ifaces_final) . " -m -o {$vnstat_tmp}/newpicture2.png");
+	exec("/usr/local/bin/vnstati -i " . escapeshellarg($ifaces_final) . " -d -o {$vnstat_tmp}/newpicture3.png");
+	exec("/usr/local/bin/vnstati -i " . escapeshellarg($ifaces_final) . " -t -o {$vnstat_tmp}/newpicture4.png");
 	write_config();
 	conf_mount_ro();
 }
@@ -136,7 +163,7 @@ function create_vnstati_image() {
 function create_vnstat_output() {
 	conf_mount_rw();
 	global $config;
-	$iface2 = $_POST['vnstat_interface2']; 
+	$iface2 = $_POST['vnstat_interface2'];
 	$ifaces_final2 = convert_friendly_interface_to_real_interface_name($iface2);
 	$config['installedpackages']['vnstat2']['config'][0]['vnstat_interface2'] = $ifaces_final2;
 	write_config();
@@ -144,7 +171,7 @@ function create_vnstat_output() {
 }
 
 function vnstat_link_config() {
-	// Check for pbi install and arch type then create symlinks
+	// Check for PBI install and arch type, then create symlinks
 	if (file_exists('/usr/pbi/vnstat-' . php_uname("m"))) {
 		$conf_path = "/usr/local/etc/vnstat.conf";
 		$pbi_conf_path = "/usr/pbi/vnstat-" . php_uname("m") . "/etc/vnstat.conf";
@@ -157,7 +184,7 @@ function vnstat_create_nic_dbs() {
 	global $config;
 	conf_mount_rw();
 	$vnstat_db_prefix = "/conf/vnstat";
-	@mkdir($vnstat_db_prefix);
+	safe_mkdir($vnstat_db_prefix);
 
 	// Locate NICs and create associated databases
 	$array_of_real_nic_names = array();
@@ -189,9 +216,8 @@ function vnstat_install_config() {
 	if (is_dir("/usr/local/pkg/vnstat2/vnstat")) {
 		@rename("/usr/local/pkg/vnstat2/vnstat", $vnstat_db_prefix);
 	}
-	if (!is_dir($vnstat_db_prefix)) {
-		@mkdir($vnstat_db_prefix);
-	}
+	safe_mkdir($vnstat_db_prefix);
+
 	vnstat_link_config();
 	// Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
 	if ($config['installedpackages']['vnstat2']['config'][0]['monthrotate'] == "") {
@@ -212,9 +238,9 @@ function vnstat_php_frontend() {
 	global $config;
 	// Copy vnstat_php_frontend to www
 	exec("/bin/cp -a /usr/local/pkg/vnstat2/vnstat_php_frontend/. /usr/local/www/vnstat2/");
-	// Find information to be writing in config.php
+	// Find information to be written in config.php
 	// $iface_list_array_items
-	exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic_in);
+	exec("/bin/ls /conf/vnstat/ | /usr/bin/grep -v '\.'", $vnstat_nic_in);
 	$iface_list_array_items = implode("', '", $vnstat_nic_in);
 	$iface_list_array = "\$iface_list = array('$iface_list_array_items');";
 	// $iface_title_array_items
@@ -235,8 +261,8 @@ function vnstat_php_frontend() {
 		}
 	}
 	$iface_title_array = implode($iface_title_array_items2);
-	// php in php static items
-	// added to new items for the front end version 1.5.1
+	// PHP in static items
+	// Added to new items for the front end version 1.5.1
 	$locale = "\$locale = 'en_US.UTF-8';";
 	$language = "\$language = 'en';";
 	$vnstat_bin2 = "\$vnstat_bin = '/usr/local/bin/vnstat';";
@@ -245,7 +271,7 @@ function vnstat_php_frontend() {
 	$colorscheme2 = "\$colorscheme['light'] = array(";
 	$colorscheme3 = "\$colorscheme['red'] = array(";
 	$colorscheme4 = "\$colorscheme['pfSense'] = array(";
-	// ************ Write new config.php ******************
+	// Write new config.php
 	$config_file = <<<EOF
 <?php
 	//
@@ -320,7 +346,7 @@ function vnstat_php_frontend() {
 ?>
 EOF;
 
-	$hf = fopen("/usr/local/www/vnstat2/config.php","w");
+	$hf = fopen("/usr/local/www/vnstat2/config.php", "w");
 	if (!$hf) {
 		log_error("could not open /usr/local/www/vnstat2/config.php for writing");
 		exit;
