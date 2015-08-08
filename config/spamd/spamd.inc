@@ -202,13 +202,15 @@ function spamd_generate_rules($type) {
 		$natrules .= "table <whitelist> persist\n";
 		$natrules .= "table <blacklist> persist\n";
 		$natrules .= "table <spamd> persist\n";
-		if(file_exists("/var/db/whitelist.txt"))
-				$natrules .= "table <spamd-white> persist file \"/var/db/whitelist.txt\"\n";
+		if(file_exists("/var/db/whitelist.txt")) {
+			$natrules .= "table <spamd-white> persist file \"/var/db/whitelist.txt\"\n";
+		}
 
-		if (is_array($config['installedpackages']['spamdsettings']['config']))		
+		if (is_array($config['installedpackages']['spamdsettings']['config'])) {
 			$spamdconfig = $config['installedpackages']['spamdsettings']['config']['0'];
-		else
+		} else {
 			$spamdconfig = $config['installedpackages']['spamdsettings']['config'];
+		}
 
 		if($spamdconfig) {
 			$nextmta = $spamdconfig['nextmta'];
@@ -216,8 +218,9 @@ function spamd_generate_rules($type) {
 			if (is_array($spamdbinds)) {
 				foreach($spamdbinds as $interface) {
 					$wanif = get_real_interface($interface);
-					if (!isset($wanif))
+					if (!isset($wanif)) {
 						continue;
+					}
 					$natrules .= "rdr pass on {$wanif} proto tcp from <blacklist> to port smtp -> 127.0.0.1 port spamd\n";
 					$natrules .= "rdr pass on {$wanif} proto tcp from <spamd> to port smtp -> 127.0.0.1 port spamd\n";
 					$natrules .= "rdr pass on {$wanif} proto tcp from !<spamd-white> to port smtp -> 127.0.0.1 port spamd\n";
