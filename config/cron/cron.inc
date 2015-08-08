@@ -3,10 +3,10 @@
 /*
 /* ========================================================================== */
 /*
-    cron.inc
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-                                                                              */
+	cron.inc
+	Copyright (C) 2008 Mark J Crane
+	All rights reserved.
+																			  */
 /* ========================================================================== */
 /*
 	Redistribution and use in source and binary forms, with or without
@@ -33,35 +33,31 @@
 
 require_once("services.inc");
 
-function cron_pkg_is_service_running($servicename)
-{
+function cron_pkg_is_service_running($servicename) {
 	exec("/bin/ps ax | awk '{ print $5 }'", $psout);
 	array_shift($psout);
-	foreach($psout as $line) {
+	foreach ($psout as $line) {
 		$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
 	}
-	if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
+	if (is_service_running($servicename, $ps) or is_process_running($servicename)) {
 		return true;
-	}
-	else {
+	} else {
 		return false;
 	}
 }
 
-function cron_sync_package()
-{
+function cron_sync_package() {
 
-	global $config;   
+	global $config;
 	//synch cron tab
 	configure_cron();
 	exec("/usr/local/etc/rc.d/cron.sh stop");
 	exec("/usr/local/etc/rc.d/cron.sh start");
 
 }
-    
 
-function cron_install_command()
-{
+
+function cron_install_command() {
 
 	global $config;
 	conf_mount_rw();
@@ -88,8 +84,7 @@ function cron_install_command()
 }
 
 
-function cron_deinstall_command()
-{
+function cron_deinstall_command() {
 	conf_mount_rw();
 	exec("/usr/local/etc/rc.d/cron.sh stop");
 	unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
