@@ -135,8 +135,8 @@ function sshdcond_sync_on_changes() {
 				}
 			}
 		}
+		log_error("[sshdcond] xmlrpc sync is ending.");
 	}
-	log_error("[sshdcond] xmlrpc sync is ending.");
 }
 
 /* Do the actual XMLRPC sync. */
