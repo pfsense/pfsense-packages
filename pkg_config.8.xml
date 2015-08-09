@@ -1536,21 +1536,6 @@
 		<configurationfile>shellcmd.xml</configurationfile>
 	</package>
 	<package>
-		<name>widescreen</name>
-		<descr>The package makes pfSense adapt to browser's current width. It is particularly convenient for Status->Dashboard page that allocates columns for widgets according to browser's current width. ATTENTION: the package heavily modifies pfsense_ng theme and affects other's themes appearance. Please REFRESH your browser's window after installing/uninstalling this package.</descr>
-		<website/>
-		<pkginfolink></pkginfolink>
-		<category>Enhancements</category>
-		<version>0.2</version>
-		<status>BETA</status>
-		<required_version>2.0</required_version>
-		<maintainer>ey@tm-k.com</maintainer>
-		<config_file>https://packages.pfsense.org/packages/config/widescreen/widescreen.xml</config_file>
-		<configurationfile>widescreen.xml</configurationfile>
-		<!-- Disabling on 2.0.2 and 2.1 since it overwrites the menu -->
-		<maximum_version>2.0.1</maximum_version>
-	</package>
-	<package>
 		<name>NRPE v2</name>
 		<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
 		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
