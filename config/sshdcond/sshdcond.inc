@@ -124,12 +124,14 @@ function sshdcond_sync_on_changes() {
 	}
 
 	log_error("[sshdcond] xmlrpc sync is starting.");
-	foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs) {
-		foreach($rs['row'] as $sh) {
-			$sync_to_ip = $sh['ipaddress'];
-			$password = $sh['password'];
-			if ($password && $sync_to_ip) {
-				sshdcond_do_xmlrpc_sync($sync_to_ip, $password);
+	if (is_array($config['installedpackages']['sshdcondsync'])) {
+		foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs) {
+			foreach($rs['row'] as $sh) {
+				$sync_to_ip = $sh['ipaddress'];
+				$password = $sh['password'];
+				if ($password && $sync_to_ip) {
+					sshdcond_do_xmlrpc_sync($sync_to_ip, $password);
+				}
 			}
 		}
 	}
