@@ -4,14 +4,21 @@
 <packagegui>
 	<copyright>
 	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
 /*
 	siproxd.xml
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006 Scott Ullrich
 	Copyright (C) 2010 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
-
+*/
+/* ====================================================================================== */
+/*
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
+
 
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
@@ -19,6 +26,7 @@
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
+
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -31,13 +39,11 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+/* ====================================================================================== */
 	]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>siproxdsettings</name>
-	<version>1.0.3</version>
+	<version>1.0.5</version>
 	<title>siproxd: Settings</title>
 	<include_file>/usr/local/pkg/siproxd.inc</include_file>
 	<aftersaveredirect>/pkg_edit.php?xml=siproxd.xml&amp;id=0</aftersaveredirect>
@@ -69,17 +75,14 @@
 	</tabs>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/siproxd/siproxdusers.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/siproxd/siproxd.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/siproxd/siproxd_registered_phones.php</item>
 	</additional_files_needed>
 	<fields>
@@ -104,7 +107,12 @@
 		<field>
 			<fielddescr>Listening port</fielddescr>
 			<fieldname>port</fieldname>
-			<description>Enter the port on which to listen for SIP traffic (default 5060). Do not change this unless you know what you're doing.</description>
+			<description>
+				<![CDATA[
+				Enter the port on which to listen for SIP traffic (default 5060).<br />
+				<strong> WARNING: Do not change this unless you know what you're doing.</strong>
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -174,13 +182,23 @@
 		<field>
 			<fielddescr>TCP inactivity timeout</fielddescr>
 			<fieldname>tcp_timeout</fieldname>
-			<description>Inactivity timeout (seconds). After that an idling TCP connection is disconnected. NOTE: Making this too short may cause multiple parallel registrations for the same phone. This timeout must be set larger than the used registration interval.</description>
+			<description>
+				<![CDATA[
+				Inactivity timeout (seconds). After that an idling TCP connection is disconnected.<br />
+				NOTE: Making this too short may cause multiple parallel registrations for the same phone. This timeout must be set larger than the used registration interval.
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>TCP Connect Timeout</fielddescr>
 			<fieldname>tcp_connect_timeout</fieldname>
-			<description>Defines How many msecs siproxd will wait for an successful connect when establishing an outgoing SIP signalling connection. This should be kept as short as possible as waiting for an TCP connection to establish is a BLOCKING operation - while waiting for a connect to succeed no SIP messages are processed (RTP is not affected).</description>
+			<description>
+				<![CDATA[
+				Defines How many msecs siproxd will wait for an successful connect when establishing an outgoing SIP signalling connection.<br />
+				This should be kept as short as possible as waiting for an TCP connection to establish is a BLOCKING operation - while waiting for a connect to succeed no SIP messages are processed (RTP is not affected).
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -218,14 +236,23 @@
 		<field>
 			<fielddescr>Expedited RTP Forwarding</fielddescr>
 			<fieldname>expeditedforwarding</fieldname>
-			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.
+			<description>
+				<![CDATA[
+				This service is designed to allow ISPs to offer a service with attributes similar to a "leased line".<br />
+				This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.
+				]]>
 			</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Expedited SIP Forwarding</fielddescr>
 			<fieldname>expeditedsipforwarding</fieldname>
-			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.</description>
+			<description>
+				<![CDATA[
+				This service is designed to allow ISPs to offer a service with attributes similar to a "leased line".<br />
+				This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.
+				]]>
+			</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -257,13 +284,23 @@
 		<field>
 			<fielddescr>Enable Fix Bogus Via Networks Plugin</fielddescr>
 			<fieldname>plugin_fix_bogus_via</fieldname>
-			<description>Incoming (from public network) SIP messages are checked for broken SIP Via headers. If the IP address in the latest Via Header is part of the list below, it will be replaced by the IP where the SIP message has been received from.</description>
+			<description>
+				<![CDATA[
+				Incoming (from public network) SIP messages are checked for broken SIP Via headers.<br />
+				If the IP address in the latest Via Header is part of the list below, it will be replaced by the IP where the SIP message has been received from.
+				]]>
+			</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Bogus Via Networks</fielddescr>
 			<fieldname>plugin_fix_bogus_via_networks</fieldname>
-			<description>Comma separated list of networks which should have their via headers rewritten. Example: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16</description>
+			<description>
+				<![CDATA[
+				Comma separated list of networks which should have their via headers rewritten.<br />
+				Example: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -325,7 +362,12 @@
 		<field>
 			<fielddescr>TCP Debug Port</fielddescr>
 			<fieldname>debug_port</fieldname>
-			<description>You may connect to this port from a remote machine and receive debug output. This allows better creation of debug output on embedded systems that do not have enough memory for large disk files. Port number 0 means this feature is disabled.</description>
+			<description>
+				<![CDATA[
+				You may connect to this port from a remote machine and receive debug output. This allows better creation of debug output on embedded systems that do not have enough memory for large disk files.<br />
+				NOTE: Port number 0 means this feature is disabled.
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 	</fields>
