@@ -1,6 +1,6 @@
 <?php
 /*
-	test.inc
+	olsrd.inc
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Ermal Luçi
 	Copyright (C) 2015 ESF, LLC
