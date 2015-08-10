@@ -104,7 +104,6 @@
 	function sync_package_arpwatch() {
 		global $config;
 		conf_mount_rw();
-		config_lock();
 		$log_file = "/var/log/arp.dat";
 
 		/* E-mail notifications setup */
@@ -139,7 +138,6 @@
 
 		restart_service("arpwatch");
 		conf_mount_ro();
-		config_unlock();
 	}
 	]]>
 	</custom_php_global_functions>
