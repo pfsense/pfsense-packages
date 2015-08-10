@@ -1004,7 +1004,7 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/netio/netio.xml</config_file>
 		<depends_on_package_pbi>netio-1.26-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.26</version>
+		<version>1.27</version>
 		<required_version>2.2</required_version>
 		<status>ALPHA</status>
 		<configurationfile>netio.xml</configurationfile>
