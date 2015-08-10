@@ -3761,8 +3761,8 @@ function snort_sync_on_changes() {
 				}
 				break;
 			case "auto":
-					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+					if (is_array($config['hasync'])) {
+						$system_carp=$config['hasync'];
 						$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
 						$rs[0]['varsyncusername']=$system_carp['username'];
 						$rs[0]['varsyncpassword']=$system_carp['password'];
