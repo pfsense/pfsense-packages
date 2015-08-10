@@ -207,10 +207,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 
 	// add basic settings
 	$devmode = empty($settings['dev_mode']) ? "tun" : $settings['dev_mode'];
-	if (($expformat != "inlinedroid") && ($expformat != "inlineios")) {
-		$conf .= "dev {$devmode}{$nl}";
-	}
-	if (!empty($settings['tunnel_networkv6']) && ($expformat != "inlinedroid") && ($expformat != "inlineios")) {
+	$conf .= "dev {$devmode}{$nl}";
+	if (!empty($settings['tunnel_networkv6'])) {
 		$conf .= "tun-ipv6{$nl}";
 	}
 	$conf .= "persist-tun{$nl}";
