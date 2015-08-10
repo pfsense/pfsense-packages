@@ -1087,7 +1087,7 @@
 		<descr>LCD display driver.</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
