@@ -257,8 +257,8 @@ EODE;
 	foreach ($config['installedpackages']['olsrd']['config'] as $conf) {
 		$interfaces = explode(',', $conf['iface_array']);
 		foreach ($interfaces as $interface) {
-		$realinterface = convert_friendly_interface_to_real_interface_name($interface);
-		$olsr .= <<<EODAD
+			$realinterface = convert_friendly_interface_to_real_interface_name($interface);
+			$olsr .= <<<EODAD
 Interface "{$realinterface}"
 {
 
