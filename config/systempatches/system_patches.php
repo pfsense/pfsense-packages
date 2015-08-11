@@ -1,7 +1,9 @@
 <?php
 /*
 	system_patches.php
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -152,7 +154,7 @@ if (isset($_POST['del_x'])) {
 }
 
 $closehead = false;
-$pgtitle = array(gettext("System"),gettext("Patches"));
+$pgtitle = array(gettext("System"), gettext("Patches"));
 include("head.inc");
 
 ?>
@@ -166,7 +168,7 @@ include("head.inc");
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
 <form action="system_patches.php" method="post" name="iform">
-<script type="text/javascript" language="javascript" src="/javascript/row_toggle.js"></script>
+<script type="text/javascript" src="/javascript/row_toggle.js"></script>
 <?php if ($savemsg) print_info_box_np($savemsg, "Patches", "Close", false); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="system patches">
 <tr><td><div id="mainarea">
@@ -204,7 +206,7 @@ include("head.inc");
 					<?php if (count($a_patches) == 0): ?>
 						<img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="<?=gettext("delete selected patches");?>" border="0" alt="delete" />
 					<?php else: ?>
-						<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
+						<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
 					<?php endif; ?>
 					</td>
 					<td><a href="system_patches_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new patch"); ?>" alt="add" /></a></td>
@@ -221,7 +223,7 @@ foreach ($a_patches as $thispatch):
 
 ?>
 	<tr valign="top" id="fr<?=$npatches;?>">
-		<td class="listt"><input type="checkbox" id="frc<?=$npatches;?>" name="patch[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$npatches;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;" /></td>
+		<td class="listt"><input type="checkbox" id="frc<?=$npatches;?>" name="patch[]" value="<?=$i;?>" onclick="fr_bgcolor('<?=$npatches;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;" /></td>
 		<td class="listlr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
 			<?=$thispatch['descr'];?>
 		</td>
@@ -260,10 +262,10 @@ foreach ($a_patches as $thispatch):
 		<td class="listr" onclick="fr_toggle(<?=$npatches;?>)" id="frd<?=$npatches;?>" ondblclick="document.location='system_patches_edit.php?id=<?=$npatches;?>';">
 			<?= isset($thispatch['autoapply']) ? "Yes" : "No" ?>
 		</td>
-		<td valign="middle" class="list" nowrap>
+		<td valign="middle" class="list" nowrap="nowrap">
 			<table border="0" cellspacing="0" cellpadding="1" summary="edit">
 				<tr>
-					<td><input onmouseover="fr_insline(<?=$npatches;?>, true)" onmouseout="fr_insline(<?=$npatches;?>, false)" name="move_<?=$i;?>" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" title="<?=gettext("move selected patches before this patch");?>" height="17" type="image" width="17" border="0" /></td>
+					<td><input onmouseover="fr_insline(<?=$npatches;?>, true)" onmouseout="fr_insline(<?=$npatches;?>, false)" name="move_<?=$i;?>" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" title="<?=gettext("move selected patches before this patch");?>" type="image" /></td>
 					<td><a href="system_patches_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="<?=gettext("edit patch"); ?>" alt="edit" /></a></td>
 				</tr>
 				<tr>
@@ -280,17 +282,17 @@ endforeach;
 ?>
 	<tr>
 		<td class="list" colspan="8"></td>
-		<td class="list" valign="middle" nowrap>
+		<td class="list" valign="middle" nowrap="nowrap">
 			<table border="0" cellspacing="0" cellpadding="1" summary="edit">
 				<tr>
-					<td><?php if ($npatches == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_left_d.gif" width="17" height="17" title="<?=gettext("move selected patches to end"); ?>" border="0" alt="move" /><?php else: ?><input name="move_<?=$i;?>" type="image" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" width="17" height="17" title="<?=gettext("move selected patches to end");?>" border="0" alt="move" /><?php endif; ?></td>
+					<td><?php if ($npatches == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_left_d.gif" width="17" height="17" title="<?=gettext("move selected patches to end"); ?>" border="0" alt="move" /><?php else: ?><input name="move_<?=$i;?>" type="image" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" title="<?=gettext("move selected patches to end");?>" alt="move" /><?php endif; ?></td>
 				</tr>
 				<tr>
 					<td width="17">
 					<?php if (count($a_patches) == 0): ?>
 						<img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="<?=gettext("delete selected patches");?>" border="0" alt="delete" />
 					<?php else: ?>
-						<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
+						<input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete selected patches"); ?>" onclick="return confirm('<?=gettext("Do you really want to delete the selected patches?");?>')" />
 					<?php endif; ?>
 					</td>
 					<td><a href="system_patches_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="<?=gettext("add new patch"); ?>" alt="add" /></a></td>
