@@ -31,7 +31,6 @@
 */
 function sync_package_ftpproxy() {
 	conf_mount_rw();
-	config_lock();
 	global $config;
 	$cf = $config['installedpackages']['ftpclientproxy']['config'][0];
 
@@ -85,7 +84,6 @@ function sync_package_ftpproxy() {
 	);
 	restart_service("ftp-proxy");
 	conf_mount_ro();
-	config_unlock();
 	filter_configure();
 }
 
