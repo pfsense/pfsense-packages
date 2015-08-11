@@ -152,4 +152,9 @@
 		@link("/usr/sbin/sm.php", "/usr/sbin/sendmail");
 	]]>
 	</custom_php_install_command>
+	<custom_php_resync_config_command>
+	<![CDATA[
+		sync_package_arpwatch();
+	]]>
+	</custom_php_resync_config_command>
 </packagegui>
