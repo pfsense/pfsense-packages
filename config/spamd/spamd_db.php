@@ -145,7 +145,6 @@ if($_GET['whitelist'] <> "") {
 }
 
 function delete_from_blacklist($srcip) {
-	config_lock();
 	$blacklist = explode("\n", file_get_contents("/var/db/blacklist.txt"));
 	$fd = fopen("/var/db/blacklist.txt", "w");
 	foreach($blacklist as $bl) {
@@ -156,11 +155,9 @@ function delete_from_blacklist($srcip) {
 	fclose($fd);
 	mwexec("/sbin/pfctl -q -t spamd -T delete {$srcip}");
 	mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
-	config_unlock();
 }
 
 function delete_from_whitelist($srcip) {
-	config_lock();
 	$whitelist = explode("\n", file_get_contents("/var/db/whitelist.txt"));
 	$fd = fopen("/var/db/whitelist.txt", "w");
 	foreach($whitelist as $wl) {
@@ -171,7 +168,6 @@ function delete_from_whitelist($srcip) {
 	fclose($fd);
 	mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 	mwexec("/sbin/pfctl -q -t whitelist -T replace -f /var/db/whitelist.txt");
-	config_unlock();
 }
 
 $pgtitle = "SpamD: Database";
