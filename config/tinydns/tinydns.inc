@@ -420,7 +420,7 @@ function tinydns_setup_ping_items() {
 		log_error("Could not open {$g['vardb_path']}/pkgpinghosts for writing.");
 		return;
 	}
-	config_lock();
+
 	/*   write out each ip address so ping_hosts.sh can begin monitoring ip
 	 *   status and create a database of the status information that we can use.
 	 */
@@ -484,7 +484,6 @@ function tinydns_setup_ping_items() {
 		}
 	}
 	fclose($fd);
-	config_unlock();
 }
 
 function tinydns_create_zone_file() {
@@ -492,7 +491,6 @@ function tinydns_create_zone_file() {
 	conf_mount_rw();
 	if(file_exists("/tmp/config.cache"))
 		unlink("/tmp/config.cache");
-	config_lock();
 	if(file_exists("{$g['varrun_path']}/service/tinydns/root/data"))
 		exec("rm -f {$g['varrun_path']}/service/tinydns/root/data");
 	if(!is_dir("{$g['varrun_path']}/service/tinydns/root"))
@@ -648,7 +646,6 @@ function tinydns_create_zone_file() {
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd {$g['varrun_path']}/service/tinydns/root && /usr/local/bin/tinydns-data");
-	config_unlock();
 	conf_mount_ro();
 }
 
