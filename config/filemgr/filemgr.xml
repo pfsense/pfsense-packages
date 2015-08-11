@@ -169,7 +169,7 @@
 		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/file_editor_style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/packages/filemgr/</prefix>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
 		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/functions.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -177,11 +177,11 @@
 		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/index.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/packages/filemgr/</prefix>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
 		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/rename.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/packages/filemgr/</prefix>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
 		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/session.php</item>
 	</additional_files_needed>
 </packagegui>
