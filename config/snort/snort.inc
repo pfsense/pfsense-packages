@@ -3455,7 +3455,7 @@ function snort_prepare_rule_files($snortcfg, $snortcfgdir) {
 
 	/* Build a new sid-msg.map file from the enabled */
 	/* rules and copy it to the interface directory. */
-	log_error(gettext("[Snort] Building new sig-msg.map file for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
+	log_error(gettext("[Snort] Building new sid-msg.map file for " . convert_friendly_interface_to_friendly_descr($snortcfg['interface']) . "..."));
 	snort_build_sid_msg_map("{$snortcfgdir}/rules/", "{$snortcfgdir}/sid-msg.map");
 }
 
