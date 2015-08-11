@@ -102,7 +102,6 @@
 	<![CDATA[
 	function sync_package_widentd() {
 		conf_mount_rw();
-		config_lock();
 		global $config;
 
 		/* Write widentd.sh */
@@ -128,7 +127,6 @@
 		} else {
 			restart_service("widentd");
 		}
-		config_unlock();
 		conf_mount_ro();
 	}
 
