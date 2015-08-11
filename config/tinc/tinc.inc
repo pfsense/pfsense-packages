@@ -26,7 +26,6 @@ if (!function_exists('clear_log_file')) {
 function tinc_save() {
 	global $config;
 	conf_mount_rw();
-	config_lock();
 	exec("/bin/mv -f /usr/local/etc/tinc /usr/local/etc/tinc.old");
 	safe_mkdir("/usr/local/etc/tinc");
 	safe_mkdir("/usr/local/etc/tinc/hosts");
@@ -127,7 +126,6 @@ function tinc_save() {
 	rmdir_recursive("/usr/local/etc/tinc.old");
 
 	conf_mount_ro();
-	config_unlock();
 }
 
 function tinc_install() {
@@ -142,7 +140,6 @@ function tinc_install() {
 	clear_log_file("/var/log/tinc.log");
 	
 	conf_mount_rw();
-	config_lock();
 
         /* Create Interface Group */
         if (!is_array($config['ifgroups']['ifgroupentry']))
@@ -161,14 +158,12 @@ function tinc_install() {
         write_config();
 
 	conf_mount_ro();
-	config_unlock();
 }
 
 function tinc_deinstall() {
 	global $config;
         /* Remove Interface Group */
         conf_mount_rw();
-        config_lock();
         if (!is_array($config['ifgroups']['ifgroupentry']))
         $config['ifgroups']['ifgroupentry'] = array();
 
@@ -200,7 +195,6 @@ function tinc_deinstall() {
         	write_config();
         }
 	conf_mount_ro();
-	config_unlock();
 
 	rmdir_recursive("/var/tmp/tinc");
 	rmdir_recursive("/usr/local/etc/tinc*");
