@@ -35,7 +35,6 @@ function php_install_command_fm()
 
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
 	if (!is_dir('/usr/local/www/packages/')) {
 		exec("mkdir /usr/local/www/packages/");
@@ -132,7 +131,6 @@ function php_install_command_fm()
 	
 
 	conf_mount_ro();
-	config_unlock();
 }
 
 
