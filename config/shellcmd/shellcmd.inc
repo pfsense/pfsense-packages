@@ -69,26 +69,9 @@ function shellcmd_install_command()
 
 	global $config;
 	conf_mount_rw();
-	config_lock();
-
-	//write_config();
-	  	
-	//write_rcfile(array(
-	//	"file" => "shellcmd.sh",
-	//	"start" => "/usr/sbin/shellcmd -s &",
-	//	"stop" => "kill -9 `cat /var/run/shellcmd.pid`"
-	//	)
-	//);
-		  	       
 	shellcmd_sync_package();
-
-	//if (pkg_is_service_running('shellcmd')) {
-		//documentation purposes
-	//}
-
 	conf_mount_ro();
-	config_unlock();
-  
+
 }
 
 
@@ -96,12 +79,10 @@ function shellcmd_deinstall_command()
 {
 
 	conf_mount_rw();
-	config_lock();
 	$handle = popen("/usr/local/etc/rc.d/shellcmd.sh stop", "r");
 	//unlink_if_exists("/usr/local/etc/rc.d/shellcmd.sh");
 	conf_mount_ro();
-	config_unlock();
-	
+
 }
 
 ?>

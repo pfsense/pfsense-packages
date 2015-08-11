@@ -67,8 +67,7 @@ function phpservice_sync_package_php()
   if($config['installedpackages']['phpservice']['config'] != "") {
 
     conf_mount_rw();
-    config_unlock();
-		
+    
 		$tmp = "<?php\n";
 		$tmp .= "\n";
 		$tmp .= "// Set time limit to indefinite execution\n";
@@ -169,7 +168,6 @@ function phpservice_install_command()
 
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
@@ -205,8 +203,7 @@ function phpservice_install_command()
 	//}
 
 	conf_mount_ro();
-	config_unlock();
-  
+
 }
 
 
@@ -214,15 +211,13 @@ function phpservice_deinstall_command()
 {
 
 	conf_mount_rw();
-	config_lock();
 	$handle = popen("/usr/local/etc/rc.d/phpservice.sh stop", "r");
 	unlink_if_exists("/usr/local/pkg/phpservice.xml");
 	unlink_if_exists("/usr/local/pkg/phpservice.inc");
 	unlink_if_exists("/usr/local/www/phpservice.inc");
 	unlink_if_exists("/usr/local/etc/rc.d/phpservice.sh");	
 	conf_mount_ro();
-	config_unlock();
-	
+
 }
 
 ?>
