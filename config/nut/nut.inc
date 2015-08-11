@@ -512,13 +512,13 @@ EOD;
 			$return = sync_package_nut_snmp();
 		}
 
-		if ($return && $_POST['monitor']) {
-			/* only start if changing settings as we have a startup script for system boot */
+		if ((!platform_booting()) && (nut_config('monitor'))) {
+			/* only start if enabled and system is not booting */
 			/* this prevents service from starting / stopping / starting on boot */
 
 			log_error("[nut] INFO: Starting service");
 			start_service("nut");
-			if ((int)exec('/bin/pgrep upsmon | /usr/bin/wc -l') == 0) {
+			if (!is_process_running('upsmon')) {
 				log_error("[nut] ERROR: Service failed to start: check configuration.");
 			}
 		} elseif (!$return && file_exists(NUT_RCFILE)) {
