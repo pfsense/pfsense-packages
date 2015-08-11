@@ -61,7 +61,6 @@ function cron_install_command() {
 
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
 	//write_config();
 
@@ -79,7 +78,6 @@ function cron_install_command() {
 	//}
 
 	conf_mount_ro();
-	config_unlock();
 
 }
 
