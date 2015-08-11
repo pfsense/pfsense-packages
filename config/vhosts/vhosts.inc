@@ -106,7 +106,6 @@ function vhosts_sync_package_php()
 	if($config['installedpackages']['vhosts']['config'] != "") {
 
 		conf_mount_rw();
-		config_unlock();
 
 		//sort the vhosts array 
 			$vhostarray = $config['installedpackages']['vhosts']['config'];
@@ -718,7 +717,6 @@ function vhosts_install_command() {
 
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
 	if (!is_dir('/usr/local/www/packages/')) {
 		exec("mkdir /usr/local/www/packages/");
@@ -794,15 +792,13 @@ function vhosts_install_command() {
 	//}
 
 	conf_mount_ro();
-	config_unlock();
-  
+
 }
 
 
 function vhosts_deinstall_command()
 {
 	conf_mount_rw();
-	config_lock();
 	$handle = popen("/usr/local/etc/rc.d/vhosts.sh stop", "r");
 	unlink_if_exists("/usr/local/pkg/vhosts.xml");
 	unlink_if_exists("/usr/local/pkg/vhosts.inc");
@@ -813,7 +809,6 @@ function vhosts_deinstall_command()
 	exec("rm -R /usr/local/www/packages/vhosts");
 	exec("rm -R /usr/local/php5");
 	conf_mount_ro();
-	config_unlock();
 }
 
 ?>
