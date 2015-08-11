@@ -43,7 +43,6 @@ function sync_package_spamd() {
 	}
 	
 	conf_mount_rw();
-	config_lock();
 	$fd = fopen("/etc/spamd.conf","w");
 	/* all header */
 	fwrite($fd, "all:\\\n\t:whitelist:blacklist");
@@ -155,8 +154,6 @@ function sync_package_spamd() {
 	spamd_install_cron(true);
 	log_error("Mounting RO");	
 	conf_mount_ro();
-	log_error("Unlocking config");	
-	config_unlock();
 	log_error("Restart cron");	
 	mwexec("killall -HUP cron");
 	log_error("Setting up spamd.conf symlink");	
@@ -176,7 +173,6 @@ function sync_package_spamd() {
 function sync_package_spamd_whitelist() {
 	global $config;
 	conf_mount_rw();
-	config_lock();
 	/* write out ip to the whitelist db */
 	$fd = fopen("/var/db/whitelist.txt","w");
 	if($config['installedpackages']['spamdwhitelist']['config'] != "") {
@@ -189,7 +185,6 @@ function sync_package_spamd_whitelist() {
 	mwexec("/usr/bin/killall -HUP spamlogd");
 	mwexec("/sbin/pfctl -t spamd-white -T add {$spamd['ip']}");
 	conf_mount_ro();
-	config_unlock();
 }
 
 function spamd_generate_rules($type) {
