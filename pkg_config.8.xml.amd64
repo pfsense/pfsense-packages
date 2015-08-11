@@ -1589,16 +1589,6 @@
 		<configurationfile>mailreport.xml</configurationfile>
 	</package>
 	<package>
-		<name>OpenVPN tap Bridging Fix</name>
-		<descr>Patch to fix OpenVPN tap bridging on 2.0.x. WARNING! Cannot be uninstalled.</descr>
-		<category>System</category>
-		<config_file>https://packages.pfsense.org/packages/config/openvpn_tapfix_20x/openvpn_tapfix_20x.xml</config_file>
-		<version>0.4</version>
-		<status>BETA</status>
-		<required_version>2.0</required_version>
-		<maximum_version>2.0.4</maximum_version>
-	</package>
-	<package>
 		<name>Quagga OSPF</name>
 		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenBGPD. Installing both will break things.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
