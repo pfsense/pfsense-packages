@@ -122,7 +122,6 @@
 		<![CDATA[
 		function sync_package_pfflowd() {
 			conf_mount_rw();
-			config_lock();
 			global $config;
 			foreach ($config['installedpackages']['pfflowd']['config'] as $cf) {
 				if ($cf['host'] != "") {
@@ -152,7 +151,6 @@
 				}
 			}
 			conf_mount_ro();
-			config_unlock();
 		}
 
 		function validate_form_pfflowd($post, &$input_errors) {
