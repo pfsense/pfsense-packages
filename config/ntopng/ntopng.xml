@@ -143,7 +143,6 @@
 			return;
 		}
 		conf_mount_rw();
-		config_lock();
 		global $config;
 		global $input_errors;
 		global $pf_version, $scripts_path, $fonts_path;
@@ -263,7 +262,6 @@
 		mwexec_bg("{$redis_path}/redis-cli SET user.admin.password " . escapeshellarg($password));
 		mwexec_bg("{$redis_path}/redis-cli save");
 		conf_mount_ro();
-		config_unlock();
 	}
 	function ntopng_update_geoip() {
 		$fetchcmd = "/usr/bin/fetch";
