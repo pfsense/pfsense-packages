@@ -1,14 +1,11 @@
 <?php
-/* $Id$ */
-/*
-/* ========================================================================== */
 /*
 	notes.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
-*/
-/* ========================================================================== */
-/*
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -30,62 +27,11 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-function notes_sync_package() {
-
-	//global $config;
-
-}
-
-
-function notes_install_command() {
-
-	global $config;
-	conf_mount_rw();
-	config_lock();
-
-	if (!is_dir('/usr/local/www/packages/')) {
-		exec("mkdir /usr/local/www/packages/");
-	}
-
-	//if (!is_dir('/usr/local/www/packages/notes/')) {
-	//   exec("mkdir /usr/local/www/packages/notes/");
-	//}
-
-	//rename PHP files from .tmp to .php
-	//exec("cp /tmp/notes.tmp /usr/local/www/packages/phpservice/notes.php");
-	//unlink_if_exists("/tmp/notes.tmp");
-
-	//write_config();
-
-	//write_rcfile(array(
-	//	"file" => "notes.sh",
-	//	"start" => "/usr/local/bin/php /usr/local/pkg/notes.php",
-	//	"stop" => "rm /tmp/phpmonitor.pid"
-	//	)
-	//);
-
-	notes_sync_package();
-
-	//if (pkg_is_service_running('notes')) {
-		//documentation purposes
-	//}
-
-	conf_mount_ro();
-	config_unlock();
-
-}
-
-
 function notes_deinstall_command() {
-
 	conf_mount_rw();
-	config_lock();
 	unlink_if_exists("/usr/local/pkg/notes.xml");
 	unlink_if_exists("/usr/local/pkg/notes.inc");
 	conf_mount_ro();
-	config_unlock();
-
 }
 
 ?>
