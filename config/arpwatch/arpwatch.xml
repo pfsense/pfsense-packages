@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 	<![CDATA[
-/* ==========================================================================
+/* $Id$ */
+/* ====================================================================================== */
 /*
 	arpwatch.xml
-	part of pfSense (https://www.pfsense.org)
-	Copyright (C) 2007-2014 Electric Sheep Fencing LP
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2007-2015 Electric Sheep Fencing LP
 	All rights reserved.
-
-										*/
-/* ==========================================================================	*/
+*/
+/* ====================================================================================== */
 /*
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	 1. Redistributions of source code must retain the above copyright notice,
-	this list of conditions and the following disclaimer.
 
-	 2. Redistributions in binary form must reproduce the above copyright
-	notice, this list of conditions and the following disclaimer in the
-	documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -34,15 +36,13 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
-										*/
-/* ==========================================================================	*/
+*/
+/* ====================================================================================== */
 	]]>
 	</copyright>
 	<description>ARP Monitoring Daemon</description>
-	<requirements>None</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>arpwatch</name>
-	<version>2.1.a14 pkg v1.1.1</version>
+	<version>1.1.2</version>
 	<title>arpwatch: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=arpwatch.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -71,12 +71,12 @@
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>a+rx</chmod>
+		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/arpwatch/arpwatch_reports.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/sbin/</prefix>
-		<chmod>a+rx</chmod>
+		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/arpwatch/sm.php</item>
 	</additional_files_needed>
 	<fields>
@@ -90,33 +90,44 @@
 			<fielddescr>Enable E-mail Notifications</fielddescr>
 			<fieldname>enable_email</fieldname>
 			<type>checkbox</type>
-			<description>Sends an E-mail notification for each new station and ARP change as they are seen &lt;strong&gt;instead of&lt;/strong&gt; local reports.&lt;br/&gt;NOTE: Only works on pfSense 2.1 or later. &lt;br/&gt;NOTE 2: Disables local reports which rely on arpwatch debug mode, which does not work with e-mail notifications.&lt;br/&gt;Configure SMTP and address settings in System &gt; Advanced on the Notifications tab</description>
+			<description>
+			<![CDATA[
+			Sends an E-mail notification for each new station and ARP change as they are seen <strong>, instead of</strong> local reports.<br />
+			NOTE: Disables local reports which rely on arpwatch debug mode, which does not work with e-mail notifications.<br />
+			Configure SMTP and address settings in System - Advanced on the Notifications tab.
+			]]>
+			</description>
 		</field>
 	</fields>
 	<custom_php_global_functions>
 	<![CDATA[
 	function sync_package_arpwatch() {
 		global $config;
-		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		conf_mount_rw();
-		config_lock();
 		$log_file = "/var/log/arp.dat";
-		if($_POST['interface'] != "") {
+
+		/* E-mail notifications setup */
+		$mail = "";
+		$debug = "";
+		if (isset($_POST['enable_email']) || ($config['installedpackages']['arpwatch']['config'][0]['enable_email'] == "on")) {
+			if (!empty($config['notifications']['smtp']['notifyemailaddress'])) {
+				$mail = " -m \"{$config['notifications']['smtp']['notifyemailaddress']}\"";
+			}
+		} else {
+			$debug = "-d";
+		}
+
+		/* Listening interface setup */
+		if ($_POST['interface'] != "") {
 			$int = $_POST['interface'];
 		} else {
 			$int = $config['installedpackages']['arpwatch']['config'][0]['interface'];
 		}
-		$mail = "";
-		$debug = "";
-		if(($pf_version > 2.0) && (isset($_POST['enable_email']) || ($config['installedpackages']['arpwatch']['config'][0]['enable_email'] == "on"))) {
-			if (!empty($config['notifications']['smtp']['notifyemailaddress']))
-				$mail = " -m \"{$config['notifications']['smtp']['notifyemailaddress']}\"";
-		} else {
-			$debug = "-d";
-		}
 		$int = convert_friendly_interface_to_real_interface_name($int);
-		$start = "touch {$log_file}\n";
-		$start .= "/usr/local/sbin/arpwatch {$debug} -f {$log_file} {$mail} -i {$int} > /var/log/arpwatch.reports 2>&amp;1 &amp;";
+
+		/* Create init script */
+		$start = "/usr/bin/touch {$log_file}\n";
+		$start .= "/usr/local/sbin/arpwatch {$debug} -f {$log_file} {$mail} -i {$int} > /var/log/arpwatch.reports 2>&1 &";
 		$stop = "/usr/bin/killall arpwatch";
 		write_rcfile(array(
 			"file" => "arpwatch.sh",
@@ -124,9 +135,9 @@
 			"stop" =>  $stop
 			)
 		);
+
 		restart_service("arpwatch");
 		conf_mount_ro();
-		config_unlock();
 	}
 	]]>
 	</custom_php_global_functions>
@@ -141,4 +152,9 @@
 		@link("/usr/sbin/sm.php", "/usr/sbin/sendmail");
 	]]>
 	</custom_php_install_command>
+	<custom_php_resync_config_command>
+	<![CDATA[
+		sync_package_arpwatch();
+	]]>
+	</custom_php_resync_config_command>
 </packagegui>
