@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc 0.5.6 pkg v. 0.9.9</title>
 	<name>lcdproc</name>
-	<version>0.5.6 pkg v. 0.9.9</version>
+	<version>0.9.12</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -657,9 +657,6 @@
 			<default_value>default</default_value>
 		</field>		
 	</fields>
-	<custom_php_command_before_form>
-		before_form_lcdproc($pkg);
-	</custom_php_command_before_form>
 	<custom_php_validation_command>
 		validate_form_lcdproc($_POST, $input_errors);
 	</custom_php_validation_command>
