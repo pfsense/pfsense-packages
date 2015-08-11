@@ -183,7 +183,6 @@
 		<![CDATA[
 		function sync_package_softflowd() {
 			conf_mount_rw();
-			config_lock();
 			global $config;
 			$cf = $config['installedpackages']['softflowd']['config'][0];
 			$interface_list = explode(",", $cf['interface']);
@@ -249,7 +248,6 @@
 				}
 			}
 			conf_mount_ro();
-			config_unlock();
 		}
 
 		function validate_form_softflowd($post, &$input_errors) {

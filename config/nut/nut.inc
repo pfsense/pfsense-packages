@@ -498,8 +498,6 @@ EOD;
 		global $config;
 		global $input_errors;
 
-		config_lock();
-
 		stop_service("nut");
 
 		/* create state path */
@@ -542,7 +540,5 @@ EOD;
 			exec('/bin/rm -rf /var/db/nut');
 			conf_mount_ro();
 		}
-
-		config_unlock();
 	}
 ?>

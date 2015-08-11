@@ -188,8 +188,6 @@ function upload_config($reasonm = "") {
 
 				// Mount RW (if needed)
 				conf_mount_rw();
-				// Lock config
-				config_lock();
 
 				$notice_text = "Beginning https://portal.pfsense.org configuration backup.";
 				log_error($notice_text);
@@ -254,8 +252,6 @@ function upload_config($reasonm = "") {
 					update_filter_reload_status($notice_text);	
 				}
 
-				// Unlock config
-				config_unlock();
 				// Mount image RO (if needed)
 				conf_mount_ro();
 

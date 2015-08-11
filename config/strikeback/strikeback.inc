@@ -44,7 +44,6 @@ function php_install_command_sb()
 
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
 	if (!is_dir('/usr/local/www/packages/')) {
 		exec("mkdir /usr/local/www/packages/");
@@ -105,7 +104,6 @@ function php_install_command_sb()
 	exec("mv /usr/local/www/packages/strikeback/43132.png /usr/local/www/packages/strikeback/color.png");
 
 	conf_mount_ro();
-	config_unlock();
 }
 
 
