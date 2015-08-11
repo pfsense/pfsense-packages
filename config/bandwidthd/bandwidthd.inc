@@ -51,14 +51,12 @@ function is_blank($value) {
 
 function bandwidthd_install_deinstall() {
 	conf_mount_rw();
-	config_lock();
 	exec("rm -f /usr/local/etc/rc.d/bandwidthd*");
 	exec("rm -rf " . PKG_BANDWIDTHD_BASE . "/htdocs");
 	exec("rm -f /usr/local/www/bandwidthd");
 	// Remove the cron job, if it is there
 	install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", false);
 	conf_mount_ro();
-	config_unlock();
 }
 
 function bandwidthd_install_config() {
@@ -71,7 +69,6 @@ function bandwidthd_install_config() {
 	$bandwidthd_runtime_library_env = PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV;
 
 	conf_mount_rw();
-	config_lock();
 
 	/* user defined values */
 	$bandwidthd_config = $config['installedpackages']['bandwidthd']['config'][0];
@@ -391,7 +388,6 @@ EOD;
 		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", false);
 	}
 	conf_mount_ro();
-	config_unlock();
 	stop_service("bandwidthd");
 	if ($bandwidthd_enable) {
 		start_service("bandwidthd");
