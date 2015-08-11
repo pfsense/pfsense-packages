@@ -38,7 +38,7 @@
 	} else {
 		define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
 	}
-	define('LCDPROC_HOST','localhost');
+	define('LCDPROC_HOST','127.0.0.1');
 	define('LCDPROC_PORT','13666');
 	define('LCDPROC_SERVICE_NAME','lcdproc');
 	/* Functions */	
