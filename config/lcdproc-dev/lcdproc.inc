@@ -63,16 +63,6 @@
 		fclose($handle);
 		chmod($file, 0755);
 	}
-	function before_form_lcdproc(&$pkg) {
-		global $config;
-		config_lock();
-		config_unlock();
-	}
-	function before_form_lcdproc_screens(&$pkg) {
-		global $config;
-		config_lock();
-		config_unlock();
-	}
 	function validate_form_lcdproc($post, &$input_errors) {
 		if($post['comport']) {
 			switch($post['comport']) {
@@ -150,7 +140,6 @@
 
 		#continue sync package 
 		lcdproc_notice("Sync: Begin package sync");
-		config_lock();
 		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
 		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 		/* since config is written before this file invoked we don't need to read post data */
@@ -191,7 +180,6 @@
 					break;
 				default:
 					lcdproc_warn("The selected com port is not valid!");
-					config_unlock();
 					return;
 			}
 			$config_text = "[server]\n";
@@ -524,7 +512,6 @@ EOD;
 				conf_mount_ro();
 			}
 		}
-		config_unlock();
 		lcdproc_notice("Sync: End package sync");
 	}
 	function set_lcd_value($fieldname, $max, $default_value) {
