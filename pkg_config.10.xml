@@ -90,20 +90,6 @@
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
-		<name>Strikeback</name>
-		<descr>Detect port scans with iplog and strike back.</descr>
-		<pkginfolink>https://forum.pfsense.org/index.php/topic,37225.0.html</pkginfolink>
-		<category>Services</category>
-		<version>0.1</version>
-		<status>BETA</status>
-		<required_version>2.2</required_version>
-		<maintainer>tom@tomschaefer.org</maintainer>
-		<config_file>https://packages.pfsense.org/packages/config/strikeback/strikeback.xml</config_file>
-		<configurationfile>strikeback.xml</configurationfile>
-		<only_for_archs>i386</only_for_archs>
-		<maximum_version>2.2.999</maximum_version>
-	</package>
-	<package>
 		<name>File Manager</name>
 		<internal_name>File_Manager</internal_name>
 		<descr>PHP File Manager.</descr>
