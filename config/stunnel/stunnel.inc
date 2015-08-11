@@ -122,7 +122,6 @@ function stunnel_delete($config) {
 function stunnel_save($config) {
 	$GLOBALS['config']['installedpackages']['stunnelcerts']['savemsg']='';
 	conf_mount_rw();
-	config_lock();
 	if (!file_exists(STUNNEL_ETCDIR))
 		@mkdir(STUNNEL_ETCDIR, 0755, true);
 	$fout = fopen(STUNNEL_ETCDIR . "/stunnel.conf","w");
@@ -148,7 +147,6 @@ function stunnel_save($config) {
 	}
 	fclose($fout);
 	conf_mount_ro();
-	config_unlock();
 	system("/usr/local/etc/rc.d/stunnel.sh stop 2>/dev/null");
 	system("/usr/local/etc/rc.d/stunnel.sh start 2>/dev/null");
 }
@@ -221,7 +219,6 @@ function stunnel_install() {
 	unlink_if_exists("/usr/local/etc/rc.d/stunnel");
 	
 	conf_mount_rw();
-	config_lock();
 	$fout = fopen(STUNNEL_ETCDIR . "/stunnel.conf","w");
 	fwrite($fout, "cert = " . STUNNEL_ETCDIR . "/stunnel.pem \n");
 	fwrite($fout, "chroot = /var/tmp/stunnel \n");
@@ -238,7 +235,6 @@ function stunnel_install() {
 	}
 	fclose($fout);
 	conf_mount_ro();
-	config_unlock();
 }
 
 function stunnel_deinstall() {
