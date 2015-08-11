@@ -41,15 +41,26 @@ function setup_routed() {
 			/* if user selected individual interfaces */
 			$ifarr = array_flip(explode(",", $config['installedpackages']['routed']['config'][0]['iface_array']));
 			$allifs = get_interface_arr();
+			/* passive array */
+			$ifarr_passive = array_flip(explode(",", $config['installedpackages']['routed']['config'][0]['enable_passive_iface_array']));
 			if (!empty($ifarr)) {
 				foreach($allifs as $ifname) {
 					$friendly_ifname = convert_real_interface_to_friendly_interface_name($ifname);
 					if (array_key_exists($friendly_ifname, $ifarr))
-						$gw .= setup_etc_gateways($ifname, 'enable');
+					{
+						if(array_key_exists($friendly_ifname, $ifarr_passive))
+						{
+							$gw .= setup_etc_gateways($ifname, 'enable', 'on');
+						}
+						else $gw .= setup_etc_gateways($ifname, 'enable', 'off');
+					}
 					else
+					{
 						$gw .= setup_etc_gateways($ifname, 'disable');
+					}
 				}
-			} else
+			}
+			else
 				/* setup for all interfaces */
 				$gw = setup_etc_gateways();
 			conf_mount_rw();
@@ -60,7 +71,7 @@ function setup_routed() {
 		stop_routed();
 }
 
-function setup_etc_gateways($iface="", $mode="") {
+function setup_etc_gateways($iface="", $mode="", $passive="") {
 	global $config;
 
 	$ret = "";
@@ -80,11 +91,15 @@ function setup_etc_gateways($iface="", $mode="") {
 			}
 			$add_no_ag = $config['installedpackages']['routed']['config'][0]['enable_no_ag'];
 			$add_no_super_ag = $config['installedpackages']['routed']['config'][0]['enable_no_super_ag'];
+			$add_passive = $config['installedpackages']['routed']['config'][0]['enable_passive'];
 			if($add_no_ag == "on") {
 				$ret .= "no_ag ";
 			}
 			if($add_no_super_ag == "on") {
 				$ret .= "no_super_ag ";
+			}
+			if($passive == "on") {
+				$ret .= "passive ";
 			}
 		}
 		break;
