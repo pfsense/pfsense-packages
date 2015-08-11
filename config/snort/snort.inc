@@ -292,7 +292,8 @@ function snort_build_list($snortcfg, $listname = "", $whitelist = false, $extern
                 if (empty($list))
                         return $list;
 		$localnet = $list['localnets'];
-		$wanip = $list['wanips'];
+//		$wanip = $list['wanips'];
+		$wanip = 'yes';
 		$wangw = $list['wangateips'];
 		$wandns = $list['wandnsips'];
 		$vips = $list['vips'];
