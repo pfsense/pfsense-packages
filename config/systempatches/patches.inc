@@ -1,7 +1,9 @@
 <?php
 /*
 	patches.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -25,12 +27,11 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require_once("globals.inc");
 require_once("util.inc");
 
 global $git_root_url, $patch_suffix, $patch_dir, $patch_cmd;
-$git_root_url = "http://github.com/pfsense/pfsense/commit/";
+$git_root_url = "https://github.com/pfsense/pfsense/commit/";
 $patch_suffix = ".patch";
 $patch_dir = "/var/patches";
 $patch_cmd = "/usr/bin/patch";
