@@ -117,26 +117,26 @@ function sshdcond_custom_php_write_config() {
 function sshdcond_sync_on_changes() {
 	global $config, $g;
 
+	/* Basically, this package was never configured */
 	if (!is_array($config['installedpackages']['sshdcondsync'])) {
-		/* Basically, this package was never configured */
 		return;
-	} elseif (!$config['installedpackages']['sshdcondsync']['config'][0]['synconchanges']) {
-		/* Package is configured but XMLRPC sync is disabled */
+	}
+	/* Package is configured but XMLRPC sync is disabled */
+	if (!isset($config['installedpackages']['sshdcondsync']['config'][0]['synconchanges'])) {
 		return;
-	} else {
-		/* Do XMLRPC sync */
-		log_error("[sshdcond] xmlrpc sync is starting.");
-		foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs) {
-			foreach($rs['row'] as $sh) {
-				$sync_to_ip = $sh['ipaddress'];
-				$password = $sh['password'];
-				if ($password && $sync_to_ip) {
-					sshdcond_do_xmlrpc_sync($sync_to_ip, $password);
-				}
+	}
+	/* Do XMLRPC sync */
+	log_error("[sshdcond] xmlrpc sync is starting.");
+	foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs) {
+		foreach($rs['row'] as $sh) {
+			$sync_to_ip = $sh['ipaddress'];
+			$password = $sh['password'];
+			if ($password && $sync_to_ip) {
+				sshdcond_do_xmlrpc_sync($sync_to_ip, $password);
 			}
 		}
-		log_error("[sshdcond] xmlrpc sync is ending.");
 	}
+	log_error("[sshdcond] xmlrpc sync is ending.");
 }
 
 /* Do the actual XMLRPC sync. */
