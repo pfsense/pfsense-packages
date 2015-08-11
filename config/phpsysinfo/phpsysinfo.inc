@@ -1,17 +1,14 @@
 <?php
 function phpsysinfo_install_deinstall() {
 	conf_mount_rw();
-	config_lock();
 	exec("cd /var/db/pkg/ && pkg_delete `ls | grep mbmon`");
 	exec("rm -d -R /usr/local/www/phpsysinfo");
 	conf_mount_ro();
-	config_unlock();
 }
 
 function phpsysinfo_install_config() {
 global $config, $g;
 	conf_mount_rw();
-	config_lock();
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/phpsysinfo-2.5.4.tar.gz");
 	exec("mv phpsysinfo /usr/local/www/phpsysinfo");
@@ -155,6 +152,5 @@ fwrite($hf, '?>');
 fwrite($hf, "\n");
 fclose($hf);
 	conf_mount_ro();
-	config_unlock();
 }
 ?>
