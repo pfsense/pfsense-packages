@@ -96,7 +96,9 @@
 		<category>Services</category>
 		<version>0.1</version>
 		<status>BETA</status>
-		<required_version>2.2</required_version>
+		<required_version>2.1</required_version>
+		<!-- Disabling on 2.2 since it calls pkg_add/pkg_delete, plus broken in general -->
+		<maximum_version>2.1.5</maximum_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/strikeback/strikeback.xml</config_file>
 		<configurationfile>strikeback.xml</configurationfile>
