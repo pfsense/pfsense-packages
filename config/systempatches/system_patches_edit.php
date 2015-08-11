@@ -1,7 +1,9 @@
 <?php
 /*
 	system_patches_edit.php
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -80,7 +82,7 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	if(empty($_POST['location'])) {
+	if (empty($_POST['location'])) {
 		$reqdfields = explode(" ", "patch");
 		$reqdfieldsn = array(gettext("Patch Contents"));
 	} else {
