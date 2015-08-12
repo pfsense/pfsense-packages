@@ -114,6 +114,12 @@
 			<description>Disable IPv4 support in Avahi.</description>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<fielddescr>Disable D-BUS</fielddescr>
+			<fieldname>disable_dbus</fieldname>
+			<description>Disable D-BUS client API support in Avahi.</description>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		avahi_sync();
