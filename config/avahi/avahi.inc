@@ -89,6 +89,7 @@ function avahi_write_config() {
 	$denyif = $config['installedpackages']['avahi']['config'][0]['denyinterfaces'];
 	$useipv4 = ($config['installedpackages']['avahi']['config'][0]['disable_ipv4']) ? "no" : "yes";
 	$useipv6 = ($config['installedpackages']['avahi']['config'][0]['disable_ipv6']) ? "no" : "yes";
+	$usedbus = ($config['installedpackages']['avahi']['config'][0]['disable_dbus']) ? "no" : "yes";
 
 	// No supplied domains? Use the defaults.
 	if (!$browsedomains) {
@@ -123,7 +124,7 @@ browse-domains={$browsedomains}
 deny-interfaces={$denyinterfaces}
 use-ipv4={$useipv4}
 use-ipv6={$useipv6}
-enable-dbus=yes
+enable-dbus={$usedbus}
 #check-response-ttl=no
 #use-iff-running=no
 #disallow-other-stacks=no
@@ -175,24 +176,28 @@ EOF;
 	$start .= "if [ ! -f /usr/local/etc/gnome.subr ]; then\n";
 	$start .= "	/bin/ln -sf " . AVAHI_BASE . "/etc/gnome.subr /usr/local/etc/gnome.subr\n";
 	$start .= "fi\n";
-	$start .= "if [ ! -d /var/run/dbus ]; then\n";
-	$start .= "        /bin/mkdir /var/run/dbus\n";
-	$start .= "        /usr/sbin/chown messagebus:messagebus /var/run/dbus\n";
-	$start .= "fi\n";
 	$start .= "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
-	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
-		$start .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
-		$start .= "/bin/rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
-		$start .= AVAHI_BASE . "/etc/rc.d/dbus onestart\n";
+	if (!$config['installedpackages']['avahi']['config'][0]['disable_dbus']) {
+		$start .= "if [ ! -d /var/run/dbus ]; then\n";
+		$start .= "        /bin/mkdir /var/run/dbus\n";
+		$start .= "        /usr/sbin/chown messagebus:messagebus /var/run/dbus\n";
+		$start .= "fi\n";
+			if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
+				$start .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
+				$start .= "/bin/rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
+				$start .= AVAHI_BASE . "/etc/rc.d/dbus onestart\n";
+				$start .= "sleep 5\n";
+			}
 	}
-	$start .= "sleep 5\n";
 	$start .= AVAHI_BASE . "/sbin/avahi-daemon -D\n";
 	$start .= "/etc/rc.conf_mount_ro\n";
 
 	$stop = "/usr/bin/killall avahi-daemon >/dev/null 2>&1\n";
-	if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
-		$stop .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
-		$stop .= "/bin/rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
+	if (!$config['installedpackages']['avahi']['config'][0]['disable_dbus']) {
+		if (file_exists(AVAHI_BASE . "/etc/rc.d/dbus")) {
+			$stop .= AVAHI_BASE . "/etc/rc.d/dbus onestop\n";
+			$stop .= "/bin/rm /var/run/dbus/dbus.pid >/dev/null 2>&1\n";
+		}
 	}
 
 	write_rcfile(array(
