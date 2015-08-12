@@ -832,7 +832,7 @@
 		<name>diag_new_states</name>
 		<descr>Paul Taylor's version of Diagnostics States which utilizes pftop.</descr>
 		<category>Network Management</category>
-		<version>0.2</version>
+		<version>0.3</version>
 		<maintainer>ptaylor@addressplus.net</maintainer>
 		<required_version>2.2</required_version>
 		<status>BETA</status>
