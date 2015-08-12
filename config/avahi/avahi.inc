@@ -209,12 +209,12 @@ function avahi_sync() {
 	global $config;
 
 	if (is_service_running("avahi")) {
-		service_stop("avahi");
+		stop_service("avahi");
 	}
 	avahi_write_config();
 	// Is package enabled?
 	if (($config['installedpackages']['avahi']['config'][0]['enable']) && file_exists("/usr/local/etc/rc.d/avahi-daemon.sh")) {
-		service_start("avahi");
+		start_service("avahi");
 	}
 }
 
