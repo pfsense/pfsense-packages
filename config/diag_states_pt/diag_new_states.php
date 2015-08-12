@@ -279,7 +279,7 @@ function writeStats($fname, &$data) {
 function readStats($fname, &$data) {
 	$fname = "/tmp/" . $fname;
 	if (file_exists($fname)) {
-		$file = fopen($fname,'r');
+		$file = fopen($fname, 'r');
 		$data = unserialize(fread($file, filesize($fname)));
 		fclose($file);
 	}
@@ -346,12 +346,12 @@ include("head.inc");
 				if ((!isset($sfilter) && (!isset($dfilter))) ||
 				    ((isset($sfilter)) && ($entry['srcip'] == $sfilter)) ||
 				    ((isset($dfilter)) && ($entry['dstip'] == $dfilter))) {
-		?>
+	?>
 	<tr>
-		<td class="listlr"><?=displayIP($entry['srcip'],'srcip');?></td>
+		<td class="listlr"><?=displayIP($entry['srcip'], 'srcip');?></td>
 		<td class="listr"><?=$entry['srcport'];?></td>
 		<td class="listr"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_<?=$entry['dir'];?>.gif" width="11" height="11" style="margin-top: 2px" alt="" /></td>
-		<td class="listr"><?=displayIP($entry['dstip'],'dstip');?></td>
+		<td class="listr"><?=displayIP($entry['dstip'], 'dstip');?></td>
 		<td class="listr"><?=$entry['dstport'];?></td>
 		<td class="listr"><?=$entry['protocol'];?></td>
 		<td class="listr" align="right"><?=$entry['packets'];?></td>
