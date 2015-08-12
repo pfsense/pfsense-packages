@@ -335,19 +335,12 @@ server.max-request-size    = 2097152
 #### fastcgi module
 ## read fastcgi.txt for more info
 fastcgi.server = ( ".php" =>
-	( "localhost" =>
-		(
-			"socket" => "/tmp/php5-fastcgi.socket",
-			"min-procs" => 1,
-			"max-procs" => 1,
-			"idle-timeout" => 0,
-			"bin-environment" => (
-				"PHP_FCGI_MAX_REQUESTS" => "500",
-				"PHP_FCGI_CHILDREN" => "1"
-			),
-			"bin-path" => "/usr/local/bin/php"
-		)
-	)
+        ( "localhost" =>
+                (
+                        "socket" => "/var/run/php-fpm.socket",
+                        "broken-scriptfilename" => "enable"
+                )
+        )
 )
 
 #### CGI module
@@ -575,19 +568,12 @@ server.max-request-size    = 2097152
 #### fastcgi module
 ## read fastcgi.txt for more info
 fastcgi.server = ( ".php" =>
-	( "localhost" =>
-		(
-			"socket" => "/tmp/php5-fastcgi.socket",
-			"min-procs" => 1,
-			"max-procs" => 1,
-			"idle-timeout" => 0,
-			"bin-environment" => (
-				"PHP_FCGI_MAX_REQUESTS" => "500",
-				"PHP_FCGI_CHILDREN" => "1"
-			),
-			"bin-path" => "/usr/local/bin/php"
-		)
-	)
+        ( "localhost" =>
+                (
+                        "socket" => "/var/run/php-fpm.socket",
+                        "broken-scriptfilename" => "enable"
+                )
+        )
 )
 
 #### CGI module
