@@ -1894,5 +1894,29 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>suricata-2.0.4-amd64.pbi</depends_on_package_pbi>
 	</package>
+	<package>
+	    <name>Puppet</name>
+	    <pkginfolink>https://doc.pfsense.org/index.php/Puppet_Package</pkginfolink>
+	    <website>http://puppetlabs.com/</website>
+	    <descr>Puppet lets you centrally manage every important aspect of your system using a cross-platform specification language that manages all the separate elements normally aggregated in different files, like users, cron jobs, and hosts, along with obviously discrete elements like packages, services, and files.</descr>
+	    <category>Services</category>
+	    <version>3.6.2_1</version>
+	    <status>Release</status>
+	    <required_version>2.1</required_version>
+	    <config_file>https://packages.pfsense.org/packages/config/puppet/puppet.xml</config_file>
+	    <maintainer>fw@moov.de</maintainer>
+	    <depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+	    <depends_on_package></depends_on_package>
+	    <depends_on_package_pbi>puppet-3.6.2_1-amd64.pbi</depends_on_package_pbi>
+	    <configurationfile>puppet.xml</configurationfile>
+	    <build_port_path>/usr/ports/</build_port_path>
+	    <build_pbi>
+		<custom_name>puppet</custom_name>
+		<ports_before>textproc/augeas sysutils/dmidecode devel/libexecinfo devel/libffi converters/libiconv textproc/libxml2 textproc/libyaml converters/ruby-iconv lang/ruby19 devel/ruby-gems archivers/rubygem-bzip2 sysutils/rubygem-facter sysutils/rubygem-hiera devel/rubygem-json_pure textproc/rubygem-augeas</ports_before>
+		<port>sysutils/puppet</port>
+	    </build_pbi>
+	    <build_options>DEPENDS_CLEAN=""; puppet_SET+=PACKAGE_ORIGIN; puppet_UNSET+=DOCS EXAMPLES PACKAGE_ROOT</build_options>
+	    <after_install_info>NOTE: First, you need to configure and enable the puppet agent under Services/Puppet. It will then try to request a certificate. You need to sign the certificate on your puppet master and run the puppet agent again.</after_install_info>
+	</package>
 </packages>
 </pfsensepkgs>

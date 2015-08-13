@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    puppet.xml
+    part of the puppet package for pfSense
+    Copyright (C) 2014 Frank Wall <fw@moov.de>
+	
+    All rights reserved.            
+			                                                      */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<name>Puppet</name>
+	<title>Services: Puppet Agent</title>
+	<category>Services</category>
+	<version>3.6.2_1</version>
+	<include_file>/usr/local/pkg/puppet.inc</include_file>
+	<addedit_string>Puppet has been created/modified.</addedit_string>
+	<delete_string>Puppet has been deleted.</delete_string>
+	<restart_command>/usr/local/etc/rc.d/puppet onerestart</restart_command>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/puppet/puppet.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/puppet/puppet_status.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/puppet/puppet_facts.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/puppet/puppet_debug.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/puppet/puppet.conf.php</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<menu>
+		<name>Puppet</name>
+		<tooltiptext>Setup puppet specific settings</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=puppet.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>puppet</name>
+		<rcfile>puppet</rcfile>
+		<executable>ruby19</executable>
+		<description>Configuration management framework written in Ruby</description>
+                <custom_php_service_status_command>is_pid_running('/var/run/puppet/agent.pid');</custom_php_service_status_command>
+	</service>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=puppet.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Status</text>
+			<url>puppet_status.php</url>
+		</tab>
+		<tab>
+			<text>Facts</text>
+			<url>puppet_facts.php</url>
+		</tab>
+		<tab>
+			<text>Debug</text>
+			<url>puppet_debug.php</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>Agent configuration parameters</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Enable Puppet Agent</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Puppet Server</fielddescr>
+			<fieldname>server</fieldname>
+			<description><![CDATA[The server to which the puppet agent should connect.
+<br>
+<strong>Default: puppet</strong>
+			]]></description>
+			<type>input</type>
+			<size>64</size>
+		</field>
+		<field>
+			<fielddescr>Environment</fielddescr>
+			<fieldname>environment</fieldname>
+			<description><![CDATA[The  environment Puppet is running in. For clients (e.g., puppet agent)
+		           this determines the environment itself, which is used to  find  modules
+		           and  much  more.  For  servers  (i.e., puppet master) this provides the
+		           default environment for nodes we know nothing about.
+<br>
+<strong>Default: production</strong>
+			]]></description>
+		         <type>input</type>
+		         <size>64</size>
+		</field>
+		<field>
+			<fielddescr>Config Timeout</fielddescr>
+			<fieldname>configtimeout</fieldname>
+			<description><![CDATA[How  long  the client should wait for the configuration to be retrieved
+		           before considering it a failure. This can help reduce flapping  if  too
+		           many  clients  contact  the  server  at one time. Can be specified as a
+		          duration.
+<br>
+<strong>Default: 2 (minutes)</strong>
+			]]></description>
+		         <type>input</type>
+		         <size>2</size>
+		</field>
+	</fields>
+	<custom_php_install_command>php_install_puppet();</custom_php_install_command>
+	<custom_php_command_before_form></custom_php_command_before_form>
+	<custom_php_after_head_command></custom_php_after_head_command>
+	<custom_php_after_form_command></custom_php_after_form_command>
+	<custom_php_validation_command>validate_input_puppet($_POST, &amp;$input_errors);</custom_php_validation_command>
+	<custom_add_php_command></custom_add_php_command>
+	<custom_php_resync_config_command>sync_package_puppet();</custom_php_resync_config_command>
+	<custom_php_deinstall_command>php_deinstall_puppet();</custom_php_deinstall_command>
+</packagegui>
