@@ -45,11 +45,6 @@ ini_set("memory_limit", "384M");
 // Explicitly declare this as global so it works through function call includes 
 global $g, $config, $rebuild_rules;
 
-// Grab the Snort binary version programmatically, but if that fails use a safe default
-$snortver = array();
-$snortbindir = SNORT_PBI_BINDIR;
-exec("{$snortbindir}snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26", $snortver);
-
 /* Rebuild Rules Flag -- if "true", rebuild enforcing rules and flowbit-rules files */
 $rebuild_rules = false;
 

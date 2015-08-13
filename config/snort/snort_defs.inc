@@ -49,13 +49,12 @@ if (!defined("SNORTLOGDIR"))
 	define("SNORTLOGDIR", "{$g['varlog_path']}/snort");
 if (!defined("SNORT_BIN_VERSION")) {
 	// Grab the Snort binary version programmatically
-	$snortver = array();
 	$snortbindir = SNORT_PBI_BINDIR;
 	$snortver = exec_command("{$snortbindir}/snort -V 2>&1 |/usr/bin/grep Version | /usr/bin/cut -c20-26");
 	if (!empty($snortver))
 		define("SNORT_BIN_VERSION", $snortver);
 	else
-		define("SNORT_BIN_VERSION", "");
+		define("SNORT_BIN_VERSION", "2.9.7.5");
 }
 if (!defined("SNORT_SID_MODS_PATH"))
 	define('SNORT_SID_MODS_PATH', "{$g['vardb_path']}/snort/sidmods/");
