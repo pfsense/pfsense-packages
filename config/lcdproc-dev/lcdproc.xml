@@ -43,8 +43,6 @@
 /* ====================================================================================== */
 	]]>
 	</copyright>
-<?xml version="1.0" encoding="utf-8" ?>
-<packagegui>
 	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
 	<version>0.9.13</version>
