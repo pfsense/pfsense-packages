@@ -1,9 +1,9 @@
 <?php
 /*
 	bacula-client_view_config.php
-	part of pfSense (https://www.pfsense.org/)
-	Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-	Copyright (C) 2012 M�rcio Carlos Ant�o
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Marcio Carlos Braga Antao
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -27,33 +27,26 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require("guiconfig.inc");
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version < 2.0)
-	$one_two = true;
-
-if ($pf_version > 2.0)
+$$pf_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
+if ($pf_version == "2.1" || $pf_version == "2.2") {
 	define('BACULA_LOCALBASE', '/usr/pbi/bacula-' . php_uname("m"));
-else
+} else {
 	define('BACULA_LOCALBASE','/usr/local');
+}
 
 $pgtitle = "Bacula-Client: View Configuration";
 include("head.inc");
 
 ?>
+
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-
-<?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
-<?php endif; ?>
 
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <form action="bacula-client_view_config.php" method="post">
-	
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
@@ -65,27 +58,24 @@ include("head.inc");
 	display_top_tabs($tab_array);
 ?>
 		</td></tr>
- 		<tr>
-    		<td>
-				<div id="mainarea">
-					<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-						<tr>
-     						<td class="tabcont" >
-									<textarea id="varnishlogs" rows="50" cols="87%">
-<?php 
-	$config_file = file_get_contents(BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf");
-	echo $config_file;
-?>
-									</textarea>
-							</td>
-						</tr>
-					</table>
-				</div>
-			</td>
-		</tr>
+ 		<tr><td>
+			<div id="mainarea">
+				<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+					<tr><td class="tabcont">
+						<textarea id="varnishlogs" rows="50" cols="87%">
+						<?php
+						$config_file = file_get_contents(BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf");
+						echo $config_file;
+						?>
+						</textarea>
+					</td></tr>
+				</table>
+			</div>
+		</td></tr>
 	</table>
 </div>
 </form>
+
 <?php include("fend.inc"); ?>
 </body>
 </html>
