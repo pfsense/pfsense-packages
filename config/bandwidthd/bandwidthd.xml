@@ -61,10 +61,10 @@
 		<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
 	</menu>
 	<service>
-			<name>bandwidthd</name>
-			<rcfile>bandwidthd.sh</rcfile>
-			<executable>bandwidthd</executable>
-			<description>BandwidthD bandwidth monitoring daemon</description>
+		<name>bandwidthd</name>
+		<rcfile>bandwidthd.sh</rcfile>
+		<executable>bandwidthd</executable>
+		<description>BandwidthD bandwidth monitoring daemon</description>
 	</service>
 	<tabs>
 		<tab>
