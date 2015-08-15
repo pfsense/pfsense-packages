@@ -335,9 +335,9 @@ function bandwidthd_upgrade_config() {
 					$realif = get_real_interface($if);
 					if (!preg_match("/pppoe[0-9]+/i", $realif)) {
 						// and finally, set the new config value for config.xml
-						echo $if;
 						$config['installedpackages']['bandwidthd']['config'][0]['interface_array'][$i] = $if;
 						$i++;
+						$changes++;
 					}
 				}
 			}
@@ -346,7 +346,9 @@ function bandwidthd_upgrade_config() {
 		unset($config['installedpackages']['bandwidthd']['config'][0]['subnets_custom']);
 	}
 	// Write the upgraded config.xml if something changed
-	write_config("[bandwidthd] Upgraded old package configuration.");
+	if ($changes > 0 ) {
+		write_config("[bandwidthd] Upgraded old package configuration.");
+	}
 }
 
 function bandwidthd_validate_input($post, &$input_errors) {
