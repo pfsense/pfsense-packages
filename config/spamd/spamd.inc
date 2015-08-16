@@ -194,21 +194,38 @@ function spamd_generate_rules($type) {
 	switch($type) {
 	case 'nat':
 		$natrules .= "\n# spam table \n";
-                $wanif = get_real_interface("wan");
-                $natrules .= "table <whitelist> persist\n";
-                $natrules .= "table <blacklist> persist\n";
-                $natrules .= "table <spamd> persist\n";
-                if(file_exists("/var/db/whitelist.txt"))
-                        $natrules .= "table <spamd-white> persist file \"/var/db/whitelist.txt\"\n";
-                $natrules .= "rdr pass on {$wanif} proto tcp from <blacklist> to port smtp -> 127.0.0.1 port spamd\n";
-                $natrules .= "rdr pass on {$wanif} proto tcp from <spamd> to port smtp -> 127.0.0.1 port spamd\n";
-                $natrules .= "rdr pass on {$wanif} proto tcp from !<spamd-white> to port smtp -> 127.0.0.1 port spamd\n";
-                if($config['installedpackages']['spamdsettings']['config'])
-                        foreach($config['installedpackages']['spamdsettings']['config'] as $ss)
-                                $nextmta = $ss['nextmta'];
-                if($nextmta <> "") {
-                        $natrules .= "rdr pass on {$wanif} proto tcp from <spamd-white> to port smtp -> {$nextmta} port smtp\n";
-                }
+		$natrules .= "table <whitelist> persist\n";
+		$natrules .= "table <blacklist> persist\n";
+		$natrules .= "table <spamd> persist\n";
+		if (file_exists("/var/db/whitelist.txt")) {
+			$natrules .= "table <spamd-white> persist file \"/var/db/whitelist.txt\"\n";
+		}
+
+		if (is_array($config['installedpackages']['spamdsettings']['config'])) {
+			$spamdconfig = $config['installedpackages']['spamdsettings']['config']['0'];
+		} else {
+			$spamdconfig = $config['installedpackages']['spamdsettings']['config'];
+		}
+
+		if ($spamdconfig) {
+			$nextmta = $spamdconfig['nextmta'];
+			$spamdbinds = explode(',', $spamdconfig['spamdbinds_array']);
+			if (is_array($spamdbinds)) {
+				foreach ($spamdbinds as $interface) {
+					$wanif = get_real_interface($interface);
+					if (!isset($wanif)) {
+						continue;
+					}
+					$natrules .= "rdr pass on {$wanif} proto tcp from <blacklist> to port smtp -> 127.0.0.1 port spamd\n";
+					$natrules .= "rdr pass on {$wanif} proto tcp from <spamd> to port smtp -> 127.0.0.1 port spamd\n";
+					$natrules .= "rdr pass on {$wanif} proto tcp from !<spamd-white> to port smtp -> 127.0.0.1 port spamd\n";
+					if ($nextmta <> "") {
+						$natrules .= "rdr pass on {$wanif} proto tcp from <spamd-white> to port smtp -> {$nextmta} port smtp\n";
+					}
+				}
+			}
+		}
+		$natrules .= "\n";
 
 		break;
 	}
