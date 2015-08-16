@@ -41,7 +41,7 @@ function get_pfstate() {
 	} else {
 		$maxstates = "/10000";
 	}
-	$curentries = shell_exec('/sbin/pfctl -si | grep current');
+	$curentries = shell_exec('/sbin/pfctl -si | /usr/bin/grep current');
 	if (preg_match("/([0-9]+)/", $curentries, $matches)) {
 		$curentries = $matches[1];
 	}
@@ -116,8 +116,8 @@ function get_loadavg_stats() {
 }
 
 function get_mbuf_stats() {
-	exec("netstat -mb | grep \"mbufs in use\" | awk '{ print $1 }' | cut -d\"/\" -f1", $mbufs_inuse);
-	exec("netstat -mb | grep \"mbufs in use\" | awk '{ print $1 }' | cut -d\"/\" -f3", $mbufs_total);
+	exec("/usr/bin/netstat -mb | /usr/bin/grep \"mbufs in use\" | /usr/bin/awk '{ print $1 }' | /usr/bin/cut -d\"/\" -f1", $mbufs_inuse);
+	exec("/usr/bin/netstat -mb | /usr/bin/grep \"mbufs in use\" | /usr/bin/awk '{ print $1 }' | /usr/bin/cut -d\"/\" -f3", $mbufs_total);
 	$status = "$mbufs_inuse[0] \/ $mbufs_total[0]";
 
 	return($status);
@@ -176,7 +176,7 @@ function get_slbd_stats() {
 
 	$nentries = $config['syslog']['nentries'];
 	if (!$nentries) {
-	        $nentries = 50;
+		$nentries = 50;
 	}
 
 	$now = time();
@@ -194,7 +194,7 @@ function get_slbd_stats() {
 			}
 			foreach ((array) $vipent['servers'] as $server) {
 				$lastchange = "";
-				$svr = split("\|", $server);
+				$svr = explode("|", $server);
 				$monitorip = $svr[1];
 				if (stristr($poolstatus, $monitorip)) {
 					$online = "Up";
@@ -219,11 +219,11 @@ function get_carp_stats () {
 	global $config;
 
 	if (is_array($config['virtualip']['vip'])) {
-	  	$carpint = 0;
+		$carpint = 0;
 		$initcount = 0;
 		$mastercount = 0;
 		$backupcount = 0;
-		foreach($config['virtualip']['vip'] as $carp) {
+		foreach ($config['virtualip']['vip'] as $carp) {
 			if ($carp['mode'] != "carp") {
 				 continue;
 			}
@@ -320,7 +320,7 @@ function output_ipsec_tunnel_status($tunnel) {
 		/* we have no sad array, bail */
 		return(false);
 	}
-	foreach($sad as $sa) {
+	foreach ($sad as $sa) {
 		if ($sa['src'] == $interfaceip) {
 			$foundsrc = true;
 		}
@@ -348,12 +348,12 @@ function get_ipsec_stats() {
 	$inactivecounter = 0;
 
 	if ($config['ipsec']['tunnel']) {
-		foreach ($config['ipsec']['tunnel'] as $tunnel) { 
+		foreach ($config['ipsec']['tunnel'] as $tunnel) {
 			$ipsecstatus = false;
 
 			$tun_disabled = "false";
 			$foundsrc = false;
-			$founddst = false; 
+			$founddst = false;
 
 			if (isset($tunnel['disabled'])) {
 				$tun_disabled = "true";
@@ -368,7 +368,7 @@ function get_ipsec_stats() {
 				/* tunnel is down */
 				$iconfn = "false";
 				$inactivecounter++;
-			}			
+			}
 		}
 	}
 
@@ -385,7 +385,7 @@ function send_lcd_commands($lcd, $lcd_cmds) {
 		lcdproc_warn("Failed to interpret lcd commands");
 		return;
 	}
-	foreach($lcd_cmds as $lcd_cmd) {
+	foreach ($lcd_cmds as $lcd_cmd) {
 		$cmd_output = "";
 		if (! fwrite($lcd, "$lcd_cmd\n")) {
 			lcdproc_warn("Connection to LCDd process lost $errstr ($errno)");
@@ -405,22 +405,22 @@ function get_lcdpanel_width() {
 	if (is_null($lcdproc_size_config['size'])) {
 		return "16";
 	} else {
-		$dimensions = split("x", $lcdproc_size_config['size']);
+		$dimensions = explode("x", $lcdproc_size_config['size']);
 		return $dimensions[0];
 	}
 }
-	
+
 function get_lcdpanel_height() {
 	global $config;
 	$lcdproc_size_config = $config['installedpackages']['lcdproc']['config'][0];
 	if (is_null($lcdproc_size_config['size'])) {
 		return "2";
 	} else {
-		$dimensions = split("x", $lcdproc_size_config['size']);
+		$dimensions = explode("x", $lcdproc_size_config['size']);
 		return $dimensions[1];
 	}
 }
-	
+
 function get_lcdpanel_refresh_frequency() {
 	global $config;
 	$lcdproc_size_config = $config['installedpackages']['lcdproc']['config'][0];
@@ -431,28 +431,28 @@ function get_lcdpanel_refresh_frequency() {
 		return $value;
 	}
 }
-	
+
 function add_summary_declaration(&$lcd_cmds, $name) {
 	$lcdpanel_height = get_lcdpanel_height();
 	if ($lcdpanel_height >= "4") {
-		$lcd_cmds[] = "widget_add $name title_summary scroller";					
+		$lcd_cmds[] = "widget_add $name title_summary scroller";
 		$lcd_cmds[] = "widget_add $name text_summary scroller";
 	}
 }
-	
+
 function add_summary_values(&$lcd_cmds, $name, $lcd_summary_data, $lcdpanel_width) {
 	if ($lcd_summary_data != "") {
 		$lcd_cmds[] = "widget_set $name title_summary 1 3 $lcdpanel_width 3 h 2 \"CPU MEM STATES\"";
 		$lcd_cmds[] = "widget_set $name text_summary 1 4 $lcdpanel_width 4 h 2 \"{$lcd_summary_data}\"";
 	}
 }
-	
+
 function build_interface($lcd) {
 	global $g;
 	global $config;
-	$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];		
+	$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 	$refresh_frequency = get_lcdpanel_refresh_frequency() * 10;
-		
+
 	$lcd_cmds = array();
 	$lcd_cmds[] = "hello";
 	$lcd_cmds[] = "client_set name pfSense";
@@ -463,10 +463,10 @@ function build_interface($lcd) {
 	$lcd_cmds[] = "widget_add welcome_scr title_wdgt title";
 	$lcd_cmds[] = "widget_add welcome_scr text_wdgt scroller";
 	add_summary_declaration($lcd_cmds, "welcome_scr");
-		
+
 	/* process screens to display */
 	if (is_array($lcdproc_screens_config)) {
-		foreach($lcdproc_screens_config as $name => $screen) {
+		foreach ($lcdproc_screens_config as $name => $screen) {
 			if ($screen == "on") {
 				switch ($name) {
 					case "scr_time":
@@ -572,7 +572,7 @@ function build_interface($lcd) {
 						$lcd_cmds[] = "screen_set $name duration $refresh_frequency";
 						$lcd_cmds[] = "widget_add $name title_wdgt string";
 						$lcd_cmds[] = "widget_add $name text_wdgt scroller";
-						break;							
+						break;
 				}
 				add_summary_declaration($lcd_cmds, $name);
 			}
@@ -598,8 +598,8 @@ function loop_status($lcd) {
 	while ($i) {
 		/* prepare the summary data */
 		if ($lcdpanel_height >= "4") {
-			$summary_states = split("/",get_pfstate());
-			$lcd_summary_data = sprintf("%02d%% %02d%% %6d", cpu_usage(),  mem_usage(), $summary_states[0]);			
+			$summary_states = explode("/", get_pfstate());
+			$lcd_summary_data = sprintf("%02d%% %02d%% %6d", cpu_usage(), mem_usage(), $summary_states[0]);
 		} else {
 			$lcd_summary_data = "";
 		}
@@ -608,9 +608,9 @@ function loop_status($lcd) {
 		$lcd_cmds[] = "widget_set welcome_scr title_wdgt \"Welcome to\"";
 		$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 $lcdpanel_width 2 h 2 \"{$g['product_name']} {$version}\"";
 		add_summary_values($lcd_cmds, "welcome_scr", $lcd_summary_data, $lcdpanel_width);
-			
+
 		/* process screens to display */
-		foreach((array) $lcdproc_screens_config as $name => $screen) {
+		foreach ((array) $lcdproc_screens_config as $name => $screen) {
 			if ($screen != "on") {
 				continue;
 			}
