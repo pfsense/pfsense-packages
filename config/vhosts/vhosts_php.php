@@ -1,8 +1,9 @@
 <?php
-/* $Id$ */
 /*
 	vhosts_php.php
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,21 +27,18 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require("guiconfig.inc");
 require("/usr/local/pkg/vhosts.inc");
 
 $a_vhosts = &$config['installedpackages']['vhosts']['config'];
 
-
+$pgtitle = "vHosts: Web Server";
 include("head.inc");
 
 ?>
 
-
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">vHosts: Web Server</p>
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -56,35 +54,23 @@ include("head.inc");
 </table>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr>
-<td class="tabcont" >
+<tr><td class="tabcont">
 
 	<form action="vhosts_php.php" method="post" name="iform" id="iform">
-	<?php 
-
+	<?php
 	if ($config_change == 1) {
 		write_config();
-		$config_change = 0;  
+		$config_change = 0;
 	}
-
-	//if ($savemsg) print_info_box($savemsg); 
-	//if (file_exists($d_hostsdirty_path)): echo"<p>";
-	//print_info_box_np("This is an info box.");
-	//echo"<br />";
-	//endif; 
-
 	?>
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">              
-			<tr>
-				<td><p><!--<span class="vexpl"><span class="red"><strong>PHP Service<br></strong></span>-->
-				vHosts is a web server package that can host HTML, Javascript, CSS, and PHP. It creates another instance of the lighttpd web server 
-				that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite. To use SFTP enable SSH from 
-				System -> Advanced -> Enable Secure Shell. Then SFTP can be used to access the files at /usr/local/vhosts.
-				After adding or updating an entry make sure to restart the <a href='/status_services.php'>service</a> to apply the settings.
-				<br /><br />
-				For more information see: <a href='https://doc.pfsense.org/index.php/vhosts'>https://doc.pfsense.org/index.php/vhosts</a>            
-				</p></td>
-			</tr>
+		<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr><td>
+			<div>vHosts is a web server package that can host HTML, Javascript, CSS, and PHP. It creates another instance of the lighttpd web server&nbsp;
+			that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite. To use SFTP enable SSH from&nbsp;
+			System -> Advanced -> Enable Secure Shell. Then SFTP can be used to access the files at /usr/local/vhosts.<br />
+			After adding or updating an entry make sure to restart the <a href='/status_services.php'>service</a> to apply the settings.<br /><br />
+			</div>
+		</td></tr>
 		</table>
 		<br />
 
@@ -97,42 +83,49 @@ include("head.inc");
 			<td width="40%" class="listhdr">Description</td>
 			<td width="10%" class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
-				  <tr>
+				<tr>
 					<td width="17"></td>
-					<td valign="middle"><a href="vhosts_php_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-				  </tr>
+					<td valign="middle"><a href="vhosts_php_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" alt="" /></a></td>
+				</tr>
 				</table>
 			</td>
 		</tr>
 
-		<?php 
+		<?php
 		$i = 0;
 		if (count($a_vhosts) > 0) {
-			//sort array
-				if (!function_exists('sort_host')) {
-					function sort_host($a, $b){
-						return strcmp($a["host"], $b["host"]);
-					}
+			// Sort array
+			if (!function_exists('sort_host')) {
+				function sort_host($a, $b) {
+					return strcmp($a["host"], $b["host"]);
 				}
-				//disable for now because it throws off the edit and delete
-				//if (count($a_vhosts) > 1) {
-				//	usort($a_vhosts, 'sort_host');
-				//}
+			}
+
 			foreach ($a_vhosts as $ent) {
 				$host = $ent['host'];
 				$port = $ent['port'];
-				if (strlen($ent['certificate']) == 0) { $http_protocol = 'http'; } else { $http_protocol = 'https'; }
-				if ($http_protocol == 'http' && $port == '80') { $port = ''; }
-				if ($http_protocol == 'https' && $port == '443') { $port = ''; }
-				if (strlen($port) > 0) { $port = ':'.$port; }
+				if (strlen($ent['certificate']) == 0) {
+					$http_protocol = 'http';
+				} else {
+					$http_protocol = 'https';
+				}
+				if ($http_protocol == 'http' && $port == '80') {
+					$port = '';
+				}
+				if ($http_protocol == 'https' && $port == '443') {
+					$port = '';
+				}
+				if (strlen($port) > 0) {
+					$port = ':'.$port;
+				}
 				$vhost_url = $http_protocol.'://'.$host.$port;
-				?>
+		?>
 				<tr>
 					<td class="listr" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
-					  <a href='<?=$vhost_url;?>' target='_blank'><?=$ent['host'];?></a>&nbsp;
+						<a href='<?=$vhost_url;?>'><?=$ent['host'];?></a>&nbsp;
 					</td>
 					<td class="listr" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
-					  <a href='<?=$vhost_url;?>' target='_blank'><?=$ent['port'];?></a>&nbsp;
+						<a href='<?=$vhost_url;?>'><?=$ent['port'];?></a>&nbsp;
 					</td>
 					<td class="listr" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
 						<div align='center'>
@@ -150,30 +143,30 @@ include("head.inc");
 						<?php echo $ent['enabled']; ?>
 					</td>
 					<td class="listbg" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
-					  <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
+						<?=htmlspecialchars($ent['description']);?>&nbsp;
 					</td>
 					<td valign="middle" nowrap class="list">
-					  <table border="0" cellspacing="0" cellpadding="1">
+						<table border="0" cellspacing="0" cellpadding="1">
 						<tr>
-						  <td valign="middle"><a href="vhosts_php_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-						  <td><a href="vhosts_php_edit.php?type=php&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+							<td valign="middle"><a href="vhosts_php_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" /></a></td>
+							<td><a href="vhosts_php_edit.php?type=php&amp;act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" alt="" /></a></td>
 						</tr>
-					 </table>
+						</table>
 					</td>
-				  </tr>
+				</tr>
 		<?php
-				$i++; 
+				$i++;
 			}
 		}
 		?>
 
 		<tr>
 			<td class="list" colspan="5"></td>
-			<td class="list">          
+			<td class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
 				<tr>
 					<td width="17"></td>
-					<td valign="middle"><a href="vhosts_php_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+					<td valign="middle"><a href="vhosts_php_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" alt="" /></a></td>
 				</tr>
 				</table>
 			</td>
@@ -186,23 +179,12 @@ include("head.inc");
 		</table>
 
 	</form>
+	<br />
 
-
-	<br>
-	<br>
-	<br>
-	<br>
-	<br>
-	<br>
-	<br>
-	<br>
-
-</td>
-</tr>
+</td></tr>
 </table>
 
 </div>
-
 
 <?php include("fend.inc"); ?>
 </body>
