@@ -415,7 +415,7 @@ EOF;
 	File: <b>{$current_folder}{$_GET['f']}</b><br />
 	<textarea name="file_content" id="file_content" cols="1" rows="1" style="width: 99%; height: 400px">{$fce}</textarea><br />
 	<input name="save" type="submit" value="Save" />
-	<input name="close" type="button" value="Close file editor" onclick="document.location = 'file_manager.php?f="{$cfe}"'" />
+	<input name="close" type="button" value="Close file editor" onclick="document.location='file_manager.php?f={$cfe}'" />
 	<input name="save_file" type="hidden" value="save_file" />
 </form>
 EOD;
