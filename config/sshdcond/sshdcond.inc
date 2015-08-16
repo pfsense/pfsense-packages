@@ -117,12 +117,15 @@ function sshdcond_custom_php_write_config() {
 function sshdcond_sync_on_changes() {
 	global $config, $g;
 
-	if (is_array($config['installedpackages']['sshdcondsync'])) {
-		if (!$config['installedpackages']['sshdcondsync']['config'][0]['synconchanges']) {
-			return;
-		}
+	/* Basically, this package was never configured */
+	if (!is_array($config['installedpackages']['sshdcondsync'])) {
+		return;
 	}
-
+	/* Package is configured but XMLRPC sync is disabled */
+	if (!isset($config['installedpackages']['sshdcondsync']['config'][0]['synconchanges'])) {
+		return;
+	}
+	/* Do XMLRPC sync */
 	log_error("[sshdcond] xmlrpc sync is starting.");
 	foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs) {
 		foreach($rs['row'] as $sh) {
