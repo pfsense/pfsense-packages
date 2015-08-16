@@ -1,53 +1,52 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-    <copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    bacula-client_df.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcio Carlos Braga Antao
-    Copyright (C) 2012 Marcello Coutinho
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	bacula-client.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) Marcio Carlos Braga Antao
+	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Client Install for Bacula 5.2.6 Backup</description>
-    <requirements>Bacula Server Installed in or network</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<requirements>Bacula Server Installed on your network.</requirements>
 	<name>baculaclientfd</name>
-	<version>5.2.6</version>
-	<title>Bacula-Client: FileDaemon Setting</title>
-    <aftersaveredirect>/pkg_edit.php?xml=bacula-client_fd.xml</aftersaveredirect>
+	<version>1.0.8</version>
+	<title>Bacula Client: FileDaemon Settings</title>
+	<aftersaveredirect>/pkg_edit.php?xml=bacula-client_fd.xml</aftersaveredirect>
 	<include_file>/usr/local/pkg/bacula-client.inc</include_file>
 	<configpath>installedpackages->package->baculaclient</configpath>
 	<tabs>
@@ -76,7 +75,7 @@
 			<fieldname>port</fieldname>
 			<type>input</type>
 			<size>4</size>
-			<description>Port for a File Daemon. Default : 9102 </description>
+			<description>Port for a File Daemon. (Default: 9102)</description>
 			<required/>
 		</field>
 		<field>
@@ -85,23 +84,14 @@
 			<type>input</type>
 			<size>3</size>
 			<required/>
-			<description>Maximum Concurrent Jobs. Default : 20</description>
+			<description>Maximum Concurrent Jobs. (Default: 20)</description>
 		</field>
 
 	</fields>
-	
 	<custom_php_install_command>
 		baculaclient_custom_php_install_command();
 	</custom_php_install_command>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
-	<custom_php_validation_command>
-	</custom_php_validation_command>
-	<custom_delete_php_command>
-	</custom_delete_php_command>	
-	<custom_add_php_command>
-	</custom_add_php_command>	
 	<custom_php_resync_config_command>
-			baculaclient_custom_php_write_config();
+		baculaclient_custom_php_write_config();
 	</custom_php_resync_config_command>
 </packagegui>
