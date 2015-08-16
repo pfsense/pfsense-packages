@@ -3,18 +3,21 @@
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
-/* ========================================================================== */
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
 /*
 	systempatches.xml
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
+
 
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
@@ -22,6 +25,7 @@
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
+
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -34,30 +38,25 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-/* ==========================================================================	*/
+/* ====================================================================================== */
 	]]>
 	</copyright>
-	<description>System Patches</description>
-	<requirements>None</requirements>
-	<faq>Applies patches supplied by the user to the firewall.</faq>
+	<description>System Patches applies patches supplied by the user to the firewall.</description>
 	<name>System Patches</name>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<title>System: Patches</title>
 	<include_file>/usr/local/pkg/patches.inc</include_file>
 	<menu>
 		<name>Patches</name>
-		<tooltiptext></tooltiptext>
 		<section>System</section>
 		<url>/system_patches.php</url>
 	</menu>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>644</chmod>
 		<item>https://packages.pfsense.org/packages/config/systempatches/system_patches.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>644</chmod>
 		<item>https://packages.pfsense.org/packages/config/systempatches/system_patches_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -67,7 +66,6 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>644</chmod>
 		<item>https://packages.pfsense.org/packages/config/systempatches/patches.inc</item>
 	</additional_files_needed>
 	<custom_php_install_command>
