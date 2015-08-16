@@ -302,27 +302,6 @@
 		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
-		<name>pure-ftpd</name>
-		<website>http://www.pureftpd.org/</website>
-		<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
-		<category>FTP</category>
-		<config_file>https://packages.pfsense.org/packages/config/pure-ftpd/pure-ftpd.xml</config_file>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>pure-ftpd-1.0.35.tbz</depends_on_package>
-		<depends_on_package_pbi>pure-ftpd-1.0.36-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/ftp/pure-ftpd</build_port_path>
-		<version>1.0.35</version>
-		<status>Stable</status>
-		<configurationfile>pure-ftpd.xml</configurationfile>
-		<required_version>1.0</required_version>
-		<maximum_version>1.0</maximum_version>
-		<logging>
-			<facilityname>ftp</facilityname>
-			<logfilename>pure-ftpd.log</logfilename>
-		</logging>
-		<noembedded>true</noembedded>
-	</package>
-	<package>
 		<name>Avahi</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/Avahi_package</pkginfolink>
 		<website>http://www.avahi.org/</website>
