@@ -1,9 +1,11 @@
 <?php
-/* $Id$ */
 /*
 	bandwidthd.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006 Scott Ullrich
-	part of pfSense
+	Copyright (C) 2009 Bill Marquette
+	Copyright (C) 2012-2013 Phil Davis
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -27,181 +29,92 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-// Check pfSense version
-$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 switch ($pfs_version) {
-  case "2.1":
-    define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
-    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
-    break;
-  case "2.2":
-    define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/local/bandwidthd');
-    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', 'LD_LIBRARY_PATH=/usr/pbi/bandwidthd-' . php_uname("m") . '/local/lib');
-    break;
-  default:
-    define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
-    define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
- }
-// End: Check pfSense version
-
-function is_blank($value) {
-    return empty($value) && !is_numeric($value);
+	case "2.1":
+		define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/bandwidthd');
+		define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
+		break;
+	case "2.2":
+		define('PKG_BANDWIDTHD_BASE', '/usr/pbi/bandwidthd-' . php_uname("m") . '/local/bandwidthd');
+		define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', 'LD_LIBRARY_PATH=/usr/pbi/bandwidthd-' . php_uname("m") . '/local/lib');
+		break;
+	default:
+		define('PKG_BANDWIDTHD_BASE', '/usr/local/bandwidthd');
+		define('PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV', '');
 }
 
 function bandwidthd_install_deinstall() {
 	conf_mount_rw();
-	exec("rm -f /usr/local/etc/rc.d/bandwidthd*");
-	exec("rm -rf " . PKG_BANDWIDTHD_BASE . "/htdocs");
-	exec("rm -f /usr/local/www/bandwidthd");
+	stop_service("bandwidthd");
+	mwexec("/bin/rm -rf " . PKG_BANDWIDTHD_BASE . "/htdocs");
+	mwexec("/bin/rm -f /usr/local/www/bandwidthd");
 	// Remove the cron job, if it is there
 	install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", false);
 	conf_mount_ro();
 }
 
 function bandwidthd_install_config() {
-	global $config, $g;
+	global $config, $g, $bandwidthd_config;
+	conf_mount_rw();
 
 	/* bandwidthd doesn't have a way to pass a custom config path, unfortunately */
-	/* the conf file must be ./etc/bandwidthd.conf relative to the current dir */
+	/* So, the .conf file must be ./etc/bandwidthd.conf relative to the current dir */
 	$bandwidthd_base_dir = PKG_BANDWIDTHD_BASE;
 	$bandwidthd_config_dir = PKG_BANDWIDTHD_BASE . "/etc";
 	$bandwidthd_runtime_library_env = PKG_BANDWIDTHD_RUNTIME_LIBRARY_ENV;
 
-	conf_mount_rw();
-
-	/* user defined values */
+	/* General Options */
 	$bandwidthd_config = $config['installedpackages']['bandwidthd']['config'][0];
-	$meta_refresh = $bandwidthd_config['meta_refresh'];
-	if (is_numeric($meta_refresh))
-		$meta_refresh = "meta_refresh $meta_refresh\n";
-	else
-		$meta_refresh = "";
-
-	$graph = $bandwidthd_config['drawgraphs'];
-	if ($graph)
-		$graph = "graph true\n";
-	else
-		$graph = "graph false\n";
-
-	$filter_text = $bandwidthd_config['filter'];
-	if (!is_blank($filter_text))
-		$filter_text = "filter $filter_text\n";
-	else
-		$filter_text = "";
-
-	$recover_cdf = $bandwidthd_config['recovercdf'];
-	if ($recover_cdf)
-		$recover_cdf = "recover_cdf true\n";
-	else
-		$recover_cdf = "";
-
-	$output_cdf = $bandwidthd_config['outputcdf'];
-	if ($output_cdf)
-		$output_cdf_string = "output_cdf true\n";
-	else
-		$output_cdf_string = "";
-
-	$output_postgresql = $bandwidthd_config['outputpostgresql'];
-	$postgresql_host = $bandwidthd_config['postgresqlhost'];
-	$postgresql_database = $bandwidthd_config['postgresqldatabase'];
-	$postgresql_username = $bandwidthd_config['postgresqlusername'];
-	$postgresql_password = $bandwidthd_config['postgresqlpassword'];
-	$postgresql_string = "";
-	if ($output_postgresql) {
-		if (!is_blank($postgresql_host) && !is_blank($postgresql_username) && !is_blank($postgresql_database) && !is_blank($postgresql_password))
-			$postgresql_string = "pgsql_connect_string \"user = $postgresql_username dbname = $postgresql_database password = $postgresql_password host = $postgresql_host\"\n";
-		else
-			log_error("bandwidthd: You have to specify the postgreSQL Host, Database, Username and Password. postgreSQL details have been ignored.");
-	}
-
-	$sensor_id = $bandwidthd_config['sensorid'];
-
-	if (!is_blank($sensor_id))
-		$sensor_id_string = "sensor_id \"$sensor_id\"";
-	else
-		$sensor_id_string = "";
-
-	$promiscuous = $bandwidthd_config['promiscuous'];
-	if ($promiscuous)
-		$promiscuous = "promiscuous true\n";
-	else
-		$promiscuous = "promiscuous false\n";
-
-	$graph_cutoff = $bandwidthd_config['graphcutoff'];
-	if (!is_blank($graph_cutoff))
-		$graph_cutoff = "graph_cutoff $graph_cutoff\n";
-	else
-		$graph_cutoff = "";
-
-	$skip_intervals = $bandwidthd_config['skipintervals'];
-	if ($skip_intervals) {
-		$skip_intervals = "skip_intervals $skip_intervals\n";
-	} else {
-		/* Includes the case where 0 is explicitly specified, which is the default anyway. */
-		$skip_intervals = "";
-	}
-
-	if (!is_blank($bandwidthd_config['active_interface'])){
-		$ifdescrs = array($bandwidthd_config['active_interface']);
-	} else {
-		log_error("You should specify an interface for bandwidthd to listen on. Exiting.");
-	}
-
-	$subnets_custom = explode(';',str_replace(' ','',$bandwidthd_config['subnets_custom']));
-
-	/* initialize to "" */
-	$subnets = "";
-	//$ifdescrs = array("lan", "wan");
-	//for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
-		//$ifdescrs['opt' . $j] = "opt" . $j;
-	//}
-	if (is_array($ifdescrs)) {
-		foreach ($ifdescrs as $int) {
-			/* calculate interface subnet information */
-			$ifcfg = $config['interfaces'][$int];
-			$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
-			$subnetmask = gen_subnet_mask($ifcfg['subnet']);
-			$subnet_with_mask = "";
-			if ($subnet == "pppoe") {
-				$subnet = find_interface_ip("ng0");
-				if ($subnet) {
-					$subnet_with_mask = $subnet . "/32";
-				}
-			} else {
-				if ($subnet) {
-					$subnet_with_mask = $subnet . "/" . $ifcfg['subnet'];
-				}
-			}
-			if (!empty($subnet_with_mask)) {
-				/* Only add the subnet if the user has not specified it in the custom subnets. */
-				/* This avoids generating an unnecessary syntax error message from the config. */
-				if (!in_array($subnet_with_mask, $subnets_custom))
-					$subnets .= "subnet {$subnet_with_mask}\n";
-			}
-		}
-	}
-
-	if (is_array($subnets_custom)) {
-		foreach ($subnets_custom as $sub) {
-			if (!empty($sub) && is_subnet($sub))
-				$subnets .= "subnet {$sub}\n";
-		}
-	}
-
-	/* initialize to "" */
+	/* Configure bandwidthd web interface */
 	$dev = "";
-	if (is_array($ifdescrs)) {
-		foreach ($ifdescrs as $ifdescr) {
-			$descr = convert_friendly_interface_to_real_interface_name($ifdescr);
-			$dev .= "dev \"$descr\"\n";
+	$ifdescrs = array($bandwidthd_config['active_interface']);
+	foreach ($ifdescrs as $ifdescr) {
+		$descr = convert_friendly_interface_to_real_interface_name($ifdescr);
+		$dev .= "dev \"{$descr}\"\n";
+	}
+	/* Configure stats interface(s) */
+	$subnets = "";
+	$stats_interfaces = $bandwidthd_config['interface_array'] ?: 'lan';
+	foreach ($stats_interfaces as $iface) {
+		if (is_ipaddr(get_interface_ip($iface))) {
+			$subnets .= "subnet " . gen_subnet(get_interface_ip($iface),get_interface_subnet($iface)) . "/" . get_interface_subnet($iface) . "\n";
 		}
 	}
+	$promiscuous_val = ($bandwidthd_config['promiscuous'] != "" ? "promiscuous true" : "promiscuous false");
+	$sensor_id_string_val = ($bandwidthd_config['sensorid'] != "" ? "sensor_id \"{$bandwidthd_config['sensorid']}\"" : "");
 
+	/* Graphs Options */
+	$graph_val = ($bandwidthd_config['drawgraphs'] != "" ? "graph true" : "graph false");
+	$meta_refresh_val = ($bandwidthd_config['meta_refresh'] != "" ? "meta_refresh {$bandwidthd_config['meta_refresh']}" : "");
+	$skip_intervals_val = ($bandwidthd_config['skipintervals'] != "" ? "skip_intervals {$bandwidthd_config['skipintervals']}" : "");
+	$graph_cutoff_val = ($bandwidthd_config['graphcutoff'] != "" ? "graph_cutoff {$bandwidthd_config['graphcutoff']}" : "");
+	$output_cdf_val = ($bandwidthd_config['outputcdf'] != "" ? "output_cdf true" : "");
+	$recover_cdf_val = ($bandwidthd_config['recovercdf'] != "" ? "recover_cdf true" : "");
+
+	/* PostgreSQL Options */
+	if ($bandwidthd_config['outputpostgresql']) {
+		$postgresql_host = $bandwidthd_config['postgresqlhost'];
+		$postgresql_database = $bandwidthd_config['postgresqldatabase'];
+		$postgresql_username = $bandwidthd_config['postgresqlusername'];
+		$postgresql_password = base64_decode($bandwidthd_config['postgresqlpasswordenc']);
+		$postgresql_string_val = "pgsql_connect_string \"user = $postgresql_username dbname = $postgresql_database password = $postgresql_password host = $postgresql_host\"\n";
+	} else {
+		$postgresql_string_val = "";
+	}
+
+	/* Advanced Filter */
+	if ($bandwidthd_config['advfilter']) {
+		$filter_text_val = "filter " . escapeshellarg(base64_decode($bandwidthd_config['advfilter']));
+	} else {
+		$filter_text_val = "";
+	}
+
+	/* Write out the config file */
 	$config_file = <<<EOF
 #
 # This file was automatically generated by the pfSense
-# package management system.  Changing this file
+# package management system. Changing this file
 # will lead to it being overwritten again when
 # the package manager resyncs.
 #
@@ -211,62 +124,62 @@ function bandwidthd_install_config() {
 # Commented out options are here to provide
 # documentation and represent defaults
 
-# Subnets to collect statistics on.  Traffic that
+# Subnets to collect statistics on. Traffic that
 # matches none of these subnets will be ignored.
 # Syntax is either IP Subnet Mask or CIDR
-$subnets
+{$subnets}
 
 # Device to listen on
 # Bandwidthd listens on the first device it detects
-# by default.  Run "bandwidthd -l" for a list of
+# by default. Run "bandwidthd -l" for a list of
 # devices.
-$dev
+{$dev}
 
 ###################################################
 # Options that don't usually get changed
 
 # An interval is 2.5 minutes, this is how many
 # intervals to skip before doing a graphing run
-$skip_intervals
+{$skip_intervals_val}
 
 # Graph cutoff is how many k must be transferred by an
 # ip before we bother to graph it
-$graph_cutoff
+{$graph_cutoff_val}
 
 #Put interface in promiscuous mode to score to traffic
 #that may not be routing through the host machine.
-$promiscuous
+{$promiscuous_val}
 
 #Log data to cdf file htdocs/log.cdf
-$output_cdf_string
+{$output_cdf_val}
 
 #Read back the cdf file on startup
-$recover_cdf
+{$recover_cdf_val}
 
 # Standard postgres connect string, just like php, see postgres docs for
 # details
-$postgresql_string
+{$postgresql_string_val}
 
 # Arbitrary sensor name, I recommend the sensors fully qualified domain
 # name
-$sensor_id_string
+{$sensor_id_string_val}
 
 #Libpcap format filter string used to control what bandwidthd sees
 #Please always include "ip" in the string to avoid strange problems
-$filter_text
+{$filter_text_val}
 
 #Draw Graphs - This defaults to true to graph the traffic bandwidthd is recording
 #Usually set this to false if you only want cdf output or
-#you are using the database output option.  Bandwidthd will use very little
+#you are using the database output option. Bandwidthd will use very little
 #ram and cpu if this is set to false.
-$graph
+{$graph_val}
 
 #Set META REFRESH seconds (default 150, use 0 to disable).
-$meta_refresh
+{$meta_refresh_val}
 
 EOF;
 
-	$fd = fopen("{$bandwidthd_config_dir}/bandwidthd.conf","w");
+	$fd = fopen("{$bandwidthd_config_dir}/bandwidthd.conf", "w");
 	if (!$fd) {
 		log_error("could not open {$bandwidthd_config_dir}/bandwidthd.conf for writing");
 		exit;
@@ -274,13 +187,12 @@ EOF;
 	fwrite($fd, $config_file);
 	fclose($fd);
 
+	/* nanobsd hacks */
 	if ($g['platform'] == 'nanobsd') {
 		$bandwidthd_nano_dir = "/var/bandwidthd";
 		$bandwidthd_htdocs_dir = $bandwidthd_nano_dir . "/htdocs";
 		if (!is_dir($bandwidthd_nano_dir)) {
-			if (file_exists($bandwidthd_nano_dir)) {
-				unlink($bandwidthd_nano_dir);
-			}
+			unlink_if_exists($bandwidthd_nano_dir);
 			mkdir($bandwidthd_nano_dir);
 		}
 	} else {
@@ -289,24 +201,19 @@ EOF;
 
 	$rc = array();
 	$rc['file'] = 'bandwidthd.sh';
-	$rc['stop'] = <<<EOD
-/usr/bin/killall bandwidthd
-EOD;
+	$rc['stop'] = '/usr/bin/killall bandwidthd';
 
-	// If this is an old config before the enable checkbox was added, then enable by default
-	$bandwidthd_enable = (!isset($bandwidthd_config['enable']) || ($bandwidthd_config['enable']));
-	if ($bandwidthd_enable) {
+	if ($bandwidthd_config['enable']) {
 		if ($g['platform'] == 'nanobsd') {
-			// On nanobsd, /var/bandwidthd is created.
-			// In that is a real /var/bandwidth/htdocs, where the graph data is written
-			// A soft link to the real bandwidth program is made - /var/bandwidthd/bandwidthd
-			// A soft link to the etc folder with the conf file is made - /var/bandwidthd/etc
-			// bandwidthd is started from /var/bandwidthd with the current dir /var/bandwidth
-			// This way, it:
-			//   looks in ./etc for the conf file
-			//   writes graph files in ./htdocs
-			//   writes cdf log files (if selected in the config) to ./
-			// All of this is on the /var filesystem, which is a read-write memory disk on nanobsd
+		/* On nanobsd:
+		* first, /var/bandwidthd is created, with real /var/bandwidth/htdocs inside, where the graph data is written;
+		* soft link to the real bandwidth program is made - /var/bandwidthd/bandwidthd;
+		* soft link to the etc folder with the conf file is made - /var/bandwidthd/etc;
+		* bandwidthd is started from /var/bandwidthd with the current dir /var/bandwidth.
+		* This way, it looks in ./etc for the conf file, writes graph files in ./htdocs
+		* writes cdf log files (if selected in the config) to ./
+		* All of these are on the /var filesystem, which is a read-write memory disk on nanobsd	*/
+
 			$rc['start'] = <<<EOD
 if [ ! -d "{$bandwidthd_nano_dir}" ] ; then
 	if [ -e "{$bandwidthd_nano_dir}" ] ; then
@@ -355,21 +262,17 @@ EOD;
 		$rc['start'] = "return";
 	}
 
-	/* write out rc.d start/stop file */
+	/* Write out rc.d file */
 	write_rcfile($rc);
 
 	if (!is_dir($bandwidthd_htdocs_dir)) {
-		if (file_exists($bandwidthd_htdocs_dir)) {
-			unlink($bandwidthd_htdocs_dir);
-		}
-		mkdir($bandwidthd_htdocs_dir);
+		unlink_if_exists($bandwidthd_htdocs_dir);
+		safe_mkdir($bandwidthd_htdocs_dir);
 	}
+
 	$bandwidthd_www_link = $g["www_path"] . "/bandwidthd";
 	if (!is_link($bandwidthd_www_link)) {
-		if (file_exists($bandwidthd_www_link)) {
-			// It is a file and not a link - clean it up.
-			unlink($bandwidthd_www_link);
-		}
+		unlink_if_exists($bandwidthd_www_link);
 		symlink($bandwidthd_htdocs_dir, $bandwidthd_www_link);
 	}
 
@@ -378,19 +281,138 @@ EOD;
 		exec("echo \"Please start bandwidthd to populate this directory.\" > " . $bandwidthd_index_file);
 	}
 
-	if (($bandwidthd_enable) && ($output_cdf)) {
+	/* Cron job for graphs */
+	if (($bandwidthd_config['enable']) && ($output_cdf)) {
 		// Use cron job to rotate logs every day at 00:01
 		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", true, "1", "0");
-	}
-	else
-	{
-		// Remove the cron job, if it is there
+	} else {
+		// Remove the cron job if it is there
 		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", false);
 	}
+
 	conf_mount_ro();
-	stop_service("bandwidthd");
-	if ($bandwidthd_enable) {
-		start_service("bandwidthd");
+	
+	/* Restart the service if enabled; otherwise stop it */
+	if ($bandwidthd_config['enable']) {
+		restart_service("bandwidthd");
+	} else {
+		stop_service("bandwidthd");
+	}
+}
+
+function bandwidthd_upgrade_config() {
+	global $config, $changes;
+	// The 'Advanced Filter' options and 'Database Password' are now base64-encoded
+	// in order to now break config.xml if they contain some special chars.
+	// If this is an old config, pick up the original unencoded values and upgrade
+	$changes = 0;
+	$bandwidthd_config = $config['installedpackages']['bandwidthd']['config'][0];
+	if (isset($bandwidthd_config['filter'])) {
+		$config['installedpackages']['bandwidthd']['config'][0]['advfilter'] = base64_encode($bandwidthd_config['filter']);
+		unset($config['installedpackages']['bandwidthd']['config'][0]['filter']);
+		$changes++;
+	}
+	if (isset($bandwidthd_config['postgresqlpassword'])) {
+		$config['installedpackages']['bandwidthd']['config'][0]['postgresqlpasswordenc'] = base64_encode($bandwidthd_config['postgresqlpassword']);
+		unset($config['installedpackages']['bandwidthd']['config'][0]['postgresqlpassword']);
+		$changes++;
+	}
+	// Subnet(s) for Statistics Collection - convert old subnets_custom to interface_array here as well.
+	if (isset($bandwidthd_config['subnets_custom'])) {
+		$i = 0;
+		$subnets_custom = explode(';', $bandwidthd_config['subnets_custom']);
+		// For each configured interface on this box...
+		$iflist = get_configured_interface_list_by_realif();
+		foreach ($iflist as $if) {
+			// first, gets its subnet...
+			$sn = gen_subnet(get_interface_ip($if), get_interface_subnet($if));
+			foreach ($subnets_custom as $subnet_custom) {
+				// next, strip the subnet mask from the old settings value...
+				$subnet_custom = substr($subnet_custom, 0, strpos($subnet_custom, '/'));
+				// next, try to match the originally configured subnet against configured interfaces...
+				if ($subnet_custom != "" && $subnet_custom == $sn) {
+					// skip PPPoE interfaces if any...
+					$realif = get_real_interface($if);
+					if (!preg_match("/pppoe[0-9]+/i", $realif)) {
+						// and finally, set the new config value for config.xml
+						$config['installedpackages']['bandwidthd']['config'][0]['interface_array'][$i] = $if;
+						$i++;
+						$changes++;
+					}
+				}
+			}
+		}
+		// Remove the old settings value now that we are done with config upgrade
+		unset($config['installedpackages']['bandwidthd']['config'][0]['subnets_custom']);
+	}
+	// Write the upgraded config.xml if something changed
+	if ($changes > 0 ) {
+		write_config("[bandwidthd] Upgraded old package configuration.");
+	}
+}
+
+function bandwidthd_validate_input($post, &$input_errors) {
+	if ($post['active_interface']) {
+		$realif = get_real_interface($post['active_interface']);
+		$ip = find_interface_ip($realif);
+		if (!is_ipaddrv4($ip)) {
+			// IPv6-only interfaces are not supported
+			$errif = convert_friendly_interface_to_friendly_descr($post['active_interface']);
+			$input_errors[] = gettext("The \"{$errif}\" interface selected under 'BandwidthD Web Interface' has no IPv4 configured. Configured IPv4 is required.");
+		}
+	} else {
+		$input_errors[] = "You must select the 'BandwidthD Web Interface'.";
+	}
+	// bandwidthd does not work with PPPoE; IPv6 is also not supported
+	if ($post['interface_array']) {
+		foreach ($post['interface_array'] as $ifname) {
+			$realif = get_real_interface($ifname);
+			$ip = find_interface_ip($realif);
+			$errif = convert_friendly_interface_to_friendly_descr($ifname);
+			if (preg_match("/pppoe[0-9]+/i", $realif)) {
+				$input_errors[] = gettext("Sorry, BandwidthD does not support PPPoE interfaces. Remove \"{$errif}\" from 'Subnet(s) for Statistics Collection'.");
+			}
+			if (!is_ipaddrv4($ip)) {
+				$input_errors[] = gettext("The \"{$errif}\" interface selected under 'Subnet(s) for Statistics Collection' has no IPv4 configured. Configured IPv4 is required.");
+			}
+		}
+	} else {
+		$input_errors[] = "You must select at least on interface under 'Subnet(s) for Statistics Collection'.";
+	}
+	// Only support sane characters in Sensor ID
+	if ($post['sensorid']) {
+		if ((!is_hostname($post['sensorid'])) && !preg_match("/^[a-zA-Z0-9\-\=\(\):. ]*$/", $post['sensorid'])) {
+			$input_errors[] .= gettext('Sensor ID must be either a hostname or a string which may only contain characters matching ^[a-zA-Z0-9\-\(\):. ]*$ regexp.');
+		}
+	}
+	if (($post['meta_refresh']) && (!is_numericint($post['meta_refresh']))) {
+		$input_errors[] = gettext("The value for 'Meta Refresh' must be a positive integer.");
+	}
+	if (($post['skipintervals']) && (!is_numericint($post['skipintervals']))) {
+		$input_errors[] = gettext("The value for 'Skip Intervals' must be a positive integer.");
+	}
+	if (($post['graphcutoff']) && (!is_numericint($post['graphcutoff']))) {
+		$input_errors[] = gettext("The value for 'Graph Cutoff' must be a positive integer.");
+	}
+	if ($post['outputpostgresql']) {
+		if (!$post['postgresqlhost']) {
+		$input_errors[] = gettext("The value for 'Database Host' must not be empty when 'Output to PostgreSQL' is enabled.");
+		}
+		if (!$post['postgresqldatabase']) {
+		$input_errors[] = gettext("The value for 'Database Name' must not be empty when 'Output to PostgreSQL' is enabled.");
+		}
+		if (!$post['postgresqlusername']) {
+		$input_errors[] = gettext("The value for 'Database User' must not be empty when 'Output to PostgreSQL' is enabled.");
+		}
+		if (!$post['postgresqlpasswordenc']) {
+		$input_errors[] = gettext("The value for 'Database Password' must not be empty when 'Output to PostgreSQL' is enabled.");
+		}
+	}
+	if (($post['postgresqlhost']) && (!is_hostname($post['postgresqlhost']))) {
+		$input_errors[] = gettext("The value for 'Database Host' must be a valid hostname or IPv4.");
+	}
+	if (($post['advfilter']) && !preg_match("/^[a-zA-Z0-9\+\-\=\(\):. ]*$/", $post['advfilter'])) {
+		$input_errors[] = gettext('Advanced traffic filtering options may only contain characters matching ^[a-zA-Z0-9\+\-\=\(\):. ]*$ regexp.');
 	}
 }
 

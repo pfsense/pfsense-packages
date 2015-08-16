@@ -929,7 +929,7 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>0.5</version>
+		<version>0.6</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>bandwidthd-2.0.1_6-##ARCH##.pbi</depends_on_package_pbi>
