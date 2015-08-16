@@ -1,8 +1,51 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<title>Services: LCDproc 0.5.6 pkg v. 0.9.9</title>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	lcdproc.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2007-2009 Seth Mos <seth.mos@dds.nl>
+	Copyright (C) 2009 Scott Ullrich
+	Copyright (C) 2011 Michele Di Maria
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
-	<version>0.9.12</version>
+	<version>0.9.13</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -18,29 +61,26 @@
 	</tabs>
 	<menu>
 		<name>LCDproc</name>
-		<tooltiptext>Set LCDproc settings such as display driver and com port</tooltiptext>
+		<tooltiptext>Set LCDproc settings such as display driver and COM port.</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
 	</menu>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc.inc</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc_screens.xml</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc_client.php</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://files.pfsense.org/misc/nexcom.so</item>
-	    <prefix>/usr/local/lib/lcdproc/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/lib/lcdproc/</prefix>
+		<chmod>0755</chmod>
 	</additional_files_needed>
 	<service>
 		<name>lcdproc</name>
@@ -50,14 +90,14 @@
 	</service>
 	<fields>
 		<field>
-			<fielddescr>Enable LCDproc at startup</fielddescr>
+			<fielddescr>Enable LCDproc</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fieldname>comport</fieldname>
-			<fielddescr>Com Port</fielddescr>
-			<description>Set the com port LCDproc should use.</description>
+			<fielddescr>COM Port</fielddescr>
+			<description>Set the COM port LCDproc should use.</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -66,27 +106,27 @@
 				</option>
 				<option>
 					<value>com1</value>
-					<name>Serial Com port 1 (/dev/cua0)</name>
-				</option>				
+					<name>Serial COM port 1 (/dev/cua0)</name>
+				</option>
 				<option>
 					<value>com2</value>
-					<name>Serial Com port 2 (/dev/cua1)</name>
+					<name>Serial COM port 2 (/dev/cua1)</name>
 				</option>
 				<option>
 					<value>com1a</value>
-					<name>Serial Com port 1 alternate (/dev/cuau0)</name>
+					<name>Serial COM port 1 alternate (/dev/cuau0)</name>
 				</option>
 				<option>
 					<value>com2a</value>
-					<name>Serial Com port 2 alternate (/dev/cuau1)</name>
-				</option>				
+					<name>Serial COM port 2 alternate (/dev/cuau1)</name>
+				</option>
 				<option>
 					<value>ucom1</value>
-					<name>USB Com port 1 (/dev/cuaU0)</name>
+					<name>USB COM port 1 (/dev/cuaU0)</name>
 				</option>
 				<option>
 					<value>ucom2</value>
-					<name>USB Com port 2 (/dev/cuaU1)</name>
+					<name>USB COM port 2 (/dev/cuaU1)</name>
 				</option>
 				<option>
 					<value>lpt1</value>
@@ -94,20 +134,20 @@
 				</option>
 				<option>
 					<value>ugen0.2</value>
-					<name>USB Com port 1 alternate (/dev/ugen0.2)</name>
-				</option>				
+					<name>USB COM port 1 alternate (/dev/ugen0.2)</name>
+				</option>
 				<option>
 					<value>ugen1.2</value>
-					<name>USB Com port 2 alternate (/dev/ugen1.2)</name>
+					<name>USB COM port 2 alternate (/dev/ugen1.2)</name>
 				</option>
 				<option>
 					<value>ugen1.3</value>
-					<name>USB Com port 3 alternate (/dev/ugen1.3)</name>
+					<name>USB COM port 3 alternate (/dev/ugen1.3)</name>
 				</option>
 				<option>
 					<value>ugen2.2</value>
-					<name>USB Com port 4 alternate (/dev/ugen2.2)</name>
-				</option>				
+					<name>USB COM port 4 alternate (/dev/ugen2.2)</name>
+				</option>
 			</options>
 			<default_value>ucom1</default_value>
 		</field>
@@ -241,7 +281,7 @@
 				<option>
 					<value>nexcom</value>
 					<name>nexcom (x86 only)</name>
-				</option>				
+				</option>
 				<option>
 					<value>NoritakeVFD</value>
 					<name>NoritakeVFD</name>
@@ -249,15 +289,15 @@
 				<option>
 					<value>picolcd</value>
 					<name>picolcd</name>
-				</option>				
+				</option>
 				<option>
 					<value>pyramid</value>
 					<name>pyramid</name>
-				</option>				
+				</option>
 				<option>
 					<value>sdeclcd</value>
 					<name>Watchguard Firebox with SDEC</name>
-				</option>				
+				</option>
 				<option>
 					<value>sed1330</value>
 					<name>sed1330</name>
@@ -277,7 +317,7 @@
 				<option>
 					<value>shuttleVFD</value>
 					<name>shuttleVFD</name>
-				</option>				
+				</option>
 				<option>
 					<value>sli</value>
 					<name>sli</name>
@@ -289,7 +329,7 @@
 				<option>
 					<value>SureElec</value>
 					<name>SureElec</name>
-				</option>				
+				</option>
 				<option>
 					<value>t6963</value>
 					<name>t6963</name>
@@ -317,7 +357,7 @@
 				</option>
 				<option>
 					<value>8bit</value>
-					<name>8bit wiring to parallel port(lcdtime)</name>
+					<name>8bit wiring to parallel port (lcdtime)</name>
 				</option>
 				<option>
 					<value>winamp</value>
@@ -385,7 +425,7 @@
 				</option>
 			</options>
 			<default_value>lcd2usb</default_value>
-		</field>	
+		</field>
 		<field>
 			<fieldname>refresh_frequency</fieldname>
 			<fielddescr>Refresh frequency</fielddescr>
@@ -414,11 +454,16 @@
 				</option>
 			</options>
 			<default_value>5</default_value>
-		</field>	
+		</field>
 		<field>
 			<fieldname>port_speed</fieldname>
 			<fielddescr>Port speed</fielddescr>
-			<description>Set the port speed. Caution: not all the driver or panels support all the speeds, leave "default" if unsure.</description>
+			<description>
+				<![CDATA[
+				Set the port speed.<br />
+				Caution: not all the driver or panels support all the speeds, leave "default" if unsure.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -448,14 +493,19 @@
 				<option>
 					<value>115200</value>
 					<name>115200 bps</name>
-				</option>				
+				</option>
 			</options>
 			<default_value>0</default_value>
 		</field>
 		<field>
 			<fieldname>brightness</fieldname>
 			<fielddescr>Brightness</fielddescr>
-			<description>Set the brightness of the LCD panel. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<description>
+				<![CDATA[
+				Set the brightness of the LCD panel.<br />
+				This option is not supported by all the LCD panels, leave "default" if unsure.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -473,11 +523,11 @@
 				<option>
 					<value>20</value>
 					<name>20%</name>
-				</option>	
+				</option>
 				<option>
 					<value>30</value>
 					<name>30%</name>
-				</option>	
+				</option>
 				<option>
 					<value>40</value>
 					<name>40%</name>
@@ -501,18 +551,23 @@
 				<option>
 					<value>90</value>
 					<name>90%</name>
-				</option>	
+				</option>
 				<option>
 					<value>100</value>
 					<name>100%</name>
 				</option>
-			</options>			
+			</options>
 			<default_value>-1</default_value>
 		</field>
 		<field>
 			<fieldname>offbrightness</fieldname>
 			<fielddescr>Off brightness</fielddescr>
-			<description>Set the off-brightness of the LCD panel. This value is used when the display is normally switched off in case LCDd is inactive. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<description>
+				<![CDATA[
+				Set the off-brightness of the LCD panel. This value is used when the display is normally switched off in case LCDd is inactive.<br />
+				This option is not supported by all the LCD panels, leave "default" if unsure.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -530,11 +585,11 @@
 				<option>
 					<value>20</value>
 					<name>20%</name>
-				</option>	
+				</option>
 				<option>
 					<value>30</value>
 					<name>30%</name>
-				</option>	
+				</option>
 				<option>
 					<value>40</value>
 					<name>40%</name>
@@ -558,18 +613,23 @@
 				<option>
 					<value>90</value>
 					<name>90%</name>
-				</option>	
+				</option>
 				<option>
 					<value>100</value>
 					<name>100%</name>
 				</option>
-			</options>			
+			</options>
 			<default_value>-1</default_value>
-		</field>		
+		</field>
 		<field>
 			<fieldname>contrast</fieldname>
 			<fielddescr>Contrast</fielddescr>
-			<description>Set the contrast of the LCD panel. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<description>
+				<![CDATA[
+				Set the contrast of the LCD panel.<br />
+				This option is not supported by all the LCD panels, leave "default" if unsure.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -587,11 +647,11 @@
 				<option>
 					<value>20</value>
 					<name>20%</name>
-				</option>	
+				</option>
 				<option>
 					<value>30</value>
 					<name>30%</name>
-				</option>	
+				</option>
 				<option>
 					<value>40</value>
 					<name>40%</name>
@@ -615,18 +675,23 @@
 				<option>
 					<value>90</value>
 					<name>90%</name>
-				</option>	
+				</option>
 				<option>
 					<value>100</value>
 					<name>100%</name>
 				</option>
-			</options>			
+			</options>
 			<default_value>-1</default_value>
-		</field>	
+		</field>
 		<field>
 			<fieldname>backlight</fieldname>
 			<fielddescr>Backlight</fielddescr>
-			<description>Set the backlight setting. If set to the default value, then the backlight setting of the display can be influenced by the clients. This option is not supported by all the LCD panels, leave "default" if unsure.</description>
+			<description>
+				<![CDATA[
+				Set the backlight setting. If set to the default value, then the backlight setting of the display can be influenced by the clients.<br />
+				This option is not supported by all the LCD panels, leave "default" if unsure.
+				]]>
+			</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -647,15 +712,19 @@
 		<field>
 			<fieldname>outputleds</fieldname>
 			<fielddescr>Enable Output LEDs</fielddescr>
-			<description>Enable the Output LEDs present on some LCD panels. This feature is currently supported by the CFontz633 driver only. &lt;br&gt;
-				Each LED can be off or show two colors: RED (alarm) or GREEN (everything ok) and shows: &lt;br&gt;
-				LED1: NICs status (green: ok, red: at least one nic down);&lt;br&gt;
-				LED2: CARP status (green: master, red: backup, off: CARP not implemented);&lt;br&gt;
-				LED3: CPU status (green &lt; 50, red &gt; 50%);&lt;br&gt;
-				LED4: Gateway status (green: ok, red: at least one gateway not responding, off: no gateway configured).</description>
+			<description>
+				<![CDATA[
+				Enable the Output LEDs present on some LCD panels. This feature is currently supported by the CFontz633 driver only.<br />
+				Each LED can be off or show two colors: RED (alarm) or GREEN (everything ok) and shows:<br />
+				LED1: NICs status (green: ok, red: at least one nic down)<br />
+				LED2: CARP status (green: master, red: backup, off: CARP not implemented)<br />
+				LED3: CPU status (green &lt; 50%, red &gt; 50%)<br />
+				LED4: Gateway status (green: ok, red: at least one gateway not responding, off: no gateway configured).
+				]]>
+			</description>
 			<type>checkbox</type>
 			<default_value>default</default_value>
-		</field>		
+		</field>
 	</fields>
 	<custom_php_validation_command>
 		validate_form_lcdproc($_POST, $input_errors);
