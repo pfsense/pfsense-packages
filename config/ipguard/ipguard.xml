@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-<copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    ipguard.xml
-    part of the ipguard package for pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcello Coutinho
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	ipguard.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>ipguard</name>
-	<version>1.0</version>
-	<title>Ipguard</title>
-	<description>Ipguard macs/ip</description>
+	<version>0.1.1</version>
+	<title>Firewall: IPguard</title>
+	<description>IPguard MACs/IP</description>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/ipguard.inc</include_file>
 	<menu>
-		<name>Ipguard</name>
-		<tooltiptext>Tool designed to protect LAN IP address space by ARP spoofing</tooltiptext>
+		<name>IPguard</name>
+		<tooltiptext>Tool designed to protect LAN IP address space by ARP spoofing.</tooltiptext>
 		<section>Firewall</section>
 		<url>/pkg.php?xml=ipguard.xml</url>
 	</menu>
@@ -57,17 +57,15 @@
 		<name>ipguard</name>
 		<rcfile>ipguard.sh</rcfile>
 		<executable>ipguard</executable>
-		<description>Tool designed to protect LAN IP address space by ARP spoofing.</description>
+		<description>IPguard ARP Spoofing Daemon</description>
 	</service>
 	<configpath>installedpackages->package->ipguard</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>755</chmod>
 		<item>https://packages.pfsense.org/packages/config/ipguard/ipguard.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>755</chmod>
 		<item>https://packages.pfsense.org/packages/config/ipguard/ipguard_sync.xml</item>
 	</additional_files_needed>
 	<tabs>
@@ -92,11 +90,11 @@
 			<fieldname>interface</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Mac Address</fielddescr>
+			<fielddescr>MAC Address</fielddescr>
 			<fieldname>mac</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Ip Address(es)</fielddescr>
+			<fielddescr>IP Address(es)</fielddescr>
 			<fieldname>ip</fieldname>
 		</columnitem>
 		<columnitem>
@@ -104,43 +102,53 @@
 			<fieldname>description</fieldname>
 		</columnitem>
 		<movable>on</movable>
-		<description><![CDATA[If firewall receives traffic with MAC/IP pair not listed here, it will send ARP reply with configured fake address.<br>This will prevent not permitted host from working properly in the specified ethernet segment.]]></description>
+		<description>
+			<![CDATA[
+			If firewall receives traffic with MAC/IP pair not listed here, it will send ARP reply with configured fake address.<br />
+			This will prevent not permitted host from working properly in the specified ethernet segment.
+			]]>
+		</description>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<type>listtopic</type>
-			<name>Ipguard Options</name>
+			<name>IPguard Options</name>
 			<fieldname>temp</fieldname>
 		</field>
 		<field>
-		<fielddescr>sortable</fielddescr>
-		<fieldname>sortable</fieldname>
-		<display_maximum_rows>20</display_maximum_rows>
-		<type>sorting</type>
-		<include_filtering_inputbox/>
-		<sortablefields>
-			<item>
-				<name>Mac Address</name>
-				<fieldname>mac</fieldname>
-				<regex>/%FILTERTEXT%/i</regex>
-			</item>
-			<item>
-				<name>Ip Address</name>
-				<fieldname>ip</fieldname>
-				<regex>/%FILTERTEXT%/i</regex>
-			</item>
-		</sortablefields>
+			<fielddescr>sortable</fielddescr>
+			<fieldname>sortable</fieldname>
+			<display_maximum_rows>20</display_maximum_rows>
+			<type>sorting</type>
+			<include_filtering_inputbox/>
+			<sortablefields>
+				<item>
+					<name>MAC Address</name>
+					<fieldname>mac</fieldname>
+					<regex>/%FILTERTEXT%/i</regex>
+				</item>
+				<item>
+					<name>IP Address</name>
+					<fieldname>ip</fieldname>
+					<regex>/%FILTERTEXT%/i</regex>
+				</item>
+			</sortablefields>
 		</field>
 		<field>
-		<fielddescr>Enable</fielddescr>
+			<fielddescr>Enable</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-		<description><![CDATA[Enable this mac rule.<br><strong>Important Note:</strong> Always create rules for pfsense mac and ip address to avoid denying access to pfsense gui.]]></description>
+			<description>
+				<![CDATA[
+				Enable this MAC rule.<br />
+				<strong>Important Note:</strong> Always create rules for pfSense MAC and IP address to avoid denying access to pfFense GUI!
+				]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>interface</fieldname>
-			<description>The interface on which ipguard server will check this mac</description>
+			<description>The interface on which IPguard server will check this MAC.</description>
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>lan</default_value>
@@ -148,39 +156,44 @@
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Describe this mac rule.</description>
+			<description>Describe this MAC rule.</description>
 			<type>input</type>
 			<size>50</size>
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Mac address</fielddescr>
+			<fielddescr>MAC Address</fielddescr>
 			<fieldname>mac</fieldname>
-			<description><![CDATA[Insert mac address you want to filter.<br>
-				<strong>To include a permit rule, use mac=00:00:00:00:00:00</strong>]]></description>
+			<description>
+				<![CDATA[
+				Insert MAC address you want to filter.<br />
+				<strong>To include a permit rule, use MAC 00:00:00:00:00:00</strong>
+				]]>
+			</description>
 			<type>input</type>
 			<size>25</size>
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Ip address</fielddescr>
+			<fielddescr>IP Address</fielddescr>
 			<fieldname>ip</fieldname>
-			<description><![CDATA[Insert ip address, hostname or network cidr you want to apply on this ipguard rule.<br>
-				<strong>To include a permit rule, use your lan cidr or 0.0.0.0</strong>]]></description>
+			<description>
+				<![CDATA[
+				Insert IP address, hostname or network CIDR you want to apply on this IPguard rule.<br>
+				<strong>To include a permit rule, use your LAN CIDR or 0.0.0.0</strong>
+				]]>
+			</description>
 			<type>input</type>
 			<size>40</size>
 			<required/>
 		</field>
 	</fields>
-
 	<custom_delete_php_command>
 		ipguard_custom_php_write_config();
 	</custom_delete_php_command>
 	<custom_add_php_command>
 		ipguard_custom_php_write_config();
 	</custom_add_php_command>
-	<custom_php_install_command>
-	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		ipguard_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
@@ -190,5 +203,4 @@
 	<custom_php_command_before_form>
 		unset($_POST['temp']);
 	</custom_php_command_before_form>
-
 </packagegui>
