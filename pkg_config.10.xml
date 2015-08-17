@@ -633,7 +633,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/ipguard/ipguard.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
 		<depends_on_package_pbi>ipguard-1.04_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.1</version>
+		<version>0.1.1</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
