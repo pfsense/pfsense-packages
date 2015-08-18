@@ -72,7 +72,11 @@ function ipguard_custom_php_write_config() {
 				$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 				if ($pfs_version == "2.2") {
 					$conf_file_link = "/usr/pbi/ipguard-" . php_uname("m") . "/local/etc/ipguard_{$key}.conf";
-					@symlink($conf_file, $conf_file_link);
+					/* Better recreate this every time just in case users shuffle interfaces assignment somehow */
+					if (is_link($conf_file_link)) {
+						unlink($conf_file_link);
+					}
+					symlink($conf_file, $conf_file_link);
 				}
 				$iface = convert_friendly_interface_to_real_interface_name($key);
 				$start .= "/usr/local/sbin/ipguard -l /var/log/ipguard_{$key}.log -p /var/run/ipguard_{$key}.pid -f {$conf_file} -u 300 -z {$iface}\n\t";
