@@ -119,10 +119,10 @@ if (file_exists($callog)) {
 			</tr>
 			<tr>
 				<td nowrap="nowrap" class="listhdrr"><?=gettext("From");?></td>
-				<td nowrap="nowrap" class="listhdrr"><?=gettext("To");?></a></td>
+				<td nowrap="nowrap" class="listhdrr"><?=gettext("To");?></td>
 				<td nowrap="nowrap" class="listhdrr"><?=gettext("Start");?></td>
-				<td nowrap="nowrap" class="listhdrr"><?=gettext("End");?></a></td>
-				<td nowrap="nowrap" class="listhdrr"><?=gettext("Duration");?></a></td>
+				<td nowrap="nowrap" class="listhdrr"><?=gettext("End");?></td>
+				<td nowrap="nowrap" class="listhdrr"><?=gettext("Duration");?></td>
 				<td nowrap="nowrap" class="listhdrr"><?=gettext("Status");?></td>
 			</tr>
 		<?php
@@ -139,7 +139,7 @@ if (file_exists($callog)) {
 			fclose($file_handle);
 		}
 		echo $out;
-		echo "<tr><td colspan='6'><a href='$pfile?cmd=download'><input type='button' name='command' value='Download' class='formbtn'></a>";
+		echo "<tr><td colspan='6'><a href='$pfile?cmd=download'><input type='button' name='command' value='Download' class='formbtn' /></a>";
 		echo "<a href='$pfile?cmd=trim'><input type='button' name='command' value='Trim log' class='formbtn' /></a>";
 		echo "<a href='$pfile?cmd=clear'><input type='button' name='command' value='Clear log' class='formbtn' /></a></td></tr>";
 		?>
