@@ -79,7 +79,7 @@ function validate_input_zabbix_agent_lts($post, &$input_errors) {
 		if ($post['listenport'] != '') {
 			if (!is_numericint($post['listenport'])) {
 				$input_errors[] = "'Listen Port' value is not numeric.";
-			} elseif ($post['buffersize'] < 1 || $post['buffersize'] > 65535) {
+			} elseif ($post['listenport'] < 1 || $post['listenport'] > 65535) {
 				$input_errors[] = "You must enter a valid value for 'Listen Port'.";
 			}
 		}
