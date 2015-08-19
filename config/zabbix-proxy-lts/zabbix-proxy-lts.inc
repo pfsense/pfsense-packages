@@ -50,13 +50,13 @@ function php_deinstall_zabbix_proxy_lts() {
 	unlink_if_exists("/var/run/zabbix-proxy-lts/zabbix_proxy_lts.pid");
 
 	if (is_dir("/var/log/zabbix-proxy-lts")) {
-		exec("/bin/rm -rf /var/log/zabbix-proxy-lts/");
+		mwexec("/bin/rm -rf /var/log/zabbix-proxy-lts/");
 	}
 	if (is_dir("/var/run/zabbix-proxy-lts")) {
-		exec("/bin/rm -rf /var/run/zabbix-proxy-lts/");
+		mwexec("/bin/rm -rf /var/run/zabbix-proxy-lts/");
 	}
 	if (is_dir("/var/db/zabbix-proxy-lts")) {
-		exec("/bin/rm -rf /var/db/zabbix-proxy-lts/");
+		mwexec("/bin/rm -rf /var/db/zabbix-proxy-lts/");
 	}
 
 	conf_mount_ro();
@@ -65,19 +65,21 @@ function php_deinstall_zabbix_proxy_lts() {
 function validate_input_zabbix_proxy_lts($post, &$input_errors) {
 	if (isset($post['proxyenabled'])) {
 		if (!preg_match("/\w+/", $post['server'])) {
-			$input_errors[] = 'Server field is required.';
+			$input_errors[] = "Server field is required.";
 		}
 
 		if (!is_numericint($post['serverport'])) {
-			$input_errors[] = 'Server Port is not numeric.'.$ServerPort;
+			$input_errors[] = "'Server Port' value is not numeric.";
+		} elseif ($post['serverport'] < 1 || $post['serverport'] > 65535) {
+			$input_errors[] = "You must enter a valid value for 'Server Port'.";
 		}
 
 		if (!preg_match("/\w+/", $post['hostname'])) {
-			$input_errors[] = 'Hostname field is required.';
+			$input_errors[] = "Hostname field is required.";
 		}
 
 		if (!is_numericint($post['configfrequency'])) {
-			$input_errors[] = 'Config Frequency is not numeric.';
+			$input_errors[] = "'Config Frequency' value is not numeric.";
 		}
 	}
 }
@@ -133,7 +135,7 @@ EOF;
 	}
 	foreach ($want_sysctls as $ws => $wv) {
 		$sc_file .= "{$ws}={$wv}\n";
-		exec("/sbin/sysctl {$ws}={$wv}");
+		mwexec("/sbin/sysctl {$ws}={$wv}");
 	}
 	file_put_contents("/etc/sysctl.conf", $sc_file);
 
@@ -163,7 +165,7 @@ EOF;
 	// Check startup script files
 	// Create a few directories and ensure the sample files are in place
 	if (!is_dir(ZABBIX_PROXY_BASE . "/etc/zabbix22")) {
-		exec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix22");
+		mwexec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/zabbix22");
 	}
 
 	$dir_checks = <<< EOF
