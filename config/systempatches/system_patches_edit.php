@@ -1,7 +1,9 @@
 <?php
 /*
 	system_patches_edit.php
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -46,8 +48,9 @@ if (!is_array($config['installedpackages']['patches']['item'])) {
 $a_patches = &$config['installedpackages']['patches']['item'];
 
 $id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id'])) {
 	$id = $_POST['id'];
+}
 
 if (isset($_GET['dup'])) {
 	$id = $_GET['dup'];
@@ -69,8 +72,9 @@ if (isset($id) && $a_patches[$id]) {
 	$pconfig['ignorewhitespace'] = true;
 }
 
-if (isset($_GET['dup']))
+if (isset($_GET['dup'])) {
 	unset($id);
+}
 
 unset($input_errors);
 
@@ -78,7 +82,7 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	if(empty($_POST['location'])) {
+	if (empty($_POST['location'])) {
 		$reqdfields = explode(" ", "patch");
 		$reqdfieldsn = array(gettext("Patch Contents"));
 	} else {
@@ -87,10 +91,11 @@ if ($_POST) {
 	}
 
 	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-	if ($pf_version < 2.1)
+	if ($pf_version < 2.1) {
 		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
-	else
+	} else {
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
+	}
 
 	if (!empty($_POST['location']) && !is_commit_id($_POST['location']) && !is_URL($_POST['location'])) {
 		$input_errors[] = gettext("The supplied commit ID/URL appears to be invalid.");
@@ -111,10 +116,11 @@ if ($_POST) {
 			/* Strip DOS style carriage returns from textarea input */
 			$thispatch['patch'] = base64_encode(str_replace("\r", "", $_POST['patch']));
 		}
-		if (is_github_url($thispatch['location']) && ($_POST['pathstrip'] == 0))
+		if (is_github_url($thispatch['location']) && ($_POST['pathstrip'] == 0)) {
 			$thispatch['pathstrip'] = 1;
-		else
+		} else {
 			$thispatch['pathstrip'] = $_POST['pathstrip'];
+		}
 		$thispatch['basedir'] = empty($_POST['basedir']) ? "/" : $_POST['basedir'];
 		$thispatch['ignorewhitespace'] = isset($_POST['ignorewhitespace']);
 		$thispatch['autoapply'] = isset($_POST['autoapply']);
@@ -125,18 +131,20 @@ if ($_POST) {
 		}
 
 		// Update the patch entry now
-		if (isset($id) && $a_patches[$id])
+		if (isset($id) && $a_patches[$id]) {
 			$a_patches[$id] = $thispatch;
-		else {
-			if (is_numeric($after))
+		} else {
+			if (is_numeric($after)) {
 				array_splice($a_patches, $after+1, 0, array($thispatch));
-			else
+			} else {
 				$a_patches[] = $thispatch;
+			}
 		}
 
 		write_config();
-		if ($thispatch['autoapply'])
+		if ($thispatch['autoapply']) {
 			patch_add_shellcmd();
+		}
 		header("Location: system_patches.php");
 		return;
 	}

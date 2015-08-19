@@ -1,14 +1,11 @@
 <?php
-/* $Id$ */
 /*
-/* ========================================================================== */
-/*
-    backup.inc
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
-/*
+	backup.inc
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -30,32 +27,16 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-
-if (!function_exists("byte_convert")) {
-	function byte_convert( $bytes ) {
-		if ($bytes<=0)
-			return '0 Byte';
-
-		$convention=1000; //[1000->10^x|1024->2^x]
-		$s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-		$e=floor(log($bytes,$convention));
-		return round($bytes/pow($convention,$e),2).' '.$s[$e];
-	}
-}
- 
-function backup_sync_package_php()
-{
-
-	global $config; 
-	if($config['installedpackages']['backup']['config'] != "") {
+function backup_sync_package() {
+	global $config;
+	if ($config['installedpackages']['backup']['config'] != "") {
 		conf_mount_rw();
-		foreach($config['installedpackages']['backup']['config'] as $rowhelper) {
+		foreach ($config['installedpackages']['backup']['config'] as $rowhelper) {
 			if ($rowhelper['enabled'] != "false") {
 				//$tmp_php = base64_decode($rowhelper['php']);
 				if (strlen($tmp_php) > 0) {
-					$tmp .= "// name: ".$rowhelper['name']." \n";
-					$tmp .= "// description: ".$rowhelper['description']." \n\n";
+					$tmp .= "// name: " . $rowhelper['name'] . " \n";
+					$tmp .= "// description: " . $rowhelper['description'] . " \n\n";
 					$tmp .= base64_decode($rowhelper['php']);
 					$tmp .= "\n";
 				}
@@ -65,29 +46,12 @@ function backup_sync_package_php()
 	}
 }
 
-
-function backup_sync_package()
-{
-	global $config;   
-	backup_sync_package_php();
-}
-
-
-function backup_install_command()
-{
-
-	global $config;
+function backup_install_command() {
 	conf_mount_rw();
-
-	//create the backup directory
-	if (!is_dir('/root/backup/')) {
-		@mkdir("/root/backup/");
-	}
-
+	// Create the backup directory
+	safe_mkdir("/root/backup/");
 	backup_sync_package();
-
 	conf_mount_ro();
-  
 }
 
 ?>

@@ -170,6 +170,9 @@ if ($_POST['save'] || $_POST['apply']) {
 		snort_reload_config($a_nat[$id]);
 		$pconfig = $natent;
 
+		// Sync to configured CARP slaves if any are enabled
+		snort_sync_on_changes();
+
 		// We have saved changes and done a soft restart, so clear "dirty" flag
 		clear_subsystem_dirty('snort_iprep');
 	}

@@ -1,14 +1,10 @@
 <?php
-
 /*
 	sshdcond.inc
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2012 Marcello Coutinho
 	Copyright (C) 2012 Han Van (namezero@afim.info)
-	All rights reserved.
-
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -45,57 +41,59 @@ function sshdcond_custom_php_install_command() {
 
 	conf_mount_rw();
 
-	// We need to generate an outfile for our extra commands
-	// The patched g_szSSHDFileGenerate php file then reads and appends that config
+	/* We need to generate an outfile for our extra commands.
+	The patched g_szSSHDFileGenerate php file then reads and appends that config.
+	*/
 	$fd = fopen("/etc/ssh/sshd_extra", 'w');
 	fclose($fd);
 
 	conf_mount_ro();
-	}
+}
 
 function sshdcond_custom_php_deinstall_command() {
 	global $g, $config;
 
 	conf_mount_rw();
 
-	// 1. Delete our config file
+	/* Delete our config file. */
 	unlink_if_exists("/etc/ssh/sshd_extra");
 
-	// 2. Re-run sshd config generation script
+	/* Re-run sshd config generation script. */
 	restart_sshd();
 
 	conf_mount_ro();
-	}
+}
 
 function sshdcond_custom_php_write_config() {
-	global $g, $config;
+	global $g, $config, $pkg_interface;
 
-	# detect boot process
-	if (is_array($_POST)) {
-		if (!preg_match("/\w+/",$_POST['__csrf_magic']))
-			return;
-		}
+	/* Detect boot process, do nothing during boot. */
+	if (platform_booting()) {
+		return;
+	}
 
-	$sshd_extra="";
+	conf_mount_rw();
+
+	$sshd_extra = "";
 	if (is_array($config['installedpackages']['sshdcond']['config'])) {
-		// Mount Read-only
-		conf_mount_rw();
 
-		// Read config
+		/* Read config. */
 		foreach ($config['installedpackages']['sshdcond']['config'] as $sshdcond) {
 			if ($sshdcond['enable'] && is_array($sshdcond['row'])) {
 				$sshd_extra.= "Match {$sshdcond['matchtype']} {$sshdcond['matchvalue']}\n";
 				foreach ($sshdcond['row'] as $sshd) {
-					//check if there is spaces on sshd value
-					if(preg_match ("/\s+/",$sshd['sshdvalue']))
-						$sshd['sshdvalue']='"'.$sshd['sshdvalue'].'"';
+					/* Check sshd value for spaces. */
+					if (preg_match ("/\s+/",$sshd['sshdvalue'])) {
+						$sshd['sshdvalue'] = '"' . $sshd['sshdvalue'] . '"';
+					}
 
-					//check if value is not empty
-					if($sshd['sshdvalue']!="")
-						$sshd_extra.="\t {$sshd['sshdoption']} {$sshd['sshdvalue']}\n";
+					/* Check that sshdvalue is not empty. */
+					if ($sshd['sshdvalue'] != "") {
+						$sshd_extra .= "\t {$sshd['sshdoption']} {$sshd['sshdvalue']}\n";
+					}
 
-					//apply file permission if option is ChrootDirectory
-					if ($sshd['sshdoption']=="ChrootDirectory" && file_exists($sshd['sshdvalue'])) {
+					/* Apply file permission if option is ChrootDirectory. */
+					if ($sshd['sshdoption'] == "ChrootDirectory" && file_exists($sshd['sshdvalue'])) {
 						chown($sshd['sshdvalue'], 'root');
 						chgrp($sshd['sshdvalue'], 'operator');
 					}
@@ -104,92 +102,98 @@ function sshdcond_custom_php_write_config() {
 		}
 	}
 
-	//Save /etc/ssh/sshd_extra
-	file_put_contents("/etc/ssh/sshd_extra",$sshd_extra,LOCK_EX);
+	/* Save /etc/ssh/sshd_extra. */
+	file_put_contents("/etc/ssh/sshd_extra", $sshd_extra, LOCK_EX);
 
-
-
-	// Restart sshd
+	/* Restart sshd and re-mount read-only. */
 	restart_sshd();
-
-	// Mount Read-only
 	conf_mount_ro();
 
-	//sync config with other pfsense servers
+	/* Sync config with other pfSense servers. */
 	sshdcond_sync_on_changes();
-	}
+}
 
-/* Uses XMLRPC to synchronize the changes to a remote node */
+/* Uses XMLRPC to synchronize the changes to a remote node. */
 function sshdcond_sync_on_changes() {
 	global $config, $g;
 
-	if (is_array($config['installedpackages']['sshdcondsync']))
-		if (!$config['installedpackages']['sshdcondsync']['config'][0]['synconchanges'])
-			return;
-
+	/* Basically, this package was never configured */
+	if (!is_array($config['installedpackages']['sshdcondsync'])) {
+		return;
+	}
+	/* Package is configured but XMLRPC sync is disabled */
+	if (!isset($config['installedpackages']['sshdcondsync']['config'][0]['synconchanges'])) {
+		return;
+	}
+	/* Do XMLRPC sync */
 	log_error("[sshdcond] xmlrpc sync is starting.");
-	foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs ) {
+	foreach ($config['installedpackages']['sshdcondsync']['config'] as $rs) {
 		foreach($rs['row'] as $sh) {
 			$sync_to_ip = $sh['ipaddress'];
 			$password = $sh['password'];
-			if($password && $sync_to_ip)
+			if ($password && $sync_to_ip) {
 				sshdcond_do_xmlrpc_sync($sync_to_ip, $password);
 			}
+		}
 	}
 	log_error("[sshdcond] xmlrpc sync is ending.");
 }
 
-/* Do the actual XMLRPC sync */
+/* Do the actual XMLRPC sync. */
 function sshdcond_do_xmlrpc_sync($sync_to_ip, $password) {
 	global $config, $g;
 
-	if(!$password)
+	if (!$password) {
 		return;
+	}
 
-	if(!$sync_to_ip)
+	if (!$sync_to_ip) {
 		return;
+	}
 
 	$username='admin';
 	$xmlrpc_sync_neighbor = $sync_to_ip;
-	if($config['system']['webgui']['protocol'] != "") {
+	if ($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
 		$synchronizetoip .= "://";
 	}
 	$port = $config['system']['webgui']['port'];
-	/* if port is empty lets rely on the protocol selection */
-	if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http")
+	/* If port is empty, let's rely on the protocol selection. */
+	if ($port == "") {
+		if ($config['system']['webgui']['protocol'] == "http") {
 			$port = "80";
-		else
+		} else {
 			$port = "443";
+		}
 	}
 	$synchronizetoip .= $sync_to_ip;
 
-	/* xml will hold the sections to sync */
+	/* xml will hold the sections to sync. */
 	$xml = array();
 	$xml['sshdcond'] = $config['installedpackages']['sshdcond'];
-	/* assemble xmlrpc payload */
+	/* Assemble XMLRPC payload. */
 	$params = array(
 		XML_RPC_encode($password),
 		XML_RPC_encode($xml)
 	);
 
-	/* set a few variables needed for sync code borrowed from filter.inc */
+	/* Set a few variables needed for sync code; borrowed from filter.inc. */
 	$url = $synchronizetoip;
 	log_error("Beginning sshdcond XMLRPC sync to {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
-	if($g['debug'])
+	if ($g['debug']) {
 		$cli->setDebug(1);
-	/* send our XMLRPC message and timeout after 250 seconds */
+	}
+	/* Send our XMLRPC message and timeout after 250 seconds. */
 	$resp = $cli->send($msg, "250");
-	if(!$resp) {
+	if (!$resp) {
 		$error = "A communications error occurred while attempting sshdcond XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
 		file_notice("sync_settings", $error, "sshdcond Settings Sync", "");
-	} elseif($resp->faultCode()) {
+	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, "250");
 		$error = "An error code was received while attempting sshdcond XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
@@ -199,11 +203,11 @@ function sshdcond_do_xmlrpc_sync($sync_to_ip, $password) {
 		log_error("sshdcond XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 
-	/* tell sshdcond to reload our settings on the destionation sync host. */
+	/* Tell sshdcond to reload our settings on the destination sync host. */
 	$method = 'pfsense.exec_php';
-	$execcmd  = "require_once('/usr/local/pkg/sshdcond.inc');\n";
+	$execcmd = "require_once('/usr/local/pkg/sshdcond.inc');\n";
 	$execcmd .= "sshdcond_custom_php_write_config();";
-	/* assemble xmlrpc payload */
+	/* Assemble XMLRPC payload. */
 	$params = array(
 		XML_RPC_encode($password),
 		XML_RPC_encode($execcmd)
@@ -214,11 +218,11 @@ function sshdcond_do_xmlrpc_sync($sync_to_ip, $password) {
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
 	$resp = $cli->send($msg, "250");
-	if(!$resp) {
+	if (!$resp) {
 		$error = "A communications error occurred while attempting sshdcond XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "sshdcond Settings Sync", "");
-	} elseif($resp->faultCode()) {
+	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, "250");
 		$error = "An error code was received while attempting sshdcond XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
@@ -228,4 +232,4 @@ function sshdcond_do_xmlrpc_sync($sync_to_ip, $password) {
 		log_error("sshdcond XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
 }
-	?>
+?>

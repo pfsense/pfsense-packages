@@ -80,6 +80,18 @@ $pconfig = array();
 if (isset($id) && isset($a_nat[$id])) {
 	$pconfig = $a_nat[$id];
 
+	// Initialize multiple config engine arrays for supported preprocessors if necessary
+	if (!is_array($pconfig['frag3_engine']['item']))
+		$pconfig['frag3_engine']['item'] = array();
+	if (!is_array($pconfig['stream5_tcp_engine']['item']))
+		$pconfig['stream5_tcp_engine']['item'] = array();
+	if (!is_array($pconfig['http_inspect_engine']['item']))
+		$pconfig['http_inspect_engine']['item'] = array();
+	if (!is_array($pconfig['ftp_server_engine']['item']))
+		$pconfig['ftp_server_engine']['item'] = array();
+	if (!is_array($pconfig['ftp_client_engine']['item']))
+		$pconfig['ftp_client_engine']['item'] = array();
+
 	/************************************************************/
 	/* To keep new users from shooting themselves in the foot   */
 	/* enable the most common required preprocessors by default */
@@ -451,6 +463,12 @@ if ($_POST['save']) {
 			$input_errors[] = gettext("The value for Application ID Stats Period must be between 60 and 3600.");
 	}
 
+	// Validate Portscan Ignore_Scanners parameter
+	if ($_POST['sf_portscan'] == 'on' && is_alias($_POST['pscan_ignore_scanners'])) {
+		if (trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = gettext("FQDN aliases are not supported in Snort for the PORTSCAN IGNORE_SCANNERS parameter.");
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		/* post new options */
@@ -568,6 +586,9 @@ if ($_POST['save']) {
 		if ($natent['host_attribute_table'] == "on" && 
 		    !empty($natent['host_attribute_data']))
 			snort_reload_config($natent, "SIGURG");
+
+		/* Sync to configured CARP slaves if any are enabled */
+		snort_sync_on_changes();
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -1500,10 +1521,10 @@ if ($savemsg) {
 			<?php
 			$values = array('Credit Card', 'Email Addresses', 'U.S. Phone Numbers', 'U.S. Social Security Numbers');
 			foreach ($values as $val): ?>
-			<option value="<?=$val;?>"
-			<?php if (preg_match("/$val/",$pconfig['sdf_alert_data_type'])) echo "selected"; ?>> 
+				<option value="<?=$val;?>"
+				<?php if (strpos($pconfig['sdf_alert_data_type'], $val) !== FALSE) echo "selected"; ?>> 
 				<?=gettext($val);?></option>
-				<?php endforeach; ?>
+			<?php endforeach; ?>
 			</select><br/><?php echo gettext("Choose which types of sensitive data to detect.  Use CTRL + Click for multiple selections."); ?><br/>
 		</td>
 	</tr>

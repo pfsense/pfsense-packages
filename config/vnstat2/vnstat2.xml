@@ -1,19 +1,53 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-    <copyright></copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	vnstat2.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 PerryMason
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>vnstat2</name>
-	<version>11.2,3</version>
+	<version>1.12.5</version>
 	<title>Vnstat2</title>
 	<aftersaveredirect>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/vnstat2/vnstat2.inc</include_file>
 	<menu>
 		<name>Vnstat2</name>
-		<tooltiptext></tooltiptext>
 		<section>Status</section>
 		<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
 	</menu>
@@ -42,17 +76,14 @@
 	</tabs>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat2.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstati.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstatoutput.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -62,137 +93,110 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/www/diag_vnstat.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/www/diag_vnstat2.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/www/vnstat2_img.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/www/vnstati.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/lang/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/lang/cs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/lang/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/lang/en.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/lang/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/lang/nl.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/dark/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/dark/style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/dark/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/dark/theme.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/espresso/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/espresso/style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/espresso/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/espresso/theme.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/light/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/light/style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/light/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/light/theme.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/pfSense/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/pfSense/style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/pfSense/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/pfSense/theme.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/red/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/red/style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/themes/red/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/themes/red/theme.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/config.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/COPYING</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/graph.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/graph_svg.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/index.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/localize.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/README</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/vera_copyright.txt</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/VeraBd.ttf</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/vnstat2/vnstat_php_frontend/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/vnstat2/vnstat_php_frontend/vnstat.php</item>
 	</additional_files_needed>
 	<fields>
@@ -203,47 +207,45 @@
 			<type>select</type>
 			<size>3</size>
 			<default_value>1</default_value>
-                        <options>
-                                 <option><name>1</name><value>1</value></option>
-                                 <option><name>2</name><value>2</value></option>
-                                 <option><name>3</name><value>3</value></option>
-                                 <option><name>4</name><value>4</value></option>
-                                 <option><name>5</name><value>5</value></option>
-                                 <option><name>6</name><value>6</value></option>
-                                 <option><name>7</name><value>7</value></option>
-                                 <option><name>8</name><value>8</value></option>
-                                 <option><name>9</name><value>9</value></option>
-                                 <option><name>10</name><value>10</value></option>
-                                 <option><name>11</name><value>11</value></option>
-                                 <option><name>12</name><value>12</value></option>
-                                 <option><name>13</name><value>13</value></option>
-                                 <option><name>14</name><value>14</value></option>
-                                 <option><name>15</name><value>15</value></option>
-                                 <option><name>16</name><value>16</value></option>
-                                 <option><name>17</name><value>17</value></option>
-                                 <option><name>18</name><value>18</value></option>
-                                 <option><name>19</name><value>19</value></option>
-                                 <option><name>20</name><value>20</value></option>
-                                 <option><name>21</name><value>21</value></option>
-                                 <option><name>22</name><value>22</value></option>
-                                 <option><name>23</name><value>23</value></option>
-                                 <option><name>24</name><value>24</value></option>
-                                 <option><name>25</name><value>25</value></option>
-                                 <option><name>26</name><value>26</value></option>
-                                 <option><name>27</name><value>27</value></option>
-                                 <option><name>28</name><value>28</value></option>
-                        </options>
+			<options>
+				<option><name>1</name><value>1</value></option>
+				<option><name>2</name><value>2</value></option>
+				<option><name>3</name><value>3</value></option>
+				<option><name>4</name><value>4</value></option>
+				<option><name>5</name><value>5</value></option>
+				<option><name>6</name><value>6</value></option>
+				<option><name>7</name><value>7</value></option>
+				<option><name>8</name><value>8</value></option>
+				<option><name>9</name><value>9</value></option>
+				<option><name>10</name><value>10</value></option>
+				<option><name>11</name><value>11</value></option>
+				<option><name>12</name><value>12</value></option>
+				<option><name>13</name><value>13</value></option>
+				<option><name>14</name><value>14</value></option>
+				<option><name>15</name><value>15</value></option>
+				<option><name>16</name><value>16</value></option>
+				<option><name>17</name><value>17</value></option>
+				<option><name>18</name><value>18</value></option>
+				<option><name>19</name><value>19</value></option>
+				<option><name>20</name><value>20</value></option>
+				<option><name>21</name><value>21</value></option>
+				<option><name>22</name><value>22</value></option>
+				<option><name>23</name><value>23</value></option>
+				<option><name>24</name><value>24</value></option>
+				<option><name>25</name><value>25</value></option>
+				<option><name>26</name><value>26</value></option>
+				<option><name>27</name><value>27</value></option>
+				<option><name>28</name><value>28</value></option>
+			</options>
 		</field>
 		<field>
-			<description>Enable vnstat php frontend (Note that no login will be needed)</description>
-			<fielddescr>Enable php frontend for vnstat</fielddescr>
+			<description>Enable vnstat PHP frontend</description>
+			<fielddescr>Enable PHP frontend for vnstat. (Note that no login will be needed.)</fielddescr>
 			<fieldname>vnstat_phpfrontend</fieldname>
 			<type>checkbox</type>
 		</field>
 	</fields>
 	<custom_add_php_command>change_vnstat_conf();</custom_add_php_command>
-	<custom_php_resync_config_command></custom_php_resync_config_command>
 	<custom_php_install_command>vnstat_install_config();</custom_php_install_command>
 	<custom_php_deinstall_command>vnstat_install_deinstall();</custom_php_deinstall_command>
 </packagegui>
-

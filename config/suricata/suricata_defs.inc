@@ -52,7 +52,7 @@ if (!is_array($config['installedpackages']['suricata']))
 	$config['installedpackages']['suricata'] = array();
 
 /* Get installed package version for display */
-$suricata_package_version = "Suricata {$config['installedpackages']['package'][get_pkg_id("suricata")]['version']}";
+$suricata_package_version = "{$config['installedpackages']['package'][get_pkg_id("suricata")]['version']}";
 
 // Define the installed package version
 if (!defined('SURICATA_PKG_VER'))
@@ -70,6 +70,16 @@ if (!defined('SURICATA_PBI_BASEDIR')) {
 // Define the PBI binary wrapper directory
 if (!defined('SURICATA_PBI_BINDIR'))
 	define('SURICATA_PBI_BINDIR', SURICATA_PBI_BASEDIR . 'bin/');
+
+if (!defined("SURICATA_BIN_VERSION")) {
+	// Grab the Suricata binary version programmatically
+	$suricatabindir = SURICATA_PBI_BINDIR;
+	$suricataver = exec_command("{$suricatabindir}suricata -V 2>&1 |/usr/bin/cut -c26-");
+	if (!empty($suricataver))
+		define("SURICATA_BIN_VERSION", $suricataver);
+	else
+		define("SURICATA_BIN_VERSION", "");
+}
 
 // Define the name of the pf table used for IP blocks
 if (!defined('SURICATA_PF_TABLE'))

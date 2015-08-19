@@ -1,8 +1,9 @@
 <?php
-/* $Id$ */
 /*
 	routed.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006 Bill Marquette
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -25,39 +26,42 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
-
 */
-
 function setup_routed() {
 	global $config;
 	$gw = "";
 
-	if (!is_array($config['installedpackages']['routed']))
+	if (!is_array($config['installedpackages']['routed'])) {
 		return;
-	if (!is_array($config['installedpackages']['routed']['config']))
+	}
+	if (!is_array($config['installedpackages']['routed']['config'])) {
 		return;
+	}
 	if (isset($config['installedpackages']['routed']['config'][0]['enable']) &&
-		$config['installedpackages']['routed']['config'][0]['enable'] == "on") {
+	    $config['installedpackages']['routed']['config'][0]['enable'] == "on") {
 			/* if user selected individual interfaces */
 			$ifarr = array_flip(explode(",", $config['installedpackages']['routed']['config'][0]['iface_array']));
 			$allifs = get_interface_arr();
 			if (!empty($ifarr)) {
-				foreach($allifs as $ifname) {
+				foreach ($allifs as $ifname) {
 					$friendly_ifname = convert_real_interface_to_friendly_interface_name($ifname);
-					if (array_key_exists($friendly_ifname, $ifarr))
+					if (array_key_exists($friendly_ifname, $ifarr)) {
 						$gw .= setup_etc_gateways($ifname, 'enable');
-					else
+					} else {
 						$gw .= setup_etc_gateways($ifname, 'disable');
+					}
 				}
-			} else
+			} else {
 				/* setup for all interfaces */
 				$gw = setup_etc_gateways();
+			}
 			conf_mount_rw();
 			file_put_contents("/etc/gateways", $gw);
-		conf_mount_ro();
-		restart_routed();
-	} else
-		stop_routed();
+			conf_mount_ro();
+			restart_service("routed");
+	} else {
+		stop_service("routed");
+	}
 }
 
 function setup_etc_gateways($iface="", $mode="") {
@@ -66,52 +70,56 @@ function setup_etc_gateways($iface="", $mode="") {
 	$ret = "";
 	if ($iface != "") {
 		$realif=convert_friendly_interface_to_real_interface_name($iface);
-		if (!empty($realif))
+		if (!empty($realif)) {
 			$ret = "if={$realif} ";
+		}
 	}
 
 	switch($mode) {
-	case "enable":
-		if ($config['installedpackages']['routed']['config'][0]['ripversion'] == "2") {
-			$ret .= "ripv2 ";
-			$passwd = $config['installedpackages']['routed']['config'][0]['passwd'];
-			if ($passwd != "") {
-				$ret .= "passwd={$passwd} ";
+		case "enable":
+			if ($config['installedpackages']['routed']['config'][0]['ripversion'] == "2") {
+				$ret .= "ripv2 ";
+				$passwd = $config['installedpackages']['routed']['config'][0]['passwd'];
+				if ($passwd != "") {
+					$ret .= "passwd={$passwd} ";
+				}
+				$add_no_ag = $config['installedpackages']['routed']['config'][0]['enable_no_ag'];
+				$add_no_super_ag = $config['installedpackages']['routed']['config'][0]['enable_no_super_ag'];
+				if ($add_no_ag == "on") {
+					$ret .= "no_ag ";
+				}
+				if ($add_no_super_ag == "on") {
+					$ret .= "no_super_ag ";
+				}
 			}
-			$add_no_ag = $config['installedpackages']['routed']['config'][0]['enable_no_ag'];
-			$add_no_super_ag = $config['installedpackages']['routed']['config'][0]['enable_no_super_ag'];
-			if($add_no_ag == "on") {
-				$ret .= "no_ag ";
-			}
-			if($add_no_super_ag == "on") {
-				$ret .= "no_super_ag ";
-			}
-		}
-		break;
-	case "disable":
-		$ret .= "no_rip_out no_solicit no_rdisc no_rdisc_adv";
-		break;
-
-	default:
-		break;
-
+			break;
+		case "disable":
+			$ret .= "no_rip_out no_solicit no_rdisc no_rdisc_adv";
+			break;
+		default:
+			break;
 	}
 	$ret .= "\n";
 
 	return $ret;
 }
 
-function start_routed() {
-	mwexec_bg("/sbin/routed");
+function routed_install_command() {
+	conf_mount_rw();
+	write_rcfile(array(
+		"file" => "routed.sh",
+		"start" => "/usr/bin/nohup /sbin/routed > /dev/null 2>&1 &",
+		"stop" => "/bin/pkill routed"
+		)
+	);
+	conf_mount_ro();
 }
 
-function stop_routed() {
-	killbyname("routed");
-}
-
-function restart_routed() {
-	stop_routed();
-	start_routed();
+function routed_deinstall_command() {
+	stop_service("routed");
+	conf_mount_rw();
+	unlink_if_exists("/usr/local/etc/rc.d/routed.sh");
+	conf_mount_ro();
 }
 
 ?>

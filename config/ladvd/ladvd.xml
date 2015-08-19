@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
 /*
 	ladvd.xml
-        Copyright (C) 2006 Scott Ullrich
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2014 Andrea Tuccia
+	Copyright (C) 2014 Ermal Luçi
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
-
+*/
+/* ====================================================================================== */
+/*
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
+
 
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
@@ -16,6 +26,7 @@
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
+
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -28,11 +39,12 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+/* ====================================================================================== */
 	]]>
 	</copyright>
 	<description>Link Layer Discovery Protocol</description>
 	<name>LADVD</name>
-	<version>1.0.2</version>
+	<version>1.0.4.2</version>
 	<category>Network Management</category>
 	<title>Services: LADVD</title>
 	<savetext>Save</savetext>
@@ -41,13 +53,11 @@
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/ladvd/ladvd.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
 	</additional_files_needed>
-        <additional_files_needed>
-                <prefix>/usr/local/www/</prefix>
-                <chmod>0755</chmod>
-                <item>https://packages.pfsense.org/packages/config/ladvd/status_ladvd.php</item>
-        </additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<item>https://packages.pfsense.org/packages/config/ladvd/status_ladvd.php</item>
+	</additional_files_needed>
 	<menu>
 		<name>LADVD</name>
 		<tooltiptext>Modify LADVD settings.</tooltiptext>
@@ -59,12 +69,12 @@
 		<tooltiptext></tooltiptext>
 		<section>Status</section>
 		<url>/status_ladvd.php</url>
-        </menu>
+	</menu>
 	<service>
 		<name>ladvd</name>
 		<rcfile>ladvd.sh</rcfile>
 		<executable>ladvd</executable>
-		<description>Send and decode link layer advertisements</description>
+		<description>Send and decode link layer advertisements.</description>
 	</service>
 	<tabs>
 		<tab>
@@ -81,7 +91,7 @@
 		<field>
 			<fielddescr>Enable ladvd</fielddescr>
 			<fieldname>enable</fieldname>
-			<description>Enable or disable ladvd</description>
+			<description>Enable or disable ladvd.</description>
 			<enablefields>iface_array[],autoenable,silent,management,location,lldp,cdp,edp,ndp</enablefields>
 			<type>checkbox</type>
 		</field>
@@ -92,7 +102,7 @@
 			<multiple>true</multiple>
 			<size>3</size>
 			<type>interfaces_selection</type>
-			<description>Select the interfaces that LADVD will bind to.  You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<description>Select the interfaces that LADVD will bind to. You can use the CTRL or COMMAND key to select multiple interfaces.</description>
 		</field>
 		<field>
 			<fielddescr>Auto-enable protocols</fielddescr>

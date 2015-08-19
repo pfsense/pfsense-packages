@@ -1,4 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
+	<copyright>
+		<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	pfflowd.xml
+	Copyright (C) 2008 Bill Marquette
+	Copyright (C) 2011 Ermal Luçi
+	Copyright (C) 2011 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	part of pfSense (http://www.pfSense.org/)
+	All rights reserved.
+*/
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+		]]>
+	</copyright>
 	<name>pfflowd</name>
 	<version>1.0.3</version>
 	<title>pfflowd: Settings</title>
@@ -80,21 +122,24 @@
 		<![CDATA[
 		function sync_package_pfflowd() {
 			conf_mount_rw();
-			config_lock();
 			global $config;
-			foreach($config['installedpackages']['pfflowd']['config'] as $cf) {
-				if($cf['host'] != "") {
+			foreach ($config['installedpackages']['pfflowd']['config'] as $cf) {
+				if ($cf['host'] != "") {
 					$start = "\n/sbin/ifconfig pfsync0 up\n";
 					$start .= "/usr/local/sbin/pfflowd ";
 					$start .= " -n {$cf['host']}";
-					if($cf['port'] != "") 
+					if ($cf['port'] != "") {
 						$start .= ":{$cf['port']}";
-					if(!empty($cf['sourcehost']))
+					}
+					if (!empty($cf['sourcehost'])) {
 						$start .= " -s {$cf['sourcehost']} ";
-					if($cf['direction'] != "") 
+					}
+					if ($cf['direction'] != "") {
 						$start .= " -S {$cf['direction']}";
-					if($cf['version'] != "") 
+					}
+					if ($cf['version'] != "") {
 						$start .= " -v {$cf['version']}";
+					}
 					write_rcfile(array(
 							"file" => "pfflowd.sh",
 							"start" => $start,
@@ -106,22 +151,23 @@
 				}
 			}
 			conf_mount_ro();
-			config_unlock();
 		}
 
 		function validate_form_pfflowd($post, &$input_errors) {
-			if(($post['host'] == "") || !is_ipaddr($post['host']))
+			if (($post['host'] == "") || !is_ipaddr($post['host'])) {
 				$input_errors[] = 'You must specify a valid ip address in the \'Host\' field';
-			if(($post['port'] == "") || !is_port($post['port']))
+			}
+			if (($post['port'] == "") || !is_port($post['port'])) {
 				$input_errors[] = 'You must specify a valid port number in the \'Port\' field';
+			}
 		}
-		
+
 		function cleanup_config_pfflowd() {
 			global $a_pkg;
 			$pffconf = array();
 			if (is_array($a_pkg)) {
 				foreach($a_pkg as $cf) {
-					if($cf['host'] != "") {
+					if ($cf['host'] != "") {
 						$pffconf = $cf;
 					}
 				}

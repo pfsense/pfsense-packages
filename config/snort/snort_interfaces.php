@@ -125,7 +125,7 @@ if ($_POST['toggle'] && is_numericint($_POST['id'])) {
 	sleep(3); // So the GUI reports correctly
 }
 
-$pgtitle = "Services: $snort_package_version";
+$pgtitle = "Services: Snort " . SNORT_BIN_VERSION . " pkg v{$config['installedpackages']['package'][get_pkg_id("snort")]['version']}";
 include_once("head.inc");
 
 ?>

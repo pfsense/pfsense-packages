@@ -114,9 +114,7 @@ foreach($grey_hosts as $grey) {
             if($debug)
                 echo "/usr/local/sbin/spamdb -a \"<$email_to>\" -T\n";
             exec("/usr/local/sbin/spamdb -a \"<$email_to>\" -T");
-            config_lock();
             system("echo $server_ip >> /var/db/blacklist.txt");
-            config_unlock();
             $result = mwexec("/usr/local/sbin/spamdb -a $server_ip -t");
         } else {
             if($debug)

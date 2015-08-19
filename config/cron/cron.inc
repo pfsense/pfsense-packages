@@ -1,14 +1,11 @@
 <?php
-/* $Id$ */
 /*
-/* ========================================================================== */
-/*
-    cron.inc
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
-/*
+	cron.inc
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -30,70 +27,23 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require_once("services.inc");
 
-function cron_pkg_is_service_running($servicename)
-{
-	exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-	array_shift($psout);
-	foreach($psout as $line) {
-		$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-	}
-	if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-function cron_sync_package()
-{
-
-	global $config;   
-	//synch cron tab
+function cron_sync_package() {
 	configure_cron();
-	exec("/usr/local/etc/rc.d/cron.sh stop");
-	exec("/usr/local/etc/rc.d/cron.sh start");
-
-}
-    
-
-function cron_install_command()
-{
-
-	global $config;
-	conf_mount_rw();
-	config_lock();
-
-	//write_config();
-
-	write_rcfile(array(
-		"file" => "cron.sh",
-		"start" => "[ `/bin/pgrep -f 'cron -s' | wc -l` -eq 0 ] && /usr/sbin/cron -s &",
-		"stop" => "[ -f \"/var/run/cron.pid\" ] && kill -9 `cat /var/run/cron.pid`; rm -f /var/run/cron.pid; /bin/pkill -f 'cron -s'"
-		)
-	);
-
-	cron_sync_package();
-
-	//if (pkg_is_service_running('cron')) {
-		//documentation purposes
-	//}
-
-	conf_mount_ro();
-	config_unlock();
-
+	// Previous package versions were "helpfully" killing cron on uninstall.
+	// Also, need to make sure cron is running, otherwise the package is useless.
+	// TODO: Something like this needs to be eventually done in configure_cron() in services.inc.
+	if (!is_process_running("cron")) {
+		exec("cd /tmp && /usr/sbin/cron -s 2>/dev/null");
+	}
 }
 
-
-function cron_deinstall_command()
-{
+function cron_install_command() {
 	conf_mount_rw();
-	exec("/usr/local/etc/rc.d/cron.sh stop");
+	// Clean up possible lingering garbage after previous package versions
 	unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
-	conf_mount_ro();
+	cron_sync_package();
 }
 
 ?>

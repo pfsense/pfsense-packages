@@ -1,9 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	nrpe2.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 Erik Kristensen
+	Copyright (C) 2011-2013 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<description>Nagios NRPEv2</description>
-	<requirements>Describe your package requirements here</requirements>
 	<name>nrpe2</name>
-	<version>2.2</version>
+	<version>2.2.1</version>
 	<title>NRPEv2</title>
 	<aftersaveredirect>/pkg_edit.php?xml=nrpe2.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/nrpe2.inc</include_file>
@@ -22,7 +63,6 @@
 	<configpath>installedpackages->package->nrpe2</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.inc</item>
 	</additional_files_needed>
 	<fields>
@@ -34,7 +74,7 @@
 		<field>
 			<fielddescr>Enabled</fielddescr>
 			<fieldname>enabled</fieldname>
-			<description>Check this to enable NRPE daemon</description>
+			<description>Check this to enable NRPE daemon.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -52,20 +92,20 @@
 		<field>
 			<fielddescr>Bind IP Address</fielddescr>
 			<fieldname>server_address</fieldname>
-			<description>Set this to the IP address of the interface you want the daemon to listen on. (optional)</description>
+			<description>Set this to the IP address of the interface you want the daemon to listen on. (Optional)</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Nagios Server(s)</fielddescr>
 			<fieldname>allowed_hosts</fieldname>
-			<description>IP Address of Nagios server, usualy a single IP, but if multiple delimit by comma</description>
+			<description>IP Address of Nagios server. Usually a single IP; multiple IPs must be delimited by comma.</description>
 			<type>input</type>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>Allow Arguments (dont_blame_nrpe)</fielddescr>
 			<fieldname>dont_blame_nrpe</fieldname>
-			<description>Check this to enable accept NRPE arguments (Default: 0)</description>
+			<description>Check this to enable accept NRPE arguments. (Default: 0)</description>
 			<type>checkbox</type>
 		</field>
 
@@ -118,7 +158,7 @@
 				<rowhelperfield>
 					<fielddescr>Extra Options (Example: -s Z \$ARG1\$ \$ARG2\$)</fielddescr>
 					<fieldname>extra</fieldname>
-					<description>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</description>
+					<description><![CDATA[<strong>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</strong>]]></description>
 					<type>input</type>
 					<size>25</size>
 				</rowhelperfield>

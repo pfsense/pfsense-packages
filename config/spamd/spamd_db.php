@@ -145,7 +145,6 @@ if($_GET['whitelist'] <> "") {
 }
 
 function delete_from_blacklist($srcip) {
-	config_lock();
 	$blacklist = explode("\n", file_get_contents("/var/db/blacklist.txt"));
 	$fd = fopen("/var/db/blacklist.txt", "w");
 	foreach($blacklist as $bl) {
@@ -156,11 +155,9 @@ function delete_from_blacklist($srcip) {
 	fclose($fd);
 	mwexec("/sbin/pfctl -q -t spamd -T delete {$srcip}");
 	mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
-	config_unlock();
 }
 
 function delete_from_whitelist($srcip) {
-	config_lock();
 	$whitelist = explode("\n", file_get_contents("/var/db/whitelist.txt"));
 	$fd = fopen("/var/db/whitelist.txt", "w");
 	foreach($whitelist as $wl) {
@@ -171,7 +168,6 @@ function delete_from_whitelist($srcip) {
 	fclose($fd);
 	mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 	mwexec("/sbin/pfctl -q -t whitelist -T replace -f /var/db/whitelist.txt");
-	config_unlock();
 }
 
 $pgtitle = "SpamD: Database";
@@ -324,6 +320,11 @@ if (typeof getURL == 'undefined') {
 					<td class="list"></td>
 				</tr>
 <?php
+
+function formatspamddatetime($dt) {
+	return date("Y-m-d", $dt) . "<br/>" . date("H:i:s", $dt);
+}
+
 	if($filter) {
 		if($not) {
 			$fd = fopen("/tmp/spamdb", "w");
@@ -387,9 +388,9 @@ if (typeof getURL == 'undefined') {
 		switch($pkgdb_split[0]) {
 			case "SPAMTRAP":
 				$recordtype = htmlentities($pkgdb_split[0]);
-				$srcip = htmlentities($pkgdb_split[1]);
-				$fromaddress = htmlentities($pkgdb_split[3]);
-				$toaddress = htmlentities($pkgdb_split[4]);
+				$srcip = "";
+				$fromaddress = htmlentities($pkgdb_split[1]);
+				$toaddress = "";
 				$first = "";
 				$pass = "";
 				$expire = "";
@@ -402,7 +403,7 @@ if (typeof getURL == 'undefined') {
 				$toaddress = "";
 				$first = "";
 				$pass = "";
-				$expire = htmlentities($pkgdb_split[2]);
+				$expire = formatspamddatetime($pkgdb_split[2]);
 				$attempts = "";
 				break;
 			case "GREY":
@@ -410,9 +411,9 @@ if (typeof getURL == 'undefined') {
 				$srcip = htmlentities($pkgdb_split[1]);
 				$fromaddress = htmlentities($pkgdb_split[3]);
 				$toaddress = htmlentities($pkgdb_split[4]);
-				$first = htmlentities($pkgdb_split[5]);
-				$pass = htmlentities($pkgdb_split[6]);
-				$expire = htmlentities($pkgdb_split[7]);
+				$first = formatspamddatetime($pkgdb_split[5]);
+				$pass = formatspamddatetime($pkgdb_split[6]);
+				$expire = formatspamddatetime($pkgdb_split[7]);
 				$attempts = htmlentities($pkgdb_split[8]);			
 				break;
 			case "WHITE":
@@ -420,9 +421,9 @@ if (typeof getURL == 'undefined') {
 				$srcip = htmlentities($pkgdb_split[1]);
 				$fromaddress = "";
 				$toaddress = "";
-				$first = htmlentities($pkgdb_split[4]);
-				$pass = htmlentities($pkgdb_split[5]);
-				$expire = htmlentities($pkgdb_split[6]);
+				$first = formatspamddatetime($pkgdb_split[4]);
+				$pass = formatspamddatetime($pkgdb_split[5]);
+				$expire = formatspamddatetime($pkgdb_split[6]);
 				$attempts = htmlentities($pkgdb_split[8]);			
 				break;
 		}
@@ -433,9 +434,9 @@ if (typeof getURL == 'undefined') {
 		echo "<td class=\"listr\">{$srcip}</td>";
 		echo "<td class=\"listr\">{$fromaddress}</td>";		
 		echo "<td class=\"listr\">{$toaddress}</td>";
-		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . date("Y-m-d", $first) . "<br/>" . date("H:i:s", $first) . "</span></td>";
-		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . date("Y-m-d", $pass) . "<br/>" . date("H:i:s", $pass) . "</span></td>";
-		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . date("Y-m-d", $expire) . "<br/>" . date("H:i:s", $expire) . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . $first . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . $pass . "</span></td>";
+		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . $expire . "</span></td>";
 		echo "<td class=\"listr\">{$attempts}</td>";
 		echo "<td>";
 		$rowtext = "<NOBR><a href='javascript:toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";

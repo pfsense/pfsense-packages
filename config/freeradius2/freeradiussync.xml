@@ -56,12 +56,6 @@ POSSIBILITY OF SUCH DAMAGE.
 		<section>Services</section>
 		<url>/pkg.php?xml=freeradiussync.xml</url>
 	</menu>
-	<service>
-		<name>FreeRADIUS</name>
-		<rcfile>radiusd.sh</rcfile>
-		<executable>radiusd</executable>
-		<description><![CDATA[The FreeRADIUS daemon.]]></description>
-	</service>
 	<tabs>
 		<tab>
 			<text>Users</text>

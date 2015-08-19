@@ -63,6 +63,21 @@ function tinydns_custom_php_install_command() {
 	if($config['installedpackages']['tinydns']['config'][0]['refreshinterval'])
 		$refreshinterval = $config['installedpackages']['tinydns']['config'][0]['refreshinterval'];
 
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version == "2.2") {
+		$svscan_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin/svscan";
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin/svc";
+		$tinydns_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin";
+	} else if ($pf_version == "2.1") {
+		$svscan_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin/svscan";
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin/svc";
+		$tinydns_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin";
+	} else {
+		$svscan_path = "/usr/local/bin/svscan";
+		$svc_path = "/usr/local/bin/svc";
+		$tinydns_path = "/usr/local/bin";
+	}
+
 	$svscan = <<<EOD
 #!/bin/sh
 
@@ -74,7 +89,7 @@ function tinydns_custom_php_install_command() {
 
 name="svscan"
 rcvar="\${name}_enable"
-command="/usr/local/bin/svscan"
+command="{$svscan_path}"
 svscan_enable=\${svscan_enable-"YES"}
 svscan_servicedir=\${svscan_servicedir-"{$g['varrun_path']}/service"}
 logdir="/var/log/svscan"
@@ -90,7 +105,7 @@ svscan_start () {
         echo "Starting svscan."
         mkdir -p \$logdir
         /usr/bin/env \
-        PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        PATH={$tinydns_path}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null
 
 EOD;
@@ -105,7 +120,7 @@ $svscan .= <<<EOD
 
 svscan_stop_post () {
         echo "Stopping svscan."
-        find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 /usr/local/bin/svc -dx
+        find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 {$svc_path} -dx
 		/bin/pkill -F /var/run/ping_hosts.pid
 }
 
@@ -132,11 +147,11 @@ ENDPHP\n";
 	$stop = "";
 	$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
 	foreach ($interfaces as $dnsidx => $dnsif)
-		$stop .= "\t/usr/local/bin/svc -dx {$g['varrun_path']}/service/dnscache{$dnsidx}\n";
+		$stop .= "\t{$svc_path} -dx {$g['varrun_path']}/service/dnscache{$dnsidx}\n";
 
 	$stop .= <<<ENDSH
-	/usr/local/bin/svc -dx {$g['varrun_path']}/service/tinydns
-	/usr/local/bin/svc -dx {$g['varrun_path']}/service/axfrdns
+	{$svc_path} -dx {$g['varrun_path']}/service/tinydns
+	{$svc_path} -dx {$g['varrun_path']}/service/axfrdns
 	/bin/rm -rf {$g['varrun_path']}/service/tinydns 2>/dev/null
 	/bin/rm -rf {$g['varetc_path']}/tinydns 2>/dev/null
 	/bin/rm -rf {$g['varrun_path']}/dnscache* 2>/dev/null
@@ -161,9 +176,19 @@ function tinydns_custom_php_deinstall_command() {
 	global $g, $config;
 
 	conf_mount_rw();
+
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version == "2.2") {
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin/svc";
+	} else if ($pf_version == "2.1") {
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin/svc";
+	} else {
+		$svc_path = "/usr/local/bin/svc";
+	}	
+
 	/* destroy all daemontools items */
-	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/tinydns*");
-	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
+	exec("{$svc_path} -xk {$g['varetc_path']}/tinydns*");
+	exec("{$svc_path} -xk {$g['varetc_path']}/dnscache*");
 	exec("/usr/local/etc/rc.d/tinydns.sh stop");
 	exec("/usr/local/etc/rc.d/svscan.sh stop");
 	exec("/usr/bin/killall supervise");
@@ -225,7 +250,7 @@ function tinydns_custom_php_changeip_command() {
 	}
 
 	exec("echo {$dnsserverip} > {$g['varetc_path']}/tinydns/env/IP");
-	exec("/usr/local/bin/svc -xk {$g['varrun_path']}/service/tinydns");
+	exec("{$svc_path} -xk {$g['varrun_path']}/service/tinydns");
 		
 
 	if(!empty($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])) {
@@ -277,7 +302,7 @@ function tinydns_custom_php_changeip_command() {
 			/* setup symlink to start dnscache */
 			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
 			
-			exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache{$dnsidx}");
+			exec("{$svc_path} -xk {$g['varetc_path']}/dnscache{$dnsidx}");
 		}
 	} else {
 		$interfaces = explode(",", $$config['installedpackages']['tinydns']['config'][0]['interface']);
@@ -285,7 +310,7 @@ function tinydns_custom_php_changeip_command() {
 			if(is_dir("{$g['varetc_path']}/dnscache{$dnsidx}"))
 				dnscache_use_root_servers($dnsidx);
 		}
-		exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
+		exec("{$svc_path} -xk {$g['varetc_path']}/dnscache*");
 	}
 
 	/* a wee bit of magic - something seems to start up a broken dnscache, the below kills it, and svc restarts it correctly. */ 
@@ -395,7 +420,7 @@ function tinydns_setup_ping_items() {
 		log_error("Could not open {$g['vardb_path']}/pkgpinghosts for writing.");
 		return;
 	}
-	config_lock();
+
 	/*   write out each ip address so ping_hosts.sh can begin monitoring ip
 	 *   status and create a database of the status information that we can use.
 	 */
@@ -459,7 +484,6 @@ function tinydns_setup_ping_items() {
 		}
 	}
 	fclose($fd);
-	config_unlock();
 }
 
 function tinydns_create_zone_file() {
@@ -467,7 +491,6 @@ function tinydns_create_zone_file() {
 	conf_mount_rw();
 	if(file_exists("/tmp/config.cache"))
 		unlink("/tmp/config.cache");
-	config_lock();
 	if(file_exists("{$g['varrun_path']}/service/tinydns/root/data"))
 		exec("rm -f {$g['varrun_path']}/service/tinydns/root/data");
 	if(!is_dir("{$g['varrun_path']}/service/tinydns/root"))
@@ -623,7 +646,6 @@ function tinydns_create_zone_file() {
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd {$g['varrun_path']}/service/tinydns/root && /usr/local/bin/tinydns-data");
-	config_unlock();
 	conf_mount_ro();
 }
 
@@ -1163,7 +1185,7 @@ function tinydns_dnscache_forwarding_servers($index) {
 		exec("rm -R {$g['varetc_path']}/dnscache/root/servers/");
 	exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$index}/root/servers/");
 	if (intval($config['version']) >= 6)
-		if (file_exists("{$g['varetc_path']}/nameserver_*")) {
+		if (!empty(glob("{$g['varetc_path']}/nameserver_*"))) {
 			exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
 		} else {
 			$fw = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");

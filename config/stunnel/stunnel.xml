@@ -116,6 +116,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Client Mode</fielddescr>
+			<fieldname>client</fieldname>
+			<description>Use client mode for this tunnel (i.e. connect to an SSL server, do not act as an SSL server)</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Listen on IP</fielddescr>
 			<fieldname>localip</fieldname>
 			<description>Enter the local IP address to bind this redirection to.</description>
@@ -158,7 +164,7 @@
 	</fields>
 	<service>
 	  <name>stunnel</name>
-	  <rcfile>/usr/local/etc/rc.d/stunnel.sh</rcfile>
+	  <rcfile>stunnel.sh</rcfile>
 	  <executable>stunnel</executable>
 	</service>
 	<include_file>/usr/local/pkg/stunnel.inc</include_file>

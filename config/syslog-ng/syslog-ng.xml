@@ -2,47 +2,47 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    syslog-ng.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Lance Leger
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	syslog-ng.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Lance Leger
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>Syslog-ng</name>
-	<version>3.5.4.1_1 pkg.v.1.0.1</version>
+	<version>1.0.8</version>
 	<title>Services: Syslog-ng</title>
 	<include_file>/usr/local/pkg/syslog-ng.inc</include_file>
 	<menu>
@@ -72,18 +72,15 @@
 		</tab>
 	</tabs>
 	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	    <item>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng_advanced.xml</item>
-	</additional_files_needed>
+		</additional_files_needed>
 	<additional_files_needed>
-	    <prefix>/usr/local/www/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/www/</prefix>
 		<item>https://packages.pfsense.org/packages/config/syslog-ng/syslog-ng_log_viewer.php</item>
 	</additional_files_needed>
 	<fields>
@@ -108,8 +105,8 @@
 			<type>select</type>
 			<value>udp</value>
 			<options>
-			    <option><name>UDP</name><value>udp</value></option>
-			    <option><name>TCP</name><value>tcp</value></option>
+				<option><name>UDP</name><value>udp</value></option>
+				<option><name>TCP</name><value>tcp</value></option>
 			</options>
 			<required/>
 		</field>
@@ -144,7 +141,7 @@
 			<type>select</type>
 			<value>daily</value>
 			<options>
-			    <option><name>Daily</name><value>daily</value></option>
+				<option><name>Daily</name><value>daily</value></option>
 				<option><name>Weekly</name><value>weekly</value></option>
 				<option><name>Monthly</name><value>monthly</value></option>
 			</options>
@@ -163,8 +160,8 @@
 			<type>select</type>
 			<value>gz</value>
 			<options>
-			    <option><name>Gzip</name><value>gz</value></option>
-			    <option><name>Bzip2</name><value>bz2</value></option>
+				<option><name>Gzip</name><value>gz</value></option>
+				<option><name>Bzip2</name><value>bz2</value></option>
 			</options>
 		</field>
 		<field>
@@ -175,7 +172,7 @@
 			<default_value>30</default_value>
 			<required/>
 		</field>
-    </fields>
+	</fields>
 	<custom_php_validation_command>
 		syslogng_validate_general($_POST, $input_errors);
 	</custom_php_validation_command>
@@ -188,5 +185,7 @@
 	<custom_php_deinstall_command>
 		syslogng_deinstall_command();
 	</custom_php_deinstall_command>
-    <filter_rules_needed>syslogng_generate_rules</filter_rules_needed>
+	<filter_rules_needed>
+		syslogng_generate_rules();
+	</filter_rules_needed>
 </packagegui>

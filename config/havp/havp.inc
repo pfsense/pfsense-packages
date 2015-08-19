@@ -76,7 +76,13 @@ define('HVDEF_PROXYPORT',	            '8080');
 define('HVDEF_MAXSCANSIZE',             '5000000'); # [bytes] ! do not enter 0 or big size !
 define('HVDEF_MAXARCSCANSIZE',          '5000000'); # [bytes] ! do not enter 0 or big size !
 define('HVDEF_PID_FILE',                '/var/run/havp.pid');
-define('HVDEF_WORK_DIR',                '/usr/local/etc/havp');
+
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version == "2.1" || $pf_version == "2.2")
+		define("HVDEF_WORK_DIR", "/usr/pbi/havp-" . php_uname("m") . "/local/etc");
+	else
+		define("HVDEF_WORK_DIR", "/usr/local/etc/havp");
+
 
 $pfSversion = str_replace("\s", "", file_get_contents("/etc/version"));
 if(preg_match("/^2./",$pfSversion))
@@ -101,8 +107,8 @@ define('HVDEF_HAVP_MINSRV',             '3');
 define('HVDEF_HAVP_MAXSRV',             '100');
 
 # Clam
-#define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
-define('HVDEF_CLAM_RUNDIR',             '/var/run');
+define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
+#define('HVDEF_CLAM_RUNDIR',             '/var/run');
 define('HVDEF_CLAM_DBDIR',              '/var/db/clamav');
 if(preg_match("/^2./",$pfSversion))
 	define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
@@ -446,9 +452,9 @@ function havp_check_system()
 
     # =-= ClamAV =-=
     # catalog for Pid and Socket files
-#    if (!file_exists(HVDEF_CLAM_RUNDIR))
-#        mwexec("mkdir -p " . HVDEF_CLAM_RUNDIR);
-#    havp_set_file_access(HVDEF_CLAM_RUNDIR, HVDEF_USER, '0774');
+    if (!file_exists(HVDEF_CLAM_RUNDIR))
+        mwexec("mkdir -p " . HVDEF_CLAM_RUNDIR);
+    havp_set_file_access(HVDEF_CLAM_RUNDIR, HVDEF_USER, '0774');
 
     # AV update script
     file_put_contents(HVDEF_AVUPD_SCRIPT, havp_AVupdate_script());

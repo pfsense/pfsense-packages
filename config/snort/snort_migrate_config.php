@@ -117,6 +117,14 @@ if (empty($config['installedpackages']['snortglobal']['openappid_detectors'])) {
 }
 
 /**********************************************************/
+/* Create new HIDE_DEPRECATED_RULES setting if not set    */
+/**********************************************************/
+if (empty($config['installedpackages']['snortglobal']['hide_deprecated_rules'])) {
+	$config['installedpackages']['snortglobal']['hide_deprecated_rules'] = "off";
+	$updated_cfg = true;
+}
+
+/**********************************************************/
 /* Migrate per interface settings if required.            */
 /**********************************************************/
 foreach ($rule as &$r) {
@@ -533,7 +541,7 @@ unset($r);
 
 // Log a message if we changed anything
 if ($updated_cfg) {
-	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2.5";
+	$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2.6";
 	log_error("[Snort] Settings successfully migrated to new configuration format...");
 }
 else

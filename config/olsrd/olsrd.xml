@@ -1,19 +1,59 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	olsrd.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Ermal Luçi
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>olsrd</name>
-	<version>1.0</version>
+	<version>1.0.3</version>
 	<title>OLSRD</title>
 	<include_file>/usr/local/pkg/olsrd.inc</include_file>
-	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>OLSRD</name>
 		<section>Services</section>
 		<configfile>olsrd.xml</configfile>
 	</menu>
 	<service>
-                <name>OLSRD</name>
-                <rcfile>/usr/local/sbin/olsrd -f /var/etc/olsr.conf</rcfile>
-    </service>
+		<name>OLSRD</name>
+		<rcfile>/usr/local/sbin/olsrd -f /var/etc/olsr.conf</rcfile>
+	</service>
 	<tabs>
 		<tab>
 			<text>OLSRD Settings</text>
@@ -22,20 +62,15 @@
 		</tab>
 	</tabs>
 	<additional_files_needed>
-            <prefix>/usr/local/pkg/</prefix>
-            <chmod>0755</chmod>
-	    <item>https://packages.pfsense.org/packages/config/olsrd/olsrd.inc</item>
-        </additional_files_needed>
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/olsrd/olsrd.inc</item>
+	</additional_files_needed>
 	<configpath>['installedpackages']['OLSRD']['config']</configpath>
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
 			<fielddescr>Enable OLSR</fielddescr>
 			<fieldname>enable</fieldname>
-			<description>Enables the dynamic mesh linking daemon</description>
+			<description>Enables the dynamic mesh linking daemon.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -56,18 +91,18 @@
 			<multiple>true</multiple>
 			<size>3</size>
 			<type>interfaces_selection</type>
-			<description>Select the interfaces that OLSR will bind to.  You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<description>Select the interfaces that OLSR will bind to. You can use the CTRL or COMMAND key to select multiple interfaces.</description>
 		</field>
 		<field>
 			<fielddescr>Enable HTTPInfo Plugin</fielddescr>
 			<fieldname>enablehttpinfo</fieldname>
-			<description>Enables the OLSR stats web server</description>
+			<description>Enables the OLSR stats web server.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>HTTPInfo Port</fielddescr>
 			<fieldname>port</fieldname>
-			<description>Port that HTTPInfo will listen on</description>
+			<description>Port that HTTPInfo will listen on.</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -85,19 +120,19 @@
 		<field>
 			<fielddescr>Enable Dynamic Gateway</fielddescr>
 			<fieldname>enabledyngw</fieldname>
-			<description>Enables the OLSR Dynamic Gateways feature</description>
+			<description>Enables the OLSR Dynamic Gateways feature.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Announce self as Dynamic Gateway</fielddescr>
 			<fieldname>enableannounce</fieldname>
-			<description>Enables the OLSR Dynamic Gateways Announcing feature</description>
+			<description>Enables the OLSR Dynamic Gateways Announcing feature.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Announce Dynamic local route</fielddescr>
 			<fieldname>announcedynamicroute</fieldname>
-			<description>Enter the IP/Netmask</description>
+			<description>Enter the IP/Netmask.</description>
 			<type>textarea</type>
 			<rows>3</rows>
 			<cols>50</cols>
@@ -105,7 +140,7 @@
 		<field>
 			<fielddescr>Ping</fielddescr>
 			<fieldname>ping</fieldname>
-			<description>Pings this host to ensure connectivity</description>
+			<description>Pings this host to ensure connectivity.</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -117,7 +152,7 @@
 		<field>
 			<fielddescr>Enable Secure Mode</fielddescr>
 			<fieldname>enabledsecure</fieldname>
-			<description>Enables the secure mode</description>
+			<description>Enables the secure mode.</description>
 			<type>checkbox</type>
 		</field>
 		<field>

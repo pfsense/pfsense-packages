@@ -1,59 +1,58 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
-/* ========================================================================== */
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
 /*
-    filer.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Brian Scholer
-    Copyright (C) 2012 Marcello Coutinho
-    All rights reserved.                                                      
+	filer.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+	Copyright (C) 2011 Brian Scholer
+	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>filer</name>
-	<version>0.60.1</version>
+	<version>0.60.4</version>
 	<title>Filer</title>
 	<include_file>/usr/local/pkg/filer.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/filer/filer.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/filer/filer_sync.xml</item>
 	</additional_files_needed>
 	<menu>
@@ -73,7 +72,6 @@
 			<url>/pkg_edit.php?xml=filer_sync.xml</url>
 		</tab>
 	</tabs>
-	
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>File</fielddescr>
@@ -86,20 +84,20 @@
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-		</columnitem>	
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
 			<name>File configuration</name>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>File</fielddescr>
 			<fieldname>fullfile</fieldname>
 			<type>input</type>
 			<size>60</size>
-			<description>Enter Full file path</description>
+			<description>Enter full file path.</description>
 			<required/>
 		</field>
 		<field>
@@ -107,6 +105,7 @@
 			<fieldname>description</fieldname>
 			<description>Enter a description for this file.</description>
 			<type>input</type>
+			<typehint>(Not parsed -- this is for your reference only.)</typehint>
 			<size>60</size>
 		</field>
 		<field>
@@ -114,7 +113,7 @@
 			<fieldname>mod</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Enter file permission you want on this file<br>Blank leaves the permissions alone.]]></description>
+			<description><![CDATA[Enter file permission you want on this file<br />If left blank, default file permissions (0644) will be used.]]></description>
 		</field>
 		<field>
 			<fielddescr>File Contents</fielddescr>
@@ -129,38 +128,43 @@
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
-			<name>cmd to run after file save/sync</name>
-		</field>	
+			<name>Command to run after file save/sync.</name>
+		</field>
 		<field>
-			<fielddescr>script</fielddescr>
+			<fielddescr>Script/Command</fielddescr>
 			<fieldname>cmd</fieldname>
-			<description>Enter script or cmd to run after file save/sync</description>
+			<description>Enter script or command to run after file save/sync.</description>
 			<type>input</type>
+			<typehint>(Optional. If using a custom script, it must have executable bit set.)</typehint>
 			<size>60</size>
 		</field>
 		<field>
-			<fielddescr>execute mode</fielddescr>
+			<fielddescr>Execute mode</fielddescr>
 			<fieldname>background</fieldname>
 			<type>select</type>
- 				<options>
- 				<option><name>Background (default)</name><value>background</value></option>
-				<option><name>Foreground</name><value>foreground</value></option>
-				<option><name>Do not run this script</name><value>disabled</value></option>
+				<options>
+					<option>
+						<name>Background (default)</name>
+						<value>background</value>
+					</option>
+					<option>
+						<name>Foreground</name>
+						<value>foreground</value>
+					</option>
+					<option>
+						<name>Do not run this script</name>
+						<value>disabled</value>
+					</option>
 				</options>
 			<description>Choose the way script will run.</description>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		filer_install();
-	</custom_php_install_command>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
 	<custom_php_validation_command>
 		filer_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 		sync_package_filer();
-	</custom_delete_php_command>	
+	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		sync_package_filer();
 	</custom_php_resync_config_command>

@@ -481,7 +481,7 @@ function suricata_build_list($suricatacfg, $listname = "", $passlist = false, $e
 		// iterate all vips and add to passlist
 		if (is_array($config['virtualip']) && is_array($config['virtualip']['vip'])) {
 			foreach($config['virtualip']['vip'] as $vip) {
-				if ($vip['subnet'] && $vip['mode'] != 'proxyarp') {
+				if ($vip['subnet']) {
 					if (!in_array("{$vip['subnet']}/{$vip['subnet_bits']}", $home_net))
 						$home_net[] = "{$vip['subnet']}/{$vip['subnet_bits']}";
 				}
@@ -3231,6 +3231,73 @@ function suricata_generate_yaml($suricatacfg) {
 	unset($suricata_conf_text);
 }
 
+function suricata_remove_dead_rules() {
+
+	/*********************************************************/
+	/* This function removes dead and deprecated rules       */
+	/* category files from the base Suricata rules directory */
+	/* and from the RULESETS setting of each interface.      */
+	/* The file "deprecated_rules", if it exists, is used    */
+	/* to determine which rules files to remove.             */
+	/*********************************************************/
+
+	global $config, $g;
+	$rulesdir = SURICATADIR . "rules/";
+	$count = 0;
+	$cats = array();
+
+	// If there is no "deprecated_rules" file, then exit
+	if (!file_exists("{$rulesdir}deprecated_rules"))
+		return;
+
+	// Open a SplFileObject to read in deprecated rules
+	$file = new SplFileObject("{$rulesdir}deprecated_rules");
+	$file->setFlags(SplFileObject::READ_AHEAD | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
+	while (!$file->eof()) {
+		$line = $file->fgets();
+
+		// Skip any lines with just spaces
+		if (trim($line) == "")
+			continue;
+
+		// Skip any comment lines starting with '#'
+		if (preg_match('/^\s*\#+/', $line))
+			continue;
+
+		$cats[] = $line;
+	}
+
+	// Close the SplFileObject since we are finished with it
+	$file = null;
+
+	// Delete any dead rules files from the Suricata RULES directory
+	foreach ($cats as $file) {
+		if (file_exists("{$rulesdir}{$file}"))
+			$count++;
+		unlink_if_exists("{$rulesdir}{$file}");
+	}
+
+	// Log how many obsoleted files were removed
+	log_error(gettext("[Suricata] Removed {$count} obsoleted rules category files."));
+
+	// Now remove any dead rules files from the interface configurations
+	if (!empty($cats) && is_array($config['installedpackages']['suricata']['rule'])) {
+		foreach ($config['installedpackages']['suricata']['rule'] as &$iface) {
+			$enabled_rules = explode("||", $iface['rulesets']);
+			foreach ($enabled_rules as $k => $v) {
+				foreach ($cats as $d) {
+					if (strpos(trim($v), $d) !== false)
+						unset($enabled_rules[$k]);
+				}
+			}
+			$iface['rulesets'] = implode("||", $enabled_rules);
+		}
+	}
+
+	// Clean up
+	unset($cats, $enabled_rules);
+}
+
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function suricata_sync_on_changes() {
 	global $config, $g;
@@ -3365,6 +3432,38 @@ function suricata_do_xmlrpc_sync($syncdownloadrules, $sync_to_ip, $port, $userna
 
 	if (!empty($sid_files) && $error == "")
 		log_error("[suricata] Suricata pkg XMLRPC CARP sync auto-SID conf files success with {$url}:{$port} (pfsense.exec_php).");
+
+	/*************************************************/
+	/* Send over any IPREP IP List files             */
+	/*************************************************/
+	$iprep_files = glob(SURICATA_IPREP_PATH . '*');
+	foreach ($iprep_files as $file) {
+		$content = base64_encode(file_get_contents($file));
+		$payload = "@file_put_contents('{$file}', base64_decode('{$content}'));";
+
+		/* assemble xmlrpc payload */
+		$method = 'pfsense.exec_php';
+		$params = array( XML_RPC_encode($password), XML_RPC_encode($payload) );
+	
+		log_error("[suricata] Suricata XMLRPC CARP sync sending IPREP files to {$url}:{$port}.");
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+		$cli->setCredentials($username, $password);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "";
+		if(!$resp) {
+			$error = "A communications error occurred while attempting Suricata XMLRPC CARP sync with {$url}:{$port}.  Failed to transfer file: " . basename($file);
+			log_error($error);
+			file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+		} elseif($resp->faultCode()) {
+			$error = "An error code was received while attempting Suricata XMLRPC CARP sync with {$url}:{$port}. Failed to transfer file: " . basename($file) . " - Code " . $resp->faultCode() . ": " . $resp->faultString();
+			log_error($error);
+			file_notice("sync_settings", $error, "Suricata Settings Sync", "");
+		}
+	}
+
+	if (!empty($iprep_files) && $error == "")
+		log_error("[suricata] Suricata pkg XMLRPC CARP sync IPREP files success with {$url}:{$port} (pfsense.exec_php).");
 
 	/**************************************************/
 	/* Send over the <suricata> portion of config.xml */

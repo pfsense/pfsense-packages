@@ -1,34 +1,64 @@
 <?php
-/* COPYRIGHT */
+/*
+	olsrd.inc
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Ermal Luçi
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 require_once("config.inc");
 
 function setup_wireless_olsr() {
 	global $config, $g;
 
-	if ($g['platform'] == 'jail' || !$config['installedpackages']['olsrd'] || !$config['installedpackages'])
+	if ($g['platform'] == 'jail' || !$config['installedpackages']['olsrd'] || !$config['installedpackages']) {
 		return;
-	if(isset($config['system']['developerspew'])) {
+	}
+	if (isset($config['system']['developerspew'])) {
 		$mt = microtime();
 		echo "setup_wireless_olsr($interface) being called $mt\n";
 	}
 	conf_mount_rw();
 
-	foreach($config['installedpackages']['olsrd']['config'] as $olsrd) {
+	foreach ($config['installedpackages']['olsrd']['config'] as $olsrd) {
 		$olsr_enable = $olsrd['enable'];
 		if ($olsr_enable <> "on") {
-			if (is_process_running("olsrd"))
+			if (is_process_running("olsrd")) {
 				mwexec("/usr/bin/killall olsrd", true);
+			}
 			return;
 		}
 		$fd = fopen("{$g['varetc_path']}/olsr.conf", "w");
 
-		if($olsrd['announcedynamicroute'] or $olsrd['enableannounce'] == "on") {
+		if ($olsrd['announcedynamicroute'] or $olsrd['enableannounce'] == "on") {
 			$enableannounce .= "\nHna4\n";
 			$enableannounce .= "{\n";
-		if($olsrd['announcedynamicroute'])
+		}
+		if ($olsrd['announcedynamicroute']) {
 			$enableannounce .= "\t{$olsrd['announcedynamicroute']}\n";
-		if($olsrd['enableannounce'] == "on")
+		}
+		if ($olsrd['enableannounce'] == "on") {
 			$enableannounce .= "0.0.0.0 0.0.0.0";
 			$enableannounce .= "\n}\n";
 		} else {
@@ -171,8 +201,8 @@ MprCoverage	3
 
 EODA;
 
-if($olsrd['enablehttpinfo'] == "on") {
-	$olsr .= <<<EODB
+	if ($olsrd['enablehttpinfo'] == "on") {
+		$olsr .= <<<EODB
 
 LoadPlugin "/usr/local/lib/olsrd_httpinfo.so.0.1"
 {
@@ -182,11 +212,11 @@ LoadPlugin "/usr/local/lib/olsrd_httpinfo.so.0.1"
 
 EODB;
 
-}
+	}
 
-if($olsrd['enabledsecure'] == "on") {
-	@file_put_contents("{$g['tmp_path']}/olsrkey.txt", $olsrd['securekey']);
-	$olsr .= <<<EODC
+	if ($olsrd['enabledsecure'] == "on") {
+		@file_put_contents("{$g['tmp_path']}/olsrkey.txt", $olsrd['securekey']);
+		$olsr .= <<<EODC
 
 LoadPlugin "/usr/local/lib/olsrd_secure.so.0.5"
 {
@@ -195,9 +225,9 @@ LoadPlugin "/usr/local/lib/olsrd_secure.so.0.5"
 
 EODC;
 
-}
+	}
 
-if($olsrd['enabledyngw'] == "on") {
+	if ($olsrd['enabledyngw'] == "on") {
 
 	/* unset default route, olsr auto negotiates */
 	mwexec("/sbin/route delete default");
@@ -222,13 +252,13 @@ LoadPlugin "/usr/local/lib/olsrd_dyn_gw.so.0.4"
 
 EODE;
 
-}
+	}
 
-foreach($config['installedpackages']['olsrd']['config'] as $conf) {
-	$interfaces = explode(',', $conf['iface_array']);
-	foreach($interfaces as $interface) {
-		$realinterface = convert_friendly_interface_to_real_interface_name($interface);
-$olsr .= <<<EODAD
+	foreach ($config['installedpackages']['olsrd']['config'] as $conf) {
+		$interfaces = explode(',', $conf['iface_array']);
+		foreach ($interfaces as $interface) {
+			$realinterface = convert_friendly_interface_to_real_interface_name($interface);
+			$olsr .= <<<EODAD
 Interface "{$realinterface}"
 {
 
@@ -271,20 +301,21 @@ Interface "{$realinterface}"
 
 EODAD;
 
-	}
-	break;
-}
-		fwrite($fd, $olsr);
-		fclose($fd);
+		}
+		break;
 	}
 
-	if (is_process_running("olsrd"))
+	fwrite($fd, $olsr);
+	fclose($fd);
+
+}
+
+	if (is_process_running("olsrd")) {
 		mwexec("/usr/bin/killall olsrd", true);
+	}
 
 	sleep(2);
-
 	mwexec_bg("/usr/local/sbin/olsrd -f {$g['varetc_path']}/olsr.conf");
-
 	conf_mount_ro();
 }
 

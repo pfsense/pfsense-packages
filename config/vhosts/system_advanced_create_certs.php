@@ -1,10 +1,9 @@
 <?php
-/* $Id$ */
 /*
 	system_advanced_create_certs.php
-	part of pfSense
-
-	Copyright (C) 2004 Scott Ullrich
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 Mark J Crane
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,15 +27,13 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require("guiconfig.inc");
 
-if(file_exists("/var/etc/ssl/openssl.cnf")) {
+if (file_exists("/var/etc/ssl/openssl.cnf")) {
 	$openssl = file_get_contents("/var/etc/ssl/openssl.cnf");
 }
 
-/* Lets match the fileds in the read in file and
-   populate the variables for the form */
+/* Lets match the fileds in the read file and populate the variables for the form */
 preg_match('/C\=(.*)\n/', $openssl, $countrycodeA);
 preg_match('/\nST\=(.*)\n/', $openssl, $stateorprovinceA);
 preg_match('/\nL\=(.*)\n/', $openssl, $citynameA);
@@ -139,36 +136,36 @@ if ($_POST) {
 	fwrite($fd, "authorityKeyIdentifier=keyid:always,issuer:always\n");
 	fclose($fd);
 
-$pgtitle = "System: Advanced functions: Create Certificates";
+$pgtitle = "System: Advanced - Create Certificates";
 include("head.inc");
 
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<p class="pgtitle"><?=$pgtitle?></p>
 <form action="system_advanced_create_certs.php" method="post" name="iform" id="iform">
-			<?php if ($input_errors) print_input_errors($input_errors); ?>
-			<?php if ($savemsg) print_info_box($savemsg); ?>
-		<p>One moment please...
+	<?php if ($input_errors) print_input_errors($input_errors); ?>
+	<?php if ($savemsg) print_info_box($savemsg); ?>
+	<div>One moment please...</div>
 	<?php
 		mwexec("cd /tmp/ && /usr/bin/openssl req -new -x509 -keyout /tmp/cakey.pem -out /tmp/cacert.pem -days 3650 -config /var/etc/ssl/openssl.cnf -passin pass:test -nodes");
 		$cacert1 = file_get_contents("/tmp/cacert.pem");
 		$cakey1  = file_get_contents("/tmp/cakey.pem");
-		$cacertA = str_replace("\r","",$cacert1);
-		$cakeyA = str_replace("\r","",$cakey1);
-		$cacert = str_replace("\n","\\n",$cacertA);
-		$cakey = str_replace("\n","\\n",$cakeyA);
+		$cacertA = str_replace("\r", "", $cacert1);
+		$cakeyA = str_replace("\r", "", $cakey1);
+		$cacert = str_replace("\n", "\\n", $cacertA);
+		$cakey = str_replace("\n", "\\n", $cakeyA);
 	?>
-	<script language="JavaScript">
-	<!--
+	<script type="text/javascript">
+	//<![CDATA[
 		var cacert='<?=$cacert?>';
 		var cakey='<?=$cakey?>';
 		opener.document.forms[0].certificate.value=cacert;
 		opener.document.forms[0].privatekey.value=cakey;
 		this.close();
-	-->
+	//]]>
 	</script>
-
+</form>
+<?php include("fend.inc"); ?>
 </body>
 </html>
 
@@ -176,61 +173,52 @@ include("head.inc");
 
 } else {
 
-$pgtitle = '&nbsp; &nbsp; System: Advanced - Create Certificates';
+$pgtitle = "System: Advanced - Create Certificates";
 include("head.inc");
 ?>
 
-
-	<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 	<form action="system_advanced_create_certs.php" method="post" name="iform" id="iform">
-		<p class="pgtitle">System: Advanced - Create Certificates</p>
-
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
 				<td width="35%" valign="top" class="vncell"><B>Country Code (2 Letters)</td>
 				<td width="78%" class="vtable">
-					<input name="countrycode" value="<?=$countrycode?>">
-					</span>
+					<input name="countrycode" type="text" value="<?=$countrycode?>" />
 				</td>
 			</tr>
 
 			<tr>
 				<td width="35%" valign="top" class="vncell"><B>State or Province name</td>
 				<td width="78%" class="vtable">
-					<input name="stateorprovince" value="<?=$stateorprovince?>">
-					</span>
+					<input name="stateorprovince" type="text" value="<?=$stateorprovince?>" />
 				</td>
 			</tr>
 
 			<tr>
 				<td width="35%" valign="top" class="vncell"><B>City name</td>
 				<td width="78%" class="vtable">
-					<input name="cityname" value="<?=$cityname?>">
-					</span>
+					<input name="cityname" type="text" value="<?=$cityname?>" />
 				</td>
 			</tr>
 
 			<tr>
 				<td width="35%" valign="top" class="vncell"><B>Organization name</td>
 				<td width="78%" class="vtable">
-					<input name="orginizationname" value="<?=$orginizationname?>">
-					</span>
+					<input name="orginizationname" type="text" value="<?=$orginizationname?>" />
 				</td>
 			</tr>
 
 			<tr>
 				<td width="35%" valign="top" class="vncell"><B>Organization department</td>
 				<td width="78%" class="vtable">
-					<input name="orginizationdepartment" value="<?=$orginizationdepartment?>">
-					</span>
+					<input name="orginizationdepartment" type="text" value="<?=$orginizationdepartment?>" />
 				</td>
 			</tr>
 
 			<tr>
 				<td width="35%" valign="top" class="vncell"><B>Common Name (Your name)</td>
 				<td width="78%" class="vtable">
-					<input name="commonname" value="<?=$commonname?>">
-					</span>
+					<input name="commonname" type="text" value="<?=$commonname?>" />
 				</td>
 			</tr>
 
@@ -238,8 +226,7 @@ include("head.inc");
 			<tr>
 				<td width="35%" valign="top" class="vncell"><B>E-Mail address</td>
 				<td width="78%" class="vtable">
-					<input name="email" value="<?=$email?>">
-					</span>
+					<input name="email" type="text" value="<?=$email?>" />
 				</td>
 			</tr>
 			-->
@@ -247,13 +234,15 @@ include("head.inc");
 			<tr>
 				<td width="35%" valign="top">&nbsp;</td>
 				<td width="78%">
-					<input name="Submit" type="submit" class="formbtn" value="Save">
+					<input name="Submit" type="submit" class="formbtn" value="Save" />
 				</td>
 			</tr>
 		</table>
+	</form>
 
-	</body>
-	</html>
+<?php include("fend.inc"); ?>
+</body>
+</html>
 
 <?php
 }

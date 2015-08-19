@@ -85,6 +85,9 @@ conf_mount_rw();
 @rename("{$snortdir}/gen-msg.map-sample", "{$snortdir}/gen-msg.map");
 //@rename("{$snortdir}/attribute_table.dtd-sample", "{$snortdir}/attribute_table.dtd");
 
+/* Move deprecated_rules file to SNORTDIR/rules directory */
+@rename("/usr/local/pkg/snort/deprecated_rules", "{$snortdir}/rules/deprecated_rules");
+
 /* fix up the preprocessor rules filenames from a PBI package install */
 $preproc_rules = array("decoder.rules", "preprocessor.rules", "sensitive-data.rules");
 foreach ($preproc_rules as $file) {
@@ -245,9 +248,8 @@ if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 	if (!($g['booting'])) {
 		if ($pkg_interface <> "console") {
 			update_status(gettext("Starting Snort using rebuilt configuration..."));
-			update_output_window(gettext("Please wait while Snort is started..."));
-			mwexec("{$rcdir}snort.sh start");
-			update_output_window(gettext("Snort has been started using the rebuilt configuration..."));
+			mwexec_bg("{$rcdir}snort.sh start");
+			update_output_window(gettext("Snort is starting as a background task using the rebuilt configuration..."));
 		}
 		else
 			mwexec_bg("{$rcdir}snort.sh start");
@@ -263,8 +265,8 @@ if (stristr($config['widgets']['sequence'], "snort_alerts-container") === FALSE)
 	$config['widgets']['sequence'] .= ",{$snort_widget_container}";
 
 /* Update Snort package version in configuration */
-$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2.5";
-write_config("Snort pkg v3.2.5: post-install configuration saved.");
+$config['installedpackages']['snortglobal']['snort_config_ver'] = "3.2.6";
+write_config("Snort pkg v3.2.6: post-install configuration saved.");
 
 /* Done with post-install, so clear flag */
 unset($g['snort_postinstall']);

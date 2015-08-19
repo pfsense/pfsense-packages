@@ -90,7 +90,7 @@ $pgtitle = array(gettext("Suricata"), gettext($title . " Viewer"));
 	<td class="tabcont">
 		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
 		<tr>
-			<td class="pgtitle" colspan="2">Snort: <?php echo gettext($title . " Viewer"); ?></td>
+			<td class="pgtitle" colspan="2">Suricata: <?php echo gettext($title . " Viewer"); ?></td>
 		</tr>
 		<tr>
 			<td align="left" width="20%">

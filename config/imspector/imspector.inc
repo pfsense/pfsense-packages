@@ -177,8 +177,7 @@
 			
 		/*continue sync process*/
 		log_error("Imspector: Saving changes.");
-		config_lock();
-			
+
 		/* remove existing rules */
 		exec('/sbin/pfctl -a imspector -Fr > /dev/null');
 		exec('/sbin/pfctl -a imspector -Fn > /dev/null');	
@@ -408,8 +407,7 @@ EOD;
 				imspector_action('restart');
 				}	
 		}	
-		config_unlock();
-		
+
 		/*check xmlrpc sync*/
 		imspector_sync_on_changes();		
 	}

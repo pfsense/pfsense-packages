@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 	<![CDATA[
@@ -8,7 +8,7 @@
 /* ========================================================================== */
 /*
 	ntopng.xml
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2014 ESF, LLC
 	All rights reserved.
 */
@@ -39,7 +39,7 @@
 	]]>
 	</copyright>
 	<name>ntopng</name>
-	<version>1.2 v0.5</version>
+	<version>0.7.2</version>
 	<title>Diagnostics: ntopng Settings</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>pkg_edit.php?xml=ntopng.xml</aftersaveredirect>
@@ -143,9 +143,10 @@
 			return;
 		}
 		conf_mount_rw();
-		config_lock();
 		global $config;
 		global $input_errors;
+		global $pf_version, $scripts_path, $fonts_path;
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($_POST) {
 			$config['installedpackages']['ntopng']['config'] = array();
 			$config['installedpackages']['ntopng']['config'][0] = $_POST;
@@ -156,7 +157,26 @@
 		safe_mkdir("/var/db/ntopng/rrd/graphics", 0755, true);
 		system("/bin/chmod -R 755 /var/db/ntopng");
 		system("/usr/sbin/chown -R nobody:nobody /var/db/ntopng");
-		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
+		
+		if ($pf_version == "2.2") {
+			$fonts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/lib/X11/fonts";
+			$scripts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/share/ntopng/scripts";
+		} else if ($pf_version == "2.1") {
+			$fonts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/lib/X11/fonts";
+			$scripts_path = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng/scripts";
+		} else {
+			$fonts_path = "/usr/local/lib/X11/fonts";
+		}
+		if ($pf_version == "2.1" || $pf_version == "2.2") {
+			$ntopng_share_path = "/usr/local/share/ntopng";
+			$scripts_link_path = $ntopng_share_path . "/scripts";
+			safe_mkdir("$ntopng_share_path", 0755, true);
+			if (!file_exists($scripts_link_path)) {
+				symlink($scripts_path, $scripts_link_path);
+			}
+		}
+		system("/bin/cp -Rp {$fonts_path}/webfonts/ {$fonts_path}/TTF/");
+
 		$first = 0;
 		foreach($ntopng_config['interface_array'] as $iface) {
 			$if = convert_friendly_interface_to_real_interface_name($iface);
@@ -203,7 +223,6 @@
 			$disable_alerts = "-H";
 		}
 
-		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($pf_version == "2.2") {
 			$redis_path = "/usr/pbi/ntopng-" . php_uname("m") . "/local/bin";
 		} else if ($pf_version == "2.1") {
@@ -243,15 +262,25 @@
 		mwexec_bg("{$redis_path}/redis-cli SET user.admin.password " . escapeshellarg($password));
 		mwexec_bg("{$redis_path}/redis-cli save");
 		conf_mount_ro();
-		config_unlock();
 	}
 	function ntopng_update_geoip() {
+		$fetchcmd = "/usr/bin/fetch";
+		$geolite_city = "https://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz";
+		$geolite_city_v6 = "https://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz";
+		$geoip_asnum = "https://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz";
+		$geoip_asnum_v6 = "https://download.maxmind.com/download/geoip/database/asnum/GeoIPASNumv6.dat.gz";
 		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 		if ($pf_version == "2.1" || $pf_version == "2.2") {
-			mwexec("/usr/pbi/ntopng-" . php_uname("m") . "/bin/ntopng-geoipupdate.sh");
+			$output_dir = "/usr/pbi/ntopng-" . php_uname("m") . "/share/ntopng";
 		} else {
-			mwexec("/usr/local/bin/ntopng-geoipupdate.sh");
+			$output_dir = "/usr/local/share/ntopng";
 		}
+		
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geolite_city}");
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geolite_city_v6}");
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geoip_asnum}");
+		mwexec("{$fetchcmd} -o {$output_dir} -T 5 {$geoip_asnum_v6}");
+		
 		ntopng_fixup_geoip();
 		restart_service("ntopng");
 	}
@@ -265,10 +294,13 @@
 			$source_dir = "/usr/local/share/ntopng";
 		}
 
+		safe_mkdir($target_dir, 0755);
+
 		foreach(glob("{$source_dir}/Geo*.dat*") as $geofile) {
 			/* Decompress if needed. */
 			if (substr($geofile, -3, 3) == ".gz") {
-				mwexec("/usr/bin/gzip -d " . escapeshellarg($geofile));
+				// keep -f here, otherwise the files will not get updated
+				mwexec("/usr/bin/gzip -d -f " . escapeshellarg($geofile));
 			}
 		}
 
@@ -296,6 +328,12 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		exec("rm /usr/local/etc/rc.d/ntopng*");
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version == "2.1" || $pf_version == "2.2") {
+			if (is_dir("/usr/local/share/ntopng/")) {
+				exec("rm -rf /usr/local/share/ntopng/");
+			}
+		}
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
 	<![CDATA[
