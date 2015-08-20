@@ -138,7 +138,15 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	if (!$server_cert) {
 		$input_errors[] = "Could not locate server certificate.";
 	} else {
+<<<<<<< Updated upstream
 		$server_ca = lookup_ca($server_cert['caref']);
+=======
+		/*
+			Replaced lookup_ca($server_cert['caref']) with ca_chain($server_cert). Note that ca_chain returns a string of Base64 encoded certificates, not an array. 
+			Thus, all references to base64_decode($server_ca['crt']) have been replaced with simply $server_ca
+		*/
+		$server_ca = ca_chain($server_cert); 
+>>>>>>> Stashed changes
 		if (!$server_ca) {
 			$input_errors[] = "Could not locate the CA reference for the server certificate.";
 		}
