@@ -138,11 +138,7 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 	if (!$server_cert) {
 		$input_errors[] = "Could not locate server certificate.";
 	} else {
-		/*
-			Replaced lookup_ca() with ca_chain(). Note that ca_chain returns a string of Base64 encoded certificates, not an array. 
-			Thus, all references to base64_decode($server_ca['crt']) have been replaced with simply $server_ca
-		*/
-		$server_ca = lookup_ca($server_cert['caref']); 
+		$server_ca = lookup_ca($server_cert['caref']);
 		if (!$server_ca) {
 			$input_errors[] = "Could not locate the CA reference for the server certificate.";
 		}
@@ -395,7 +391,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 			file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
 
 			$cafile = "{$tempdir}/{$cafile}";
-			file_put_contents("{$cafile}", $server_ca);
+			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
 			if ($settings['tls']) {
 				$tlsfile = "{$tempdir}/{$prefix}-tls.key";
 				file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -429,7 +425,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		case "inlinedroid":
 		case "inlineios":
 			// Inline CA
-			$conf .= "<ca>{$nl}" . trim($server_ca) . "{$nl}</ca>{$nl}";
+			$conf .= "<ca>{$nl}" . trim(base64_decode($server_ca['crt'])) . "{$nl}</ca>{$nl}";
 			if ($settings['mode'] != "server_user") {
 				// Inline Cert
 				$conf .= "<cert>{$nl}" . trim(base64_decode($cert['crt'])) . "{$nl}</cert>{$nl}";
@@ -457,7 +453,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 			file_put_contents("{$tempdir}/vpn.cnf", $conf);
 
 			$cafile = "{$keydir}/ca.crt";
-			file_put_contents("{$cafile}", $server_ca);
+			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
 			if ($settings['tls']) {
 				$tlsfile = "{$keydir}/ta.key";
 				file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -483,7 +479,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 			file_put_contents("{$tempdir}/vpn.cnf", $conf);
 
 			$cafile = "{$tempdir}/ca.crt";
-			file_put_contents("{$cafile}", $server_ca);
+			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
 			if ($settings['tls']) {
 				$tlsfile = "{$tempdir}/ta.key";
 				file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -576,7 +572,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $veri
 	file_put_contents($cfgfile, $conf);
 
 	$cafile = "{$tempdir}/config/{$prefix}-ca.crt";
-	file_put_contents($cafile, $server_ca);
+	file_put_contents($cafile, base64_decode($server_ca['crt']));
 	if ($settings['tls']) {
 		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
 		file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -712,7 +708,7 @@ EOF;
 
 	// write ca
 	$cafile = "{$tempdir}/ca.crt";
-	file_put_contents($cafile, $server_ca);
+	file_put_contents($cafile, base64_decode($server_ca['crt']));
 
 	if ($settings['mode'] != "server_user") {
 
