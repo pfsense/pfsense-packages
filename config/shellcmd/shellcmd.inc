@@ -123,13 +123,16 @@ function shellcmd_sync_package() {
 	$cmdtype = '';
 	$a_shellcmd = array();
 	$a_earlyshellcmd = array();
+	/* afterfilterchangeshellcmd is NOT treated as an array, it's a string! */
+	/* See /etc/inc/xmlparse.inc and /etc/inc/xmlreader.inc */
+	$afterfilterchangeshellcmd = '';
 	$a_shellcmd_config = &$config['installedpackages']['shellcmdsettings']['config'];
 	if (!is_array($a_shellcmd_config)) {
 		$a_shellcmd_config = array();
 	}
 	$i = 0;
-	/* When shellcmd/earlyshellcmd is added to shellcmd package configuration, make sure */
-	/* we add corresponding shellcmd/earlyshellcmd entry to $config['system'] as well */
+	/* When an item is added to shellcmd package configuration, make sure */
+	/* we add corresponding entry to $config['system'] as well */
 	foreach ($a_shellcmd_config as $item) {
 		/* Get the command from package configuration here */
 		$cmd = $a_shellcmd_config[$i]['cmd'];
@@ -143,6 +146,10 @@ function shellcmd_sync_package() {
 		} elseif ($cmdtype == "earlyshellcmd") {
 			$a_earlyshellcmd[] = $cmd;
 			$i++;
+		/* afterfilterchangeshellcmd */
+		} elseif ($cmdtype == "afterfilterchangeshellcmd") {
+			$afterfilterchangeshellcmd = $cmd;
+			$i++;
 		/* Either disabled, or possibly someone messing with config.xml manually?! */
 		} else {
 			$i++;
@@ -154,6 +161,8 @@ function shellcmd_sync_package() {
 	$config['system']['shellcmd'] = $a_shellcmd;
 	unset($config['system']['earlyshellcmd']);
 	$config['system']['earlyshellcmd'] = $a_earlyshellcmd;
+	unset($config['system']['afterfilterchangeshellcmd']);
+	$config['system']['afterfilterchangeshellcmd'] = $afterfilterchangeshellcmd;
 	write_config("[shellcmd] Successfully (re)synced shellcmd configuration.");
 
 }
@@ -224,6 +233,15 @@ function shellcmd_import_config() {
 		}
 	}
 
+	/* Import afterfilterchangeshellcmd entry which was created manually (if there is any in config.xml) */
+	/* afterfilterchangeshellcmd is NOT treated as an array, it's a string! See /etc/inc/xmlparse.inc and /etc/inc/xmlreader.inc */
+	if ($config['system']['afterfilterchangeshellcmd'] != '') {
+		$shellcmd_config[$i]['cmd'] = $config['system']['afterfilterchangeshellcmd'];
+		$shellcmd_config[$i]['cmdtype'] = "afterfilterchangeshellcmd";
+		$shellcmd_config[$i]['description'] = $shellcmd_config[$i]['description'] ?: "Imported afterfilterchangeshellcmd";
+		$i++;
+	}
+
 	/* Write the new config.xml when import is finished */
 	write_config("[shellcmd] Successfully imported package configuration from config.xml.");
 
@@ -243,9 +261,11 @@ function shellcmd_validate_input($post, &$input_errors) {
 	if (!is_array($a_shellcmd_config)) {
 		$a_shellcmd_config = array();
 	}
+	/* afterfilterchangeshellcmd is NOT an array */
+	$afterfilterchangeshellcmd = $config['system']['afterfilterchangeshellcmd'];
 
 	/* Make sure we don't add the same command twice as it's just pointless */
-	if (($post['cmd']) != '')  {
+	if (($post['cmd']) != '') {
 		$id = $post['id'];
 		if ($post['cmdtype'] == "shellcmd") {
 			if (in_array($post['cmd'], $a_shellcmd)) {
@@ -265,6 +285,19 @@ function shellcmd_validate_input($post, &$input_errors) {
 				} else {
 					$input_errors[] = "{$post['cmd']} already exists as earlyshellcmd.";
 				}
+			}
+		}
+		/* Only ONE item of this type may be configured */
+		if ($post['cmdtype'] == "afterfilterchangeshellcmd") {
+			// Not yet configured, OK
+			if ($afterfilterchangeshellcmd == '') {
+				return;
+			// Allow changing description
+			} elseif ((($post['cmd']) == $a_shellcmd_config[$id]['cmd']) && (($post['cmdtype']) == $a_shellcmd_config[$id]['cmdtype'])) {
+				return;
+			// Tired of input validation... Needs something better in future.
+			} else {
+				$input_errors[] = "Only ONE afterfilterchangeshellcmd may be configured! Delete the existing entry and try again!";
 			}
 		}
 	}
