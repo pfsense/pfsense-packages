@@ -61,6 +61,7 @@
 			<active/>
 		</tab>
 	</tabs>
+	<configpath>['installedpackages']['shellcmdsettings']['config']</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/shellcmd/shellcmd.inc</item>
@@ -109,12 +110,17 @@
 						<name>earlyshellcmd</name>
 						<value>earlyshellcmd</value>
 					</option>
+					<option>
+						<name>disabled</name>
+						<value>disabled</value>
+					</option>
 				</options>
 			<description>
 				<![CDATA[
 				Choose the shellcmd type.<br /><br />
 				<strong>shellcmd</strong> will run the command specified towards the end of the boot process.<br />
-				<strong>earlyshellcmd</strong> will run the command specified at the beginning of the boot process.<br /><br />
+				<strong>earlyshellcmd</strong> will run the command specified at the beginning of the boot process.<br />
+				<strong>disabled</strong> will save the command in package configuration but it will NOT run on boot.<br /><br />
 				See <a href="https://doc.pfsense.org/index.php/Executing_commands_at_boot_time">Executing commands at boot time</a> for detailed explanation.
 				]]>
 			</description>
