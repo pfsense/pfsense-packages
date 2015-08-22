@@ -102,6 +102,7 @@ function shellcmd_delete_php_command() {
 	}
 }
 
+
 /* Force restore of protected (early)shellcmds from system config */
 function shellcmd_forced_restore($pkg) {
 	log_error("[shellcmd] Refused to delete {$pkg} earlyshellcmd. Use {$pkg} to configure this entry.");
@@ -142,9 +143,8 @@ function shellcmd_sync_package() {
 		} elseif ($cmdtype == "earlyshellcmd") {
 			$a_earlyshellcmd[] = $cmd;
 			$i++;
-		/* Should never happen; someone messing with config.xml manually?! */
+		/* Either disabled, or possibly someone messing with config.xml manually?! */
 		} else {
-			return;
 			$i++;
 		}
 	}
@@ -162,15 +162,30 @@ function shellcmd_sync_package() {
 function shellcmd_import_config() {
 	global $config;
 
-	/* Import earlyshellcmd entries which were either created by previous package versions, */
-	/* or manually, or added by some other package(s) (if there are any in config.xml) */
-	/* Two currently known special cases are handled here - System Patches and pfBlockerNG */
 	$shellcmd_config = &$config['installedpackages']['shellcmdsettings']['config'];
 	if (!is_array($shellcmd_config)) {
 		$shellcmd_config = array();
 	}
 
 	$i = 0;
+
+	/* First, preserve any disabled items */
+	$a_shellcmd_config = &$shellcmd_config;
+	foreach ($a_shellcmd_config as $item => $value) {
+		$cmd = $value['cmd'];
+		$cmdtype = $value['cmdtype'];
+		$description = $value['description'];
+		if ($cmdtype == "disabled") {
+			$shellcmd_config[$i]['cmd'] = $cmd;
+			$shellcmd_config[$i]['cmdtype'] = "disabled";
+			$shellcmd_config[$i]['description'] = $description ?: "Imported disabled item ({$i})";
+			$i++;
+		}
+	}
+
+	/* Import earlyshellcmd entries which were either created by previous package versions, */
+	/* or manually, or added by some other package(s) (if there are any in config.xml) */
+	/* Two currently known special cases are handled here - System Patches and pfBlockerNG */
 	if (is_array($config['system']['earlyshellcmd'])) {
 		$earlyshellcmds = &$config['system']['earlyshellcmd'];
 		$pfbcmd = "/usr/local/pkg/pfblockerng/pfblockerng.sh";
@@ -192,7 +207,7 @@ function shellcmd_import_config() {
 			} else {
 				$shellcmd_config[$i]['cmd'] = $earlyshellcmd;
 				$shellcmd_config[$i]['cmdtype'] = "earlyshellcmd";
-				$shellcmd_config[$i]['description'] = "Imported earlyshellcmd ({$i})";
+				$shellcmd_config[$i]['description'] = $shellcmd_config[$i]['description'] ?: "Imported earlyshellcmd ({$i})";
 				$i++;
 			}
 
@@ -204,7 +219,7 @@ function shellcmd_import_config() {
 		foreach ($shellcmds as $shellcmd) {
 			$shellcmd_config[$i]['cmd'] = $shellcmd;
 			$shellcmd_config[$i]['cmdtype'] = "shellcmd";
-			$shellcmd_config[$i]['description'] = "Imported shellcmd ({$i})";
+			$shellcmd_config[$i]['description'] = $shellcmd_config[$i]['description'] ?: "Imported shellcmd ({$i})";
 			$i++;
 		}
 	}
@@ -224,17 +239,32 @@ function shellcmd_validate_input($post, &$input_errors) {
 	if (!is_array($a_earlyshellcmd)) {
 		$a_earlyshellcmd = array();
 	}
+	$a_shellcmd_config = &$config['installedpackages']['shellcmdsettings']['config'];
+	if (!is_array($a_shellcmd_config)) {
+		$a_shellcmd_config = array();
+	}
 
 	/* Make sure we don't add the same command twice as it's just pointless */
-	if (($post['cmd']) != '') {
+	if (($post['cmd']) != '')  {
+		$id = $post['id'];
 		if ($post['cmdtype'] == "shellcmd") {
 			if (in_array($post['cmd'], $a_shellcmd)) {
-				$input_errors[] = "{$post['cmd']} already exists as shellcmd.";
+				/* Allow changing description */
+				if ((($post['cmd']) == $a_shellcmd_config[$id]['cmd']) && (($post['cmdtype']) == $a_shellcmd_config[$id]['cmdtype'])) {
+					return;
+				} else {
+					$input_errors[] = "{$post['cmd']} already exists as shellcmd.";
+				}
 			}
 		}
 		if ($post['cmdtype'] == "earlyshellcmd") {
 			if (in_array($post['cmd'], $a_earlyshellcmd)) {
-				$input_errors[] = "{$post['cmd']} already exists as earlyshellcmd.";
+				/* Allow changing description */
+				if ((($post['cmd']) == $a_shellcmd_config[$id]['cmd']) && (($post['cmdtype']) == $a_shellcmd_config[$id]['cmdtype'])) {
+					return;
+				} else {
+					$input_errors[] = "{$post['cmd']} already exists as earlyshellcmd.";
+				}
 			}
 		}
 	}
