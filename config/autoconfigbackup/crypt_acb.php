@@ -132,4 +132,3 @@ function stripos($str, $needle) {
 	return strpos(strtolower($str), strtolower($needle));
 }
 
-?>
