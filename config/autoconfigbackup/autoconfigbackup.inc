@@ -39,7 +39,7 @@ unlink_if_exists("/usr/local/pkg/parse_config/parse_config_upload.inc");
 unlink_if_exists("/usr/local/pkg/parse_config/parse_config_upload.php");
 
 // Ensures patches match
-function custom_php_validation_command($post, &$input_errors) {
+function acb_custom_php_validation_command($post, &$input_errors) {
 	global $_POST, $savemsg, $config;
 
 	if (!$post['username']) {
@@ -71,6 +71,20 @@ function custom_php_validation_command($post, &$input_errors) {
 
 	// We do not need to store this value.
 	unset($_POST['testconnection']);
+}
+
+function acb_custom_php_resync_config_command() {
+	conf_mount_rw();
+	unlink_if_exists("/cf/conf/lastpfSbackup.txt");
+	conf_mount_ro();
+	if (!function_exists("filter_configure")) {
+		require_once("filter.inc");
+	}
+	filter_configure();
+	if ($savemsg) {
+		$savemsg .= "<br/>";
+	}
+	$savemsg .= "A configuration backup has been queued.";
 }
 
 function configure_proxy() {
