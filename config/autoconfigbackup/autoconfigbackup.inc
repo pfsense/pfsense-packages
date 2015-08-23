@@ -287,4 +287,3 @@ function upload_config($reasonm = "") {
 	}
 }
 
-?>
