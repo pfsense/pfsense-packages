@@ -35,9 +35,7 @@ function ipguard_custom_php_deinstall_command() {
 	stop_service('ipguard');
 	unlink_if_exists("/usr/local/etc/rc.d/ipguard.sh");
 	$files = glob("/usr/local/etc/ipguard_*.conf");
-	foreach ($files as $file) {
-		unlink_if_exists($file);
-	}
+	unlink_if_exists($files);
 	conf_mount_ro();
 }
 
