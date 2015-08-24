@@ -149,9 +149,15 @@
 	<custom_php_install_command>
 	<![CDATA[
 		unlink_if_exists("/usr/local/etc/rc.d/arpwatch.sh");
-		@link("/usr/sbin/sm.php", "/usr/sbin/sendmail");
+		unlink_if_exists("/usr/sbin/sendmail");
+		symlink("/usr/sbin/sm.php", "/usr/sbin/sendmail");
 	]]>
 	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		<![CDATA[
+		unlink_if_exists("/usr/sbin/sendmail");
+		]]>
+	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 	<![CDATA[
 		sync_package_arpwatch();
