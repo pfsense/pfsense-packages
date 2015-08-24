@@ -1,118 +1,109 @@
 <?php
-/* ========================================================================== */
 /*
 	asterisk.inc
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012-2013 Marcello Coutinho
-    Copyright (C) 2012-2013 robi <robreg@zsurob.hu>
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
-/*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012-2013 Marcello Coutinho
+	Copyright (C) 2012-2013 robi <robreg@zsurob.hu>
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 define('ASTERISK_CONF_DIR', '/conf/asterisk');
-//Check pfsense version
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version == "2.1" || $pf_version == "2.2")
+$pf_version=substr(trim(file_get_contents("/etc/version")), 0, 3);
+if ($pf_version == "2.1" || $pf_version == "2.2") {
 	define('ASTERISK_LOCALBASE', '/usr/pbi/asterisk-' . php_uname("m"));
-else
+} else {
 	define('ASTERISK_LOCALBASE','/usr/local');
+}
 
 function asterisk_install() {
+	// Remove rc script from previous package versions
+	unlink_if_exists("/usr/local/etc/rc.d/asterisk");
 	sync_package_asterisk();
 }
 
 function asterisk_deinstall() {
-	$script='/usr/local/etc/rc.d/asterisk';
-	if (file_exists($script)){
-		mwexec("$script stop");
-		chmod ($script,0444);
-		}
+	stop_service("asterisk");
+	unlink_if_exists("/usr/local/etc/rc.d/asterisk.sh");
 }
 
 function sync_package_asterisk() {
-	global $config, $g;
-
-	#mount filesystem writeable
 	conf_mount_rw();
-	
-  	//for NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
-  	$dist_dir=ASTERISK_CONF_DIR ."/dist";
-  	if (!is_dir($dist_dir))
-  		mkdir($dist_dir,0755,TRUE);
 
-  	if(file_exists (ASTERISK_LOCALBASE."/etc/asterisk") && !is_link(ASTERISK_LOCALBASE."/etc/asterisk")){
-  		$dist_files= scandir(ASTERISK_LOCALBASE."/etc/asterisk");
-  		foreach ($dist_files as $dist){
-  			if (preg_match("/-dist/",$dist))
-  				rename (ASTERISK_LOCALBASE."/etc/asterisk"."/$dist", "$dist_dir/$dist");
-  			elseif (preg_match("/\w+/",$dist))
-  				rename (ASTERISK_LOCALBASE."/etc/asterisk"."/$dist", ASTERISK_CONF_DIR."/$dist");
-  			}
-  		rmdir(ASTERISK_LOCALBASE. "/etc/asterisk");
-  		symlink (ASTERISK_CONF_DIR , ASTERISK_LOCALBASE. "/etc/asterisk");
-  		}
-	
-	//fix asterisk options for nanobsd: logging, db and calls log in /tmp
-	//	if ($g['platform'] == "nanobsd"){
-		$script='/conf/asterisk/logger.conf';
-		if (file_exists($script)){
-			$script_file=file_get_contents($script);
-			$pattern[0]='@;rotatestrategy@';
-			$replace[0]='rotatestrategy = rotate ;by pfSense ;';
-			$script_file=preg_replace($pattern,$replace,$script_file);
-			file_put_contents($script, $script_file, LOCK_EX);
-		}
-		
-		$script='/conf/asterisk/asterisk.conf';
-		if (file_exists($script)){
-		//point to the /var subdirs in the writable area in RAM
-			$script_file=file_get_contents($script);
-			$pattern[0]='/(\Wdirectories\W)\S+/';
-			$replace[0]='$1';
-			$pattern[1]='/astetcdir => \S+/';
-			$replace[1]='astetcdir => /conf/asterisk';
-			$pattern[2]='/astdbdir => \S+/';
-			$replace[2]='astdbdir => /var/db/asterisk';
-			$pattern[3]='/astspooldir => \S+/';
-			$replace[3]='astspooldir => /var/spool/asterisk';
-			$pattern[4]='/astrundir => \S+/';
-			$replace[4]='astrundir => /var/run/asterisk';
-			$pattern[5]='/astlogdir => \S+/';
-			$replace[5]='astlogdir => /var/log/asterisk';
-			$script_file=preg_replace($pattern,$replace,$script_file);
-			file_put_contents($script, $script_file, LOCK_EX);
-		}
-//	}
+	// For NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
+	$dist_dir = ASTERISK_CONF_DIR . "/dist";
+	safe_mkdir($dist_dir, 0755);
 
-	//add modules settings, for disabling those not required on pfSense	
-        $script='/conf/asterisk/modules.conf';
-		if (file_exists($script)){
-			$script_file=file_get_contents($script);
-			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
-				$add_modules_settings=<<<EOF
+	if (file_exists (ASTERISK_LOCALBASE . "/etc/asterisk") && !is_link(ASTERISK_LOCALBASE . "/etc/asterisk")) {
+		$dist_files = scandir(ASTERISK_LOCALBASE . "/etc/asterisk");
+		foreach ($dist_files as $dist) {
+			if (preg_match("/-dist/", $dist)) {
+				rename (ASTERISK_LOCALBASE . "/etc/asterisk" . "/$dist", "$dist_dir/$dist");
+			} elseif (preg_match("/\w+/", $dist)) {
+				rename (ASTERISK_LOCALBASE . "/etc/asterisk" . "/$dist", ASTERISK_CONF_DIR . "/$dist");
+			}
+		}
+		rmdir(ASTERISK_LOCALBASE . "/etc/asterisk");
+		symlink(ASTERISK_CONF_DIR, ASTERISK_LOCALBASE . "/etc/asterisk");
+	}
+
+	// Fix asterisk options for NanoBSD: logging, db and calls log in /tmp
+	$script = '/conf/asterisk/logger.conf';
+	if (file_exists($script)) {
+		$script_file = file_get_contents($script);
+		$pattern[0] = '@;rotatestrategy@';
+		$replace[0] = 'rotatestrategy = rotate ;by pfSense ;';
+		$script_file = preg_replace($pattern, $replace, $script_file);
+		file_put_contents($script, $script_file, LOCK_EX);
+	}
+
+	$script = '/conf/asterisk/asterisk.conf';
+	if (file_exists($script)) {
+		// Point to the /var subdirs in the writable area in ramfs
+		$script_file = file_get_contents($script);
+		$pattern[0] = '/(\Wdirectories\W)\S+/';
+		$replace[0] = '$1';
+		$pattern[1] = '/astetcdir => \S+/';
+		$replace[1] = 'astetcdir => /conf/asterisk';
+		$pattern[2] = '/astdbdir => \S+/';
+		$replace[2] = 'astdbdir => /var/db/asterisk';
+		$pattern[3] = '/astspooldir => \S+/';
+		$replace[3] = 'astspooldir => /var/spool/asterisk';
+		$pattern[4] = '/astrundir => \S+/';
+		$replace[4] = 'astrundir => /var/run/asterisk';
+		$pattern[5] = '/astlogdir => \S+/';
+		$replace[5] = 'astlogdir => /var/log/asterisk';
+		$script_file = preg_replace($pattern, $replace, $script_file);
+		file_put_contents($script, $script_file, LOCK_EX);
+	}
+
+	// Add modules settings, for disabling those not required on pfSense
+	$script = '/conf/asterisk/modules.conf';
+	if (file_exists($script)) {
+		$script_file = file_get_contents($script);
+		// First check if already added...
+		if (strpos($script_file, 'pfSense') === false) {
+			$add_modules_settings = <<<EOF
 ;The following modules settings work out of the box on pfSense (note: do not remove this comment line).
 ;Should you need any disabled module, check for its functionality individually in your environment.
 ;For more information check asterisk's online documentation.
@@ -327,32 +318,34 @@ noload => chan_h323.so
 noload => res_config_odbc.so
 
 EOF;
-				$script_file .= $add_modules_settings;
-				file_put_contents($script, $script_file, LOCK_EX);
-			}
+			$script_file .= $add_modules_settings;
+			file_put_contents($script, $script_file, LOCK_EX);
+		}
+	}
+
+	// Replace general SIP settings as a newbie hint to start configuration
+	$script = '/conf/asterisk/sip.conf';
+	if (file_exists($script)) {
+		$script_file = file_get_contents($script);
+		// Strenghten a couple of security settings, and predefine codecs in the default SIP configuration
+		// First check if already added...
+		if (strpos($script_file, 'pfSense') === false) {
+			$pattern[0] = '/;allowguest\S+/';
+			$replace[0] = 'allowguest=no ;by pfSense ;';
+			$pattern[1] = '/;alwaysauthreject/';
+			$replace[1] = 'alwaysauthreject=yes ;by pfSense ;';
+			$pattern[2] = '/; jbenable/';
+			$replace[2] = 'jbenable=yes ;by pfSense ;';
+			$pattern[3] = '/(First disallow all codecs)/';
+			$replace[3] = "$1\n;The following general settings usually work on pfSense boxes (note: please do not remove this comment line).\ndisallow=all ;by pfSense\nallow=g729\nallow=gsm\nallow=ulaw\nallow=alaw\n\n";
+			$script_file = preg_replace($pattern, $replace, $script_file);
+			file_put_contents($script, $script_file, LOCK_EX);
 		}
 
-	//replace general SIP settings as a newbie hint to start configuration
-		$script='/conf/asterisk/sip.conf';
-		if (file_exists($script)){
-			$script_file=file_get_contents($script);
-			//strenghten a couple of security settings, and predefine codecs in the default SIP configuration
-			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
-				$pattern[0]='/;allowguest\S+/';
-				$replace[0]='allowguest=no ;by pfSense ;';
-				$pattern[1]='/;alwaysauthreject/';
-				$replace[1]='alwaysauthreject=yes ;by pfSense ;';
-				$pattern[2]='/; jbenable/';
-				$replace[2]='jbenable=yes ;by pfSense ;';
-				$pattern[3]='/(First disallow all codecs)/';
-				$replace[3]="$1\n;The following general settings usually work on pfSense boxes (note: please do not remove this comment line).\ndisallow=all ;by pfSense\nallow=g729\nallow=gsm\nallow=ulaw\nallow=alaw\n\n";
-				$script_file=preg_replace($pattern,$replace,$script_file);
-				file_put_contents($script, $script_file, LOCK_EX);
-			}
-	
-			if (strpos($script_file,'demo extension for pfSense') === false) {  //first check if already added...
-				$add_demo_extension = <<<EOF
-				
+		// First check if already added...
+		if (strpos($script_file, 'demo extension for pfSense') === false) {
+			$add_demo_extension = <<<EOF
+
 [301]
 ;demo extension for pfSense
 type=friend
@@ -376,51 +369,50 @@ context=default
 EOF;
 				$script_file .= $add_demo_extension;
 				file_put_contents($script, $script_file, LOCK_EX);
-			}
 		}
+	}
 
-	$script='/usr/local/etc/rc.d/asterisk';
-	if (file_exists($script)){
-		$script_file=file_get_contents($script);
-		if (preg_match('/NO/',$script_file)){
-			$script_file=preg_replace("/NO/","YES",$script_file);
-			$script_file=preg_replace("/core stop now'/","core stop now'\n  killall \$name",$script_file);
-			
-			//create the /var subdirs for the writable area in RAM
-			if (strpos($script_file,'pfSense') === false) {  //first check if already added...
-				$writable_area = <<< EOF
-# Create paths in pfSense's volatile area if they don't exist (note: please do not remove this comment line)
+	// Write /usr/local/etc/rc.d/asterisk.sh rc script
+	$asterisk_user = "asterisk";
+	$command = "/usr/local/sbin/asterisk";
+	$command_args = "-n -F -U {$asterisk_user}";
+	$start = <<<EOF
+
+# Create the /var subdirs for the writable area in ramfs
 for a in db spool run log 
 do
 if [ ! -d /var/\$a/asterisk ]; then
-  mkdir -p /var/\$a/asterisk
-  chown -R asterisk:asterisk /var/\$a/asterisk
-  chmod -R g+w /var/\$a/asterisk
+	mkdir -p /var/\$a/asterisk
+	chown -R asterisk:asterisk /var/\$a/asterisk
+	chmod -R g+w /var/\$a/asterisk
 fi
 done
 
 if [ ! -d /var/log/asterisk/cdr-csv ]; then
-  mkdir -p /var/log/asterisk/cdr-csv
-  chown -R asterisk:asterisk /var/log/asterisk/cdr-csv
-  chmod -R g+w /var/log/asterisk/cdr-csv
+	mkdir -p /var/log/asterisk/cdr-csv
+	chown -R asterisk:asterisk /var/log/asterisk/cdr-csv
+	chmod -R g+w /var/log/asterisk/cdr-csv
 fi
 
+{$command} {$command_args}
+
 EOF;
-				$script_file .= $writable_area;
-			}
-			file_put_contents($script, $script_file, LOCK_EX);
-		}
-		chmod ($script,0755);
-		mwexec("$script stop");			
-		mwexec_bg("$script start");
-	}
-	
-	//prepare backup for factory defaults restoring feature
+
+	$stop = "{$command} -nqrx 'core stop now'\n\t";
+	$stop .= "/usr/bin/killall asterisk";
+
+	write_rcfile(array(
+		'file' => 'asterisk.sh',
+		'start' => $start,
+		'stop' => $stop	));
+
+	restart_service("asterisk");
+
+	// Prepare backup for factory defaults restoring feature
 	if (!file_exists("/conf.default/asterisk_factory_defaults_config.tgz")) {
-		system("cd /conf/asterisk/ && tar czf /conf.default/asterisk_factory_defaults_config.tgz *");
+		system("cd /conf/asterisk/ && /usr/bin/tar czf /conf.default/asterisk_factory_defaults_config.tgz *");
 	}
-	
-	//mount filesystem readonly
+
 	conf_mount_ro();
 }
 
