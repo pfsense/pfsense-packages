@@ -164,13 +164,7 @@
 			<cols>50</cols>
 		</field>
 	</fields>
-	<custom_delete_php_command>
-	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		setup_wireless_olsr($if);
 	</custom_php_resync_config_command>
-	<custom_php_install_command>
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-	</custom_php_deinstall_command>
 </packagegui>
