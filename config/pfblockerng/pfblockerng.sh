@@ -81,7 +81,7 @@ DISK_NAME=`/bin/df /var/db/rrd | /usr/bin/tail -1 | /usr/bin/awk '{print $1;}'`
 DISK_TYPE=`/usr/bin/basename ${DISK_NAME} | /usr/bin/cut -c1-2`
 
 if [ "${PLATFORM}" != "pfSense" ] || [ ${USE_MFS_TMPVAR} -gt 0 ] || [ "${DISK_TYPE}" = "md" ]; then
-	/usr/local/bin/php /etc/rc.conf_mount_rw >/dev/null 2>&1
+	/etc/rc.conf_mount_rw >/dev/null 2>&1
 	if [ ! -d $pfbdbdir ]; then mkdir $pfbdbdir; fi
 	if [ ! -d $pfsense_alias_dir ]; then mkdir $pfsense_alias_dir; fi
 fi
@@ -104,7 +104,7 @@ if [ ! -d $tmpxlsx ]; then mkdir $tmpxlsx; fi
 # Exit Function to set mount RO if required before Exiting
 exitnow() {
 	if [ "${PLATFORM}" != "pfSense" ] || [ ${USE_MFS_TMPVAR} -gt 0 ] || [ "${DISK_TYPE}" = "md" ]; then
-		/usr/local/bin/php /etc/rc.conf_mount_ro >/dev/null 2>&1
+		/etc/rc.conf_mount_ro >/dev/null 2>&1
 	fi
 	exit
 }
