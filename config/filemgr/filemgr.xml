@@ -184,4 +184,11 @@
 		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
 		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/session.php</item>
 	</additional_files_needed>
+	<custom_php_deinstall_command>
+		<![CDATA[
+		if (is_dir("/usr/local/www/packages/filemgr")) {
+			mwexec("/bin/rm -rf /usr/local/www/packages/filemgr/");
+		}
+		]]>
+	</custom_php_deinstall_command>
 </packagegui>
