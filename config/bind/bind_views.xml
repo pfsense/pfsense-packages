@@ -1,61 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-		<![CDATA[
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    bind_zone.xml
-    part of pfSense (http://www.pfSense.com)
-    part of the Bind package for pfSense
-    Copyright (C) 2013 Juliano Oliveira/Adriano Brancher
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	bind_views.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2013 Juliano Oliveira
+	Copyright (C) 2013 Adriano Brancher
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+	]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bindviews</name>
-	<version>0.1.0</version>
-	<title>Bind: Views Settings</title>
+	<version>0.4.0</version>
+	<title>BIND: Views Settings</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
-	<menu>
-		<name>BIND Server</name>
-		<tooltiptext></tooltiptext>
-		<section>Services</section>
-		<configfile>bind.xml</configfile>
-	</menu>
 	<tabs>
 		<tab>
 			<text>Settings</text>
@@ -108,10 +97,12 @@
 		<field>
 			<fielddescr>Recursion</fielddescr>
 			<fieldname>recursion</fieldname>
-			<description>A recursive query occurs when your DNS server is queried for a domain that it
-					currently knows nothing about, in which case it will try to resolve the given host by
-					performing further queries (eg by starting at the root servers and working out, or by
-					simply passing the request to yet another DNS server).
+			<description>
+				<![CDATA[
+				A recursive query occurs when your DNS server is queried for a domain that it currently knows nothing about,&nbsp;
+				in which case it will try to resolve the given host by performing further queries&nbsp;
+				(e.g. by starting at the root servers and working out, or by simply passing the request to yet another DNS server).
+				]]>
 			</description>
 			<type>select</type>
 			<options>
@@ -120,11 +111,13 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Match-clients</fielddescr>
+			<fielddescr>match-clients</fielddescr>
 			<fieldname>match-clients</fieldname>
-			<description>If either or both of match-clients are missing they default to any (all hosts
-					match). The match-clients statement defines the address_match_list for the source IP
-					address of the incoming messages.
+			<description>
+				<![CDATA[
+				If either or both of match-clients are missing they default to any (all hosts match).<br />
+				The match-clients statement defines the address_match_list for the source IP address of the incoming messages.
+				]]>
 			</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
@@ -134,10 +127,13 @@
 			<size>03</size>
 		</field>
 		<field>
-			<fielddescr>Allow-recursion</fielddescr>
+			<fielddescr>allow-recursion</fielddescr>
 			<fieldname>allow-recursion</fieldname>
-			<description>For example, if you have one DNS server serving your local network, you may want
-					all of your local computers to use your DNS server.
+			<description>
+				<![CDATA[
+				For example, if you have one DNS server serving your local network, you may want&nbsp;
+				all of your local computers to use your DNS server.
+				]]>
 			</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['installedpackages']['bindacls']['config']]]></source>
@@ -154,18 +150,13 @@
 		<field>
 			<fielddescr>Custom Options</fielddescr>
 			<fieldname>bind_custom_options</fieldname>
-			<description>You can put your own custom options here, separated by semi-colons (;).
-			</description>
+			<description>You can put your own custom options here, separated by semi-colons (;).</description>
 			<type>textarea</type>
 			<cols>65</cols>
 			<rows>8</rows>
 			<encoding>base64</encoding>
 		</field>
 	</fields>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
-	<custom_delete_php_command>
-	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		bind_sync();
 	</custom_php_resync_config_command>
