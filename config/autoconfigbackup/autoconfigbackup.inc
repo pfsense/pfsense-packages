@@ -74,9 +74,11 @@ function acb_custom_php_validation_command($post, &$input_errors) {
 }
 
 function acb_custom_php_resync_config_command() {
-	conf_mount_rw();
-	unlink_if_exists("/cf/conf/lastpfSbackup.txt");
-	conf_mount_ro();
+	if (is_file("/cf/conf/lastpfSbackup.txt") {
+		conf_mount_rw();
+		unlink("/cf/conf/lastpfSbackup.txt");
+		conf_mount_ro();
+	}
 	if (!function_exists("filter_configure")) {
 		require_once("filter.inc");
 	}
