@@ -518,9 +518,6 @@ EOD;
 
 			log_error("[nut] INFO: Starting service");
 			start_service("nut");
-			if (!is_process_running('upsmon')) {
-				log_error("[nut] ERROR: Service failed to start: check configuration.");
-			}
 		} elseif (!$return && file_exists(NUT_RCFILE)) {
 			/* no parameters user does not want nut running */
 			/* lets stop the service and remove the rc file */
