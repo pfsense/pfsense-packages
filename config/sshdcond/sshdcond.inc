@@ -39,21 +39,16 @@ function restart_sshd() {
 function sshdcond_custom_php_install_command() {
 	global $g, $config;
 
-	conf_mount_rw();
-
 	/* We need to generate an outfile for our extra commands.
 	The patched g_szSSHDFileGenerate php file then reads and appends that config.
 	*/
 	$fd = fopen("/etc/ssh/sshd_extra", 'w');
 	fclose($fd);
 
-	conf_mount_ro();
 }
 
 function sshdcond_custom_php_deinstall_command() {
 	global $g, $config;
-
-	conf_mount_rw();
 
 	/* Delete our config file. */
 	unlink_if_exists("/etc/ssh/sshd_extra");
@@ -61,7 +56,6 @@ function sshdcond_custom_php_deinstall_command() {
 	/* Re-run sshd config generation script. */
 	restart_sshd();
 
-	conf_mount_ro();
 }
 
 function sshdcond_custom_php_write_config() {
