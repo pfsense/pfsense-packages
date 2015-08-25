@@ -45,7 +45,6 @@ function tftp_install_command() {
 	$tftpbackup = "/root/backup/tftp.bak.tgz";
 
 	// Create the directories if required
-	conf_mount_rw();
 	safe_mkdir("{$tftpdir}", 0777);
 	safe_mkdir("/root/backup/");
 
@@ -55,14 +54,11 @@ function tftp_install_command() {
 		system("/bin/chmod -R 0744 {$tftpdir}/*");
 		unset($tftpbackup);
 	}
-	conf_mount_ro();
 }
 
 function tftp_deinstall_command() {
-	conf_mount_rw();
 	unlink_if_exists("/usr/local/etc/rc.d/tftp.sh");
 	unlink_if_exists("/tmp/pkg_mgr_tftp.log");
-	conf_mount_ro();
 }
 
 function tftp_generate_rules($type) {
