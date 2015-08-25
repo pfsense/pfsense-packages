@@ -31,12 +31,10 @@ require_once("config.inc");
 require_once("util.inc");
 
 function ipguard_custom_php_deinstall_command() {
-	conf_mount_rw();
 	stop_service('ipguard');
 	unlink_if_exists("/usr/local/etc/rc.d/ipguard.sh");
 	$files = glob("/usr/local/etc/ipguard_*.conf");
 	unlink_if_exists($files);
-	conf_mount_ro();
 }
 
 function ipguard_custom_php_write_config() {
