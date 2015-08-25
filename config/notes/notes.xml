@@ -103,7 +103,4 @@
 			<rows>20</rows>
 		</field>
 	</fields>
-	<custom_php_deinstall_command>
-		notes_deinstall_command();
-	</custom_php_deinstall_command>
 </packagegui>
