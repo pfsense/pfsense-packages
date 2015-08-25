@@ -104,7 +104,6 @@ EOF;
 }
 
 function phpservice_install_command() {
-	conf_mount_rw();
 	write_rcfile(array(
 		"file" => "phpservice.sh",
 		"start" => "/usr/local/bin/php /usr/local/pkg/phpservice.php >> /var/log/phpservice.log &",
@@ -112,15 +111,6 @@ function phpservice_install_command() {
 		)
 	);
 	phpservice_sync_package();
-	conf_mount_ro();
-}
-
-
-function phpservice_deinstall_command() {
-	conf_mount_rw();
-	stop_service("phpservice");
-	unlink_if_exists("/usr/local/etc/rc.d/phpservice.sh");	
-	conf_mount_ro();
 }
 
 ?>
