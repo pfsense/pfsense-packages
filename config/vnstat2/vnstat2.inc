@@ -30,7 +30,6 @@
 require_once("util.inc");
 
 function vnstat_install_deinstall() {
-	conf_mount_rw();
 	global $config;
 	// Remove Vnstat package and files
 	exec("/bin/rm -d -R /usr/local/www/vnstat2");
@@ -39,7 +38,6 @@ function vnstat_install_deinstall() {
 	exec("/bin/rm /usr/local/etc/vnstat.conf");
 	// Remove vnstat cron entry from config.xml
 	vnstat2_install_cron(false);
-	conf_mount_ro();
 }
 
 function vnstat2_install_cron($vnstat_cron_value) {
