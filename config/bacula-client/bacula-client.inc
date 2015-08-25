@@ -44,15 +44,8 @@ function baculaclient_custom_php_install_command() {
 }
 
 function baculaclient_custom_php_deinstall_command(){
-	conf_mount_rw();
-
 	// Delete our config file
 	unlink_if_exists(BACULA_LOCALBASE . "/etc/bacula/bacula-fd.conf");
-	// Stop service and delete our rc file
-	stop_service("bacula-client");
-	unlink_if_exists(BACULA_STARTUP_SCRIPT);
-
-	conf_mount_ro();
 }
 
 function baculaclient_custom_php_write_config(){
