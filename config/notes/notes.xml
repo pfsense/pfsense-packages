@@ -45,7 +45,6 @@
 	<name>Notes</name>
 	<version>0.2.6</version>
 	<title>Settings</title>
-	<include_file>/usr/local/pkg/notes.inc</include_file>
 	<menu>
 		<name>Notes</name>
 		<tooltiptext>Notes.</tooltiptext>
