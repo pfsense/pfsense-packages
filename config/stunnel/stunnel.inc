@@ -218,7 +218,6 @@ function stunnel_install() {
 	write_rcfile($_rcfile);
 	unlink_if_exists("/usr/local/etc/rc.d/stunnel");
 	
-	conf_mount_rw();
 	$fout = fopen(STUNNEL_ETCDIR . "/stunnel.conf","w");
 	fwrite($fout, "cert = " . STUNNEL_ETCDIR . "/stunnel.pem \n");
 	fwrite($fout, "chroot = /var/tmp/stunnel \n");
@@ -234,7 +233,6 @@ function stunnel_install() {
 		}
 	}
 	fclose($fout);
-	conf_mount_ro();
 }
 
 function stunnel_deinstall() {
