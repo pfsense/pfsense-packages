@@ -29,7 +29,6 @@
 */
 function shellcmd_install_command() {
 	global $config;
-	conf_mount_rw();
 
 	/* Remove garbage left over by previous broken package versions */
 	unlink_if_exists("/usr/local/etc/rc.d/shellcmd.sh");
@@ -39,7 +38,6 @@ function shellcmd_install_command() {
 
 	shellcmd_import_config();
 	shellcmd_sync_package();
-	conf_mount_ro();
 
 }
 
