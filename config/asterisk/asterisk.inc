@@ -42,11 +42,6 @@ function asterisk_install() {
 	sync_package_asterisk();
 }
 
-function asterisk_deinstall() {
-	stop_service("asterisk");
-	unlink_if_exists("/usr/local/etc/rc.d/asterisk.sh");
-}
-
 function sync_package_asterisk() {
 	conf_mount_rw();
 
