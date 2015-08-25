@@ -45,13 +45,10 @@ switch ($pfs_version) {
 }
 
 function bandwidthd_install_deinstall() {
-	conf_mount_rw();
-	stop_service("bandwidthd");
 	mwexec("/bin/rm -rf " . PKG_BANDWIDTHD_BASE . "/htdocs");
 	mwexec("/bin/rm -f /usr/local/www/bandwidthd");
 	// Remove the cron job, if it is there
 	install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", false);
-	conf_mount_ro();
 }
 
 function bandwidthd_install_config() {
