@@ -40,7 +40,6 @@ function php_install_apcupsd() {
 function php_deinstall_apcupsd() {
 	global $config, $g;
 
-	conf_mount_rw();
 	$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 		define('APCUPSD_BASE', '/usr/pbi/apcupsd-' . php_uname("m"));
@@ -48,7 +47,6 @@ function php_deinstall_apcupsd() {
 		define('APCUPSD_BASE', '/usr/local');
 	}
 
-	exec("/usr/bin/killall apcupsd");
 	unlink_if_exists(APCUPSD_BASE . "/etc/rc.d/apcupsd.sh");
 	unlink_if_exists(APCUPSD_BASE . "/etc/apcupsd/apcupsd.conf");
 	unlink_if_exists("/var/log/apcupsd/apcupsd.log");
@@ -61,7 +59,6 @@ function php_deinstall_apcupsd() {
 		exec("/bin/rm -rf /var/run/apcupsd/");
 	}
 
-	conf_mount_ro();
 }
 
 function validate_input_apcupsd($post, &$input_errors) {
