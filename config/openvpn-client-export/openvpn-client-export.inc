@@ -62,8 +62,7 @@ function openvpn_client_export_install() {
 }
 
 function openvpn_client_export_deinstall() {
-	$workdir = "{$ovpndir}/client-export";
-	exec("/bin/rm -r {$workdir}");
+	exec("/bin/rm -r /usr/local/share/openvpn/client-export");
 }
 
 function openvpn_client_export_prefix($srvid, $usrid = null, $crtid = null) {
