@@ -39,7 +39,7 @@
 		</descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>0.3.2</version>
+		<version>0.3.3</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
@@ -171,7 +171,7 @@
 		</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>0.28</version>
+		<version>0.29</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -261,7 +261,7 @@
 			<ports_after>net/avahi-app devel/dbus</ports_after>
 		</build_pbi>
 		<depends_on_package_pbi>avahi-0.6.31-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.10.0</version>
+		<version>1.10.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
@@ -279,7 +279,7 @@
 			<port>net/ntop</port>
 		</build_pbi>
 		<build_options>ntop_SET_FORCE=PCAP_PORT XMLDUMP MAKO;ntop_UNSET_FORCE=JUMBO_FRAMES;rrdtool_UNSET_FORCE=DEJAVU PERL_MODULE PYTHON_MODULE RUBY_MODULE;rrdtool_SET_FORCE=JSON MMAP NLS;graphviz_UNSET_FORCE=XPM DIGCOLA IPSEPCOLA PANGOCAIRO;graphviz_SET_FORCE=ICONV NLS;cairo_UNSET_FORCE=X11 XCB;libgd_UNSET_FORCE=FONTCONFIG XPM;libgd_SET_FORCE=ICONV;libpcap_UNSET_FORCE=DAG;libpcap_SET_FORCE=IPV6</build_options>
-		<version>5.0.1_4 v2.3</version>
+		<version>2.3.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntop2/ntop.xml</config_file>
@@ -312,7 +312,7 @@
 		<category>Status</category>
 		<pkginfolink/>
 		<config_file>https://packages.pfsense.org/packages/config/notes/notes.xml</config_file>
-		<version>0.2.6</version>
+		<version>0.2.7</version>
 		<status>Alpha</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -325,7 +325,7 @@
 		<pkginfolink/>
 		<port_category>ftp</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/tftp2/tftp.xml</config_file>
-		<version>2.2</version>
+		<version>2.2.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>tftp.xml</configurationfile>
@@ -337,7 +337,7 @@
 		<category>Services</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/PHPService</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/phpservice/phpservice.xml</config_file>
-		<version>0.5.0</version>
+		<version>0.5.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -349,7 +349,7 @@
 		<descr>Tool to Backup and Restore files and directories.</descr>
 		<category>System</category>
 		<config_file>https://packages.pfsense.org/packages/config/backup/backup.xml</config_file>
-		<version>0.1.9</version>
+		<version>0.2.0</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -360,7 +360,7 @@
 		<descr>The cron utility is used to manage commands on a schedule.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/cron/cron.xml</config_file>
-		<version>0.3.0</version>
+		<version>0.3.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -373,7 +373,7 @@
 		<port_category>www</port_category>
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
-		<version>0.8.0</version>
+		<version>0.8.1</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -426,7 +426,7 @@
 		<category>Network Management</category>
 		<port_category>net</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/routed/routed.xml</config_file>
-		<version>1.2</version>
+		<version>1.2.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<configurationfile>routed.xml</configurationfile>
@@ -438,7 +438,7 @@
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_pbi>spamd-4.9.1_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.1.3</version>
+		<version>1.1.4</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<port_category>mail</port_category>
@@ -566,7 +566,7 @@
 		<build_pbi>
 			<port>net/openbgpd</port>
 		</build_pbi>
-		<version>0.9.3.4</version>
+		<version>0.9.3.5</version>
 		<status>STABLE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -688,7 +688,7 @@
 		<build_pbi>
 			<port>net/vnstat</port>
 		</build_pbi>
-		<version>1.12.5</version>
+		<version>1.12.6</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
@@ -722,7 +722,7 @@
 		<descr>VMware Tools is a suite of utilities that enhances the performance of the virtual machine's guest operating system and improves management of the virtual machine.</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>1280544.11</version>
+		<version>1280544.12</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -814,7 +814,7 @@
 		<descr>Network UPS Tools.</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.0.8</version>
+		<version>2.0.9</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
@@ -907,7 +907,7 @@
 		</descr>
 		<pkginfolink>https://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
 		<category>System</category>
-		<version>1.6.14</version>
+		<version>1.6.15</version>
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
@@ -929,7 +929,7 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>0.6</version>
+		<version>0.6.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>bandwidthd-2.0.1_6-##ARCH##.pbi</depends_on_package_pbi>
@@ -951,7 +951,7 @@
 		<descr>SSL encryption wrapper between remote client and local or remote servers.</descr>
 		<category>Network Management</category>
 		<depends_on_package_pbi>stunnel-5.20-##ARCH##.pbi</depends_on_package_pbi>
-		<version>5.20</version>
+		<version>5.20.1</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -1184,7 +1184,7 @@
 		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<port_category>security</port_category>
 		<run_depends>share/openvpn/client-export/template/config-import:security/openvpn-client-export bin/zip:archivers/zip bin/7z:archivers/p7zip</run_depends>
-		<version>1.2.19</version>
+		<version>1.2.20</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
@@ -1299,7 +1299,7 @@
 		</build_pbi>
 		<build_options>nrpe_SET_FORCE=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.15_5 v2.2_4</version>
+		<version>2.2.5</version>
 		<status>Beta</status>
 		<required_version>2.2.1</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
@@ -1336,7 +1336,7 @@
 			]]>
 		</descr>
 		<category>Enhancements</category>
-		<version>1.0.3</version>
+		<version>1.0.4</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.xml</config_file>
@@ -1397,7 +1397,7 @@
 		<descr>Bacula is a set of Open Source computer programs that permit managings backups, recovery, and verification of computer data across a network of computers of different kinds.</descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>1.0.8</version>
+		<version>1.0.9</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
@@ -1495,7 +1495,7 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>1.0.8</version>
+		<version>1.0.9</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>syslog-ng-3.6.2_3-##ARCH##.pbi</depends_on_package_pbi>
@@ -1523,7 +1523,7 @@
 		<website>http://www.zabbix.com/product.php</website>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix-agent-lts/zabbix-agent-lts.xml</config_file>
-		<version>0.8.6</version>
+		<version>0.8.7</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix-agent-lts.xml</configurationfile>
@@ -1550,7 +1550,7 @@
 		<website>http://www.zabbix.com/product.php</website>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix-proxy-lts/zabbix-proxy-lts.xml</config_file>
-		<version>0.8.6</version>
+		<version>0.8.7</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix-proxy-lts.xml</configurationfile>
@@ -1669,7 +1669,7 @@
 		<website>http://www.apcupsd.com/</website>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>0.3.7</version>
+		<version>0.3.8</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
