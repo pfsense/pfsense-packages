@@ -1,111 +1,154 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <name>havpavset</name>
-        <title>Antivirus: Settings</title>
-        <category>Status</category>
-        <version>none</version>
-        <include_file>/usr/local/pkg/havp.inc</include_file>
-        <tabs>
-                <tab>
-                        <text>General page</text>
-                        <url>/antivirus.php</url>
-                </tab>
-                <tab>
-                        <text>HTTP Proxy</text>
-                        <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
-                </tab>
-                <!--tab>
-                        <text>Files Scanner</text>
-                        <url>/pkg_edit.php?xml=havp_fscan.xml&amp;id=0</url>
-                </tab-->
-                <tab>
-                        <text>Settings</text>
-                        <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
-                        <active/>
-                </tab>
-                <tab>
-                        <text>HAVP Log</text>
-                        <url>/havp_log.php</url>
-                </tab>
-        </tabs>
-        <fields>
-                <field>
-                        <fielddescr>AV base update</fielddescr>
-                        <fieldname>havpavupdate</fieldname>
-                        <description>
-                                &lt;input name='submit' type='submit' value='Update_AV'&gt;
-                                Press button for update AV database now.
-                        </description>
-                        <type>select</type>
-                        <value>hv_none</value>
-                        <options>
-                                <option><name>none          </name><value>0</value></option>
-                                <option><name>every 1  hours</name><value>1</value></option>
-                                <option><name>every 2  hours</name><value>2</value></option>
-                                <option><name>every 3  hours</name><value>3</value></option>
-                                <option><name>every 4  hours</name><value>4</value></option>
-                                <option><name>every 6  hours</name><value>5</value></option>
-                                <option><name>every 8  hours</name><value>6</value></option>
-                                <option><name>every 12 hours</name><value>7</value></option>
-                                <option><name>every 24 hours</name><value>8</value></option>
-                        </options>
-                </field>
-                <field>
-                        <fielddescr>Regional AV database update mirror</fielddescr>
-                        <fieldname>dbregion</fieldname>
-                        <description>Select regional database mirror.</description>
-                        <type>select</type>
-                        <value></value>
-                        <options>
-                                 <option><value></value><name>-----</name></option>
-                                 <option><value>au</value><name>Australia</name></option>
-                                 <option><value>eu</value><name>Europe</name></option>
-                                 <option><value>ca</value><name>Canada</name></option>
-                                 <option><value>cn</value><name>China</name></option>
-                                 <option><value>id</value><name>Indonesia</name></option>
-                                 <option><value>jp</value><name>Japan</name></option>
-                                 <option><value>kr</value><name>Korea</name></option>
-                                 <option><value>ml</value><name>Malaysia</name></option>
-                                 <option><value>ru</value><name>Russian</name></option>
-                                 <option><value>sa</value><name>South africa</name></option>
-                                 <option><value>tw</value><name>Taiwan</name></option>
-                                 <option><value>uk</value><name>United Kingdom</name></option>
-                                 <option><value>us</value><name>United States</name></option>
-                        </options>
-                </field>
-                <field>
-                        <fielddescr>Optional AV database update servers</fielddescr>
-                        <fieldname>avupdateserver</fieldname>
-                        <description>Enter here space separated AV update servers, or leave empty.</description>
-                        <type>textarea</type>
-                        <cols>60</cols>
-                        <rows>5</rows>
-                </field>
-                <field>
-                        <fielddescr>Log</fielddescr>
-                        <fieldname>avsetlog</fieldname>
-                        <description>Check this for enable log.</description>
-                        <type>checkbox</type>
-                        <enablefields>avsetsyslog</enablefields>
-                </field>
-                <field>
-                        <fielddescr>SysLog</fielddescr>
-                        <fieldname>avsetsyslog</fieldname>
-                        <description>Check this for enable SysLog.</description>
-                        <type>checkbox</type>
-                </field>
-        </fields>
-        <custom_php_command_before_form>
-		havp_before_form($pkg);
-        </custom_php_command_before_form>
-        <custom_php_validation_command>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	havp_avset.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009-2010 Sergey Dvoriancev <dv_serg@mail.ru>
+	Copyright (C) 2014 Andrew Nikitin <andrey.b.nikitin@gmail.com>.
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<name>havpavset</name>
+	<title>Antivirus: Settings</title>
+	<category>Status</category>
+	<include_file>/usr/local/pkg/havp.inc</include_file>
+	<tabs>
+		<tab>
+			<text>General Page</text>
+			<url>/antivirus.php</url>
+		</tab>
+		<tab>
+			<text>HTTP Proxy</text>
+			<url>/pkg_edit.php?xml=havp.xml</url>
+		</tab>
+		<!--
+		<tab>
+			<text>Files Scanner</text>
+			<url>/pkg_edit.php?xml=havp_fscan.xml</url>
+		</tab>
+		-->
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=havp_avset.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>HAVP Log</text>
+			<url>/havp_log.php</url>
+			</tab>
+		</tabs>
+	<fields>
+		<field>
+			<fielddescr>ClamAV Database Update</fielddescr>
+			<fieldname>havpavupdate</fieldname>
+			<description>
+				<![CDATA[
+				<input name='submit' type='submit' value='Update_AV' />
+				Press button to update AV databases now.
+				]]>
+			</description>
+			<type>select</type>
+			<value>hv_none</value>
+			<options>
+				<option><name>none	  </name><value>0</value></option>
+				<option><name>every 1  hours</name><value>1</value></option>
+				<option><name>every 2  hours</name><value>2</value></option>
+				<option><name>every 3  hours</name><value>3</value></option>
+				<option><name>every 4  hours</name><value>4</value></option>
+				<option><name>every 6  hours</name><value>5</value></option>
+				<option><name>every 8  hours</name><value>6</value></option>
+				<option><name>every 12 hours</name><value>7</value></option>
+				<option><name>every 24 hours</name><value>8</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Regional AV Database Update Mirror</fielddescr>
+			<fieldname>dbregion</fieldname>
+			<description>Select regional database mirror.</description>
+			<type>select</type>
+			<value></value>
+			<options>
+				<option><value></value><name>-----</name></option>
+				<option><value>au</value><name>Australia</name></option>
+				<option><value>eu</value><name>Europe</name></option>
+				<option><value>ca</value><name>Canada</name></option>
+				<option><value>cn</value><name>China</name></option>
+				<option><value>id</value><name>Indonesia</name></option>
+				<option><value>jp</value><name>Japan</name></option>
+				<option><value>kr</value><name>Korea</name></option>
+				<option><value>ml</value><name>Malaysia</name></option>
+				<option><value>ru</value><name>Russian</name></option>
+				<option><value>sa</value><name>South Africa</name></option>
+				<option><value>tw</value><name>Taiwan</name></option>
+				<option><value>uk</value><name>United Kingdom</name></option>
+				<option><value>us</value><name>United States</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Optional AV Database Update Servers</fielddescr>
+			<fieldname>avupdateserver</fieldname>
+			<description>
+				<![CDATA[
+				Enter space-separated ClamAV update servers here, or leave empty.<br />
+				Note: For official update mirrors, use db.XY.clamav.net format. (Replace XY with your <a href="http://www.iana.org/domains/root/db">country code</a>.)
+				]]>
+			</description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>5</rows>
+		</field>
+		<field>
+			<fielddescr>Log</fielddescr>
+			<fieldname>avsetlog</fieldname>
+			<description>Check this to enable AV logging.</description>
+			<type>checkbox</type>
+			<enablefields>avsetsyslog</enablefields>
+		</field>
+		<field>
+			<fielddescr>SysLog</fielddescr>
+			<fieldname>avsetsyslog</fieldname>
+			<description>Check this to enable AV logging to syslog.</description>
+			<type>checkbox</type>
+		</field>
+	</fields>
+	<custom_php_validation_command>
 		havp_validate_settings($_POST, $input_errors);
-        </custom_php_validation_command>
-        <custom_php_resync_config_command>
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
 		havp_avset_resync();
-        </custom_php_resync_config_command>
-        <custom_php_install_command>
-        </custom_php_install_command>
-        <custom_php_deinstall_command>
-        </custom_php_deinstall_command>
+	</custom_php_resync_config_command>
 </packagegui>
