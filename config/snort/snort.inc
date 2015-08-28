@@ -3748,8 +3748,8 @@ function snort_sync_on_changes() {
 		$syncdownloadrules = $snort_sync['vardownloadrules'];
 		switch ($synconchanges){
 			case "manual":
-				if (is_array($snort_sync[row])){
-					$rs=$snort_sync[row];
+				if (is_array($snort_sync['row'])){
+					$rs=$snort_sync['row'];
 				}
 				else{
 					log_error("[snort] xmlrpc sync is enabled but there are no hosts configured as replication targets.");
