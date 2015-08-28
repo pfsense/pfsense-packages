@@ -1,0 +1,103 @@
+
+<?php
+error_reporting(0);
+include_once("/usr/local/appsbypacketapps/AppInstaller");
+
+function formatName($url,$key){
+	$url_explode = explode('/',$url);
+	$archive = $url_explode[count($url_explode)-1];
+	$decomp = explode('.',$archive);
+	$basename = $decomp[0];
+	return str_replace($key,'',$basename);
+}
+
+function getMount(){
+	$mount = 'write';
+	exec('mount',$out);
+	foreach( $out as $line ){
+		if( strpos($line,' / ') != false){
+			if( strpos($line,'read-only') !== false && $mount == 'write' ){
+				$mount = 'only';
+			}
+		}
+		if( strpos($line,' /cf ') != false ){
+			if( !strpos($line,'read-only') && $mount == 'only' ){
+				$mount = 'write';
+			}
+		}
+	}
+	return $mount;
+}
+
+
+
+$key = $_GET['key'];
+if($key != "") {
+	if( strlen($key) != 5 ){
+		echo json_encode(array('result' => 0, 'text' => 'Invalid setup key' ));
+	}
+
+	$dns = "https://packetapps.com/php";
+	$id = trim(file_get_contents("/usr/local/appsbypacketapps/.device/id"));
+	$url = "/app/register/device/".$id."/getpackage";
+	$ch = curl_init();
+	curl_setopt($ch,CURLOPT_URL,$dns.$url);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+	curl_setopt($ch, CURLOPT_HEADER, false);
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	$fields = array(
+		'key' => urlencode($key),
+	);
+	curl_setopt($ch,CURLOPT_POST, count($fields));
+	curl_setopt($ch,CURLOPT_POSTFIELDS, $fields);
+	$result = curl_exec($ch);
+	curl_close($ch);
+	$archives = json_decode($result);
+	if( is_array($archives) ){
+		print(json_encode(array('result' => 1, 'text' => "Package installation is above to start.")));
+		//Ecriture dans les logs
+		$conf = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+		$pkgs = $conf['arg_list'];
+		$pkgs = $archives;		
+		$conf['arg_list'] = $pkgs;
+		$mount = getMount();
+		conf_mount_rw();
+		file_put_contents('/usr/local/appsbypacketapps/config.json',json_encode($conf));
+		if( $mount == 'only' ){
+			conf_mount_ro();
+		}
+	} else {
+		if( $result == false ){
+			echo json_encode(array('result' => 0, 'text' => 'It seems connection with packetapps.com is impossible'));
+		} else {
+			echo json_encode(array('result' => 0, 'text' => $result ));
+		}	
+	}
+} else {
+	$conf = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+	$archives = $conf['arg_list'];
+	foreach( $archives as $url){
+		$archive_name = basename($url);
+		$name_length = strlen($archive_name);
+		$name = substr($archive_name,0,$name_length-12);
+		$installer = new AppInstaller($url,$key);
+		$res = $installer->install();
+		if( $res !== false ){
+		
+		} else {
+			//echo json_encode(array('result' => 0, 'text' => "Error during installation of ".$name."<br/>Installation canceled"));
+			$begining = array_slice($archives, 0, array_search($url,$archives)+1,true);
+			foreach( $begining as $pkg ){
+				$installer = new AppInstaller($pkg,$key);
+				$installer->uninstall(true);
+			}
+			$installer->writeInstallLogs("#end#");
+			exit(1);
+		}
+	}
+	$conf = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+	unset($conf['arg_list']);
+	file_put_contents('/usr/local/appsbypacketapps/config.json',json_encode($conf));
+	$installer->writeInstallLogs("#end#");
+}
+?>

@@ -1,0 +1,396 @@
+<?php
+set_time_limit(900);
+ini_set('max_execution_time', 900);
+
+
+$statusurl = "status_captiveportal.php";
+$logurl = "diag_logs_auth.php";
+
+require("guiconfig.inc");
+require_once("/etc/inc/functions.inc");
+
+//on debloque l'installation si c'est le cas
+$app = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+
+
+include("head.inc");
+
+function niceName($name){
+		$name = str_replace('_',' ',$name);
+		if( !ctype_upper ( substr($name,0,1) ) ){
+				return strtoupper(substr($name,0,1)).substr($name,1);
+		}
+		else{
+				return $name;
+		}
+}
+?>
+<?php include("fbegin.inc"); ?>
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC" style="background-color:#7F7F7F">
+	<link rel='stylesheet' href='./css/bootstrap.css'/>
+	<style>
+		.logo {height:48px;border-radius:5px;margin-right:10px;vertical-align:middle;border:0;}
+		h4 {color: #0088cc;font-size: 1.4em;font-weight: 400;letter-spacing: normal;line-height: 27px;margin: 0 0 14px 0;}
+		h4 small {font-size:75%;font-weight: normal;line-height: 1;color: #999999;}
+		#right {padding-bottom:0px !important;}
+		.breadcrumb > li + li:before {display: inline;font-size: 16px;height: auto;content: ">";font-weight: 300;text-shadow: none;padding: 0 5px;}
+		.ui-tooltip {padding: 8px;position: absolute;z-index: 9999;-webkit-box-shadow: 0 0 5px #aaa;box-shadow: 0 0 5px #aaa;}
+		body .ui-tooltip {border-width: 2px;}
+		#preloader-1 {position:relative;}
+		#preloader-1 span {position:absolute;border: 8px solid #2187e7;border-top: 8px solid transparent;border-radius:999px;}
+		#preloader-1 span:nth-child(1){width:80px;height:80px;animation: spin-1 2s infinite linear;}
+		#preloader-1 span:nth-child(2){top: 20px;left: 20px;width:40px;height:40px;animation: spin-2 3s infinite linear;}
+		@keyframes spin-1 {0% {transform: rotate(360deg); opacity: 1;}50% {transform: rotate(180deg); opacity: 0.5;}100% {transform: rotate(0deg); opacity: 1;}}
+		@keyframes spin-2 {0% {transform: rotate(0deg); opacity: 0.5;}50% {transform: rotate(180deg); opacity: 1;}100% {transform: rotate(360deg); opacity: 0.5;}}
+	</style>
+<script language="javascript" src="javascript/jquery-1.11.1.min.js"></script>
+<script language="javascript" src="javascript/jquery/jquery-ui-1.11.1.min.js"></script>
+<script>
+jQuery(document).ready(function() {
+		//hide '?' button
+		jQuery('img[alt=\"help\"]').parent().css('display','none');
+		var refreshLog;
+
+		function startLog(title){
+			jQuery('#LogTitle').text("");
+			jQuery("#Log").text("");
+			jQuery('#done').fadeOut();
+			jQuery('#preloader-1').fadeIn();
+			jQuery("#LogTitle").text(title);
+			jQuery("#LogTitleDiv").fadeIn(function(){
+				jQuery("#Log").fadeIn(function(){
+					refreshLog = window.setInterval(function(){
+										jQuery.ajax({
+											url: "system_apps_by_packetapps_get_log.php",
+											type: "POST",
+											dataType : "json",
+											success: function(products){
+												if ( products['finish'] == '1' ) {
+													writeLog(products['text']);
+													finishLog();
+													jQuery('#preloader-1').fadeOut(function(){
+														jQuery('#done').fadeIn();
+													});
+												}
+												else{
+													if ( products['text'][0] != "" ) {
+														writeLog(products['text']);
+													}
+												}
+											}
+										});
+								}, 100);
+				});
+			});
+		}
+
+
+		function writeLog(text){
+			jQuery("#Log").html(text.join('<br/>'));
+		}
+
+		function openPop(title,install,product_name){
+			jQuery('#popin').fadeIn(function(){
+				jQuery('#contented').fadeIn(function(){
+					if(install == 1) {
+						jQuery.ajax({
+							url : "system_apps_by_packetapps_send_license.php",
+							data : "key="+"&rdm="+Math.random(),
+							dataType : 'json',
+							type : 'GET',
+							success : function(res){}
+						});
+					} else {
+						var data = 'pkg='+product_name+"&rdm="+Math.random()+"&pass=2";
+						jQuery.ajax({
+							url : "system_apps_by_packetapps_uninstall.php",
+							data : data,
+							dataType : 'json',
+							type : 'GET',
+							success :function(res){}
+						});					
+					}
+					startLog(title);
+				});
+			});
+		}
+
+		function finishLog(){
+			clearInterval(refreshLog);
+		}
+
+
+		jQuery(document).on( 'click','#done',function(){
+				jQuery(this).fadeOut();
+				jQuery('#popin').fadeOut(function(){
+					jQuery("#LogTitleDiv").fadeOut(function(){
+						jQuery("#Log").fadeOut(function(){
+							jQuery('#contented').fadeOut(function(){
+								window.location.reload();
+							});
+						});
+					});
+				});
+			}
+		);
+
+
+		jQuery(document).on('click','#license_button',function(){
+			var key = jQuery.trim(jQuery("#license_key").val());
+			if ( !(key.length==5) ) {
+				jQuery("#license").html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'>Invalid setup key</span></div>");
+				window.setTimeout(function(){
+					jQuery('#license').fadeOut(function(){
+						jQuery('#license').html("<div class='col-xs-12'>\
+													<div style='text-align:center;margin-bottom:20px;'>\
+														<span style='color:#08C;'><a href='https://packetapps.com/browse-apps.php'>You first need to browse and subscribe to a product online.</a></span>\
+													</div>\
+													<div style='text-align:center;'>\
+														<span style='margin-right:15px;color:#08C;'>Then copy/paste your setup key here :</span>\
+														<input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/>\
+														<button id='license_button' class='btn btn-info'>Install now</button>\
+													</div>\
+												</div>").fadeIn();
+					})
+				},2000);
+			}
+			else{
+				//passé la div licence en mode, installation d'un package et faire un affichage à l'install package natif pfsense
+				jQuery("#license").html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'>The app request has been made, wait for validation</span></div>");
+				var data = "key="+key+"&rdm="+Math.random();
+				jQuery.ajax({
+						url : "system_apps_by_packetapps_send_license.php",
+						data : data,
+						dataType : 'json',
+						type : 'GET',
+						success : function(res){
+							if( res['result'] == 1 ){
+								openPop('Package Installation',1,"");
+							}
+							jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'>"+res['text']+"</span></div>");
+							window.setTimeout(function(){
+								jQuery('#license').fadeOut(function(){
+									jQuery('#license').html("<div class='col-xs-12'>\
+																<div style='text-align:center;margin-bottom:20px;'>\
+																	<span style='color:#08C;'><a href='https://packetapps.com/browse-apps.php'>You first need to browse and subscribe to a product online.</a></span>\
+																</div>\
+																<div style='text-align:center;'>\
+																	<span style='margin-right:15px;color:#08C;'>Then copy/paste your setup key here :</span>\
+																	<input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/>\
+																	<button id='license_button' class='btn btn-info'>Install now</button>\
+																</div>\
+															</div>").fadeIn();
+								})
+							},5000);
+						},
+						error : function(){
+									jQuery('#license').html("<div class='col-xs-12'>\
+																<div style='text-align:center;margin-bottom:20px;'>\
+																	<span style='color:#08C;'><a href='https://packetapps.com/browse-apps.php'>You first need to browse and subscribe to a product online.</a></span>\
+																</div>\
+																<div style='text-align:center;'>\
+																	<span style='margin-right:15px;color:#08C;'>Then copy/paste your setup key here :</span>\
+																	<input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/>\
+																	<button id='license_button' class='btn btn-info'>Install now</button>\
+																</div>\
+															</div>").fadeIn();
+								}
+				});
+			}
+		});
+
+
+		jQuery(document).on('click','.deinstall',function(){
+
+			var product = jQuery(this).parent().parent();
+			var product_name = product.attr('id');
+			var r = confirm("Are you sure you really want to uninstall "+product_name);
+			if (r == true) {
+				var data = 'pkg='+product_name+"&rdm="+Math.random()+"&pass=1";
+				jQuery.ajax({
+						url : "system_apps_by_packetapps_uninstall.php",
+						data : data,
+						dataType : 'json',
+						type : 'GET',
+						success :function(res){
+							if( res['result'] == 1 ){
+								openPop('Package Uninstallation',0,product_name);
+							}
+							jQuery('#license').html("<div  class='row' style='text-align:center;margin-bottom:20px;'><span style='color:#08C;'>"+res['text']+"</span></div>");
+							window.setTimeout(function(){
+								jQuery('#license').fadeOut(function(){
+									jQuery('#license').html("<div class='col-xs-12'>\
+																<div style='text-align:center;margin-bottom:20px;'>\
+																	<span style='color:#08C;'><a href='https://packetapps.com/browse-apps.php'>You first need to browse and subscribe to a product online.</a></span>\
+																</div>\
+																<div style='text-align:center;'>\
+																	<span style='margin-right:15px;color:#08C;'>Then copy/paste your setup key here :</span>\
+																	<input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/>\
+																	<button id='license_button' class='btn btn-info'>Install now</button>\
+																</div>\
+															</div>").fadeIn();
+												})
+							},5000);
+						},
+						error :function(){
+								jQuery('#license').html("<div class='col-xs-12'>\
+															<div style='text-align:center;margin-bottom:20px;'>\
+																<span style='color:#08C;'><a href='https://packetapps.com/browse-apps.php'>You first need to browse and subscribe to a product online.</a></span>\
+															</div>\
+															<div style='text-align:center;'>\
+																<span style='margin-right:15px;color:#08C;'>Then copy/paste your setup key here :</span>\
+																<input id='license_key' type='text' placeholder='Setup key.' style='text-align:center;margin-right:15px;'/>\
+																<button id='license_button' class='btn btn-info'>Install now</button>\
+															</div>\
+														</div>").fadeIn();
+								}
+				});
+			}
+
+		});
+
+		jQuery(document).on('click','.help',function(){
+			window.location.replace("https:///packetapps.com/help.php");
+		});
+
+		$(document).tooltip({
+			items: ".tooltip-button",
+			content: function() {
+				var element = $(this).attr('data-tooltip');
+				return element;
+			},
+			position: { my: "center top", at: "center bottom" },
+			open: function (event, ui) {
+				ui.tooltip.css("max-width", "1000px");
+
+			}
+		});
+
+		jQuery(window).load(function(){
+			jQuery('a').each(function(){
+				href = jQuery(this).attr('href');
+				if ( href == undefined ) {
+					jQuery(this).contents().unwrap();
+				}
+			});
+		});
+});
+
+
+
+
+</script>
+    <div class="row">
+		<div style='text-align:center;margin-bottom:10px;height:100px;'>
+			<img src='logo/logo.png' class='col-xs-3' alt='Apps by Packetapps.com' style='width:21%'/>
+			<div class="col-xs-9" style='margin-top:30px;'>
+				<span style='color:#08C;'>PacketApps.com is a marketplace for apps, services, and hardware. <a href='https://packetapps.com/browse-apps.php'>Go browse it !<a/></span>
+			</div>
+		</div>
+        <div class='row'>
+				<div class='col-xs-12'>
+					<hr style='margin-top:15px;margin-bottom : 25px;border: 0;height: 3px;background: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0));background-image: -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0));background-image: -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0));background-image: -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0))'></hr>
+				</div>
+		</div>
+		<!-- We start defining a div which check if the App was associated to a device on packetapps.com -->
+		<!-- how chek if device associated? -->
+
+
+		<!-- show list of installed package -->
+		<!-- also permit to add a new package via his license key -->
+		<div id="licences" style="padding:10px;margin-top:20px;margin-bottom:25px;text-align:center;">
+			<div class='row' style='text-align:center;'>
+				<div class='col-xs-12'>
+					<div style='margin-bottom:20px;'>
+						<?php
+						$config_app = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+						$pkgs = $config_app['apps']['packages'];
+						if( count($pkgs) == 0 ){ ?>
+								<span style='color:#08C;' id='list_title'>You currently don't have any app installed</span>
+						<?php }
+						else if( count($pkgs) == 1 ){ ?>
+								<span style='color:#08C;' id='list_title'>Currently installed app</span>
+						<?php }
+						else{ ?>
+								<span style='color:#08C;' id='list_title'>Currently installed apps</span>
+						<?php } ?>
+					</div>
+					<div id='prodList' style='margin-left:5px;'>
+						<?php foreach( $pkgs as $pkg ){ ?>
+							<div class='col-xs-6'>
+								<div id="<?php echo $pkg['name'];?>" style="display:inline-block;border: 1px solid #EDEDED;text-align:center;border-radius:5px;padding:5px 20px 5px 20px;margin:5px;background:#FAFAFA;box-shadow: 0px 0px 8px rgba(0,0,0,0.3);">
+									<div>
+										<h4 style='text-align:left;'><img class='logo' src='logo/<?php echo str_replace(' ','_',$pkg['name']);?>'><?php echo niceName($pkg['name']);?>  <small>( v<?php echo $pkg['version'];?> )</small></h4>
+									</div>
+									<div>
+										<p style='text-align:justify;color:#777;'>
+											<?php echo $pkg['synopsis'];?>
+										</p>
+									</div>
+									<div>
+										<a href="<?php echo $pkg['index'];?>"><button class='btn-success' style='float:left;border-radius:5px'>Administrate</button></a>
+										<button class="deinstall btn-danger" style='float:right;border-radius:5px'>Uninstall</button>
+									</div>
+								</div>
+							</div>
+						<?php } ?>
+					</div>
+				</div>
+			</div>
+			<!-- License add div -->
+			<div class='row' id="license" style='margin-top:30px';>
+				<div class='col-xs-12'>
+					<div style='text-align:center;margin-bottom:20px;'>
+						<span style='color:#08C;'><a href='https://packetapps.com/browse-apps.php'>You first need to browse and subscribe to a product online.</a></span>
+					</div>
+					<div style='text-align:center;'>
+						<span style='margin-right:15px;color:#08C;'>Then copy/paste your setup key here :</span>
+						<input id="license_key" type="text" placeholder='Setup key.' style='text-align:center;margin-right:15px;'/>
+						<button id="license_button" class='btn btn-info'>Install now</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr style='margin-top:15px;margin-bottom : 25px;border: 0;height: 3px;background: -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0));background-image: -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0));background-image: -ms-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0));background-image: -o-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.20), rgba(0,0,0,0))'></hr>
+		<div id='footer-app' style="margin-top:25px;">
+			<div class='col-xs-4'>
+				<center>
+					<a href="https://packetapps.com/faq.php" target='_blank'><button class="btn btn-info btn-xs">Common questions</button></a>
+				</center>
+			</div>
+			<div class='col-xs-4'>
+				<center>
+					<a href='https://packetapps.com/forum.php' target='_blank'><button class="btn btn-info btn-xs">Packet Apps Forum</button></a>
+				</center>
+			</div>
+			<div class='col-xs-4'>
+				<center>
+					<a href='https://packetapps.com/dashboard.php' target='_blank'><button class="btn btn-info btn-xs">My dashboard</button></a>
+				</center>
+			</div>
+		</div>
+		<div id="popin" style="display:none; opacity: 0.5; position: fixed; top: 0px; left: 0px; bottom: 0px; right: 0px; z-index: 2000; background-color: black;" width="100%" height="100%"></div>
+		<style>
+			#contented {display:inline-block;}
+		</style>
+		<div id="contented" style="display:none; position: relative;min-height:200px;z-index: 2001;background-color:white;opacity:0.9;top: -400px;color: #777;width:100%;border:10px solid #0088CC;border-radius:5px;">
+			<div id='LogTitleDiv' style="padding: 20px;margin-bottom:20px;">
+				<div class='col-xs-10'>
+					<b>
+						<p style='color: #777;padding:30px;font-size:20px;vertical-align:middle;' id='LogTitle'></p>
+						<p name="output" id="Log"></p>
+					</b>
+				</div>
+				<div class='col-xs-2'>
+					<div id="preloader-1" style="margin-top:20px;">
+						<span></span>
+						<span></span>
+					</div>
+					<button id='done'  style='display:none;margin-top:30px;' class='btn btn-info'>Done</button>
+				</div>
+			</div>
+		</div>
+	</div>
+<?php include("fend.inc"); ?>
+</body>
+</html>

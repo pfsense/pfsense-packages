@@ -1732,5 +1732,18 @@
 		<required_version>2.2</required_version>
 		<configurationfile>ftpproxy.xml</configurationfile>
 	</package>
+	<package>
+		<name><![CDATA[Apps by PacketApps]]></name>
+		<pkginfolink>https://packetapps.com</pkginfolink>
+		<descr><![CDATA[Apps available on the PacketApps.com website. PacketApps.com is a collection of software, hardware, and services made by huge fans of your favorite firewall software. Go browse our website if you want to get, buy, or add your own app.<br/> Note: PacketApps.com is a service by Elonet, not a service by Electric Sheep Fencing, LLC.]]></descr>
+		<category>System</category>
+		<website>http://packetapps.com</website>
+		<version>1.0</version>
+		<status>release</status>
+		<required_version>2.2</required_version>
+		<config_file>https://packages.pfsense.org/packages/config/AppsByPacketApps/AppsByPacketApps.xml</config_file>
+		<maintainer>support@packetapps.com</maintainer>
+		<configurationfile>AppsByPacketApps.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
