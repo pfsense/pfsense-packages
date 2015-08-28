@@ -159,8 +159,8 @@ function tinc_save() {
 
 	if ($tincconf['enable'] != "") {
 		restart_service("tinc");
-	} elseif (is_process_running("tincd")); {
-			stop_service("tinc");
+	} elseif (is_process_running("tincd")) {
+		stop_service("tinc");
 	}
 
 	rmdir_recursive("/usr/local/etc/tinc.old");
