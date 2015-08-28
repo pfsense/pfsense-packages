@@ -524,18 +524,11 @@ function havp_reconfigure_cron() {
 	$on = ($opt[1] !== "");
 	$crontask = "/usr/bin/nice -n20 " . HVDEF_AVUPD_SCRIPT;
 
-	// Delete old cron task if it exists
-	if (is_array($config['cron']['item'])) {
-		foreach ($config['cron']['item'] as $item) {
-			if (strpos($item['command'], $crontask) !== false) {
-				install_cron_job($crontask, false);
-			}
-		}
-	}
-
-	// Set new cron task
+	// Set new cron task or remove it if inactive
 	if ($on === true) {
 		install_cron_job($crontask, $on, $opt);
+	} else {
+		install_cron_job($crontask, false);
 	}
 }
 /*
