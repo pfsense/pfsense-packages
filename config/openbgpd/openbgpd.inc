@@ -319,14 +319,6 @@ function openbgpd_put_raw_config($conffile) {
 	}
 }
 
-function deinstall_openbgpd() {
-	global $config, $g;
-
-	exec("rm /usr/local/etc/rc.d/bgpd.sh");
-	exec("rm /usr/local/www/openbgpd_status.php");
-	exec("killall bgpd");
-}
-
 function check_group_usage($groupname) {
 	global $config, $g;
 

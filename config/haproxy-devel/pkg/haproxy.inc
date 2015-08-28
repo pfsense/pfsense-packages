@@ -380,10 +380,6 @@ function haproxy_custom_php_install_command() {
 	$static_output .= "HAProxy, running haproxy_custom_php_install_command()\n";
 	update_output_window($static_output);
 	
-	$static_output .= "HAProxy, conf_mount_rw\n";
-	update_output_window($static_output);
-	conf_mount_rw();
-	
 	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 	if ($pf_version == "2.1" || $pf_version == "2.2")
 		$haproxy_binary = "/usr/pbi/haproxy-devel-" . php_uname("m") . "/sbin/haproxy";
@@ -487,10 +483,6 @@ EOD;
 	// this avoids a problem with php cache that loaded haproxy.inc during uninstalling the old version
 	require_once('haproxy_upgrade_config.inc'); 
 	haproxy_upgrade_config();
-	
-	$static_output .= "HAProxy, conf_mount_ro\n";
-	update_output_window($static_output);
-	conf_mount_ro();
 	
 	$static_output .= "HAProxy, starting haproxy (if previously enabled)\n";
 	update_output_window($static_output);

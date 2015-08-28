@@ -150,6 +150,9 @@
 	<custom_php_install_command>
 		baculaclient_custom_php_install_command();
 	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		baculaclient_custom_php_deinstall_command();
+	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 		baculaclient_custom_php_write_config();
 	</custom_php_resync_config_command>

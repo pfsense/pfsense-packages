@@ -179,7 +179,6 @@
 		nrpe2_custom_php_service();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		nrpe2_custom_php_deinstall_command();
 		nrpe2_custom_php_write_config();
 	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>

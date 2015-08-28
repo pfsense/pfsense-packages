@@ -84,9 +84,6 @@
 	<custom_php_install_command>
 		asterisk_install();
 	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		asterisk_deinstall();
-	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 		sync_package_asterisk();
 	</custom_php_resync_config_command>

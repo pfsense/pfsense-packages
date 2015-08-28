@@ -51,7 +51,6 @@ define('NRPE_RCFILE', '/usr/local/etc/rc.d/nrpe2.sh');
 
 function nrpe2_custom_php_install_command() {
 	global $g, $config;
-	conf_mount_rw();
 	$NRPE_BASE = NRPE_BASE;
 	$NRPE_CONFIG_DIR = NRPE_CONFIG_DIR;
 
@@ -159,14 +158,6 @@ EOD;
 	fclose($fd);
 	chmod(NRPE_RCFILE, 0755);
 
-	conf_mount_ro();
-}
-
-function nrpe2_custom_php_deinstall_command() {
-	global $g, $config;
-	conf_mount_rw();
-
-	conf_mount_ro();
 }
 
 function nrpe2_custom_php_write_config() {

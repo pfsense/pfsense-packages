@@ -81,7 +81,4 @@
 	<custom_php_install_command>
 		phpservice_install_command();
 	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		phpservice_deinstall_command();
-	</custom_php_deinstall_command>
 </packagegui>

@@ -622,7 +622,6 @@ EOF;
 
 function vhosts_install_command() {
 	global $config;
-	conf_mount_rw();
 	safe_mkdir("/usr/local/vhosts/");
 
 	write_rcfile(array(
@@ -637,13 +636,9 @@ function vhosts_install_command() {
 
 
 function vhosts_deinstall_command() {
-	conf_mount_rw();
-	stop_service("vhosts-http");
-	unlink_if_exists("/usr/local/etc/rc.d/vhosts-http.sh");
 	exec("/bin/rm -f /usr/local/etc/rc.d/vhosts*");
 	exec("/bin/rm -f /var/etc/vhosts*");
 	exec("/bin/rm -rf /usr/local/www/packages/vhosts");
-	conf_mount_ro();
 }
 
 ?>

@@ -156,9 +156,6 @@
 	}
 
 	function deinstall_package_nut() {
-		stop_service("nut");
-
-		unlink_if_exists(NUT_RCFILE);
 		unlink_if_exists(NUT_DIR.'/upsmon.conf');
 		unlink_if_exists(NUT_DIR.'/ups.conf');
 		unlink_if_exists(NUT_DIR.'/upsd.conf');

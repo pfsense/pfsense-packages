@@ -69,7 +69,6 @@ function migrate_old_sync_config(){
 }
 function haproxy_custom_php_install_command() {
 	global $g, $config;
-	conf_mount_rw();
 
 	$haproxy = <<<EOD
 #!/bin/sh
@@ -118,7 +117,6 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 	migrate_old_sync_config();
-	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
 }

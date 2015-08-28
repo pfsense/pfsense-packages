@@ -52,7 +52,6 @@ function syslogng_get_real_interface_address($interface) {
 }
 
 function syslogng_install_command() {
-	conf_mount_rw();
 	if (is_link("/usr/local/lib/syslog-ng")) {
 		unlink("/usr/local/lib/syslog-ng");
 	}
@@ -60,20 +59,15 @@ function syslogng_install_command() {
 		@symlink(SYSLOGNG_BASEDIR . "local/lib/syslog-ng", "/usr/local/lib/syslog-ng");
 	}
 	syslogng_install_cron(true);
-	conf_mount_ro();
 	syslogng_resync();
 }
 
 function syslogng_deinstall_command() {
-	conf_mount_rw();
-	service_stop("syslog-ng");
-	unlink_if_exists("/usr/local/etc/rc.d/syslog-ng.sh");
 	if (is_link("/usr/local/lib/syslog-ng"))
 		unlink("/usr/local/lib/syslog-ng");
 	syslogng_install_cron(false);
 	unlink_if_exists("/usr/local/etc/logrotate.conf");
 	unlink_if_exists("/usr/local/etc/syslog-ng.conf");
-	conf_mount_ro();
 	filter_configure();
 }
 
