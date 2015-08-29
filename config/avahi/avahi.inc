@@ -223,7 +223,7 @@ function avahi_sync() {
 	}
 	avahi_write_config();
 	// Is package enabled?
-	if (($config['installedpackages']['avahi']['config'][0]['enable']) && file_exists("/usr/local/etc/rc.d/avahi-daemon.sh")) {
+	if ($config['installedpackages']['avahi']['config'][0]['enable']) {
 		start_service("avahi");
 	}
 }
