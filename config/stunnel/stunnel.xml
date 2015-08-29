@@ -1,71 +1,68 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    stunnel.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007-2008 Scott Ullrich
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	stunnel.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2007-2008 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>stunnel</name>
-	<version>4.18</version>
+	<version>5.20.2</version>
 	<title>Services: Secure Tunnel</title>
-	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>STunnel</name>
-		<tooltiptext>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote server. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the programs' code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, so stunnel supports whatever cryptographic algorithms you compiled into your crypto package.</tooltiptext>
+		<tooltiptext>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote server.
+		It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the programs' code.
+		It will negotiate an SSL connection using the OpenSSL or SSLeay libraries.
+		It calls the underlying crypto libraries, so stunnel supports whatever cryptographic algorithms you compiled into your crypto package.</tooltiptext>
 		<section>Services</section>
 		<configfile>stunnel.xml</configfile>
 	</menu>
-	
+	<include_file>/usr/local/pkg/stunnel.inc</include_file>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel_certs.xml</item>
 	</additional_files_needed>
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
 	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
-         
 	<tabs>
 		<tab>
 			<text>Tunnels</text>
@@ -77,9 +74,11 @@
 			<url>/pkg.php?xml=stunnel_certs.xml</url>
 		</tab>
 	</tabs>
-
-	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
-         items.  An example of this would be the nat page where you add new nat redirects -->         
+	<service>
+		<name>stunnel</name>
+		<rcfile>stunnel.sh</rcfile>
+		<executable>stunnel</executable>
+	</service>	
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
@@ -106,8 +105,6 @@
 			<fieldname>redirectport</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
 			<fielddescr>Description</fielddescr>
@@ -118,7 +115,7 @@
 		<field>
 			<fielddescr>Client Mode</fielddescr>
 			<fieldname>client</fieldname>
-			<description>Use client mode for this tunnel (i.e. connect to an SSL server, do not act as an SSL server)</description>
+			<description>Use client mode for this tunnel (i.e. connect to an SSL server, do not act as an SSL server).</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -128,7 +125,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Listen on port</fielddescr>
+			<fielddescr>Listen on Port</fielddescr>
 			<fieldname>localport</fieldname>
 			<description>Enter the local port to bind this redirection to.</description>
 			<type>input</type>
@@ -156,18 +153,12 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Outgoing source IP</fielddescr>
+			<fielddescr>Outgoing Source IP</fielddescr>
 			<fieldname>sourceip</fieldname>
 			<description>Enter the source IP address for outgoing connections.</description>
 			<type>input</type>
 		</field>
 	</fields>
-	<service>
-	  <name>stunnel</name>
-	  <rcfile>stunnel.sh</rcfile>
-	  <executable>stunnel</executable>
-	</service>
-	<include_file>/usr/local/pkg/stunnel.inc</include_file>
 	<custom_add_php_command_late>
 		stunnel_save($config);
 	</custom_add_php_command_late>
