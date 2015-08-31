@@ -185,7 +185,7 @@
 			<custom_name>haproxy-devel</custom_name>
 			<port>net/haproxy-devel</port>
 		</build_pbi>
-		<build_options>WITH_OPENSSL_PORT=yes;haproxy_UNSET_FORCE=DPCRE;haproxy_SET_FORCE=OPENSSL SPCRE LUA</build_options>
+		<build_options>WITH_OPENSSL_PORT=yes;net_haproxy-devel_UNSET_FORCE=DPCRE;net_haproxy-devel_SET_FORCE=OPENSSL SPCRE LUA</build_options>
 	</package>
 	<package>
 		<name>Apache with mod_security-dev</name>
