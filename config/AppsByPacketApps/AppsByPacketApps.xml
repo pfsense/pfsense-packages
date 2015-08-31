@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<packagegui>
+    <name><![CDATA[Apps by PacketApps]]></name>
+	<copyrights>Package created by Elonet</copyrights>
+	<description><![CDATA[Apps available on the PacketApps.com website. PacketApps.com is a collection of software, hardware, and services made by huge fans of your favorite firewall software. Go browse our website if you want to get, buy, or add your own app. Note: PacketApps.com is a service by Elonet, not a service by Electric Sheep Fencing, LLC.]]></description>
+	<!-- package for pfsense 2.2.1 -->
+	<requirements>2.2</requirements>
+	<faq>https://www.packetapps.com</faq>
+	<version>1.0</version>
+	<titre><![CDATA[Apps by PacketApps.com]]></titre>
+	<!-- install and uninstall function -->
+	<include_file>/usr/local/appsbypacketapps/AppsByPacketApps.inc</include_file>
+	<!-- menu place into pfsense -->
+	<menu>
+		<name>PacketApps.com</name>
+		<tooltiptext><![CDATA[Apps Manager for PacketApps.com]]></tooltiptext>
+		<section>System</section>
+		<url>/system_apps_by_packetapps.php</url>
+	</menu>
+	<!-- librairie bootstrap -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0777</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/bootstrap</item>
+	</additional_files_needed>
+	<!-- logo packetapps -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0777</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/logo.png</item>
+	</additional_files_needed>
+	<!-- install and uninstall functions file to download -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/AppsByPacketApps.inc</item>
+	</additional_files_needed>
+	<!-- log reloader for app install file -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/getAppsLog</item>
+	</additional_files_needed>
+	<!-- blenc php library for 32 bits arch -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/blenc_i386.so</item>
+	</additional_files_needed>
+	<!-- blenc php library for 64 bits arch -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/blenc_amd64.so</item>
+	</additional_files_needed>
+	<!-- main gui php file -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/main</item>
+	</additional_files_needed>
+	<!-- application installer php file -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/send_license</item>
+	</additional_files_needed>
+	<!-- Installer php class file -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0644</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/AppInstaller</item>
+	</additional_files_needed>
+	<!-- php reloader script ( use during Apps install ) -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/finish_blenc.sh</item>
+	</additional_files_needed>
+	<!-- application uninstall file -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/uninstall</item>
+	</additional_files_needed>
+	<!-- bash script to delete old log -->
+	<additional_files_needed>
+		<prefix>/usr/local/appsbypacketapps/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/AppsByPacketApps/cleanLog.sh</item>
+	</additional_files_needed>
+	<!-- to delete old install log -->
+	<cron>
+		<minute>*</minute>
+		<hour>*</hour>
+		<mday>*</mday>
+		<month>*</month>
+		<wday>6</wday>
+		<who>root</who>
+		<command>/bin/sh /usr/local/appsbypacketapps/cleanLog.sh</command>
+	</cron>
+
+	<!-- Apps install command -->
+	<custom_php_install_command>app_install();</custom_php_install_command>
+	<!-- Apps uninstall command -->
+	<custom_php_deinstall_command>app_deinstall();</custom_php_deinstall_command>
+</packagegui>

@@ -1,0 +1,22 @@
+<?php
+	require_once("globals.inc");
+	require_once("pfsense-utils.inc");
+	require_once("pkg-utils.inc");
+	require_once("config.lib.inc");
+	require_once("services.inc");
+	$text=file_get_contents("/usr/local/appsbypacketapps/logs/Installer.log");
+
+	$text_to_send = explode(PHP_EOL,$text);
+	if( strpos($text,'Restarting PHP') !== false || strpos($text,'#end#') !== false){
+		if( $text_to_send[count($text_to_send)-1] === '#end#' ){
+			unset($text_to_send[count($text_to_send)-1]);
+		}
+		conf_mount_rw();
+		file_put_contents("/usr/local/appsbypacketapps/logs/Installer.log","");
+		conf_mount_ro();
+		echo json_encode(array('finish' => 1, 'text' => $text_to_send));
+	}
+	else{
+		echo json_encode(array('finish' => 0, 'text' => $text_to_send));
+	}
+?>

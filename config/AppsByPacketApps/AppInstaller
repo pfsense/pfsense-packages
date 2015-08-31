@@ -1,0 +1,1265 @@
+<?php
+
+require_once("globals.inc");
+require_once("pfsense-utils.inc");
+require_once("pkg-utils.inc");
+require_once("config.lib.inc");
+require_once("services.inc");
+
+/*
+ * Handle application install and uninstall for PacketApps application
+ */
+class AppInstaller {
+	
+	/*
+	 * Setup key
+	 */
+	private $key;
+	/*
+	 * Application name
+	 */
+	private $name;
+	/*
+	 * Application archive list url
+	 */
+	private $url;
+	/*
+	 * path of downloaded archive
+	 */
+	private $pathArchive;
+	/*
+	 * Domain url of packetapps
+	 */
+	private $dnsToContact;
+	/*
+	 * Installation folder into apps root folder
+	 */
+	private $pathInstall;
+	/*
+	 * path to install decompressed data
+	 */
+	private $pathDecompress;
+	/*
+	 * Lock to prevent double install
+	 */
+	private $lock;
+	/*
+	 * App configuration variables
+	 */
+	private $app;
+	
+	/*
+	 * Mount configuration
+	 */
+	private $mount;
+	
+	public function __construct($urlOrName,$key=null){
+		$this->getMount();
+		conf_mount_rw();
+		$this->app = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+		$this->lock = $this->app['apps']['lock'];
+		file_put_contents("/usr/local/appsbypacketapps/logs/Installer.log","");
+		$this->key = $key;
+		$this->archiveName = trim(basename($urlOrName));
+		$this->name = str_replace('.tar.gz','',$this->archiveName);
+		$this->name = str_replace(trim($this->key),'',$this->name);
+		$this->url = $urlOrName;
+		$this->pathArchive = '/tmp/app/';
+		$this->dnsToContact = "https://packetapps.com";
+		$this->pathDecompress = '/usr/local/appsbypacketapps/';
+		$this->pathInstall = $this->pathDecompress.$this->name;
+		// No php warining with echo
+		error_reporting(0);
+		if( !$this->isMountWrite()){
+			conf_mount_ro();
+		}
+	}
+	
+	
+	/*
+	 * Always try to install two times if first fail
+	 */
+	public function install(){
+		while( $this->isLock() ){
+			$this->writeInstallLogs("Apps Installer is lock. Please wait a moment\n");
+			sleep(5);
+		}
+		try{
+			$this->lock();
+			conf_mount_rw();
+			$this->writeInstallLogs("Beginning package installation of ".$this->name.".\n");
+			// mount read and write filesystem
+			$this->writeInstallLogs("Read and write filesystem mounting...Done\n");
+			
+			$this->writeInstallLogs("First install try\n");
+			$res = $this->startInstall();
+			
+			if( $res !== false ){
+				$this->writeInstallLogs("Sending first install result ( &#9888; this step may take a moment )...");
+				$this->sendResult($res,true);
+				$this->writeInstallLogs("Done\n");
+				$this->writeInstallLogs("Package ".$this->name." Sucessfully installed\n");
+			}
+			else{
+				$this->name = trim(basename($this->url));
+				$this->writeInstallLogs("Second install try\n");
+				$res = $this->startInstall();
+				$this->writeInstallLogs("Sending second install result...");
+				$this->sendResult($res,true);
+				$this->writeInstallLogs("Done\n");
+				if( $res === false ){
+					$this->uninstall(false);
+				}
+				else{
+					$this->writeInstallLogs("Package ".$this->name." Successfully installed\n");
+				}
+			}
+			
+			// mount read only file system
+			if( !$this->isMountWrite()){
+				conf_mount_ro();
+				$this->writeInstallLogs("Read only filesystem mounting...Done\n");
+			}
+			
+			$this->writeInstallLogs("Restarting PHP\n");
+			$this->saveLog();
+			$this->unlock();
+			shell_exec("/usr/local/appsbypacketapps/finish_blenc.sh > /dev/null 2>&1 &"); 
+		}
+		catch( Exception $e){
+			$this->writeInstallLogs("#end#");
+			$this->saveLog();
+			$this->unlock();
+		}
+		return $res;
+	}
+	
+	/*
+	 * Install includes :
+	 * download archive
+	 * check if download is ok
+	 * decompress archive
+	 * get application infos
+	 * check files integrity with md5 file hash
+	 * check system version compatibility
+	 * put blenc keys if necessary
+	 * execute prinstall scripts
+	 * do a backup of configuration files ( declare into manifest )
+	 * copy data into install path
+	 * write application info into Apps config
+	 * write pfsense config with structure such as menu, service, create logfile, declare cron, modufy files
+	 * execute postinstall scripts
+	 * clean decompress archive and archive file
+	 * return application ID
+	 */
+	private function startInstall(){
+		global $config;
+		$ready = true;
+		$this->writeInstallLogs("Downloading application archive ( &#9888; this step may take a moment )...");
+		$this->downloadArchive();
+		$this->writeInstallLogs("Done\n");
+		$ready = $this->checkArchiveReady();
+		if( $ready ){
+				//first extract archive
+				$this->writeInstallLogs("Decompression of application's archive...");
+				$this->pathDecompress = $this->uncompress_pkg();
+				$this->writeInstallLogs("Done\n");
+				//get pkg infos 
+				$pkg_info = $this->get_info_pkg($this->pathDecompress);
+				$this->name = $pkg_info['name'];
+				$this->writeInstallLogs("Checking application files integrity...");
+				if( !$this->check_md5s($this->pathDecompress) ){
+					$this->writeInstallLogs("Error, a file seems to be corrupt\n");
+					return false;
+				}
+				$this->writeInstallLogs("Done\n");
+				$this->writeInstallLogs("Checking application system compatibility...");
+				if( !$this->isCompatible($pkg_info['required_version']) ){
+					$this->writeInstallLogs('Package '.$this->name.' is not supported on this version.\n');
+					return false;
+				}
+				else{
+					$this->writeInstallLogs("Done\n");
+					$this->writeInstallLogs("Copy secure keys...");
+					$this->insertBlencKeys();
+					$this->writeInstallLogs("Done\n");
+					
+					if( file_exists($this->pathDecompress."/scripts/preinstall/") ){
+						$this->writeInstallLogs("Executing preinstall scripts...");
+						$this->execScript('preinstall',$this->pathDecompress);
+						$this->writeInstallLogs("Done\n");
+					}
+
+				    $this->writeInstallLogs("Check for configration backups...");
+					$this->checkForConfigBackup();
+					$this->writeInstallLogs("Done\n");
+					$this->writeInstallLogs("Copying application files...");
+					if( $this->copyIntels() ){
+						$this->writeInstallLogs("Done\n");
+						$this->writeInstallLogs("Writing Apps configuration....");
+						$this->writeAppsConfig();
+						$this->writeInstallLogs("Done\n");
+						$this->writeInstallLogs("Writing pfSense&reg; softwares configuration....");
+						if( !$this->writePfSenseConfig() ){
+							$this->writeInstallLogs("...Error\n");
+							return false;
+						}
+						$this->writeInstallLogs("...Done\n");
+						if( file_exists($this->pathDecompress."/scripts/postinstall/") ){
+						    $this->writeInstallLogs("Executing postinstall scripts...");
+							$this->execScript('postinstall',$this->pathDecompress);
+							$this->writeInstallLogs("Done\n");
+						}
+						
+						$this->writeInstallLogs("Cleaning archive files...");
+						$this->cleanAll();
+						$this->writeInstallLogs("Done\n");
+						return $pkg_id;
+						
+					}
+					else{
+						$this->writeInstallLogs("Error\n");
+						$this->writeInstallLogs("Cleaning archive files...");
+						$this->cleanAll();
+						$this->writeInstallLogs("Done\n");
+						return false;
+					}
+					
+				}
+		}
+	}
+	
+	/*
+	 * uninstall includes :
+	 * do configuration file backup
+	 * delete cron, services, logs, installed files, remodify files, menus
+	 * execute uninstall scripts
+	 * write Apps configuration
+	 * delete logo
+	 * delete application manifest file, synopsis file, version file
+	 * delete root application folder
+	 */
+	public function uninstall($fromUrl=false){
+		while( $this->isLock() ){
+			$this->writeInstallLogs("Apps Installer is lock. Please wait a moment\n");
+			sleep(5);
+		}
+		try{
+			$this->lock();
+			if( $fromUrl ){
+				$this->name = substr($this->name,0,strlen($this->name)-15);
+			}
+			conf_mount_rw();
+			$this->writeInstallLogs("Beginning uninstall of ".$this->name."\n");
+			$this->writeInstallLogs("Read and write filesystem mounting...Done\n");
+			
+			$id = $this->get_id_pkg($this->name);		
+			
+			$this->writeInstallLogs("Check for configration backups...");
+			$this->checkForConfigBackup();
+			$this->writeInstallLogs("Done\n");
+			$this->writeInstallLogs("Removing application menu entries, services, crons and installed files ( &#9888; this step may take a moment )...");
+			$this->deleteCrons();
+			$this->deleteServices();
+			$this->deleteInstalledFiles();
+			$this->deleteLogs();
+			$this->unmodifyFiles();
+			$this->deleteMenus();
+			write_config('menu, log, service, cron, ext deps and modify file');
+			exec("rm /tmp/config.cache",$out);
+			$this->writeInstallLogs("Done\n");
+			$this->writeInstallLogs("Executing uninstall scripts...");
+			$this->execScript('uninstall');
+			$this->writeInstallLogs("Done\n");
+			
+			$this->writeInstallLogs("Writing Apps configuration...");
+			$this->writeAppsConfig(false);
+			$this->writeInstallLogs("Done\n");
+			
+			
+			$this->writeInstallLogs("Deleting application folders...");
+			if( file_exists("/usr/local/appsbypacketapps/".$this->name."/.id") ){
+				$packetapps_id = file_get_contents("/usr/local/appsbypacketapps/".$this->name."/.id");
+				if( $packetapps_id != null && $packetapps_id != "" && $packetapps_id != " " ) {
+					foreach( scandir('/usr/local/appsbypacketapps/.'.$packetapps_id) as $content ){
+						if( is_dir($content) && $content != "." && $content != ".."){
+							foreach( scandir($content) as $sub_content ){
+								if( $sub_content != "." && $sub_content != ".."){
+									unlink('/usr/local/appsbypacketapps/.'.$packetapps_id.'/'.$content."/".$sub_content); 
+								}
+							}
+							rmdir($content);
+						}
+						else{
+							if( $content != "." && $content !=".." ){
+								if( $content == "scripts" ){
+									exec('rm -R /usr/local/appsbypacketapps/.'.$packetapps_id.'/'.$content);
+								}
+								else{
+									unlink('/usr/local/appsbypacketapps/.'.$packetapps_id.'/'.$content);	
+								}
+							}
+						}
+					}
+					exec('rm -fR /usr/local/appsbypacketapps/.'.$packetapps_id);
+				}
+				
+				unlink('/usr/local/appsbypacketapps/'.$this->name."/.id");
+				if( count(scandir('/usr/local/appsbypacketapps/'.$this->name)) > 2 ){
+					exec('rm -R /usr/local/appsbypacketapps/'.$this->name);
+				}
+				else{
+					rmdir('/usr/local/appsbypacketapps/'.$this->name);
+				}
+			}
+			
+			@unlink('/usr/local/www/logo/'.str_replace(' ','_',$this->name));
+			$this->writeInstallLogs("Done\n");
+			
+			
+			
+			
+			if( !$this->isMountWrite()){
+				conf_mount_ro();
+				$this->writeInstallLogs("Read only filesystem mounting...Done\n");
+			}
+			$this->writeInstallLogs("Package ".$this->name." Successfull uninstalled\n");
+			$this->writeInstallLogs("Restarting PHP\n");
+			$this->unlock();
+			$this->saveLog();
+			shell_exec("/usr/local/appsbypacketapps/finish_blenc.sh > /dev/null 2>&1 &");
+		}
+		catch( Exception $e ){
+			$this->writeInstallLogs("#end#");
+			$this->saveLog();
+			$this->unlock();
+		}
+		return true;
+	}
+	
+	/*
+	 * check if configuration files need to be backed up into a folder
+	 * configuration files are declared into application manifest
+	 */
+	private function checkForConfigBackup(){
+		$pkgid = $this->get_id_pkg($this->name);
+		if( file_exists("/usr/local/appsbypacketapps/".$this->name."/.id") ){
+				$packetapps_id = file_get_contents("/usr/local/appsbypacketapps/".$this->name."/.id");
+				if($pkgid !== -1) { 
+					$manifest = simplexml_load_file("/usr/local/appsbypacketapps/.".$packetapps_id."/Manifest_package.xml");
+					$configs = $manifest->configurationfile;
+					if( count($configs) > 0 ){
+						@mkdir("/usr/local/appsbypacketapps/backups/".$this->name);
+						foreach( $configs as $config ){
+							$file = $config;
+							if( !file_exists($config)){
+								$file = "/usr/local/appsbypacketapps/".$this->name."/".$config;
+							}
+							
+							if( file_exists($file)){
+								$filename_explode = explode(".",basename($file));
+								$filename = $filename_explode[0];
+								$filext = $filename_explode[1];
+								$this->writeInstallLogs("Copy of ".$file." at "."/usr/local/appsbypacketapps/backups/".$this->name."/".$filename.time().$filext." ...");
+								if(copy($file,"/usr/local/appsbypacketapps/backups/".$this->name."/".$filename.time().$filext)){
+									$this->writeInstallLogs("Done\n");
+								}
+								else{
+									$this->writeInstallLogs("Error\n");
+								}
+							}
+						}
+						
+					}
+				}
+		}
+	}
+	
+	/*
+	 * Erase text from native pfsense file
+	 */
+	private function unmodifyFiles(){
+		$packetapps_id = file_get_contents($this->pathInstall.'/.id');
+		$pkg_info = $this->get_info_pkg($this->pathDecompress.'/.'.$packetapps_id);
+		if(!empty($pkg_info) ) {
+			/* system files */
+			if(is_array($pkg_info['modify_system']) && is_array($pkg_info['modify_system']['modifyitem'])) {
+				foreach($pkg_info['modify_system']['modifyitem'] as $ms)
+					if($ms['textneeded']) remove_text_from_file($ms['modifyfilename'], $ms['textneeded']);
+			}
+		}
+	}
+	
+	/*
+	 * Add text to a native pfsense file
+	 */
+	private function modifyFiles(){
+		$pkg_info = $this->get_info_pkg($this->pathDecompress);
+		if(!empty($pkg_info) ) {
+			/* modify system files */
+			if(is_array($pkg_info['modify_system']) && is_array($pkg_info['modify_system']['modifyitem'])) {
+				foreach($pkg_info['modify_system']['modifyitem'] as $ms) {
+					if($ms['textneeded']) {
+						add_text_to_file($ms['modifyfilename'], $ms['textneeded']);
+					}
+				}
+			}
+		}		
+	}
+	
+	/*
+	 * Erase cron declaration into pfsense configuration
+	 */
+	private function deleteCrons(){
+		$packetapps_id = file_get_contents($this->pathInstall.'/.id');
+		$pkg_info = $this->get_info_pkg($this->pathDecompress.'/.'.$packetapps_id);
+		if(!empty($pkg_info) ) {
+			/* remove crons */
+			//put second argument to false make the function uninstall crons
+			if(!isset($pkg_info['cron']['minute'])) {
+				foreach($pkg_info['cron'] as $cron) {
+					install_cron_job($cron['command'], false, $cron['minute'],$cron['hour'], $cron['mday'], $cron['month'], $cron['wday']);
+				}
+			}
+			else{
+				install_cron_job($pkg_info['cron']['command'], false, $pkg_info['cron']['minute'],$pkg_info['cron']['hour'], $pkg_info['cron']['mday'], $pkg_info['cron']['month'], $pkg_info['cron']['wday']);
+			}
+		}
+	}
+	
+	/*
+	 * Put cron declaration into pfsense configuration
+	 */
+	private function putCronsInPlace(){
+		$pkg_info = $this->get_info_pkg($this->pathDecompress);
+		if(!empty($pkg_info) ) {
+			/* put cron into config */
+			if(!isset($pkg_info['cron']['minute'])) {
+				foreach($pkg_info['cron'] as $cron) {
+					install_cron_job($cron['command'], true, $cron['minute'],$cron['hour'], $cron['mday'], $cron['month'], $cron['wday']);
+				}
+			}
+			else{
+				install_cron_job($pkg_info['cron']['command'], true, $pkg_info['cron']['minute'],$pkg_info['cron']['hour'], $pkg_info['cron']['mday'], $pkg_info['cron']['month'], $pkg_info['cron']['wday']);
+			}
+		}
+	}
+	
+	/*
+	 * Delete installed file
+	 * declare into application manifest
+	 */
+	private function deleteInstalledFiles(){
+		$packetapps_id = file_get_contents($this->pathInstall.'/.id');
+		$pkg_info = $this->get_info_pkg($this->pathDecompress.'/.'.$packetapps_id);
+		if(!empty($pkg_info) ) {
+			/* remove all additional files */
+			if(is_array($pkg_info['additional_files_needed'])) {
+				foreach($pkg_info['additional_files_needed'] as $afn) {
+					$filename = basename($afn['item']);
+					if($afn['prefix'] <> "")
+						$prefix = $afn['prefix'];
+					else
+						$prefix = "/usr/local/appsbypacketapps/";
+					
+					unlink_if_exists($prefix . $filename);
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Copy file to install
+	 * declared into application manifest
+	 */
+	private function putFilesInPlace(){
+		$pkg_info = $this->get_info_pkg($this->pathDecompress);
+		if(!empty($pkg_info) ) {
+			if(is_array($pkg_info['additional_files_needed'])) {
+				if(isset($pkg_info['additional_files_needed']["item"])){
+					$tmp=$pkg_info['additional_files_needed'];
+					unset($pkg_info['additional_files_needed']);
+					$pkg_info['additional_files_needed'][0]=$tmp;
+					unset($tmp);
+				}
+				foreach($pkg_info['additional_files_needed'] as $afn) {
+						$filename = $afn['item'];
+						if($afn['chmod'] <> "")
+							$pkg_chmod = $afn['chmod'];
+						else
+							$pkg_chmod = "";
+						if($afn['prefix'] <> "")
+							$prefix = $afn['prefix'];
+						else
+							$prefix = "/usr/local/appsbypacketapps/";
+						
+
+						if(!is_dir($prefix)) 
+							safe_mkdir($prefix);
+						//$static_output .= $filename . " ";
+						//update_output_window(//$static_output);
+						
+						if (copy($this->pathDecompress.'/'.$filename, $prefix . basename($filename)) === false) {
+							//$static_output .= "failed.\n";
+							@unlink($prefix . $filename);
+							return false;
+						}
+						if(stristr($filename, ".tgz") <> "") {
+							$tarout = "";
+							exec("/usr/bin/tar xvzf " . escapeshellarg($prefix . $filename) . " -C / 2>&1", $tarout);
+						}
+						
+						if($pkg_chmod <> "") {
+							chmod($prefix . basename($filename), $pkg_chmod);
+							system("/bin/chmod {$pkg_chmod} {$prefix}{basename($filename)}");
+						}
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Erase menu declaration from pfsense configuration
+	 */
+	private function deleteMenus(){
+		global $config;
+		$packetapps_id = file_get_contents($this->pathInstall.'/.id');
+		$pkg_info = $this->get_info_pkg($this->pathDecompress.'/.'.$packetapps_id);
+		$menus = &$config['installedpackages']["menu"];
+		
+		if(!empty($pkg_info) ) {
+			/* remove menu items */
+			if(is_array($pkg_info['menu'])) {
+				if (is_array($pkg_info['menu']) && is_array($menus)) {
+					if( isset($pkg_info['menu']['name'])){
+						foreach($menus as $key => $instmenu) {
+							if(trim($instmenu['name']) == trim($pkg_info['menu']['name'])) {
+								unset($menus[$key]);
+								break;
+							}
+						}
+					}
+					else{
+						foreach($pkg_info['menu'] as $menu) {
+							foreach($menus as $key => $instmenu) {
+								if(trim($instmenu['name']) == trim($menu['name'])) {
+									unset($menus[$key]);
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Add menu structure declaration into pfsense configuration
+	 */
+	private function putMenusInPlace(){
+		global $config;
+		$pkg_info = $this->get_info_pkg($this->pathDecompress);
+		if(!empty($pkg_info) ) {
+			//on vérifie d'abords que le tableau des menu existe dans la conf
+			if(!isset($config['installedpackages']["menu"])) {
+				$config['installedpackages']["menu"] = array();
+			}
+			
+			//ensuite on va venir vérifier qu'il y a bien une balise 'menu' dans la config du pkg
+			if( isset($pkg_info["menu"])){
+				
+				
+				//$static_output .= gettext("Menu items... ");
+				//update_output_window(//$static_output);
+				//on regarde ensuite si cette variable contient un tableau de menu
+				//ou alors un seul menu est déclarer et la balise contient les infos à insérer das le menu
+				if( isset($pkg_info["menu"]['name'])){
+					//on ve chercher dans les balises menu si une existe déjà avec le même nom
+					//si oui on la remplace par la nouvelle
+					//sinon on ajoute cette balise à la config
+					$i = 0;
+					$found = false;
+					while( $i < count($config['installedpackages']["menu"]) && !$found ){
+						if( trim($config['installedpackages']["menu"][$i]["name"]) == trim($pkg_info["menu"]['name']) ){
+							$found = true;
+						}
+						else{
+							$i++;
+						}
+					}
+					
+					if( !$found ){
+						$config['installedpackages']["menu"][] = $pkg_info["menu"];
+					}
+					else{
+						$config['installedpackages']["menu"][$i] = $pkg_info["menu"];
+					}
+					
+					
+				}
+				else{
+					foreach( $pkg_info["menu"] as $menu ){
+						$i = 0;
+						$found = false;
+						while( $i < count($config['installedpackages']["menu"]) && !$found ){
+							if( trim($config['installedpackages']["menu"][$i]["name"]) == trim($menu['name']) ){
+								$found = true;
+							}
+							else{
+								$i++;
+							}
+						}
+						
+						if( !$found ){
+							$config['installedpackages']["menu"][] = $menu;
+						}
+						else{
+							$config['installedpackages']["menu"][$i] = $menu;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Erase service declaration from pfsense configuration
+	 */
+	private function deleteServices(){
+		global $config;
+		$packetapps_id = file_get_contents($this->pathInstall.'/.id');
+		$pkg_info = $this->get_info_pkg($this->pathDecompress.'/.'.$packetapps_id);
+		$services = &$config['installedpackages']['service'];
+		
+		if(!empty($pkg_info) ) {
+			/* remove services */
+			//$static_output .= gettext("Services... ");
+			//update_output_window(//$static_output);
+			if (!isset($pkg_info['service']['name']) && is_array($services)) {
+				foreach($pkg_info['service'] as $service) {
+					foreach($services as $key => $instservice) {
+						if($instservice['name'] == $service['name']) {
+							if($service['rcfile']) {
+								$prefix = RCFILEPREFIX;
+								if (!empty($service['prefix']))
+									$prefix = $service['prefix'];
+								if (file_exists("{$prefix}{$service['rcfile']}"))
+									@unlink("{$prefix}{$service['rcfile']}");
+							}
+							unset($services[$key]);
+						}
+					}
+				}
+			}
+			else{
+				foreach($services as $key => $instservice) {
+					if($instservice['name'] == $pkg_info['service']['name']) {
+						if($pkg_info['service']['rcfile']) {
+							$prefix = RCFILEPREFIX;
+							if (!empty($pkg_info['service']['prefix']))
+								$prefix = $pkg_info['service']['prefix'];
+							if (file_exists("{$prefix}{$pkg_info['service']['rcfile']}"))
+								@unlink("{$prefix}{$pkg_info['service']['rcfile']}");
+						}
+						unset($services[$key]);
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Add service declaration into pfsense configuration
+	 */
+	private function putServicesInPlace(){
+		global $config;
+		$pkg_info = $this->get_info_pkg($this->pathDecompress);
+		if(!empty($pkg_info) ) {
+			if( isset($pkg_info['service'])){
+				//on regarde ensuite si cette variable contient un tableau de service
+				//ou alors un seul menu est déclarer et la balise contient les infos à insérer dans les services
+				if( isset($pkg_info['service']['name'])){
+					//on ve chercher dans les balises service si une existe déjà avec le même nom
+					//si oui on la remplace par la nouvelle
+					//sinon on ajoute cette balise à la config
+					$i = 0;
+					$found = false;
+					while( $i < count($config['installedpackages']['service']) && !$found ){
+						if( $config['installedpackages']['service'][$i]["name"] == $pkg_info['service']['name'] ){
+							$found = true;
+						}
+						else{
+							$i++;
+						}
+					}
+					
+					if( !$found ){
+						$config['installedpackages']['service'][] = $pkg_info['service'];
+					}
+					else{
+						$config['installedpackages']['service'][$i] = $pkg_info['service'];
+					}
+					
+					
+				}
+				else{
+					foreach( $pkg_info['service'] as $service ){
+						$i = 0;
+						$found = false;
+						while( $i < count($config['installedpackages']['service']) && !$found ){
+							if( $config['installedpackages']['service'][$i]["name"] == $service['name'] ){
+								$found = true;
+							}
+							else{
+								$i++;
+							}
+						}
+						
+						if( !$found ){
+							$config['installedpackages']['service'][] = $service;
+						}
+						else{
+							$config['installedpackages']['service'][$i] = $service;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Erase application log file
+	 */
+	private function deleteLogs(){
+		$packetapps_id = file_get_contents($this->pathInstall.'/.id');
+		$pkg_info = $this->get_info_pkg($this->pathDecompress.'/.'.$packetapps_id);
+		if(!empty($pkg_info) ) {
+			/* syslog */
+			if(is_array($pkg_info['logging']) && $pkg_info['logging']['logfile_name'] <> "") {
+				remove_text_from_file("/etc/syslog.conf", $pkg_info['logging']['facilityname'] . "\t\t\t\t" . $pkg_info['logging']['logfilename']);
+				system_syslogd_start();
+				@unlink("{$g['varlog_path']}/{$pkg_info['logging']['logfilename']}");;
+			}
+		}
+	}
+	
+	/*
+	 * Create log file
+	 */
+	private function putLogsInPlace(){
+		$pkg_info = $this->get_info_pkg($this->pathDecompress);
+		if(!empty($pkg_info) ) {
+			/* set up package logging streams */
+			if(isset($pkg_info['logging'])) {
+				$path_log = '/usr/local/appsbypacketapps/logs';
+				mwexec("/usr/sbin/fifolog_create -s 32768 {$path_log}/{$pkg_info['logging']['logfilename']}");
+				@chmod($path_log . '/' . $pkg_info['logging']['logfilename'], 0600);
+				add_text_to_file("/etc/syslog.conf", $pkg_info['logging']['facilityname'] . "\t\t\t\t" . $pkg_info['logging']['logfilename']);
+				system_syslogd_start();
+			}
+		}
+	}
+	
+	/*
+	 * Install FreeBSD packages
+	 */
+	private function installExtDeps(){
+		$pkg_info = $this->get_info_pkg($this->pathDecompress);
+		if(!empty($pkg_info) ) {
+			/* set up package logging streams */
+			if(isset($pkg_info['external_dependencies'])) {
+				foreach( $pkg_info['external_dependencies']['external_dependency'] as $dep ){
+						$this->writeInstallLogs("Install dependency : ".$dep." ( &#9888; this step may take a moment )...");
+						$this->install_freebsd_pkg($dep);
+						$this->writeInstallLogs("Done\n");
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Put all manifest declared structures in place
+	 */
+	private function writePfSenseConfig(){
+		global $config;
+		if(($pkgid = $this->get_id_pkg($this->name)) == -1) {
+			
+			return false;
+		}
+		else{
+			$this->modifyFiles();
+			$this->putCronsInPlace();
+			$this->putFilesInPlace();
+			$this->putMenusInPlace();
+			$this->putServicesInPlace();
+			$this->putLogsInPlace();
+			$this->installExtDeps();
+			write_config('menu, log, service, cron, ext deps and modify file');
+			exec('rm /tmp/config.cache');
+		}
+		return true;
+	}
+	
+	/*
+	 * Write application info into Apps configuration
+	 * name
+	 * version
+	 * synopsis
+	 * index url
+	 */
+	private function writeAppsConfig($install=true){
+		$pkgs = $this->app['apps']['packages'];
+		
+		if( $install ){
+				$pkg_info = $this->get_info_pkg($this->pathDecompress);
+				$packetapps_id = file_get_contents("/usr/local/appsbypacketapps/".$this->name."/.id");
+				$name = $this->name;
+				$version = file_get_contents('/usr/local/appsbypacketapps/.'.$packetapps_id."/version");
+				$synopsis = file_get_contents('/usr/local/appsbypacketapps/.'.$packetapps_id."/synopsis");
+				if( isset($pkg_info['menu']['name'])){
+						$index = $pkg_info['menu']['url'];
+				}
+				else{
+					$index = $pkg_info['menu'][0]['url'];
+				}
+				$i = 0;
+				$found = false;
+				while( $i < count($pkgs) && !$found ){
+						if( $pkgs[$i]['name'] == $name ){
+								$found = true;
+						}
+						else{
+								$i++;
+						}
+				}
+				if( !$found ){
+						$pkgs[] = array('name' => $name, 'version' => $version, 'synopsis' => $synopsis, 'index' => $index);
+				}
+				else{
+						$pkgs[$i] = array('name' => $name, 'version' => $version, 'synopsis' => $synopsis, 'index' => $index);
+				}
+		}
+		else{
+				foreach( $pkgs as $pkg){
+						if( $pkg['name'] == $this->name ){
+								unset($pkgs[array_search($pkg,$pkgs)]);
+						}
+				}
+				
+		}
+		$this->app['apps']['packages'] = $pkgs;
+		file_put_contents('/usr/local/appsbypacketapps/config.json',json_encode($this->app));
+
+	}
+	
+	/*
+	 * Copy needed application files :
+	 * Product ID
+	 * create name folder
+	 * version file
+	 * synopsis file
+	 * logo
+	 * Manifest
+	 */
+	private function copyIntels(){
+		//get package directory in place
+		$pkg_id = file_get_contents($this->pathDecompress."/pkg.id");
+		@mkdir("/usr/local/appsbypacketapps/.".$pkg_id);
+		
+		//get .id in place in pacakge_name directory
+		@mkdir("/usr/local/appsbypacketapps/".$this->name."/");
+		file_put_contents("/usr/local/appsbypacketapps/".$this->name."/.id", $pkg_id);
+		
+		//add Manifest_package.xml to package_id hidden directory
+		@mkdir("/usr/local/pkg/appsbypacketapps/.".$pkg_id."/");
+		copy($this->pathDecompress."/Manifest_package.xml","/usr/local/appsbypacketapps/.".$pkg_id."/Manifest_package.xml");
+		//add version to package_id hidden directory
+		copy($this->pathDecompress."/version","/usr/local/appsbypacketapps/.".$pkg_id."/version");
+		//add synopsis to package_id hidden directory
+		copy($this->pathDecompress."/synopsis","/usr/local/appsbypacketapps/.".$pkg_id."/synopsis");
+		
+		//add logo to logo folder in /usr/local/www/
+		if( file_exists($this->pathDecompress."/logo")){
+			copy($this->pathDecompress."/logo","/usr/local/www/logo/".str_replace(' ','_',$this->name));
+		}
+		else{
+			copy("/usr/local/www/logo/logo.png","/usr/local/www/logo/".str_replace(' ','_',$this->name));
+		}
+		
+		if( file_exists($this->pathDecompress."/scripts/uninstall/") ){
+			exec("mkdir /usr/local/appsbypacketapps/.".$pkg_id."/scripts/");
+			exec("mkdir /usr/local/appsbypacketapps/.".$pkg_id."/scripts/uninstall/");
+			exec('cp -R '.$this->pathDecompress."/scripts/uninstall/ /usr/local/appsbypacketapps/.".$pkg_id."/scripts/uninstall/");
+		}
+		
+		
+		if( file_exists("/usr/local/appsbypacketapps/.".$pkg_id)
+		   && file_exists("/usr/local/appsbypacketapps/".$this->name."/")
+		   && file_exists("/usr/local/appsbypacketapps/.".$pkg_id."/Manifest_package.xml")
+		   && file_exists("/usr/local/appsbypacketapps/.".$pkg_id."/version")
+		   && file_exists("/usr/local/appsbypacketapps/.".$pkg_id."/synopsis")
+		   && file_exists("/usr/local/www/logo/".str_replace(' ','_',$this->name)) ){
+			return true;
+		}
+		else{
+			return false;
+		}
+		
+	}
+	
+	/*
+	 * Execute postinstall, preinstall or uninstall scripts
+	 */
+	private function execScript($type,$path=null){
+		if( !isset($path) ){
+				$packetapps_id = file_get_contents($this->pathInstall.'/.id');
+				$path = $this->pathDecompress.'.'.$packetapps_id;
+		}
+		if( file_exists( $path."/scripts/" ) && file_exists( $path."/scripts/".$type."/" ) ){
+				$files = scandir($path."/scripts/".$type."/");
+				foreach( $files as $file ){
+					if( basename($file) != "." && basename($file) != ".."){
+						$info = $this->detectFileMimeType($path."/scripts/".$type."/".$file);
+						$ext = pathinfo($path."/scripts/".$type."/".$file);
+						$ext = $ext['extension'];
+						if( strpos($info,'php') !== false ){
+							$aS = array('<?php', '?>', '<?');
+							$aR = array('', '', '');
+							$code = trim(str_replace($aS, $aR, file_get_contents($path."/scripts/".$type."/".$file)));
+							eval($code);
+						}
+						else if( strpos($info,'text/plain') !== false ){
+							passthru("/bin/sh ".$path."/scripts/".$type."/".$file,$out);
+						}
+					}
+				}
+		}
+	}
+	
+	/*
+	 * Install a FreeBSD package
+	 */
+	private function install_freebsd_pkg($pkg_name){
+		exec('pkg info',$output);
+		foreach( $output as $installed ){
+			if( preg_match("/".$pkg_name.".*/",$output[count($output)-1]) === 1 ){
+				return true;
+			}
+		}
+		exec("env ASSUME_ALWAYS_YES=YES pkg upgrade",$output);
+		if( in_array("Your packages are up to date.",$output)){
+			exec("env ASSUME_ALWAYS_YES=YES pkg install ".escapeshellarg($pkg_name),$output);
+			
+			if( preg_match("/.*Extracting ".$pkg_name.".* done/",$output[count($output)-1]) === 1 || "The most recent version of packages are already installed" == $output[count($output)-1]){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		else{
+			return false;
+		}
+		
+	}
+	
+	/*
+	 * Uncompress application archive file
+	 */
+	private function uncompress_pkg(){
+		exec(escapeshellcmd("tar")." ".escapeshellarg("-zxvf")." ".escapeshellarg($this->pathArchive.$this->archiveName),$output);
+		unlink($this->pathArchive.$this->archiveName);
+		$files = scandir($this->pathArchive);
+		return $this->pathArchive.$files[2];
+	}
+	
+	/*
+	 * Extract application infos from manifest
+	 */
+	private function get_info_pkg($path){ 
+		$pkg_xml = simplexml_load_file($path."/Manifest_package.xml");
+		return json_decode(json_encode($pkg_xml),true);
+	}
+	
+	/*
+	 * Return application ID into Apps configuration
+	 */
+	private function get_id_pkg($pkg_name) {
+		$config_app = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+		$pkgs = $config_app['apps']['packages'];
+		foreach($pkgs as $name)
+		{
+			if($name['name']==$pkg_name)
+			{
+				return $name['name'];
+			}
+		}
+		return -1;
+	}
+	
+	/*
+	 * Return application infos from Apps cofiguration
+	 */
+	public function get_installed_infos($pkg_name){
+		$config_app = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+		$pkgs = $config_app['apps']['packages'];
+		foreach($pkgs as $pkg)
+		{
+				if(strtoupper($pkg['name'])==strtoupper($pkg_name)){
+						return $pkg;
+				}
+		}
+		return -1;
+	}
+	
+	/*
+	 * Certify application file integrity
+	 */
+	private function check_md5s(){
+		$files = json_decode(file_get_contents($this->pathDecompress."/files.md5"),true);
+		foreach( $files as $file_name => $file_md5 ){
+			if( md5(file_get_contents($this->pathDecompress."/".$file_name)) != $file_md5 ){
+				return false ;
+			}
+		}
+		return true;
+	}
+	
+	/*
+	 * Erase archive file and uncompress archive folder
+	 */
+	private function cleanAll(){
+		exec("rm -rf ".$this->pathArchive);
+	}
+	
+	/*
+	 * Detect file type
+	 */
+	private function detectFileMimeType($filename=''){
+		$filename = escapeshellcmd($filename);
+		$command = "file -b --mime-type -m /usr/share/misc/magic {$filename}";
+	    
+		$mimeType = shell_exec($command);
+		return trim($mimeType);
+	}
+	
+	/*
+	 * Copy application's blenc keys into blenckey file into pfsense
+	 */
+	private function insertBlencKeys(){
+		exec('chmod 777 /usr/local/etc/blenckeys',$output);
+		if( count($output) == 0 ){
+			if( file_exists($this->pathDecompress."/blenc.key_file") ){
+				exec('cat '.$this->pathDecompress."/blenc.key_file".' >> /usr/local/etc/blenckeys',$output);
+				if( count($output) !== 0 ){
+					$this->writeInstallLogs("Blenc keys unwritable. Abort install...");
+					return false;
+				}
+				else{
+					$this->writeInstallLogs("Blenc keys successfuly installed...");
+					return true;
+				}
+			}
+		}
+		else{
+			$this->writeInstallLogs("Blenc keys unwritable. Abort install...");
+			return false;
+		}
+	}
+	
+	/*
+	 * Write application's instllation log
+	 */
+	public function writeInstallLogs($text){
+		conf_mount_rw();
+		if( !file_exists("/usr/local/appsbypacketapps/logs/Installer.log")){
+			touch("/usr/local/appsbypacketapps/logs/Installer.log");
+		}
+		file_put_contents("/usr/local/appsbypacketapps/logs/Installer.log",$text,FILE_APPEND);
+		conf_mount_ro();
+	}
+	
+	/*
+	 * Certify pfsense vesrion compatibility with application pfsense required version
+	 */
+	private function isCompatible($required){
+		$version = rtrim(file_get_contents("/etc/version"));
+		if (isset($required)){
+			return (pfs_version_compare("", $version, $required) >= 0);
+		}
+		return null;
+	}
+	
+	/*
+	 * Do a recusive copy of a folder
+	 */
+	private function xcopy($source, $dest, $permissions = 0755){
+		// Check for symlinks
+		if (is_link($source)) {
+			return symlink(readlink($source), $dest);
+		}
+	
+		// Simple copy for a file
+		if (is_file($source)) {
+			return copy($source, $dest);
+		}
+	
+		// Make destination directory
+		if (!is_dir($dest)) {
+			@mkdir($dest, $permissions);
+		}
+	
+		// Loop through the folder
+		$dir = dir($source);
+		while (false !== $entry = $dir->read()) {
+			// Skip pointers
+			if ($entry == '.' || $entry == '..') {
+				continue;
+			}
+	
+			// Deep copy directories
+			xcopy("$source/$entry", "$dest/$entry");
+		}
+	
+		// Clean up
+		$dir->close();
+		return true;
+	}
+	
+	/*
+	 * Download application archive ( with internal dependencies )
+	 * into archive folder on pfsense
+	 */
+	private function downloadArchive(){
+		//récupération de l'archive contenant le package
+		if( !@mkdir($this->pathArchive,0777,true) ){
+			exec("mkdir ".$this->pathArchive);
+		}
+		chdir($this->pathArchive);
+		$curl = curl_init();
+		$destination = $this->pathArchive.basename($this->url);
+		//$destination = substr($destination,0,strlen($destination));
+	
+		$file=fopen($destination,"w+");
+		curl_setopt($curl, CURLOPT_URL,trim($this->url));
+		curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($curl, CURLOPT_HEADER, false);
+		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($curl, CURLOPT_FILE, $file);
+		$result=curl_exec($curl);
+		fclose($file);
+		curl_close($curl);
+	}
+	
+	/*
+	 * Certify archive is ready to be decompress
+	 */
+	private function checkArchiveReady(){
+		exec("ls ".$this->pathArchive.$this->archiveName,$output);
+		return in_array($this->pathArchive.$this->archiveName,$output);
+	}
+	
+	/*
+	 * Send install and uninstall result
+	 */
+	private function sendResult($install_result, $first_try = false){
+		$id = trim(file_get_contents("/usr/local/appsbypacketapps/.device/id"));
+		if( $first_try ){
+			$url = "/php/app/register/device/".$id."/".$this->key."/first_install_result";
+		}
+		else{
+			$url = "/php/app/register/device/".$id."/".$this->key."/second_install_result";
+		}
+		$result = -1;
+		if( count($this->dnsToContact.$url) < 2000 ){
+			$curl = curl_init();
+			curl_setopt($curl, CURLOPT_URL,trim($this->dnsToContact.$url));
+			curl_setopt($curl,CURLOPT_RETURNTRANSFER,true);
+			curl_setopt($curl, CURLOPT_HEADER, false);
+			curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+			$fields = array(
+				'result' => json_encode($install_result),
+			);
+			curl_setopt($curl,CURLOPT_POST, count($fields));
+			curl_setopt($curl,CURLOPT_POSTFIELDS, $fields);
+			$result=curl_exec($curl);
+			curl_close($curl);
+			if( $result !== false ){
+				$result = 0;
+			}
+		}
+		
+		return $result;
+	}
+	
+	/*
+	 * Certified that install/uninstall process is lock or not
+	 */
+	private function isLock(){
+		$this->app = json_decode(file_get_contents('/usr/local/appsbypacketapps/config.json'),true);
+		$this->lock = $this->app['apps']['lock'];
+		return $this->lock;
+	}
+	
+	/*
+	 * Lock installation/uninstallation by creating an empty file
+	 */
+	private function lock(){
+		conf_mount_rw();
+		$this->app['apps']['lock'] = 1;
+		$this->lock = 1;
+		file_put_contents('/usr/local/appsbypacketapps/config.json',json_encode($this->app));
+		conf_mount_ro();
+	}
+	
+	/*
+	 * Unlock installation/uninstalation by deleting an empty file
+	 */
+	private function unlock(){
+		conf_mount_rw();
+		$this->app['apps']['lock'] = 0;
+		$this->lock = 0;
+		file_put_contents('/usr/local/appsbypacketapps/config.json',json_encode($this->app));
+		conf_mount_ro();
+	}
+	
+	
+	private function saveLog(){
+		conf_mount_rw();
+		if( file_exists("/usr/local/appsbypacketapps/logs/Installer.log")){
+			file_put_contents("/usr/local/appsbypacketapps/logs/".$this->name.".log","Install/uninstall of ".$this->name."\n".file_get_contents("/usr/local/appsbypacketapps/logs/Installer.log")."\n-----------------------\n",FILE_APPEND);
+		}
+		conf_mount_ro();
+	}
+	
+	private function getMount(){
+		$this->mount = 'write'; 
+		exec('mount',$out);
+		foreach( $out as $line ){
+			if( strpos($line,' / ') != false){
+				if( strpos($line,'read-only') !== false && $this->mount == 'write' ){
+					$this->mount = 'only';
+				}
+			}
+			if( strpos($line,' /cf ') != false ){
+				if( !strpos($line,'read-only') && $this->mount == 'only' ){
+					$this->mount = 'write';
+				}
+			}
+		}
+	}
+	
+	private function isMountWrite(){
+		if( $this->mount === 'write' ){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	
+	
+}
+?>
