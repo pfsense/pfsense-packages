@@ -290,7 +290,7 @@ EOD;
 	}
 
 	/* Cron job for graphs */
-	if (($bandwidthd_config['enable']) && ($output_cdf)) {
+	if (($bandwidthd_config['enable']) && ($bandwidthd_config['outputcdf'])) {
 		// Use cron job to rotate logs every day at 00:01
 		install_cron_job("/bin/kill -HUP `cat /var/run/bandwidthd.pid`", true, "1", "0");
 	} else {
