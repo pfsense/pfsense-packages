@@ -52,9 +52,9 @@ exec("/bin/sh /usr/local/pkg/pfblockerng/geoipupdate.sh all >> {$pfb['geolog']} 
 update_output_window(gettext("MaxMind Country Database downloads completed..."));
 update_output_window(gettext("Converting MaxMind Country Databases for pfBlockerNG. This may take a few minutes..."));
 pfblockerng_uc_countries();
-update_output_window(gettext("Creating pfBlockerNG Continenet XML Files..."));
+update_output_window(gettext("Creating pfBlockerNG Continent XML Files..."));
 pfblockerng_get_countries();
-update_output_window(gettext("Completed Creating pfBlockerNG Continenet XML Files..."));
+update_output_window(gettext("Completed Creating pfBlockerNG Continent XML Files..."));
 
 // Remove Original Maxmind Database Files
 @unlink_if_exists("{$pfb['dbdir']}/GeoIPCountryCSV.zip");
