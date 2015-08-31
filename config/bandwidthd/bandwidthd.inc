@@ -78,6 +78,17 @@ function bandwidthd_install_config() {
 			$subnets .= "subnet " . gen_subnet(get_interface_ip($iface),get_interface_subnet($iface)) . "/" . get_interface_subnet($iface) . "\n";
 		}
 	}
+
+	/* Configure extra stats subnet(s) */
+	$subnets_extra = explode(';', str_replace(' ', '', $bandwidthd_config['subnets_extra']));
+	if (is_array($subnets_extra)) {
+		foreach ($subnets_extra as $sn) {
+			if (!empty($sn) && is_subnetv4($sn)) {
+				$subnets .= "subnet {$sn}\n";
+			}
+		}
+	}
+	
 	$promiscuous_val = ($bandwidthd_config['promiscuous'] != "" ? "promiscuous true" : "promiscuous false");
 	$sensor_id_string_val = ($bandwidthd_config['sensorid'] != "" ? "sensor_id \"{$bandwidthd_config['sensorid']}\"" : "");
 
@@ -102,7 +113,7 @@ function bandwidthd_install_config() {
 
 	/* Advanced Filter */
 	if ($bandwidthd_config['advfilter']) {
-		$filter_text_val = "filter " . escapeshellarg(base64_decode($bandwidthd_config['advfilter']));
+		$filter_text_val = 'filter "' . base64_decode($bandwidthd_config['advfilter']) . '"';
 	} else {
 		$filter_text_val = "";
 	}
@@ -375,6 +386,17 @@ function bandwidthd_validate_input($post, &$input_errors) {
 		}
 	} else {
 		$input_errors[] = "You must select at least on interface under 'Subnet(s) for Statistics Collection'.";
+	}
+	// Extra subnets
+	if ($post['subnets_extra']) {
+		$subnets_extra = explode(';', str_replace(' ', '', $post['subnets_extra']));
+		if (is_array($subnets_extra)) {
+			foreach ($subnets_extra as $sn) {
+				if (!is_subnetv4($sn)) {
+					$input_errors[] = gettext("'Extra Subnet(s) for Statistics Collection' may only contain valid IPv4 subnet(s).");
+				}
+			}
+		}
 	}
 	// Only support sane characters in Sensor ID
 	if ($post['sensorid']) {
