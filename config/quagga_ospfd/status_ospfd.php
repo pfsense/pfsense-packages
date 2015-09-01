@@ -112,8 +112,12 @@ function doCmdT($title, $command) {
 								defCmdT("Quagga OSPF Interfaces", "{$control_script} ospf interfaces");
 								defCmdT("Quagga OSPF CPU Usage", "{$control_script} ospf cpu");
 								defCmdT("Quagga OSPF Memory", "{$control_script} ospf mem");
+								defCmdT("Quagga BGP Neighbors", "/usr/local/bin/vtysh -c 'show ip bgp summary'");
+                                defCmdT("Quagga BGP Paths", "/usr/local/bin/vtysh -c 'show ip bgp paths'");
+                                defCmdT("Quagga BGP Routes", "/usr/local/bin/vtysh -c 'show ip bgp'");
 								defCmdT("Quagga ospfd.conf", "/bin/cat {$pkg_homedir}/ospfd.conf");
 								defCmdT("Quagga zebra.conf", "/bin/cat {$pkg_homedir}/zebra.conf");
+								defCmdT("Quagga bgpd.conf", "/bin/cat {$pkg_homedir}/bgpd.conf");
 ?>
 								<div id="cmdspace" style="width:100%">
 									<?php listCmds(); ?>
