@@ -46,11 +46,6 @@
 	<name>widget-havp</name>
 	<version>0.1.1</version>
 	<title>Widget - HAVP</title>
-	<include_file>/usr/local/pkg/widget-havp.inc</include_file>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<item>https://packages.pfsense.org/packages/config/widget-havp/widget-havp.inc</item>
-	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/includes/</prefix>
 		<item>https://packages.pfsense.org/packages/config/widget-havp/havp_alerts.inc.php</item>
