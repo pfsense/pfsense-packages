@@ -46,11 +46,6 @@
 	<name>widget-antivirus</name>
 	<version>0.1.2</version>
 	<title>Widget - Antivirus Status</title>
-	<include_file>/usr/local/pkg/widget-antivirus.inc</include_file>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<item>https://packages.pfsense.org/packages/config/widget-antivirus/widget-antivirus.inc</item>
-	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/widgets/include/</prefix>
 		<item>https://packages.pfsense.org/packages/config/widget-antivirus/antivirus_status.inc</item>
