@@ -92,10 +92,6 @@
 		</columnitem>
 	</adddeleteeditpagefields>
 	<additional_files_needed>
-		<prefix>/usr/local/www/</prefix>
-		<item>https://packages.pfsense.org/packages/config/spamd/spamd_rules.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/spamd/spamd_whitelist.xml</item>
 	</additional_files_needed>
