@@ -103,8 +103,8 @@ function sync_package_spamd() {
 	log_error("[spamd] Looping through spamdsettings");
 	if ($config['installedpackages']['spamdsettings']['config']) {
 		foreach ($config['installedpackages']['spamdsettings']['config'] as $ss) {
-			if ($ss['nextmta'] != "") {
-				$nextmta = $ss['nextmta'];
+			if ($ss['next_mta'] != "") {
+				$nextmta = $ss['next_mta'];
 			}
 			if ($ss['greylistingparms'] != "") {
 				$passtime = " -G " . $ss['greylistingparms'];
@@ -213,7 +213,7 @@ function spamd_generate_rules($type) {
 		}
 
 		if ($spamdconfig) {
-			$nextmta = $spamdconfig['nextmta'];
+			$nextmta = $spamdconfig['next_mta'];
 			$spamdbinds = explode(',', $spamdconfig['spamdbinds_array']);
 			if (is_array($spamdbinds)) {
 				foreach ($spamdbinds as $interface) {
@@ -312,21 +312,10 @@ function custom_php_deinstall_command() {
 }
 
 function spamd_validate_input($post, &$input_errors) {
-	global $config;
-	$nextmta = str_replace("$", "", $post['nextmta']);
-	if (stristr($nextmta, "{")) {
-		/* item is an alias, make sure the name exists */
-		$nextmta = str_replace("$", "", $nextmta);
-		$found = false;
-		if ($config['aliases']['alias']) {
-			foreach ($config['aliases']['alias'] as $alias) {
-				if ($alias['name'] == $nextmta) {
-					$found = true;
-				}
-			}
+	if (!empty($post["next_mta"])) {
+		if (!is_ipaddrv4($post['next_mta'])) {
+			$input_errors[] = "NextMTA is not a valid IPv4 address";
 		}
-		if ($found == false)
-			$input_errors[] = "Could not locate alias named " . htmlentities($nextmta);
 	}
 }
 
