@@ -2130,48 +2130,7 @@ function squid_generate_rules($type) {
 	global $config;
 
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	//check captive portal option
-	$cp_file='/etc/inc/captiveportal.inc';
-	$pfsense_version=preg_replace("/\s/","",file_get_contents("/etc/version"));
-	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
-	$cp_inc = file($cp_file);
-	$new_cp_inc="";
-	$found_rule=0;
-	foreach ($cp_inc as $line) {
-		$new_line=$line;
-		//remove applied squid patch
-		if (preg_match('/skipto 65314 ip/',$line)) {
-			$found_rule++;
-			$new_line ="";
-		}
-
-		if (substr($pfsense_version,0,3) > 2.0) {
-			if (preg_match('/255.255.255.255/',$line) && $squid_conf['patch_cp']) {
-				$found_rule++;
-				$new_line .= "\t".'$cprules .= "add {$rulenum} skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
-				$new_line .= "\t".'$cprules .= "add {$rulenum} skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
-			}
-		} else {
-			//add squid patch option based on current config
-			if (preg_match('/set 1 pass ip from any to/',$line) && $squid_conf['patch_cp']) {
-				$found_rule++;
-				$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from any to {$ips} '.$port.' in\n";'."\n";
-				$new_line .= $line;
-			}
-			if (preg_match('/set 1 pass ip from {/',$line) && $squid_conf['patch_cp']) {
-				$found_rule++;
-				$new_line = "\t".'$cprules .= "add {$rulenum} set 1 skipto 65314 ip from {$ips} '.$port.' to any out\n";'."\n";
-				$new_line .= $line;
-			}
-		}
-		$new_cp_inc .= $new_line;
-	}
-	if (!file_exists('/root/'.$pfsense_version.'.captiveportal.inc.backup')) {
-		copy ($cp_file,'/root/'.$pfsense_version.'.captiveportal.inc.backup');
-	}
-	if ($found_rule > 0) {
-		file_put_contents($cp_file,$new_cp_inc, LOCK_EX);
-	}
+	
 	//normal squid rule check
 	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
@@ -2510,6 +2469,46 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 		file_notice("sync_settings", $error, "squid Settings Sync", "");
 	} else {
 		log_error("squid XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+	}
+}
+
+function squid_unbreak_captiveportal_inc() {
+	/*
+	Attempt to undo the damage caused by previous Squid3 package versions.
+	See https://redmine.pfsense.org/issues/4583 for reference.
+	*/
+	global $config;
+	$squid_conf = $config['installedpackages']['squid']['config'][0];
+	
+	/*
+	Use the original version check here. If it was buggy previously, we still
+	need it to remain buggy for the below code to hopefully find the backup file.
+	*/
+	$pfsense_version=preg_replace("/\s/","",file_get_contents("/etc/version"));
+	$cp_file='/etc/inc/captiveportal.inc';
+	/* Restore existing backup if it exists ... */
+	if (file_exists('/root/'.$pfsense_version.'.captiveportal.inc.backup')) {
+		/*
+		Run this whether the patch_cp option is set or not since chances are high
+		that the broken code failed to undo the damages when switching the option off.
+		*/
+		copy('/root/'.$pfsense_version.'.captiveportal.inc.backup',$cp_file);
+		echo "\nWARNING: Patch Captive Portal feature was removed - see Bug #4583!";
+		echo "\nWARNING: Found and restored a previous backup of {$cp_file}.";
+		echo "\nWARNING: Double-check {$cp_file} contents for sanity!";
+		echo "\nWARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository if needed.";
+		/* Remove the backup and unset the config option to avoid running this again in future. */
+		unlink('/root/'.$pfsense_version.'.captiveportal.inc.backup');
+		if (isset($squid_conf['patch_cp'])) {
+			unset($squid_conf['patch_cp']);
+		}
+	/* ... and at least warn the users if it does not and provide some help. */
+	} else if (isset($squid_conf['patch_cp'])) {
+		echo "\nWARNING: Patch Captive Portal feature was removed - see Bug #4583!";
+		echo "\nWARNING: Failed to find a backup of {$cp_file}!";
+		echo "\nWARNING: Get a sane copy of {$cp_file} from pfSense GitHub repository!";
+		/* Unset the config option to avoid running this again in future. */
+		unset($squid_conf['patch_cp']);
 	}
 }
 
