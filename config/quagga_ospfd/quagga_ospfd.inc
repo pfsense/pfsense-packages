@@ -219,6 +219,17 @@ function quagga_ospfd_install_conf() {
 			}
 		}
 
+		if ($conf['md5password'] && !empty($conf['password']) && !empty($conf['interfacearea']))
+				$conffile .= "  area {$conf['interfacearea']} authentication message-digest\n";
+			else if ($conf['md5password'] && !empty($conf['password']) && empty($conf['interfacearea']))
+				$conffile .= "  area 0.0.0.0 authentication message-digest\n";
+			
+		if ($conf['password'] && empty($conf['md5password']) && !empty($conf['interfacearea']))
+				$conffile .= "  area {$conf['interfacearea']} authentication\n";
+			else if ($conf['password'] && empty($conf['md5password']) && empty($conf['interfacearea']))
+				$conffile .= "  area 0.0.0.0 authentication\n";
+		
+		
 		if (!empty($redist))
 			$conffile .= $redist;
 
