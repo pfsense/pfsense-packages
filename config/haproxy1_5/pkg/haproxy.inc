@@ -347,10 +347,10 @@ function haproxy_custom_php_deinstall_command() {
 	update_output_window($static_output);
 	unlink_if_exists("/usr/local/etc/rc.d/haproxy.sh");
 	unlink_if_exists("/etc/rc.haproxy_ocsp.sh");
-	$static_output .= "HAProxy, installing cron job if needed\n";
+	$static_output .= "HAProxy, uninstalling cron job if needed\n";
 	update_output_window($static_output);
-	haproxy_install_cron(false);
-	haproxy_install_cronjob(false, '/etc/rc.haproxy_ocsp.sh');
+	install_cron_job("/usr/local/etc/rc.d/haproxy.sh onecheck", false);
+	install_cron_job("/etc/rc.haproxy_ocsp.sh", false);
 	$static_output .= "HAProxy, running haproxy_custom_php_deinstall_command() DONE\n";
 	update_output_window($static_output);
 }
@@ -472,95 +472,6 @@ EOD;
 	update_output_window($static_output);
 }
 
-function haproxy_install_cronjob($should_install, $script, $interval = 60, $parameters = "") {
-	global $config, $g;
-	if($g['booting']==true) 
-		return;
-	$is_installed = false;
-	if(!$config['cron']['item'])
-		return;
-	$x=0;
-	foreach($config['cron']['item'] as $item) {
-		if(strstr($item['command'], $script)) {
-			$is_installed = true;
-			break;
-		}
-		$x++;
-	}
-	switch($should_install) {
-		case true:
-			if(!$is_installed) {
-				$cron_item = array();
-				$cron_item['minute'] = "*/{$interval}";
-				$cron_item['hour'] = "*";
-				$cron_item['mday'] = "*";
-				$cron_item['month'] = "*";
-				$cron_item['wday'] = "*";
-				$cron_item['who'] = "root";
-				$cron_item['command'] = "$script $parameters";		
-				$config['cron']['item'][] = $cron_item;
-				parse_config(true);
-				write_config("haproxy, install cron job");
-				configure_cron();
-			}
-		break;
-		case false:
-			if($is_installed == true) {
-				if($x > 0) {
-					unset($config['cron']['item'][$x]);
-					parse_config(true);
-					write_config("haproxy, remove cron job");
-				}
-				configure_cron();
-			}
-		break;
-	}
-}
-
-function haproxy_install_cron($should_install) {
-	global $config, $g;
-	if($g['booting']==true) 
-		return;
-	$is_installed = false;
-	if(!$config['cron']['item'])
-		return;
-	$x=0;
-	foreach($config['cron']['item'] as $item) {
-		if(strstr($item['command'], "/usr/local/etc/rc.d/haproxy.sh")) {
-			$is_installed = true;
-			break;
-		}
-		$x++;
-	}
-	switch($should_install) {
-		case true:
-			if(!$is_installed) {
-				$cron_item = array();
-				$cron_item['minute'] = "*/2";
-				$cron_item['hour'] = "*";
-				$cron_item['mday'] = "*";
-				$cron_item['month'] = "*";
-				$cron_item['wday'] = "*";
-				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/local/etc/rc.d/haproxy.sh onecheck";		
-				$config['cron']['item'][] = $cron_item;
-				parse_config(true);
-				write_config("haproxy, install cron CARP job");
-				configure_cron();
-			}
-		break;
-		case false:
-			if($is_installed == true) {
-				if($x > 0) {
-					unset($config['cron']['item'][$x]);
-					parse_config(true);
-					write_config("haproxy, remove cron CARP job");
-				}
-				configure_cron();
-			}
-		break;
-	}
-}
 
 function haproxy_find_backend($backendname) {
 	global $config;
@@ -1729,12 +1640,14 @@ function haproxy_check_run($reload) {
 		haproxy_updateocsp(false);
 		
 		if (isset($a_global['carpdev']))
-			haproxy_install_cron(true);
+			install_cron_job("/usr/local/etc/rc.d/haproxy.sh onecheck", true, "*/2");
 		else
-			haproxy_install_cron(false);
+			install_cron_job("/usr/local/etc/rc.d/haproxy.sh onecheck", false);
 	
 		$useocsp = haproxy_uses_ocsp();
-		haproxy_install_cronjob($useocsp, '/etc/rc.haproxy_ocsp.sh', 120);
+		if ($useocsp == "true") {
+			install_cron_job("/etc/rc.haproxy_ocsp.sh", true, "*/120");
+		}
 	}
 
 	if(isset($a_global['enable'])) {
