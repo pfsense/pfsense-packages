@@ -111,10 +111,6 @@
 		<prefix>/usr/local/www/</prefix>
 		<item>https://packages.pfsense.org/packages/config/spamd/spamd_db.php</item>
 	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/bin/</prefix>
-		<item>https://packages.pfsense.org/packages/config/spamd/spamd_gather_stats.php</item>
-	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Provider Name</fielddescr>
