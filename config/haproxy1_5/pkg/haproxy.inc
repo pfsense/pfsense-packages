@@ -1647,6 +1647,8 @@ function haproxy_check_run($reload) {
 		$useocsp = haproxy_uses_ocsp();
 		if ($useocsp == "true") {
 			install_cron_job("/etc/rc.haproxy_ocsp.sh", true, "*/120");
+		} else {
+			install_cron_job("/etc/rc.haproxy_ocsp.sh", false);
 		}
 	}
 
