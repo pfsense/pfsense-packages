@@ -212,12 +212,11 @@
 		-->
 		<field>
 			<fielddescr>NextMTA</fielddescr>
-			<fieldname>nextmta</fieldname>
+			<fieldname>next_mta</fieldname>
 			<description>
 				<![CDATA[
-				After processing, automatically send messages to specified IP Address. You may enter an alias if you like, simply prepend $ to the alias name.<br />
-				(Example: $mailservers)<br />
-				Note: If you have postfix package installed, enter 127.0.0.1 here.<br />
+				After processing, automatically send messages to specified IP address.<br />
+				Note: If you have postfix package installed, enter 127.0.0.1 here.
 				]]>
 			</description>
 			<type>input</type>
