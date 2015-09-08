@@ -112,7 +112,7 @@ function dwg_av_statistic() {
 					// Show package version at least, no good quick way to get the PBI version
 					echo "pkg v{$config['installedpackages']['package'][get_pkg_id("havp")]['version']}";
 				} else {
-					echo exec("/usr/sbin/pkg info havp | /usr/bin/head -n 1");
+					echo pkg_exec("query '%v' havp");
 				}
 			?>
 			</td>
