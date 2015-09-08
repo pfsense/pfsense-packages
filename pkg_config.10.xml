@@ -1246,7 +1246,7 @@
 		<descr>Dashboard widget for HAVP alerts.</descr>
 		<category>System</category>
 		<config_file>https://packages.pfsense.org/packages/config/widget-havp/widget-havp.xml</config_file>
-		<version>0.1</version>
+		<version>0.1.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>widget-havp.xml</configurationfile>
