@@ -141,154 +141,106 @@ function sync_relay_recipients($via_cron="cron"){
 }
 function check_cron(){
 	global $config, $g;
-			#check crontab
-			$new_cron=array();
-			$cron_cmd_sqlite = "";
-			$cron_postfix_sqlite="";
-			$cron_cmd= "/usr/local/bin/php -q /usr/local/www/postfix_recipients.php";
-			$postfix_enabled=$config['installedpackages']['postfix']['config'][0]['enable_postfix'];
-			#check ldap update
-			if (is_array($config['installedpackages']['postfixrecipients']['config']))
-				$postfix_recipients_config=$config['installedpackages']['postfixrecipients']['config'][0];
-			if(preg_match("/(\d+)(\w)/",$postfix_recipients_config['freq'],$matches)){
-					$cron_postfix=array("minute" =>	"*",
-										"hour"	 =>	"*",
-										"mday" 	 =>	"*",
-										"month"  =>	"*",
-										"wday"	 =>	"*",
-										"who"	 =>	"root",
-										"command"=>	$cron_cmd);
-					switch ($matches[2]){
-						case m:
-							$cron_postfix["minute"]="*/".$matches[1];
-							break;
-						case h:
-							$cron_postfix["minute"]="0";
-							$cron_postfix["hour"]="*/".$matches[1];
-							break;
-						case d:
-							$cron_postfix["minute"]="0";
-							$cron_postfix["hour"]="0";
-							$cron_postfix["mday"]="*/".$matches[1];
-							break;
-						default:
-							$input_errors[] = "A valid number with a time reference is required for the field 'Frequency'";
-					}
+
+	$cron_postfix_sqlite = "";
+	$cron_cmd_sqlite = "/usr/local/bin/php -q /usr/local/www/postfix.php";
+	$cron_cmd_recipients = "/usr/local/bin/php -q /usr/local/www/postfix_recipients.php";
+	if (is_array($config['installedpackages']['postfix']['config'])) {
+		$postfix_enabled = $config['installedpackages']['postfix']['config'][0]['enable_postfix'];
+	}
+
+	// check ldap update
+	if (is_array($config['installedpackages']['postfixrecipients']['config'])) {
+		$postfix_recipients_config = $config['installedpackages']['postfixrecipients']['config'][0];
+	}
+	// check crontab relay recipients
+	if (preg_match("/(\d+)(\w)/", $postfix_recipients_config['freq'], $matches)) {
+		$r_minute = "*";
+		$r_hour = "*";
+		$r_mday = "*";
+		$r_month = "*";
+		$r_wday = "*";
+		$r_who = "root";
+		switch ($matches[2]) {
+			case m:
+				$r_minute = "*/" . $matches[1];
+				break;
+			case h:
+				$r_minute = "0";
+				$r_hour = "*/" . $matches[1];
+				break;
+			case d:
+				$r_minute = "0";
+				$r_hour = "0";
+				$r_mday = "*/" . $matches[1];
+				break;
+			default:
+				$input_errors[] = "A valid number with a time reference is required for the field 'Frequency'";
+		}
+	}
+		
+	// check crontab Sqlite databases
+	if (is_array($config['installedpackages']['postfix']['config'])) {
+		$cron_sqlite_queue = $config['installedpackages']['postfix']['config'][0]['update_sqlite'];
+		if ($cron_sqlite_queue != "" && $cron_sqlite_queue != "never") {
+			$s_minute = "*";
+			$s_hour = "*";
+			$s_mday = "*";
+			$s_month = "*";
+			$s_wday = "*";
+			$s_who = "root";
+			switch ($cron_sqlite_queue) {
+				case '01min':
+					$cron_postfix_sqlite = $cron_cmd_sqlite . " 01min";
+					break;
+				case '10min':
+					$s_minute = "*/10";
+					$cron_postfix_sqlite = $cron_cmd_sqlite . " 10min";
+					break;
+				case '01hour':
+					$s_minute = "0";
+					$cron_postfix_sqlite = $cron_cmd_sqlite . " 01hour";
+					break;
+				case '24hours':
+					$s_minute = "0";
+					$s_hour = "0";
+					$cron_postfix_sqlite = $cron_cmd_sqlite . " 24hours";
+					break;
 			}
-			#check crontab Sqlite databases
-			if (is_array($config['installedpackages']['postfix']['config']) && $postfix_enabled=="on"){
-				$cron_sqlite_queue=$config['installedpackages']['postfix']['config'][0]['update_sqlite'];
-				$cron_cmd_sqlite="/usr/local/bin/php -q /usr/local/www/postfix.php";
-				if ($cron_sqlite_queue != "" && $cron_sqlite_queue != "never"){
-					$cron_postfix_sqlite=array("minute" =>	"*",
-											"hour"	 =>	"*",
-											"mday" 	 =>	"*",
-											"month"  =>	"*",
-											"wday"	 =>	"*",
-											"who"	 =>	"root",
-											"command"=>	"");
-					switch ($cron_sqlite_queue){
-						case '01min':
-							$cron_postfix_sqlite["command"] = $cron_cmd_sqlite ." 01min";
-							break;
-						case '10min':
-							$cron_postfix_sqlite["minute"]="*/10";
-							$cron_postfix_sqlite["command"] = $cron_cmd_sqlite ." 10min";
-							break;
-						case '01hour':
-							$cron_postfix_sqlite["minute"]="0";
-							$cron_postfix_sqlite["command"] = $cron_cmd_sqlite ." 01hour";
-							break;
-						case '24hours':
-							$cron_postfix_sqlite["minute"]="0";
-							$cron_postfix_sqlite["hour"]="0";
-							$cron_postfix_sqlite["command"] = $cron_cmd_sqlite ." 24hours";
-							break;
-						}
-				}
-			}
-
-			#check crontab relay recipients
-			$cron_found="";
-			if (is_array($config['cron']['item'])){
-				#print "<pre>";
-				foreach($config['cron']['item'] as $cron){
-					#check valid_recipients cron
-					if ($cron["command"] == $cron_cmd){
-						#postfix cron cmd found
-						if($postfix_enabled=="on"){
-							$cron_found=$cron;
-							if($postfix_recipients_config['enable_ldap'] || $postfix_recipients_config['enable_url']){
-								#update cron schedule
-								$new_cron['item'][]=$cron_postfix;
-								}
-							}
-						}
-					#check sqlite update queue
-					else if(!preg_match("/.usr.local.www.postfix.php/",$cron["command"])){
-						#keep all non postfix cron cmds if not empty
-						if ($cron["command"] != "")
-							$new_cron['item'][]=$cron;
-						}
-					}
-			$write_cron=1;
-			# Check if crontab must be changed to valid recipients cmd
-			if ($postfix_recipients_config['enable_ldap'] || $postfix_recipients_config['enable_url']){
-				if ($cron_found!=$cron_postfix){
-					#update postfix cron schedule
-					if (! is_array($cron_found) && $postfix_enabled=="on")
-						$new_cron['item'][]=$cron_postfix;
-					$write_cron=1;
-					}
-				}
-			else{
-				if (is_array($cron_found)){
-					#remove postfix cron cmd
-					$write_cron=1;
-					}
-				}
-			#check if cron must be changed to Sqlite cmd
-			if($cron_sqlite_queue != "" && $cron_sqlite_queue != "never"){
-				$new_cron['item'][]=$cron_postfix_sqlite;
-				$config['cron']=$new_cron;
-				$write_cron=1;
-				}
-			}
-
-			#call cron functions
-			if ($write_cron==1){
-				$config['cron']=$new_cron;
-				write_config('Postfix - sync remote sqlite database',$backup = false);
-				configure_cron();
-				}
-			#remove postfix old cron call
-			$old_cron=0;
-			$crontab = file('/etc/crontab');
-			$new_crontab="";
-			foreach ($crontab as $line){
-				if (preg_match("/php..usr.local.www.postfix_recipients.php/",$line))
-					$old_cron=1;
-				else
-					$new_crontab .= $line;
-				}
-			if ($old_cron==1)
-				file_put_contents("/etc/crontab",$new_crontab, LOCK_EX);
-
-			#print "<pre>". var_dump($new_cron). var_dump($cron_postfix_sqlite).var_dump($config['cron']);
-			#exit;
-
-
+		}
+	}
+	
+	// update cron
+	if ($postfix_enabled == "on") {
+		if ($postfix_recipients_config['enable_ldap'] || $postfix_recipients_config['enable_url']) {
+			install_cron_job("{$cron_cmd_recipients}", true, $r_minute, $r_hour, $r_mday, $r_month, $r_wday, $r_who);
+		} else {
+			install_cron_job("{$cron_cmd_recipients}", false);
+		}
+		if ($cron_sqlite_queue != "" && $cron_sqlite_queue != "never") {
+			// First remove the previous schedule since the command was appended as well
+			install_cron_job("{$cron_cmd_sqlite}", false);
+			install_cron_job("{$cron_postfix_sqlite}", true, $s_minute, $s_hour, $s_mday, $s_month, $s_wday, $s_who);
+		} else {
+			install_cron_job("{$cron_cmd_sqlite}", false);
+		}
+	} else {
+		install_cron_job("{$cron_cmd_recipients}", false);
+		install_cron_job("{$cron_cmd_sqlite}", false);
+	}
 }
+
 function sync_package_postfix($via_rpc="no") {
 	global $config;
 
 	log_error("sync_package_postfix called with via_rpc={$via_rpc}");
 	# detect boot process
 	if (is_array($_POST)){
-		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+		if (platform_booting()) {
 			unset($boot_process);
-		else
+		} else {
 			$boot_process="on";
+		}
 	}
 
 	if(is_process_running("master") && isset($boot_process) && $via_rpc=="no")
