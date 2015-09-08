@@ -252,8 +252,20 @@ if (!empty($act)) {
 		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
 	}
 
-	if (substr($act, 0, 4) == "inst") {
-		$exp_name = urlencode($exp_name.$act."-install.exe");
+	if (substr($act, 0, 11) == "inst-x86-xp") {
+		$exp_name = urlencode($exp_name."inst-x86-xp-install.exe");
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
+	}
+	if (substr($act, 0, 11) == "inst-x64-xp") {
+		$exp_name = urlencode($exp_name."inst-x64-xp-install.exe");
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
+	}
+	if (substr($act, 0, 13) == "inst-x86-win6) {
+		$exp_name = urlencode($exp_name."inst-x86-win6-install.exe");
+		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
+	}
+	if (substr($act, 0, 13) == "inst-x64-win6") {
+		$exp_name = urlencode($exp_name."inst-x64-win6-install.exe");
 		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
 
