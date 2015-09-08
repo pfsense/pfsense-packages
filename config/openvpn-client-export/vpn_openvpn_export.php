@@ -253,7 +253,7 @@ if (!empty($act)) {
 	}
 
 	if (substr($act, 0, 4) == "inst") {
-		$exp_name = urlencode($exp_name."-install.exe");
+		$exp_name = urlencode($exp_name.$act."-install.exe");
 		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
 
