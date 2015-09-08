@@ -67,7 +67,9 @@ function avahi_write_config() {
 	conf_mount_rw();
 
 	// Pull some various values out of config.xml
-	$avahi_config = $config['installedpackages']['avahi']['config'][0];
+	if (isset($config['installedpackages']['avahi']['config'][0])) {
+		$avahi_config = $config['installedpackages']['avahi']['config'][0];
+	}
 	// Server Options
 	$hostname = $config['system']['hostname'];
 	$domain = $config['system']['domain'];
@@ -237,16 +239,16 @@ function avahi_upgrade_config() {
 	}
 	$changes = 0;
 	// Convert previous disable values to enable ones
-	if ($avahi_config['disable_ipv4'] != "on" ) {
+	if (isset($avahi_config['disable_ipv4']) && $avahi_config['disable_ipv4'] != "on") {
 		$avahi_config['enable_ipv4'] == "on";
 		$changes++;
 	}
-	if ($avahi_config['disable_ipv6'] != "on" ) {
+	if (isset($avahi_config['disable_ipv6']) && $avahi_config['disable_ipv6'] != "on") {
 		$avahi_config['enable_ipv6'] == "on";
 		$changes++;
 	}
 	// If broken settings were configured due to lack of validation, just set to defaults
-	if (($avahi_config['disable_ipv4'] == "on" ) && ($avahi_config['disable_ipv6'] == "on" )) {
+	if (isset($avahi_config['disable_ipv4']) && isset($avahi_config['disable_ipv6']) && $avahi_config['disable_ipv4'] == "on" && $avahi_config['disable_ipv6'] == "on") {
 		$avahi_config['enable_ipv4'] == "on";
 		$avahi_config['enable_ipv6'] == "on";
 		$changes++;
