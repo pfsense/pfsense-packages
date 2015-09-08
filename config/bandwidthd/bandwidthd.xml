@@ -46,7 +46,7 @@
 	<name>bandwidthd</name>
 	<version>0.6</version>
 	<title>Diagnostics: Bandwidthd</title>
-	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml</aftersaveredirect>
 	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
 	<menu>
 		<name>BandwidthD</name>
@@ -58,7 +58,7 @@
 		<name>BandwidthD Settings</name>
 		<tooltiptext></tooltiptext>
 		<section>Diagnostics</section>
-		<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=bandwidthd.xml</url>
 	</menu>
 	<service>
 		<name>bandwidthd</name>
@@ -119,6 +119,20 @@
 			<required/>
 		</field>
 		<field>
+			<fielddescr>Extra Subnet(s) for Statistics Collection</fielddescr>
+			<fieldname>subnets_extra</fieldname>
+			<description>
+				<![CDATA[
+				Specify additional IPv4 subnet(s) in CIDR notation for statistics collection (or leave empty if none).
+				For multiple subnets, separate entries with ';'<br />
+				(Example: 192.168.1.0/24;10.0.0.0/24)<br />
+				<strong>Note: Do NOT specify any local subnets already selected in 'Subnet(s) for Statistics Collection' above!</strong>
+				]]>
+			</description>
+			<type>input</type>
+			<size>50</size>
+		</field>
+		<field>
 			<fielddescr>Promiscuous</fielddescr>
 			<fieldname>promiscuous</fieldname>
 			<description>
@@ -155,6 +169,7 @@
 			</description>
 			<type>checkbox</type>
 			<default_value>on</default_value>
+			<enablefields>meta_refresh,skipintervals,graphcutoff</enablefields>
 		</field>
 		<field>
 			<fielddescr>Meta Refresh</fielddescr>
@@ -194,6 +209,7 @@
 			<fieldname>outputcdf</fieldname>
 			<description>Log data to CDF files log*.cdf</description>
 			<type>checkbox</type>
+			<enablefields>recovercdf</enablefields>
 		</field>
 		<field>
 			<fielddescr>Recover CDF</fielddescr>
@@ -279,7 +295,7 @@
 			<type>textarea</type>
 			<encoding>base64</encoding>
 			<cols>65</cols>
-			<rows>1</rows>
+			<rows>5</rows>
 			<advancedfield/>
 		</field>
 	</fields>
