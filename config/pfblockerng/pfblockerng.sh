@@ -235,11 +235,11 @@ cp $pfbdeny$alias".txt" $tempfile; > $dedupfile
 data255="$(cut -d '.' -f 1-3 $tempfile | awk '{a[$0]++}END{for(i in a){if(a[i] > 255){print i}}}')"
 if [ ! -z "$data255" ]; then
 	for ip in $data255; do
-		ii=$(echo "^$ip" | sed 's/\./\\\./g')
+		ii=$(echo "^$ip." | sed 's/\./\\\./g')
 		grep $ii $tempfile >> $dedupfile
 	done
 	awk 'FNR==NR{a[$0];next}!($0 in a)' $dedupfile $tempfile > $pfbdeny$alias".txt"
-	for ip in $data255; do echo $ip"0/24" >> $pfbdeny$alias".txt"; done
+	for ip in $data255; do echo $ip".0/24" >> $pfbdeny$alias".txt"; done
 fi
 }
 
@@ -252,6 +252,8 @@ dupcheck=yes
 hcheck=$(grep -c ^ $masterfile); if [ "$hcheck" -eq "0" ]; then dupcheck=no; fi
 # Check if Alias exists in Masterfile
 lcheck=$(grep -m 1 "$alias " $masterfile ); if [ "$lcheck" == "" ]; then dupcheck=no; fi
+# Check for single alias in masterfile
+aliaslist=$(cut -d' ' -f1 $masterfile | sort | uniq); if [ "$alias" == "$aliaslist" ]; then hcheck="0"; fi
 
 if [ "$dupcheck" == "yes" ]; then
 	# Grep Alias with a trailing Space character
@@ -332,7 +334,6 @@ if [ -e "$pfbsuppression" ] && [ -s "$pfbsuppression" ]; then
 						octet4=$(echo $ip | cut -d '.' -f 4 | sed 's/\/.*//')
 						dcheck=$(grep $iptrim".0/24" $dupfile)
 						if [ "$dcheck" == "" ]; then
-							echo $iptrim".0" >> $tempfile
 							echo $iptrim".0/24" >> $dupfile
 							counter=$(($counter + 1))
 							# Add Individual IP addresses from Range excluding Suppressed IP
@@ -424,6 +425,8 @@ dupcheck=yes
 hcheck=$(grep -cv "^$" $masterfile); if [ "$hcheck" -eq "0" ]; then dupcheck=no; fi
 # Check if Alias exists in Masterfile
 lcheck=$(grep -m1 "$alias " $masterfile); if [ "$lcheck" == "" ]; then dupcheck=no; fi
+# Check for single alias in masterfile
+aliaslist=$(cut -d' ' -f1 $masterfile | sort | uniq); if [ "$alias" == "$aliaslist" ]; then hcheck="0"; fi
 
 if [ "$dupcheck" == "yes" ]; then
 	# Grep Alias with a trailing Space character
@@ -478,7 +481,7 @@ fi
 
 > $tempfile; > $tempfile2; > $dupfile; > $addfile; > $dedupfile; > $matchfile; > $tempmatchfile; count=0; dcount=0; mcount=0; mmcount=0
 echo; echo "Querying for Repeat Offenders"
-data="$(find $pfbdeny ! -name "pfB*.txt" ! -name "*_v6.txt" -type f | cut -d '.' -f 1-3 $pfbdeny*.txt |
+data="$(find $pfbdeny ! -name "pfB*.txt" ! -name "*_v6.txt" -type f | xargs cut -d '.' -f 1-3 |
 	awk -v max="$max" '{a[$0]++}END{for(i in a){if(a[i] > max){print i}}}' | grep -v "^1\.1\.1")"
 count=$(echo "$data" | grep -c ^)
 if [ "$data" == "" ]; then count=0; fi
@@ -605,7 +608,7 @@ fi
 > $tempfile; > $tempfile2; > $dupfile; > $addfile; > $dedupfile; count=0; dcount=0
 echo; echo "====================================================================="
 echo; echo "Querying for Repeat Offenders"
-data="$(find $pfbdeny ! -name "pfB*.txt" ! -name "*_v6.txt" -type f | cut -d '.' -f 1-3 $pfbdeny*.txt |
+data="$(find $pfbdeny ! -name "pfB*.txt" ! -name "*_v6.txt" -type f | xargs cut -d '.' -f 1-3 |
 	awk -v max="$max" '{a[$0]++}END{for(i in a){if(a[i] > max){print i}}}' | grep -v "^1\.1\.1")"
 count=$(echo "$data" | grep -c ^)
 if [ "$data" == "" ]; then count=0; fi
