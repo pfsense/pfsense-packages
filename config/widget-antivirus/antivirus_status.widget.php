@@ -30,6 +30,7 @@
 require_once("guiconfig.inc");
 require_once("pfsense-utils.inc");
 require_once("functions.inc");
+require_once("pkg-utils.inc");
 
 define('PATH_CLAMDB', '/var/db/clamav');
 define('PATH_HAVPLOG', '/var/log/access.log');
@@ -91,26 +92,6 @@ function dwg_av_statistic() {
 		$log = file_get_contents(PATH_HAVPLOG);
 		$count = substr_count(strtolower($log), "virus clamd:");
 		$s = "Found $count viruses (total).";
-
-/*
-# slowly worked - need apply cache or preparse stat
-
-        $log   = explode("\n", $log);
-        # counters: day, week, mon, total
-        $count = 0;
-        foreach($log as $ln) {
-            $ln = explode(' ', $ln);
-            # 0:date 1:time 2:ip 3:get 4:len 5:url 6:xx 7:status
-            if (strpos(strtolower($ln[7]), "virus") !== false) {
-                $count++;
-            }
-        }
-        $s  = "Found viruses:<br>";
-        $s .= "<table width='100%' border='0' cellspacing='0' cellpadding='0'><tbody>";
-        $s .= "<tr align='center'><td>today</td><td>week</td><td>mon</td><td>total</td></tr>";
-        $s .= "<tr align='center'><td>0</td><td>0</td><td>0</td><td>$count</td></tr>";
-        $s .= "</tbody></table>";
-*/
 	}
 	return $s;
 }
@@ -123,8 +104,17 @@ function dwg_av_statistic() {
 			<td class="vncellt">HTTP Scanner</td>
 			<td class="listr" width="75%">
 			<?php
-				// HAVP version; note - obviously broken now
-				echo exec("pkg_info | grep \"[h]avp\"");
+				// HAVP version
+				$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
+				if ($pfs_version == "2.1") {
+					echo exec("pkg_info | grep \"[h]avp\"");
+				} elseif ($pfs_version == "2.2") {
+					// Show package version at least, no good quick way to get the PBI version
+					echo "pkg v{$config['installedpackages']['package'][get_pkg_id("havp")]['version']}";
+				} else {
+					pkg_exec("query '%v' havp", $version, $err);
+					echo $version;
+				}
 			?>
 			</td>
 		</tr>
