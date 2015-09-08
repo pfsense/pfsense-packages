@@ -30,56 +30,13 @@
 require_once("util.inc");
 
 function vnstat_install_deinstall() {
-	global $config;
 	// Remove Vnstat package and files
 	exec("/bin/rm -d -R /usr/local/www/vnstat2");
 	exec("/bin/rm -d -R /usr/local/www/vnstati");
 	exec("/bin/rm -d -R /usr/local/pkg/vnstat2");
 	exec("/bin/rm /usr/local/etc/vnstat.conf");
 	// Remove vnstat cron entry from config.xml
-	vnstat2_install_cron(false);
-}
-
-function vnstat2_install_cron($vnstat_cron_value) {
-	global $config;
-	$is_installed = false;
-	if (!$config['cron']['item']) {
-		return;
-	}
-	$x=0;
-	foreach ($config['cron']['item'] as $item) {
-		if (strstr($item['command'], "/usr/local/pkg/vnstat2/vnstat2.sh")) {
-			$is_installed = true;
-			break;
-		}
-		$x++;
-	}
-	switch ($vnstat_cron_value) {
-		case true:
-			if (!$is_installed) {
-				$cron_item = array();
-				$cron_item['minute'] = "*/1";
-				$cron_item['hour'] = "*";
-				$cron_item['mday'] = "*";
-				$cron_item['month'] = "*";
-				$cron_item['wday'] = "*";
-				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/local/pkg/vnstat2/vnstat2.sh";
-				$config['cron']['item'][] = $cron_item;
-				write_config();
-				configure_cron();
-			}
-			break;
-		case false:
-			if ($is_installed == true) {
-				if ($x > 0) {
-					unset($config['cron']['item'][$x]);
-					write_config();
-				}
-				configure_cron();
-			}
-			break;
-	}
+	install_cron_job("/usr/local/pkg/vnstat2/vnstat2.sh", false);
 }
 
 function change_vnstat_conf() {
@@ -226,7 +183,7 @@ function vnstat_install_config() {
 	}
 	write_conf_f();
 	// Add cron job to config.xml
-	vnstat2_install_cron(true);
+	install_cron_job("/usr/local/pkg/vnstat2/vnstat2.sh", true, "*/1");
 	vnstat_create_nic_dbs();
 	write_config();
 	conf_mount_ro();
