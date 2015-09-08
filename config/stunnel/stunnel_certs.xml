@@ -1,53 +1,51 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    stunnel.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007-2009 Scott Ullrich
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	stunnel_certs.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2007-2009 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Stunnel certificates</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>stunnelcerts</name>
-	<version>4.18</version>
+	<version>5.20.2</version>
 	<title>Services: Secure Tunnel - Certificates</title>
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
+	<include_file>/usr/local/pkg/stunnel.inc</include_file>
 	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
-
 	<tabs>
 		<tab>
 			<text>Tunnels</text>
@@ -59,9 +57,6 @@
 			<active/>
 		</tab>
 	</tabs>
-
-	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
-         items.  An example of this would be the nat page where you add new nat redirects -->
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
@@ -79,55 +74,59 @@
 			<fielddescr>Status</fielddescr>
 			<fieldname>status</fieldname>
 		</columnitem>
-
 	</adddeleteeditpagefields>
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Enter a (short) description for this certificate</description>
+			<description>Enter a (short) description for this certificate.</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Certificate filename</fielddescr>
+			<fielddescr>Certificate Filename</fielddescr>
 			<fieldname>filename</fieldname>
 			<description>File name of certificate (read-only; updated on save). Extensions (.pem, .chain, .key) are added automatically.</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Certificate subject</fielddescr>
+			<fielddescr>Certificate Subject</fielddescr>
 			<fieldname>subject</fieldname>
 			<description>Certificate subject (read-only; updated on save)</description>
 			<type>input</type>
 			<size>50</size>
 		</field>
 		<field>
-			<fielddescr>Certificate valid until</fielddescr>
+			<fielddescr>Certificate Valid Until</fielddescr>
 			<fieldname>expiry</fieldname>
 			<description>The certificate will expire on this date, and will no longer work.</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>RSA private key</fielddescr>
+			<fielddescr>RSA Private Key</fielddescr>
 			<fieldname>cert_key</fieldname>
-			<description>RSA private key used for certificate. Do not change for existing certificates!&lt;br&gt;</description>
+			<description>
+				<![CDATA[
+				RSA private key used for certificate. Do not change for existing certificates!<br />
+				]]>
+			</description>
 			<type>textarea</type>
 			<rows>7</rows>
-			<cols>65</cols>
+			<cols>70</cols>
 		</field>
 		<field>
-			<fielddescr>Certificate chain</fielddescr>
+			<fielddescr>Certificate Chain</fielddescr>
 			<fieldname>cert_chain</fieldname>
-			<description>Full certificate chain; root certificate on top, then any intermediates, server certificate at the end.&lt;br&gt;
-							&lt;b&gt;Full chain required for private or EV certificates!&lt;/b&gt;</description>
+			<description>
+				<![CDATA[
+				Full certificate chain; root certificate on top, then any intermediates, server certificate at the end.<br />
+				<strong>Full chain required for private or EV certificates!</strong>
+				]]>
+			</description>
 			<type>textarea</type>
 			<rows>7</rows>
-			<cols>65</cols>
+			<cols>70</cols>
 		</field>
 	</fields>	
-	<include_file>/usr/local/pkg/stunnel.inc</include_file>
 	<custom_add_php_command>
 		stunnel_save_cert($config);
 		stunnel_save($config);
