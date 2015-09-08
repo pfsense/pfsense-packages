@@ -1839,10 +1839,11 @@ function squid_resync($via_rpc="no") {
 
 	// detect boot process
 	if (is_array($_POST)) {
-		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+		if (platform_booting()) {
 			unset($boot_process);
-		else
+		} else {
 			$boot_process="on";
+		}
 	}
 
 	log_error("[Squid] - Squid_resync function call pr:".is_process_running('squid')." bp:".isset($boot_process)." rpc:".$via_rpc);
