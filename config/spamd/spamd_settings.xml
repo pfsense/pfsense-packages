@@ -1,62 +1,51 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    spamd_settings.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2008 Scott Ullrich
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	spamd_settings.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>spamdsettings</name>
-	<version>1.1.1</version>
+	<version>1.1.5</version>
 	<title>SpamD: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=spamd_settings.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/spamd.inc</include_file>
-	<!-- Menu is where this packages menu will appear -->
-	<menu>
-		<name>SpamD</name>
-		<section>Services</section>
-		<configfile>spamd.xml</configfile>
-	</menu>
-	<service>
-                <name>spamd</name>
-                <rcfile>spamd.sh</rcfile>
-                <executable>spamd</executable>
-        </service>
 	<tabs>
 		<tab>
 			<text>SpamD External Sources</text>
@@ -76,18 +65,12 @@
 			<url>/spamd_db.php</url>
 		</tab>
 	</tabs>
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
 	<configpath>['installedpackages']['spamd']['config']</configpath>
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
-			<fielddescr>Intercept on interfaces</fielddescr>
+			<fielddescr>Intercept on Interfaces</fielddescr>
 			<fieldname>spamdbinds_array</fieldname>
-			<description>
-				<![CDATA[These are the interfaces spamd will intercept smtp connections on.]]>
-			</description>
+			<description>These are the interfaces SpamD will intercept SMTP connections on.</description>
 			<type>interfaces_selection</type>
 			<multiple>true</multiple>
 			<hideinterfaceregex>loopback</hideinterfaceregex>
@@ -97,71 +80,119 @@
 			<fieldname>identifier</fieldname>
 			<description>The SMTP version banner that is reported upon initial connection.</description>
 			<type>input</type>
-		</field>		
+		</field>
 		<field>
-			<fielddescr>Maximum blacklisted connections</fielddescr>
+			<fielddescr>Maximum Blacklisted Connections</fielddescr>
 			<fieldname>maxblack</fieldname>
-			<description>The maximum number of concurrent blacklisted connections to allow in greylisting mode.  This value may not be greater than maxcon (see below).  The default is maxcon - 100.</description>
+			<description>
+				<![CDATA[
+				The maximum number of concurrent blacklisted connections to allow in greylisting mode.
+				This value must not be greater than 'Max Concurrent Connections' (see below).<br />
+				(Default: 'Max Concurrent Connections' - 100)
+				]]>
+			</description>
 			<type>input</type>
+			<size>10</size>
 		</field>
 		<field>
-			<fielddescr>Max concurrent connections</fielddescr>
+			<fielddescr>Max Concurrent Connections</fielddescr>
 			<fieldname>maxcon</fieldname>
-			<description>The maximum number of concurrent connections to allow.  The default is 800.</description>
+			<description>
+				<![CDATA[
+				The maximum number of concurrent connections to allow.<br />
+				(Default: 800)
+				]]>
+			</description>
 			<type>input</type>
-			<value>800</value>
+			<size>10</size>
+			<default_value>800</default_value>
 		</field>
 		<field>
-			<fielddescr>Grey listing</fielddescr>
+			<fielddescr>Greylisting</fielddescr>
 			<fieldname>greylisting</fieldname>
-			<description>Connections from addresses not blacklisted on the black lists tab will be considered for greylisting.  Such connections will not be stuttered at (though see the stutter secs option) or delayed, and will receive the pleasantly innocuous temporary failure.  After passtime if the host returns it will be added to the white list.</description>
+			<description>
+				<![CDATA[
+				Connections from addresses not blacklisted on the black lists tab will be considered for greylisting.
+				Such connections will not be stuttered at (see the 'Stutter Secs' option) or delayed, and will receive the pleasantly innocuous temporary failure.
+				After passtime elapsed, the host will be added to the white list upon reconnection.
+				]]>
+			</description>
 			<type>checkbox</type>
-			<value>yes</value>
+			<enablefields>passtime,greyexp,whiteexp</enablefields>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>Passtime</fielddescr>
 			<fieldname>passtime</fieldname>
-			<description>Adjust the three time parameters for greylisting.  Passtime defaults to 25 (minutes).  After passtime minutes if spamd sees a retried attempt to deliver mail for the same tuple, spamd will whitelist the connecting address by adding it as a whitelist entry.</description>
+			<description>
+				<![CDATA[
+				After specified number of minutes, if SpamD sees a retried attempt to deliver mail for the same tuple, it will whitelist
+				the connecting address by adding it as a whitelist entry.<br />
+				(Default: 25 minutes)
+				]]>
+			</description>
 			<type>input</type>
-			<size>30</size>
-			<value>25:4:864</value>
+			<size>5</size>
+			<default_value>25</default_value>
 		</field>
 		<field>
 			<fielddescr>Grey Expiration</fielddescr>
 			<fieldname>greyexp</fieldname>
-			<description>Adjust the three time parameters for greylisting.  Grey expiration defaults to 4.  SpamD removes connection entries from the database if delivery has not been retried within greyexp hours from the initial time a connection is seen.</description>
+			<description>
+				<![CDATA[
+				SpamD removes connection entries from the database if delivery has not been retried within specified numbers of hours from the initial time a connection is seen.<br />
+				(Default: 4 hours)
+				]]>
+			</description>
 			<type>input</type>
-			<size>30</size>
-			<value>25:4:864</value>
+			<size>5</size>
+			<default_value>4</default_value>
 		</field>
 		<field>
 			<fielddescr>White Exp</fielddescr>
 			<fieldname>whiteexp</fieldname>
-			<description>Adjust the three time parameters for greylisting.  White expiration defaults to 864 (hours, approximately 36 days).  SpamD removes whitelist entries from the database if no mail delivery activity has been seen from the whitelisted address within whiteexp hours from the initial time an address is whitelisted.</description>
+			<description>
+				<![CDATA[
+				SpamD removes whitelist entries from the database if no mail delivery activity has been seen from the whitelisted address within specified number of hours
+				from the initial time an address is whitelisted.<br />
+				(Default: 864 hours - approximately 36 days)
+				]]>
+			</description>
 			<type>input</type>
-			<size>30</size>
-			<value>25:4:864</value>
+			<size>5</size>
+			<default_value>864</default_value>
 		</field>
 		<field>
 			<fielddescr>Stutter Secs</fielddescr>
 			<fieldname>stuttersecs</fieldname>
-			<description>Stutter at greylisted connections for the specified amount of seconds, after which the connection is not stuttered at.  Defaults to 10.</description>
+			<description>
+				<![CDATA[
+				Stutter at greylisted connections for the specified amount of seconds, after which the connection is not stuttered at.<br />
+				(Defaults: 10 seconds)
+				]]>
+			</description>
 			<type>input</type>
-			<value>10</value>
+			<size>5</size>
+			<default_value>10</default_value>
 		</field>
 		<field>
 			<fielddescr>Delay Secs</fielddescr>
 			<fieldname>delaysecs</fieldname>
-			<description>Delay each character sent to the client by the specified amount of seconds.  Defaults to 1.</description>
+			<description>
+				<![CDATA[
+				Delay each character sent to the client by the specified amount of seconds.<br />
+				(Default: 1 second)
+				]]>
+			</description>
 			<type>input</type>
-			<value>1</value>
+			<size>5</size>
+			<default_value>1</default_value>
 		</field>
 		<field>
 			<fielddescr>Window Size</fielddescr>
 			<fieldname>window</fieldname>
 			<description>Set the socket receive buffer to this many bytes, adjusting the window size.</description>
 			<type>input</type>
-			<value></value>
 		</field>
 		<!--
 		<field>
@@ -170,33 +201,31 @@
 			<description>The SMTP error to return to the spammer, i.e. 450, 451, 550. This defaults to 450.</description>
 			<type>select</type>
 			<size>1</size>
-			<value>450</value>
+			<default_value>450</default_value>
 			<options>
-			    <option><name></name><value></value></option>
-			    <option><name>450</name><value>450</value></option>
-			    <option><name>451</name><value>451</value></option>
-			    <option><name>550</name><value>550</value></option>
+				<option><name></name><value></value></option>
+				<option><name>450</name><value>450</value></option>
+				<option><name>451</name><value>451</value></option>
+				<option><name>550</name><value>550</value></option>
 			</options>
 		</field>
 		-->
 		<field>
 			<fielddescr>NextMTA</fielddescr>
-			<fieldname>nextmta</fieldname>
-			<description>Automatically sends messages after being processed by SpamD to IP Address.  You may enter an alias if you like, simply prepend $ to the alias name. example: $mailservers.  Note, if you have postfix package installed enter 127.0.0.1 here.</description>
+			<fieldname>next_mta</fieldname>
+			<description>
+				<![CDATA[
+				After processing, automatically send messages to specified IP address.<br />
+				Note: If you have postfix package installed, enter 127.0.0.1 here.
+				]]>
+			</description>
 			<type>input</type>
-			<value>1</value>
+			<default_value>on</default_value>
 		</field>
-		<field>
-			<fielddescr>Enable RRD graphing</fielddescr>
-			<fieldname>enablerrd</fieldname>
-			<description>Enables the graphing of SpamD connection and disconnection statistics.</description>
-			<type>checkbox</type>
-			<value></value>
-		</field>		
 	</fields>
 	<custom_php_validation_command>
 		spamd_validate_input($_POST, $input_errors);
-	</custom_php_validation_command>	
+	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_spamd();
 	</custom_php_resync_config_command>
