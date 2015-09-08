@@ -235,11 +235,11 @@ cp $pfbdeny$alias".txt" $tempfile; > $dedupfile
 data255="$(cut -d '.' -f 1-3 $tempfile | awk '{a[$0]++}END{for(i in a){if(a[i] > 255){print i}}}')"
 if [ ! -z "$data255" ]; then
 	for ip in $data255; do
-		ii=$(echo "^$ip" | sed 's/\./\\\./g')
+		ii=$(echo "^$ip." | sed 's/\./\\\./g')
 		grep $ii $tempfile >> $dedupfile
 	done
 	awk 'FNR==NR{a[$0];next}!($0 in a)' $dedupfile $tempfile > $pfbdeny$alias".txt"
-	for ip in $data255; do echo $ip"0/24" >> $pfbdeny$alias".txt"; done
+	for ip in $data255; do echo $ip".0/24" >> $pfbdeny$alias".txt"; done
 fi
 }
 
@@ -334,7 +334,6 @@ if [ -e "$pfbsuppression" ] && [ -s "$pfbsuppression" ]; then
 						octet4=$(echo $ip | cut -d '.' -f 4 | sed 's/\/.*//')
 						dcheck=$(grep $iptrim".0/24" $dupfile)
 						if [ "$dcheck" == "" ]; then
-							echo $iptrim".0" >> $tempfile
 							echo $iptrim".0/24" >> $dupfile
 							counter=$(($counter + 1))
 							# Add Individual IP addresses from Range excluding Suppressed IP
