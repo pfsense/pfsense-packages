@@ -1025,7 +1025,7 @@
 		<descr>High performance web proxy cache.</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>2.7.9 pkg v.4.3.6</version>
+		<version>4.3.7</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
