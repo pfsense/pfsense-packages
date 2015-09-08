@@ -772,89 +772,33 @@ function squid_validate_auth($post, &$input_errors) {
 }
 
 function squid_install_cron($should_install) {
-	global $config, $g;
+	global $config;
 
-	if ($g['booting']==true)
+	if (platform_booting()) {
 		return;
-	$rotate_is_installed = false;
-	$swapstate_is_installed = false;
-
-	if (!$config['cron']['item'])
-		return;
-
-	if (is_array($config['installedpackages']['squidcache']))
-		$settings = $config['installedpackages']['squidcache']['config'][0];
-	else
-		$settings = array();
-
-	$x=0;
-	$rotate_job_id=-1;
-	$swapstate_job_id=-1;
-	$cron_cmd=($settings['clear_cache']=='on' ?  "/usr/local/pkg/swapstate_check.php clean; " : "");
-	$cron_cmd .= SQUID_BASE."/sbin/squid -k rotate -f " . SQUID_CONFFILE;
-	$need_write = false;
-	foreach ($config['cron']['item'] as $item) {
-		if (strstr($item['task_name'], "squid_rotate_logs")) {
-			$rotate_job_id = $x;
-			if ($item['command'] != $cron_cmd) {
-				$config['cron']['item'][$x]['command']=$cron_cmd;
-				$need_write = true;
-			}
-		} elseif (strstr($item['task_name'], "squid_check_swapstate")) {
-			$swapstate_job_id = $x;
-		}
-		$x++;
 	}
+
+	parse_config(true);
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$settings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$settings = array();
+	}
+
+	$cron_cmd = ($settings['clear_cache'] == 'on' ?  "/usr/local/pkg/swapstate_check.php clean; " : "");
+	$cron_cmd .= SQUID_BASE . "/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+	install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
+
+	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php clean; ";
 	if ($should_install) {
-		$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-		if ($rotate_job_id < 0) {
-			$cron_item['command']=($settings['clear_cache']=='on' ?  "/usr/local/pkg/swapstate_check.php clean; " : "");
-			$cron_item = array();
-			$cron_item['task_name'] = "squid_rotate_logs";
-			$cron_item['minute'] = "0";
-			$cron_item['hour'] = "0";
-			$cron_item['mday'] = "*";
-			$cron_item['month'] = "*";
-			$cron_item['wday'] = "*";
-			$cron_item['who'] = "root";
-			$cron_item['command'] .= $cron_cmd;
-			/* Add this cron_item as a new entry at the end of the item array. */
-			$config['cron']['item'][] = $cron_item;
-			$need_write = true;
-		}
-		if ($swapstate_job_id < 0) {
-			$cron_item = array();
-			$cron_item['task_name'] = "squid_check_swapstate";
-			$cron_item['minute'] = "*/15";
-			$cron_item['hour'] = "*";
-			$cron_item['mday'] = "*";
-			$cron_item['month'] = "*";
-			$cron_item['wday'] = "*";
-			$cron_item['who'] = "root";
-			$cron_item['command'] = "/usr/local/pkg/swapstate_check.php";
-			/* Add this cron_item as a new entry at the end of the item array. */
-			$config['cron']['item'][] = $cron_item;
-			$need_write = true;
-		}
-		if ($need_write) {
-			parse_config(true);
-			write_config("Adding Squid Cron Jobs");
+		if ($settings['clear_cache'] == 'on' ) {
+			install_cron_job("{$swapstate_cmd}", true, "*/15");
+		} else {
+			install_cron_job("{$swapstate_cmd}", false);
 		}
 	} else {
-		if ($rotate_job_id >= 0) {
-			unset($config['cron']['item'][$rotate_job_id]);
-			$need_write = true;
-		}
-		if ($swapstate_job_id >= 0) {
-			unset($config['cron']['item'][$swapstate_job_id]);
-			$need_write = true;
-		}
-		if ($need_write) {
-			parse_config(true);
-			write_config("Removing Squid Cron Jobs");
-		}
+		install_cron_job("{$swapstate_cmd}", false);
 	}
-	configure_cron();
 }
 
 function squid_check_ca_hashes() {
@@ -1895,10 +1839,11 @@ function squid_resync($via_rpc="no") {
 
 	// detect boot process
 	if (is_array($_POST)) {
-		if (preg_match("/\w+/",$_POST['__csrf_magic']))
+		if (platform_booting()) {
 			unset($boot_process);
-		else
+		} else {
 			$boot_process="on";
+		}
 	}
 
 	log_error("[Squid] - Squid_resync function call pr:".is_process_running('squid')." bp:".isset($boot_process)." rpc:".$via_rpc);
