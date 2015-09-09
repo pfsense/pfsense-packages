@@ -306,9 +306,10 @@ function squid_install_command() {
 	update_status("Creating squid cache pools... One moment please...");
 	squid_dash_z();
 
-	/* make sure pinger is executable */
+	/* make sure pinger is executable and suid root */
+	// XXX: Bug #5114
 	if (file_exists(SQUID_LOCALBASE. "/libexec/squid/pinger"))
-		@chmod(SQUID_LOCALBASE. "/libexec/squid/pinger", 0755);
+		@chmod(SQUID_LOCALBASE. "/libexec/squid/pinger", 4755);
 
 	// XXX: Is it really necessary?
 	if (file_exists("/usr/local/etc/rc.d/squid"))
@@ -1876,10 +1877,10 @@ function squid_resync($via_rpc="no") {
 	// write config file
 	file_put_contents(SQUID_CONFFILE, $conf);
 
-	/* make sure pinger is executable */
-	// XXX: Is it really necessary? Who could change its permission?
+	/* make sure pinger is executable and suid root */
+	// XXX: Bug #5114
 	if (file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger"))
-		@chmod(SQUID_LOCALBASE. "/libexec/squid/pinger", 0755);
+		@chmod(SQUID_LOCALBASE. "/libexec/squid/pinger", 4755);
 
 	$log_dir="";
 	// check if squid is enabled
