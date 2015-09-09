@@ -68,7 +68,12 @@
 		</tab>
 		<tab>
 			<text>HAVP Log</text>
-			<url>/havp_log.php</url>
+			<url>/havp_log.php?logtab=havp</url>
+			</tab>
+		</tabs>
+		<tab>
+			<text>Clamd Log</text>
+			<url>/havp_log.php?logtab=clamd</url>
 			</tab>
 		</tabs>
 	<fields>
