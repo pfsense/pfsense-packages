@@ -241,16 +241,20 @@ function avahi_upgrade_config() {
 	// Convert previous disable values to enable ones
 	if (isset($avahi_config['disable_ipv4']) && $avahi_config['disable_ipv4'] != "on") {
 		$avahi_config['enable_ipv4'] == "on";
+		unset($avahi_config['disable_ipv4']);
 		$changes++;
 	}
 	if (isset($avahi_config['disable_ipv6']) && $avahi_config['disable_ipv6'] != "on") {
 		$avahi_config['enable_ipv6'] == "on";
+		unset($avahi_config['disable_ipv6']);
 		$changes++;
 	}
 	// If broken settings were configured due to lack of validation, just set to defaults
 	if (isset($avahi_config['disable_ipv4']) && isset($avahi_config['disable_ipv6']) && $avahi_config['disable_ipv4'] == "on" && $avahi_config['disable_ipv6'] == "on") {
 		$avahi_config['enable_ipv4'] == "on";
 		$avahi_config['enable_ipv6'] == "on";
+		unset($avahi_config['disable_ipv4']);
+		unset($avahi_config['disable_ipv6']);
 		$changes++;
 	}
 	if ($changes > 0 ) {
