@@ -521,12 +521,12 @@ function havp_reconfigure_cron() {
 	$optval = array("", "*/1", "*/2", "*/3", "*/4", "*/6", "*/8", "*/12", "0");
 	$opt = array("0", "*", "*", "*", "*", "root");
 	$opt[1] = $optval[$havp_config[F_HAVPUPDATE]];
-	$on = ($opt[1] !== "");
+	$on = ($opt[1] != "");
 	$crontask = "/usr/bin/nice -n20 " . HVDEF_AVUPD_SCRIPT;
 
 	// Set new cron task or remove it if inactive
 	if ($on === true) {
-		install_cron_job($crontask, $on, $opt);
+		install_cron_job($crontask, true, $opt[0], $opt[1], $opt[2], $opt[3], $opt[4], $opt[5]);
 	} else {
 		install_cron_job($crontask, false);
 	}
