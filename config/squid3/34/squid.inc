@@ -1840,7 +1840,7 @@ function squid_resync($via_rpc="no") {
 
 	// detect boot process
 	if (is_array($_POST)) {
-		if (platform_booting()) {
+		if (!platform_booting()) {
 			unset($boot_process);
 		} else {
 			$boot_process="on";
