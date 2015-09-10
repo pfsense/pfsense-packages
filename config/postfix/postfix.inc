@@ -236,7 +236,7 @@ function sync_package_postfix($via_rpc="no") {
 	log_error("sync_package_postfix called with via_rpc={$via_rpc}");
 	# detect boot process
 	if (is_array($_POST)){
-		if (platform_booting()) {
+		if (!platform_booting()) {
 			unset($boot_process);
 		} else {
 			$boot_process="on";
