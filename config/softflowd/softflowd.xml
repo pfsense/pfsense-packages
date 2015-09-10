@@ -243,7 +243,11 @@
 					)
 				);
 				/* Only try to restart if not booting */
-				if (!platform_booting()) {
+				if (function_exists("platform_booting")) {
+					if (!platform_booting()) {
+						restart_service("softflowd");
+					}
+				} elseif (!($g['booting'])) {
 					restart_service("softflowd");
 				}
 			}
