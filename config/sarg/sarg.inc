@@ -192,7 +192,11 @@ function sync_package_sarg() {
 	global $config, $g, $sarg_proxy;
 
 	// detect boot process
-	if (platform_booting()) {
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
 	}
 
