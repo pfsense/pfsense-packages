@@ -62,7 +62,11 @@ function sshdcond_custom_php_write_config() {
 	global $g, $config, $pkg_interface;
 
 	/* Detect boot process, do nothing during boot. */
-	if (platform_booting()) {
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
 	}
 

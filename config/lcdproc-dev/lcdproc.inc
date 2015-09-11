@@ -139,12 +139,14 @@ function sync_package_lcdproc_screens() {
 }
 
 function sync_package_lcdproc() {
-	global $g;
-	global $config;
-	global $input_errors;
+	global $g, $config, $input_errors;
 
 	# Detect boot process
-	if (platform_booting()) {
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
 	}
 

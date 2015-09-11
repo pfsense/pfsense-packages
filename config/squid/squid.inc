@@ -543,10 +543,15 @@ function squid_validate_auth($post, &$input_errors) {
 }
 
 function squid_install_cron($should_install) {
-	global $config;
-	if (platform_booting()) {
+	global $g, $config;
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
 	}
+
 	parse_config(true);
 
 	if (is_array($config['installedpackages']['squidcache'])) {

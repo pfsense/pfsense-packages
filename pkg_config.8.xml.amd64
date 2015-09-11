@@ -662,7 +662,7 @@
 		<depends_on_package>sarg-2.3.6_2.tbz</depends_on_package>
 		<depends_on_package>gd-2.0.35_8,1.tbz</depends_on_package>
 		<depends_on_package_pbi>sarg-2.3.6_2-amd64.pbi</depends_on_package_pbi>
-		<version>2.3.6_2 pkg v.0.6.3</version>
+		<version>2.3.6_2 pkg v.0.6.6</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<configurationfile>sarg.xml</configurationfile>
@@ -683,7 +683,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
  		<depends_on_package>ipguard-1.04.tbz</depends_on_package>
 		<depends_on_package_pbi>ipguard-1.04-amd64.pbi</depends_on_package_pbi>
-		<version>1.0.4 pkg v.0.1</version>
+		<version>1.0.4 pkg v.0.1.2</version>
 		<status>beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
@@ -903,7 +903,7 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.6.5_1 pkg 2.0.4</version>
+		<version>2.6.5_1 pkg 2.1.0</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
@@ -1117,7 +1117,7 @@
 		<descr>High performance web proxy cache.</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>2.7.9 pkg v.4.3.4</version>
+		<version>2.7.9 pkg v.4.3.9</version>
 		<status>Stable</status>
 		<required_version>2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -1219,7 +1219,7 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.6 pkg v. 0.9.11</version>
+		<version>lcdproc-0.5.6 pkg v. 0.9.14</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
 		<maintainer>michele@nt2.it</maintainer>
@@ -1550,7 +1550,7 @@
 		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br />
 				This package acts as an access list frontend for ssh connections]]></descr>
 		<category>Enhancements</category>
-		<version>1.0.1</version>
+		<version>1.0.5</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.xml</config_file>
