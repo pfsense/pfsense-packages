@@ -69,13 +69,12 @@
 		<tab>
 			<text>HAVP Log</text>
 			<url>/havp_log.php?logtab=havp</url>
-			</tab>
-		</tabs>
+		</tab>
 		<tab>
 			<text>Clamd Log</text>
 			<url>/havp_log.php?logtab=clamd</url>
-			</tab>
-		</tabs>
+		</tab>
+	</tabs>
 	<fields>
 		<field>
 			<fielddescr>ClamAV Database Update</fielddescr>
