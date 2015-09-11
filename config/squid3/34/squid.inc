@@ -309,7 +309,7 @@ function squid_install_command() {
 	/* make sure pinger is executable and suid root */
 	// XXX: Bug #5114
 	if (file_exists(SQUID_LOCALBASE. "/libexec/squid/pinger"))
-		chmod(SQUID_LOCALBASE. "/libexec/squid/pinger", 4755);
+		chgrp(SQUID_LOCALBASE. "/libexec/squid/pinger", SQUID_GID);
 
 	// XXX: Is it really necessary?
 	if (file_exists("/usr/local/etc/rc.d/squid"))
@@ -1840,7 +1840,7 @@ function squid_resync($via_rpc="no") {
 
 	// detect boot process
 	if (is_array($_POST)) {
-		if (platform_booting()) {
+		if (!platform_booting()) {
 			unset($boot_process);
 		} else {
 			$boot_process="on";
@@ -1880,7 +1880,7 @@ function squid_resync($via_rpc="no") {
 	/* make sure pinger is executable and suid root */
 	// XXX: Bug #5114
 	if (file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger"))
-		chmod(SQUID_LOCALBASE. "/libexec/squid/pinger", 4755);
+		chgrp(SQUID_LOCALBASE. "/libexec/squid/pinger", SQUID_GID);
 
 	$log_dir="";
 	// check if squid is enabled
