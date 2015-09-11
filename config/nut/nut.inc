@@ -492,8 +492,7 @@ EOD;
 	}
 
 	function sync_package_nut() {
-		global $config;
-		global $input_errors;
+		global $g, $config, $input_errors;
 
 		stop_service("nut");
 
@@ -509,10 +508,12 @@ EOD;
 			$return = sync_package_nut_snmp();
 		}
 
-		if ((!platform_booting()) && (nut_config('monitor'))) {
-			/* only start if enabled and system is not booting */
-			/* this prevents service from starting / stopping / starting on boot */
-
+		/* only start if enabled and system is not booting */
+		/* this prevents service from starting / stopping / starting on boot */
+		if ((function_exists("platform_booting")) && (!platform_booting()) && (nut_config('monitor'))) {
+			log_error("[nut] INFO: Starting service");
+			start_service("nut");
+		} elseif ((!($g['booting'])) && (nut_config('monitor'))) {
 			log_error("[nut] INFO: Starting service");
 			start_service("nut");
 		} elseif (!$return && file_exists(NUT_RCFILE)) {
