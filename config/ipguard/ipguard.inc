@@ -41,7 +41,11 @@ function ipguard_custom_php_write_config() {
 	global $g, $config;
 
 	/* Detect boot process and do nothing */
-	if (platform_booting()) {
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
 	}
 
