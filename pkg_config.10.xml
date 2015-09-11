@@ -606,7 +606,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_pbi>sarg-2.3.9-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.6.5</version>
+		<version>0.6.6</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<port_category>www</port_category>
@@ -633,7 +633,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/ipguard/ipguard.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
 		<depends_on_package_pbi>ipguard-1.04_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.1.1</version>
+		<version>0.1.2</version>
 		<status>beta</status>
 		<required_version>2.2</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
@@ -814,7 +814,7 @@
 		<descr>Network UPS Tools.</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.0.9</version>
+		<version>2.1.0</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
@@ -1025,7 +1025,7 @@
 		<descr>High performance web proxy cache.</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>4.3.8</version>
+		<version>4.3.9</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
@@ -1096,7 +1096,7 @@
 		<descr>LCD display driver - development version.</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>0.9.13</version>
+		<version>0.9.14</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>michele@nt2.it</maintainer>
@@ -1336,7 +1336,7 @@
 			]]>
 		</descr>
 		<category>Enhancements</category>
-		<version>1.0.4</version>
+		<version>1.0.5</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.xml</config_file>
