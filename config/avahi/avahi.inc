@@ -233,27 +233,25 @@ function avahi_sync() {
 function avahi_upgrade_config() {
 	global $config, $avahi_config;
 
-	$avahi_config = $config['installedpackages']['avahi']['config'][0];
+	$avahi_config &= $config['installedpackages']['avahi']['config'][0];
 	if (!is_array($avahi_config)) {
 		$avahi_config = array();
 	}
 	$changes = 0;
 	// Convert previous disable values to enable ones
-	if (isset($avahi_config['disable_ipv4']) && $avahi_config['disable_ipv4'] != "on") {
-		$avahi_config['enable_ipv4'] == "on";
-		unset($avahi_config['disable_ipv4']);
-		$changes++;
-	}
-	if (isset($avahi_config['disable_ipv6']) && $avahi_config['disable_ipv6'] != "on") {
-		$avahi_config['enable_ipv6'] == "on";
-		unset($avahi_config['disable_ipv6']);
-		$changes++;
-	}
 	// If broken settings were configured due to lack of validation, just set to defaults
 	if (isset($avahi_config['disable_ipv4']) && isset($avahi_config['disable_ipv6']) && $avahi_config['disable_ipv4'] == "on" && $avahi_config['disable_ipv6'] == "on") {
 		$avahi_config['enable_ipv4'] == "on";
 		$avahi_config['enable_ipv6'] == "on";
 		unset($avahi_config['disable_ipv4']);
+		unset($avahi_config['disable_ipv6']);
+		$changes++;
+	} elseif (isset($avahi_config['disable_ipv4']) && $avahi_config['disable_ipv4'] != "on") {
+		$avahi_config['enable_ipv4'] == "on";
+		unset($avahi_config['disable_ipv4']);
+		$changes++;
+	} elseif (isset($avahi_config['disable_ipv6']) && $avahi_config['disable_ipv6'] != "on") {
+		$avahi_config['enable_ipv6'] == "on";
 		unset($avahi_config['disable_ipv6']);
 		$changes++;
 	}
