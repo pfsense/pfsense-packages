@@ -233,7 +233,7 @@ function avahi_sync() {
 function avahi_upgrade_config() {
 	global $config, $avahi_config;
 
-	$avahi_config &= $config['installedpackages']['avahi']['config'][0];
+	$avahi_config =& $config['installedpackages']['avahi']['config'][0];
 	if (!is_array($avahi_config)) {
 		$avahi_config = array();
 	}
