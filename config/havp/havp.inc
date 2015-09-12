@@ -240,6 +240,9 @@ function havp_deinstall() {
 	// unlink_if_exists(HVDEF_AVUPD_SCRIPT);
 	// unlink_if_exists(HVDEF_CLAM_PID);
 	// unlink_if_exists(HVDEF_CLAM_SOCKET);
+	if (is_dir("/usr/local/share/examples/havp/")) {
+		mwexec("/bin/rm -rf /usr/local/share/examples/havp/");
+	}
 	umountRAMDisk();
 }
 /*
