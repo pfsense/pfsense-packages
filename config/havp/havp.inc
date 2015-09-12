@@ -633,7 +633,7 @@ function havp_convert_pfxml_xml() {
 	$havp_config[F_PROXYBINDIFACE]	= 'localhost';
 	/* Language template files path */
 	$lng = $havp_config[F_LANGUAGE]	? $havp_config[F_LANGUAGE] : "en";
-	$havp_config[F_TEMPLATEPATH]	= (file_exists(HVDEF_TEMPLATES . "/$lng") ? HVDEF_TEMPLATES : HVDEF_TEMPLATES_EX );
+	$havp_config[F_TEMPLATEPATH]	= (file_exists(HVDEF_TEMPLATES_EX . "/$lng") ? HVDEF_TEMPLATES_EX : HVDEF_TEMPLATES );
 	$havp_config[F_TEMPLATEPATH]	.= "/$lng";
 	/* AV settings */
 	$pf_avset_conf = $config['installedpackages'][HVFORM_AVSET]['config'][0];
