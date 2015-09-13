@@ -44,7 +44,7 @@
 	</copyright>
 	<requirements>Bacula Server Installed on your network.</requirements>
 	<name>baculaclient</name>
-	<version>1.0.8</version>
+	<version>1.0.10</version>
 	<title>Bacula Client: Settings</title>
 	<aftersaveredirect>/pkg.php?xml=bacula-client.xml</aftersaveredirect>
 	<include_file>/usr/local/pkg/bacula-client.inc</include_file>
