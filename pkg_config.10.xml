@@ -1397,7 +1397,7 @@
 		<descr>Bacula is a set of Open Source computer programs that permit managings backups, recovery, and verification of computer data across a network of computers of different kinds.</descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>1.0.9</version>
+		<version>1.0.10</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
