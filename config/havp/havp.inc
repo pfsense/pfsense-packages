@@ -87,9 +87,13 @@ define('HVDEF_PID_FILE',	'/var/run/havp.pid');
 
 $pf_version=substr(trim(file_get_contents("/etc/version")), 0, 3);
 if ($pf_version == "2.1" || $pf_version == "2.2") {
-	define("HVDEF_WORK_DIR", "/usr/pbi/havp-" . php_uname("m") . "/local/etc");
+	define("HVDEF_WORK_DIR", 	"/usr/pbi/havp-" . php_uname("m") . "/local/etc");
+	define('HVDEF_TEMPLATES',	"/usr/pbi/havp-" . php_uname("m") . "/local/share/examples/havp/templates");
+	define('HVDEF_TEMPLATES_EX',	HVDEF_TEMPLATES . '_ex');
 } else {
-	define("HVDEF_WORK_DIR", "/usr/local/etc/havp");
+	define("HVDEF_WORK_DIR", 	"/usr/local/etc/havp");
+	define('HVDEF_TEMPLATES',	'/usr/local/share/examples/havp/templates');
+	define('HVDEF_TEMPLATES_EX',	HVDEF_TEMPLATES . '_ex');
 }
 
 define('HVDEF_LOG_DIR',		'/var/log/havp');
@@ -97,8 +101,6 @@ define('HVDEF_TEMP_DIR',	'/var/tmp');
 define('HVDEF_HAVPTEMP_DIR',	HVDEF_TEMP_DIR . '/havp');
 define('HVDEF_RAMTEMP_DIR',	HVDEF_TEMP_DIR . '/havpRAM');
 define('HVDEF_SCANTEMPFILE',	'/havp-XXXXXX');
-define('HVDEF_TEMPLATES',	'/usr/local/share/examples/havp/templates');
-define('HVDEF_TEMPLATES_EX',	HVDEF_TEMPLATES . '_ex');
 define('HVDEF_FILTER_RULES',	'/tmp/rules.havp');
 define('HVDEF_HAVP_CONFIG',	HVDEF_WORK_DIR . '/havp.config');
 define('HVDEF_HAVP_XMLCONF',	HVDEF_WORK_DIR . '/havp_conf.xml');
@@ -238,6 +240,9 @@ function havp_deinstall() {
 	// unlink_if_exists(HVDEF_AVUPD_SCRIPT);
 	// unlink_if_exists(HVDEF_CLAM_PID);
 	// unlink_if_exists(HVDEF_CLAM_SOCKET);
+	if (is_dir("/usr/local/share/examples/havp/")) {
+		mwexec("/bin/rm -rf /usr/local/share/examples/havp/");
+	}
 	umountRAMDisk();
 }
 /*

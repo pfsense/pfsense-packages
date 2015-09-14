@@ -212,9 +212,11 @@
 				 <option><value>es</value><name>Spanish</name></option>
 				 <option><value>fr</value><name>French</name></option>
 				 <option><value>it</value><name>Italian</name></option>
-				 <option><value>nf</value><name>Norf'k</name></option>
+				 <option><value>nl</value><name>Dutch</name></option>
+				 <option><value>pf</value><name>Norf'k</name></option>
 				 <option><value>pl</value><name>Polish</name></option>
 				 <option><value>ru</value><name>Russian</name></option>
+				 <option><value>sv</value><name>Swedish</name></option>
 			</options>
 		</field>
 		<field>
