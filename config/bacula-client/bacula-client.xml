@@ -44,7 +44,7 @@
 	</copyright>
 	<requirements>Bacula Server Installed on your network.</requirements>
 	<name>baculaclient</name>
-	<version>1.0.10</version>
+	<version>1.0.11</version>
 	<title>Bacula Client: Settings</title>
 	<aftersaveredirect>/pkg.php?xml=bacula-client.xml</aftersaveredirect>
 	<include_file>/usr/local/pkg/bacula-client.inc</include_file>
@@ -156,4 +156,7 @@
 	<custom_php_resync_config_command>
 		baculaclient_custom_php_write_config();
 	</custom_php_resync_config_command>
+	<custom_delete_php_command>
+		baculaclient_custom_php_write_config();
+	</custom_delete_php_command>
 </packagegui>
