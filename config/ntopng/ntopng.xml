@@ -58,7 +58,6 @@
 		<tooltiptext>Access ntopng</tooltiptext>
 		<section>Diagnostics</section>
 		<url>http://$myurl:3000</url>
-		<depends_on_service>ntopng</depends_on_service>
 	</menu>
 	<service>
 		<name>ntopng</name>
@@ -90,7 +89,7 @@
 			<description>
 				<![CDATA[
 				Check this to keep ntopng settings, graphs and traffic data. (Default: on)<br />
-				<strong><span class="errmsg">Note:</span> If 'Keep Data' is disabled, all settings and data will be wiped on package uninstall/reinstall/upgrade!</strong>
+				<strong><span class="errmsg">Note:</span> If 'Keep Data/Settings' is disabled, all settings and data will be wiped on package uninstall/reinstall/upgrade!</strong>
 				]]>
 			</description>
 			<type>checkbox</type>
