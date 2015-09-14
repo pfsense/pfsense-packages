@@ -185,7 +185,6 @@
 	<custom_php_install_command>
 		ntopng_php_install_command();
 		ntopng_update_geoip();
-		ntopng_sync_package();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		ntopng_php_deinstall_command();
