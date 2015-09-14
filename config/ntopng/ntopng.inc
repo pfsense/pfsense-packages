@@ -173,7 +173,7 @@ function ntopng_sync_package() {
 			start_service("ntopng");
 			sleep(20);
 		}
-	} elseif ((!($g['booting'])) && (is_service_running("ntopng"))) {
+	} elseif (!($g['booting']))  {
 		ntopng_services_stop();
 		if ($ntopng_config['enable'] == "on") {
 			start_service("ntopng");
