@@ -173,7 +173,7 @@ function ntopng_sync_package() {
 			start_service("ntopng");
 			sleep(20);
 		}
-	} elseif (!($g['booting']))  {
+	} elseif (!($g['booting'])) {
 		ntopng_services_stop();
 		if ($ntopng_config['enable'] == "on") {
 			start_service("ntopng");
@@ -273,10 +273,13 @@ function ntopng_update_geoip() {
 
 	ntopng_fixup_geoip();
 
-	$ntopng_config = $config['installedpackages']['ntopng']['config'][0];
-	ntopng_services_stop();
-	if ($ntopng_config['enable'] == "on") {
-		start_service("ntopng");
+	/* Do not (re)start services on package (re)install, only on manual GeoIP updates via the GUI */
+	if ($_POST['Submit'] == "Update GeoIP Data") {
+		$ntopng_config = $config['installedpackages']['ntopng']['config'][0];
+		ntopng_services_stop();
+		if ($ntopng_config['enable'] == "on") {
+			start_service("ntopng");
+		}
 	}
 }
 
@@ -351,10 +354,10 @@ function ntopng_flush_historical_data() {
 }
 
 function ntopng_validate_input($post, &$input_errors) {
-	if (empty($_POST['redis_password']) || empty($_POST['redis_passwordagain'])) {
+	if (empty($post['redis_password']) || empty($post['redis_passwordagain'])) {
 		$input_errors[] = "You must provide (and confirm) ntopng's password.";
 	}
-	if ((strlen($_POST['redis_password']) < 5) || (strlen($_POST['redis_passwordagain']) < 5)) {
+	if ((strlen($post['redis_password']) < 5) || (strlen($post['redis_passwordagain']) < 5)) {
 		$input_errors[] = "Password must have at least 5 characters.";
 	}
 	if ($post['redis_password'] != $post['redis_passwordagain']) {
