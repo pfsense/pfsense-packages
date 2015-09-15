@@ -27,63 +27,29 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$pf_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
+if ($pf_version == "2.1" || $pf_version == "2.2") {
+	define('APACHEDIR', '/usr/pbi/proxy_mod_security-' . php_uname("m") . "/local");
+} else {
+	define('APACHEDIR', '/usr/local');
+}
+define('APACHEVERSION', 'apache22');
+
 // Rules directory location
-define("rules_directory", "/usr/local/apachemodsecurity/rules");
+define('RULES_DIR', '/usr/local/apachemodsecurity/rules');
 
-// Ensure NanoBSD can write. pkg_mgr will remount RO
-conf_mount_rw();
-
-// Needed mod_security directories
-if(!is_dir("/usr/local/apachemodsecurity"))  	
-	safe_mkdir("/usr/local/apachemodsecurity");
-if(!is_dir("/usr/local/apachemodsecurity/rules")) 
-	safe_mkdir("/usr/local/apachemodsecurity/rules");
-
-// Startup function	
-function apache_mod_security_start() {
-	exec("/usr/local/sbin/httpd -k start");
-}
-
-// Shutdown function
-function apache_mod_security_stop() {
-	exec("/usr/local/sbin/httpd -k stop");
-}
-
-// Restart function
-function apache_mod_security_restart() {
-	if(is_process_running("httpd")) {
-		exec("/usr/local/sbin/httpd -k graceful");
-	} else {
-		apache_mod_security_start();		
-	}
-}
-
-// Install function
+// Install package routines
 function apache_mod_security_install() {
 	global $config, $g;
 
-	// We might be reinstalling and a configuration
-	// already exists.
+	safe_mkdir("/usr/local/apachemodsecurity/rules");
+	// We might be reinstalling and a configuration already exists.
 	generate_apache_configuration();
 
 	$filename = "apache_mod_security.sh";
+	$start = APACHEDIR . "/sbin/httpd -k start";
+	$stop = APACHEDIR . "/sbin/httpd -k stop";
 
-	$start = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
-	<?php
-		require_once(\"functions.inc\");
-		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
-		apache_mod_security_start();
-	?>
-ENDPHP\n";
-
-	$stop = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
-	<?php
-		require_once(\"functions.inc\");
-		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
-		apache_mod_security_stop();
-	?>
-ENDPHP\n";
-	
 	write_rcfile(array(
 			"file" => $filename,
 			"start" => $start,
@@ -94,148 +60,93 @@ ENDPHP\n";
 
 // Deinstall package routines
 function apache_mod_security_deinstall() {
+	if (is_dir("/usr/local/apachemodsecurity")) {
+		mwexec("/bin/rm -rf /usr/local/apachemodsecurity");
+	}
+	if (is_dir("/var/db/apachemodsecuritycache")) {
+		mwexec("/bin/rm -rf /var/db/apachemodsecuritycache");
+	}
+}
+
+// Check Apache configuration syntax
+function apache_mod_security_checkconfig() {
 	global $config, $g;
-	apache_mod_security_stop();
-	exec("/bin/rm -rf /usr/local/apachemodsecurity");
-	exec("/bin/rm -f /usr/local/etc/rc.d/apache_mod_security.sh");
+	$status = mwexec(APACHEDIR . "/sbin/httpd -t");
+	if ($status) {
+		$input_errors[] = "[apache_mod_security]: There was an error parsing the Apache configuration: {$status}";
+		log_error("[apache_mod_security]: There was an error parsing the Apache configuration: {$status}");
+	}
+}
+
+// Restart service function
+function apache_mod_security_restart() {
+	if (is_process_running("httpd")) {
+		mwexec(APACHEDIR . "/sbin/httpd -k graceful");
+	} else {
+		start_service("apache_mod_security");
+	}
 }
 
 // Regenerate apache configuration and handle server restart
 function apache_mod_security_resync() {
 	global $config, $g;
-	apache_mod_security_install();
-	if(!file_exists(rules_directory . "/10_asl_rules.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/10_asl_rules.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/10_asl_rules.conf");
-	if(!file_exists(rules_directory . "/a_exclude.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/a_exclude.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/a_exclude.conf");
-	if(!file_exists(rules_directory . "/blacklist.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/blacklist.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/blacklist.conf");
-	if(!file_exists(rules_directory . "/default.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/rules/default.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/default.conf");
-	if(!file_exists(rules_directory . "/recons.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/recons.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/recons.conf");
-	if(!file_exists(rules_directory . "/rootkits.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/rootkits.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/rootkits.conf");
-	if(!file_exists(rules_directory . "/useragents.conf"))
-		exec("/usr/bin/fetch -q -o " . rules_directory . "/useragents.conf https://packages.pfsense.org/packages/config/apache_mod_security/rules/useragents.conf");
+	generate_apache_configuration();
 	apache_mod_security_checkconfig();
 	apache_mod_security_restart();
 }
 
-function apache_mod_security_checkconfig() {
-	global $config, $g;
-	$status = mwexec("/usr/local/sbin/httpd -t");
-	if($status) {
-		$input_error = "apache_mod_security_package: There was an error parsing the Apache configuration: {$status}";
-		log_error("apache_mod_security_package: There was an error parsing the Apache configuration: {$status}");
-	}
-}
-
 // Generate mod_proxy specific configuration
 function generate_apache_configuration() {
-	global $config, $g;
-	$mod_proxy = "";
+	global $config, $g, $modsec_config;
 
+	$modsec_config =& $config['installedpackages']['apachemodsecuritysettings']['config'][0];
 	// Set global site e-mail
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail']) {
-		$global_site_email = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'];
-	} else {
-                $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'] = "admin@admin.com";
-                $global_site_email = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'];
-                // update configuration with default value in this case
-                write_config($pkg['addedit_string']);
-		log_error("WARNING!  Global site Administrator E-Mail address has not been set.  Defaulting to bogus e-mail address.");
-	}
+	$global_site_email = $modsec_config['globalsiteadminemail'] ?: "admin@example.com";
 
 	// Set ServerName
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']) {
-		$servername = "ServerName {$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']}\n";
+	if ($modsec_config['hostname']) {
+		$servername = "ServerName {$modsec_config['hostname']}\n";
 	} else {
-		$servername = "ServerName " . `hostname` . "\n";
-		$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname'] = `hostname`;
-                // update configuration with default value in this case
-                write_config($pkg['addedit_string']);
+		$servername = "ServerName " . $config['system']['hostname'] . "\n";
 	}
 
 	// Set global listening directive and ensure nothing is listening on this port already
-	$globalbind = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
-	$socksstat = split("\n", `/usr/bin/sockstat | awk '{ print $6 }' | grep ":{$globalbind}" | cut -d ":" -f2`);
-	if(is_array($socksstat)) {
-		foreach($socksstat as $ss) {
-			if($ss == $globalbind) {
-				$already_binded = true;
-				$input_errors[] = "Sorry, there is a process already listening on port {$globalbind}";
-			}
-		}
+	$global_listen  = $modsec_config['globalbindtoipaddr'] ?: "";
+	if ($modsec_config['globalbindtoport']) {
+		$global_listen .= ":" . $modsec_config['globalbindtoport'];
+	} else {
+		$global_listen .= ":80";
 	}
-//	if(!$already_binded) {
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
-			$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
-			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-				$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-			else 
-				$global_listen .= ":80";
-		} else {
- 	               	$config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'] = "";
-        	        $global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
-			// update configuration with default value in this case
-			 write_config($pkg['addedit_string']);		
-			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-				$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-			else 
-				$global_listen .= ":80";
-		}
-//	} else {
-//		log_error("Could not start mod_security + mod_proxy on port {$global_listen}.  Process is already bound to this port.");
-//	}
-	
+
 	// Setup mem_cache
-	if(file_exists("/usr/local/libexec/apache22/mod_mem_cache.so")) {
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache']) {
-			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'])
-				$mcachesize = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'];
-			else 
-				$mcachesize = "100";
-			//$mem_cache = "MCacheSize $mcachesize\n";
+	if (file_exists(APACHEDIR . "/libexec/" . APACHEVERSION . "/mod_mem_cache.so")) {
+		if ($modsec_config['mod_mem_cache']) {
+			$mcachesize = $modsec_config['mod_mem_cache_size'] ?: "100";
+			$mem_cache = "MCacheSize $mcachesize\n";
 		}
 	}
 
-	// CacheRoot Directive
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_disk_cache']) {
+	// Setup mod_disk_cache
+	if ($modsec_config['mod_disk_cache']) {
 		safe_mkdir("/var/db/apachemodsecuritycache");
 		$cache_root .= "CacheRoot /var/db/apachemodsecuritycache\n";
+		$dcachemaxfilesize = $modsec_config['mod_disk_cache_max_filesize'] ?: "1000000";
+		$disk_cache = "CacheMaxFileSize $dcachemaxfilesize\n";
 	}
 
 	// SecRequestBodyInMemoryLimit Directive
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['secrequestbodyinmemorylimit']) 
-		$secrequestbodyinmemorylimit = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['secrequestbodyinmemorylimit'];
-	else 
-		$secrequestbodyinmemorylimit = "131072";
+	$secrequestbodyinmemorylimit = $modsec_config['secrequestbodyinmemorylimit'] ?: "131072";
 
 	// SecRequestBodyLimit
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['secrequestbodylimit']) 
-		$secrequestbodylimit = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['secrequestbodylimit'];
-	else 
-		$secrequestbodylimit = "10485760";
+	$secrequestbodylimit = $modsec_config['secrequestbodylimit'] ?: "10485760";
 
 	// ErrorDocument
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['errordocument']) 
-		$errordocument = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['errordocument'];
-	else 
-		$errordocument = "";
+	$errordocument = isset($modsec_config['errordocument_custom']) ? preg_replace("/\r\n/", "\n", base64_decode($modsec_config['errordocument_custom'])) : "";
 
 	// SecAuditEngine
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['secauditengine']) 
-		$secauditengine = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['secauditengine'];
-	else 
-		$secauditengine = "RelevantOnly";
+	$secauditengine = $modsec_config['secauditengine'] ?: "RelevantOnly";
 
-	// SecReadStateLimit
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['SecReadStateLimit']) 
-		$secreadstatelimit = "SecReadStateLimit " . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['SecReadStateLimit'] ."\n";
-	else 
-		$secreadstatelimit = "";
-
+	$mod_proxy = "";
 	$mod_proxy .= <<<EOF
 
 # Off when using ProxyPass
@@ -248,7 +159,7 @@ ProxyRequests off
 
 EOF;
 
-	/*  
+	/*
 		#####################################################
 		# Format for the Proxy servers:
 		# Please do not delete these from the source file
@@ -281,36 +192,37 @@ EOF;
 
 	$configuredaliases = array();
 	// Read already configured addresses
-        if($config['installedpackages']['apachemodsecuritysettings']['config']['0']) {
-		foreach($config['installedpackages']['apachemodsecuritysettings']['config']['0']['row'] as $row) {
+        if ($modsec_config) {
+		foreach ($modsec_config['row'] as $row) {
                 	if ($row['ipaddress'] && $row['ipport']) {
-				$configuredaliases[] = $row; 
+				$configuredaliases[] = $row;
                         }
                	}
-	} 
+	}
 
 
 	// clear list of bound addresses
-        $config['installedpackages']['apachemodsecuritysettings']['config'][0]['row'] = array();
+        $modsec_config['row'] = array();
 
 	// Process proxy sites
 	// Configure NameVirtualHost directives
         $aliases = "";
 	$processed = array();
 
-	if($config['installedpackages']['apachemodsecurity']) {
+	if ($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
-			if($ams['ipaddress'] && $ams['port']) 
+			if ($ams['ipaddress'] && $ams['port']) {
 				$local_ip_port = "{$ams['ipaddress']}:{$ams['port']}";
-			else 
+			} else {
 				$local_ip_port = $global_listen;
+			}
 			// Do not add entries twice.
-			if(!in_array($local_ip_port, $processed)) {
+			if (!in_array($local_ip_port, $processed)) {
 				// explicit bind if not global ip:port
 				if ($local_ip_port != $global_listen) {
 					$aliases .= "Listen $local_ip_port\n";
 					// Automatically add this to configuration
-                                	$config['installedpackages']['apachemodsecuritysettings']['config'][0]['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['port']); 
+                                	$modsec_config['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['port']);
 				}
 				$mod_proxy .= "NameVirtualHost $local_ip_port\n";
 				$processed[] = $local_ip_port;
@@ -318,36 +230,34 @@ EOF;
 		}
 	}
 
-//** Uncomment to allow adding ip/ports not used by any site proxies
-//** Otherwise unused addresses/ports will be automatically deleted from the configuration
-//	foreach ($configuredaliases as $ams) {
-//		$local_ip_port = "{$ams['ipaddress']}:{$ams['ipport']}";
-//               if(!in_array($local_ip_port, $processed)) {
-//                	// explicit bind if not global ip:port
-//                        if ($local_ip_port != $global_listen) {
-//                        	$aliases .= "Listen $local_ip_port\n";    
-//                                // Automatically add this to configuration
-//                                $config['installedpackages']['apachemodsecuritysettings']['config'][0]['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['ipport']);
-//                        }
-//		}
-//	}
-
-	// update configuration with actual ip bindings
-	write_config($pkg['addedit_string']);
-
+/* Uncomment to allow adding ip/ports not used by any site proxies */
+/* Otherwise unused addresses/ports will be automatically deleted from the configuration */
+/*
+	foreach ($configuredaliases as $ams) {
+		$local_ip_port = "{$ams['ipaddress']}:{$ams['ipport']}";
+		if (!in_array($local_ip_port, $processed)) {
+			// explicit bind if not global ip:port
+			if ($local_ip_port != $global_listen) {
+				$aliases .= "Listen $local_ip_port\n";
+				// Automatically add this to configuration
+				$modsec_config['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['ipport']);
+			}
+		}
+	}
+*/
 
 	// Setup mod_proxy entries $mod_proxy
-	if($config['installedpackages']['apachemodsecurity']) {
-		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
+	if ($config['installedpackages']['apachemodsecurity']) {
+		foreach ($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			// Set rowhelper used variables
                         $additionalsitehostnames = "";
 			foreach($ams['row'] as $row) {
 				if ($row['additionalsitehostnames']) {
 					$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
-			}				
-			}				
-			$backend_sites = ""; 
-			$sslproxyengine = ""; 
+				}
+			}
+			$backend_sites = "";
+			$sslproxyengine = "";
 			$backend_sites_count = 0;
 			$balancer_members = ""; // not technically needed.
 			foreach($ams['row'] as $row) {
@@ -360,10 +270,10 @@ EOF;
 				// Ensure leading http(s)://
 						$normalised_ipaddr .= "http://";
 					}
-					$normalised_ipaddr .=  trim($row['webserveripaddr']);				
+					$normalised_ipaddr .=  trim($row['webserveripaddr']);
 					$balancer_members .= " BalancerMember " . $normalised_ipaddr . "\n";
 				// Ensure trailing /
-					if(substr($normalised_ipaddr,-1) != "/") {
+					if (substr($normalised_ipaddr,-1) != "/") {
 						$normalised_ipaddr .= "/";
 					}
 					$backend_sites .= $normalised_ipaddr . " ";
@@ -371,20 +281,23 @@ EOF;
 				}
 			}
 			// Set general items
-			if($ams['siteemail'])
+			if ($ams['siteemail']) {
 				$serveradmin = $ams['siteemail'];
-			else 
+			} else {
 				$serveradmin = $global_site_email;
-			if($ams['primarysitehostname'])
+			}
+			if ($ams['primarysitehostname']) {
 				$primarysitehostname = $ams['primarysitehostname'];
-			$sitename = str_replace(" ", "", $ams['sitename']);			
+			}
+			$sitename = str_replace(" ", "", $ams['sitename']);
 			// Set local listening directive
-			if($ams['ipaddress'] && $ams['port']) 
+			if ($ams['ipaddress'] && $ams['port']) {
 				$local_ip_port = "{$ams['ipaddress']}:{$ams['port']}";
-			else 
+			} else {
 				$local_ip_port = $global_listen;
+			}
 			// Is this item a load balancer
-			if($backend_sites_count>1) {
+			if ($backend_sites_count > 1) {
 				$balancer = true;
 				$mod_proxy .= "<Proxy balancer://{$sitename}>\n";
 				$mod_proxy .= $balancer_members;
@@ -393,63 +306,76 @@ EOF;
 				$sitename = "";			// we are not using sitename in this case
 			}
 			// Set SSL items
-			if($ams['siteurl'])
+			if ($ams['siteurl']) {
 				$siteurl = $ams['siteurl'];
-			if($ams['certificatefile'])
+			}
+			if ($ams['certificatefile']) {
 				$certificatefile = $ams['certificatefile'];
-			if($ams['certificatekeyfile'])
+			}
+			if ($ams['certificatekeyfile']) {
 				$certificatekeyfile = $ams['certificatekeyfile'];
-			if($ams['certificatechainfile'])
+			}
+			if ($ams['certificatechainfile']) {
 				$certificatechainfile = $ams['certificatechainfile'];
+			}
 			// Begin VirtualHost
 			$mod_proxy .= "\n<VirtualHost {$local_ip_port}>\n";
-			if($siteurl == "HTTPS" && $certificatefile && $certificatekeyfile) {
+			if ($siteurl == "HTTPS" && $certificatefile && $certificatekeyfile) {
 				$mod_proxy .= "  SSLEngine on\n";
-				if ($certificatefile)
-					$mod_proxy .= "  SSLCertificateFile /usr/local/etc/apache22/$certificatefile\n";  
-				if ($certificatekeyfile)
-					$mod_proxy .= "  SSLCertificateKeyFile /usr/local/etc/apache22/$certificatekeyfile\n";
-				if ($certificatechainfile)
-					$mod_proxy .= "  SSLCertificateChainFile /usr/local/etc/apache22/$certificatechainfile\n";
+				if ($certificatefile) {
+					$mod_proxy .= "  SSLCertificateFile " . APACHEDIR . "/etc/" . APACHEVERSION . "/{$certificatefile}\n";
+				}
+				if ($certificatekeyfile) {
+					$mod_proxy .= "  SSLCertificateKeyFile " . APACHEDIR . "/etc/" . APACHEVERSION . "/{$certificatekeyfile}\n";
+				}
+				if ($certificatechainfile) {
+					$mod_proxy .= "  SSLCertificateChainFile " . APACHEDIR . "/etc" . APACHEVERSION . "/{$certificatechainfile}\n";
+				}
 			}
-			if($sslproxyengine)
+			if ($sslproxyengine) {
 				$mod_proxy .= "  {$sslproxyengine}\n";
-			if($additionalsitehostnames)
-				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
-			if($serveradmin)
-				$mod_proxy .= "  ServerAdmin $serveradmin\n";
-			if($primarysitehostname)
-				$mod_proxy .= "  ServerName $primarysitehostname \n";						
-			if($backend_sites) {
+			}
+			if ($additionalsitehostnames) {
+				$mod_proxy .= "  ServerAlias {$additionalsitehostnames}\n";
+			}
+			if ($serveradmin) {
+				$mod_proxy .= "  ServerAdmin {$serveradmin}\n";
+			}
+			if ($primarysitehostname) {
+				$mod_proxy .= "  ServerName {$primarysitehostname} \n";
+			}
+			if ($backend_sites) {
 				$mod_proxy .= "  ProxyPassReverse /{$sitename}  {$backend_sites}\n";
 				$mod_proxy .= "  ProxyPass / {$backend_sites}\n";
 			}
-			if($ams['preserveproxyhostname']) 
+			if ($ams['preserveproxyhostname']) {
 				$mod_proxy .= "  ProxyPreserveHost on\n";
-			$mod_proxy .= "</VirtualHost>\n\n";
-			// End VirtualHost			
-		}
-	}
-
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['modsecuritycustom'])  
-		$mod_security_custom = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['modsecuritycustom'];
-
-	// Process and include rules
-	if(is_dir(rules_directory)) {
-		$mod_security_rules = "";
-		$files = return_dir_as_array(rules_directory);
-		foreach($files as $file) { 
-			if(file_exists(rules_directory . "/" . $file)) {
-				// XXX: TODO integrate snorts rule on / off thingie
-				$file_txt = file_get_contents(rules_directory . "/" . $file);
-				$mod_security_rules .= $file_txt . "\n";
 			}
+			$mod_proxy .= "</VirtualHost>\n\n";
+			// End VirtualHost
 		}
 	}
+
 
 	// Mod_security enabled?
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['enablemodsecurity'])  {
-		$enable_mod_security = true;
+	if ($modsec_config['enablemodsecurity']) {
+
+		// Process and include rules
+		if (is_dir(RULES_DIR)) {
+			$mod_security_rules = "";
+			$files = return_dir_as_array(RULES_DIR);
+			foreach ($files as $file) {
+				if (file_exists(RULES_DIR . "/" . $file)) {
+					// XXX: TODO integrate snorts rule on / off thingie
+					$file_txt = file_get_contents(RULES_DIR . "/" . $file);
+					$mod_security_rules .= $file_txt . "\n";
+				}
+			}
+		}
+
+		// Custom mod_security rules
+		$mod_security_custom = isset($modsec_config['modsecuritycustom_adv']) ? preg_replace("/\r\n/", "\n", base64_decode($modsec_config['modsecuritycustom_adv'])) : "";
+
 		$mod_security = <<< EOF
 <IfModule mod_security.c>
 
@@ -490,9 +416,6 @@ EOF;
     # Only allow bytes from this range
     SecFilterForceByteRange 1 255
 
-	# Help prevent the effects of a Slowloris-type of attack
-	# $secreadstatelimit
-
     # Cookie format checks.
     SecFilterCheckCookieFormat On
 
@@ -511,9 +434,13 @@ EOF;
 
 }
 
-if(file_exists("/usr/local/libexec/apache22/mod_mem_cache.so"))
-	$mod_mem_cacheLoad = "Module mem_cache_module libexec/apache22/mod_mem_cache.so\n";
-
+	// Cannot use constants to replace stuff in the template
+	$apache_dir = APACHEDIR;
+	$apache_version = APACHEVERSION;
+	if (file_exists(APACHEDIR . "/libexec/" . APACHEVERSION . "/mod_mem_cache.so")) {
+		$mod_mem_cache = "LoadModule mem_cache_module libexec/{$apache_version}/mod_mem_cache.so\n";
+	}
+	
 	$apache_config = <<<EOF
 ##################################################################################
 # NOTE: This file was generated by the pfSense package management system.        #
@@ -526,13 +453,13 @@ if(file_exists("/usr/local/libexec/apache22/mod_mem_cache.so"))
 # This is the main Apache HTTP server configuration file.  It contains the
 # configuration directives that give the server its instructions.
 # See <URL:http://httpd.apache.org/docs/2.2> for detailed information.
-# In particular, see 
+# In particular, see
 # <URL:http://httpd.apache.org/docs/2.2/mod/directives.html>
 # for a discussion of each configuration directive.
 #
 # Do NOT simply read the instructions in here without understanding
 # what they do.  They're here only as hints or reminders.  If you are unsure
-# consult the online docs. You have been warned.  
+# consult the online docs. You have been warned.
 #
 # Configuration and logfile names: If the filenames you specify for many
 # of the server's control files begin with "/" (or "drive:/" for Win32), the
@@ -550,14 +477,14 @@ if(file_exists("/usr/local/libexec/apache22/mod_mem_cache.so"))
 # at a local disk.  If you wish to share the same ServerRoot for multiple
 # httpd daemons, you will need to change at least LockFile and PidFile.
 #
-ServerRoot "/usr/local"
+ServerRoot "{$apache_dir}"
 
 #
 # Listen: Allows you to bind Apache to specific IP addresses and/or
 # ports, instead of the default. See also the <VirtualHost>
 # directive.
 #
-# Change this to Listen on specific IP addresses as shown below to 
+# Change this to Listen on specific IP addresses as shown below to
 # prevent Apache from glomming onto all bound IP addresses.
 #
 Listen {$global_listen}
@@ -577,67 +504,67 @@ Listen {$global_listen}
 #
 # have to place corresponding `LoadModule' lines at this location so the
 # LoadModule foo_module modules/mod_foo.so
-LoadModule authn_file_module libexec/apache22/mod_authn_file.so
-LoadModule authn_dbm_module libexec/apache22/mod_authn_dbm.so
-LoadModule authn_anon_module libexec/apache22/mod_authn_anon.so
-LoadModule authn_default_module libexec/apache22/mod_authn_default.so
-LoadModule authn_alias_module libexec/apache22/mod_authn_alias.so
-LoadModule authz_host_module libexec/apache22/mod_authz_host.so
-LoadModule authz_groupfile_module libexec/apache22/mod_authz_groupfile.so
-LoadModule authz_user_module libexec/apache22/mod_authz_user.so
-LoadModule authz_dbm_module libexec/apache22/mod_authz_dbm.so
-LoadModule authz_owner_module libexec/apache22/mod_authz_owner.so
-LoadModule authz_default_module libexec/apache22/mod_authz_default.so
-LoadModule auth_basic_module libexec/apache22/mod_auth_basic.so
-LoadModule auth_digest_module libexec/apache22/mod_auth_digest.so
-LoadModule file_cache_module libexec/apache22/mod_file_cache.so
-LoadModule cache_module libexec/apache22/mod_cache.so
-LoadModule disk_cache_module libexec/apache22/mod_disk_cache.so
-LoadModule dumpio_module libexec/apache22/mod_dumpio.so
-LoadModule include_module libexec/apache22/mod_include.so
-LoadModule filter_module libexec/apache22/mod_filter.so
-LoadModule charset_lite_module libexec/apache22/mod_charset_lite.so
-LoadModule deflate_module libexec/apache22/mod_deflate.so
-LoadModule log_config_module libexec/apache22/mod_log_config.so
-LoadModule logio_module libexec/apache22/mod_logio.so
-LoadModule env_module libexec/apache22/mod_env.so
-LoadModule mime_magic_module libexec/apache22/mod_mime_magic.so
-LoadModule cern_meta_module libexec/apache22/mod_cern_meta.so
-LoadModule expires_module libexec/apache22/mod_expires.so
-LoadModule headers_module libexec/apache22/mod_headers.so
-LoadModule usertrack_module libexec/apache22/mod_usertrack.so
-LoadModule unique_id_module libexec/apache22/mod_unique_id.so
-LoadModule setenvif_module libexec/apache22/mod_setenvif.so
-LoadModule version_module libexec/apache22/mod_version.so
-LoadModule proxy_module libexec/apache22/mod_proxy.so
-LoadModule proxy_connect_module libexec/apache22/mod_proxy_connect.so
-LoadModule proxy_ftp_module libexec/apache22/mod_proxy_ftp.so
-LoadModule proxy_http_module libexec/apache22/mod_proxy_http.so
-LoadModule proxy_ajp_module libexec/apache22/mod_proxy_ajp.so
-LoadModule proxy_balancer_module libexec/apache22/mod_proxy_balancer.so
-LoadModule ssl_module libexec/apache22/mod_ssl.so
-LoadModule mime_module libexec/apache22/mod_mime.so
-LoadModule status_module libexec/apache22/mod_status.so
-LoadModule autoindex_module libexec/apache22/mod_autoindex.so
-LoadModule asis_module libexec/apache22/mod_asis.so
-LoadModule info_module libexec/apache22/mod_info.so
-LoadModule cgi_module libexec/apache22/mod_cgi.so
-LoadModule vhost_alias_module libexec/apache22/mod_vhost_alias.so
-LoadModule negotiation_module libexec/apache22/mod_negotiation.so
-LoadModule dir_module libexec/apache22/mod_dir.so
-LoadModule imagemap_module libexec/apache22/mod_imagemap.so
-LoadModule actions_module libexec/apache22/mod_actions.so
-LoadModule speling_module libexec/apache22/mod_speling.so
-LoadModule userdir_module libexec/apache22/mod_userdir.so
-LoadModule alias_module libexec/apache22/mod_alias.so
-LoadModule rewrite_module libexec/apache22/mod_rewrite.so
+LoadModule authn_file_module libexec/{$apache_version}/mod_authn_file.so
+LoadModule authn_dbm_module libexec/{$apache_version}/mod_authn_dbm.so
+LoadModule authn_anon_module libexec/{$apache_version}/mod_authn_anon.so
+LoadModule authn_default_module libexec/{$apache_version}/mod_authn_default.so
+LoadModule authn_alias_module libexec/{$apache_version}/mod_authn_alias.so
+LoadModule authz_host_module libexec/{$apache_version}/mod_authz_host.so
+LoadModule authz_groupfile_module libexec/{$apache_version}/mod_authz_groupfile.so
+LoadModule authz_user_module libexec/{$apache_version}/mod_authz_user.so
+LoadModule authz_dbm_module libexec/{$apache_version}/mod_authz_dbm.so
+LoadModule authz_owner_module libexec/{$apache_version}/mod_authz_owner.so
+LoadModule authz_default_module libexec/{$apache_version}/mod_authz_default.so
+LoadModule auth_basic_module libexec/{$apache_version}/mod_auth_basic.so
+LoadModule auth_digest_module libexec/{$apache_version}/mod_auth_digest.so
+LoadModule file_cache_module libexec/{$apache_version}/mod_file_cache.so
+LoadModule cache_module libexec/{$apache_version}/mod_cache.so
+LoadModule disk_cache_module libexec/{$apache_version}/mod_disk_cache.so
+LoadModule dumpio_module libexec/{$apache_version}/mod_dumpio.so
+LoadModule include_module libexec/{$apache_version}/mod_include.so
+LoadModule filter_module libexec/{$apache_version}/mod_filter.so
+LoadModule charset_lite_module libexec/{$apache_version}/mod_charset_lite.so
+LoadModule deflate_module libexec/{$apache_version}/mod_deflate.so
+LoadModule log_config_module libexec/{$apache_version}/mod_log_config.so
+LoadModule logio_module libexec/{$apache_version}/mod_logio.so
+LoadModule env_module libexec/{$apache_version}/mod_env.so
+LoadModule mime_magic_module libexec/{$apache_version}/mod_mime_magic.so
+LoadModule cern_meta_module libexec/{$apache_version}/mod_cern_meta.so
+LoadModule expires_module libexec/{$apache_version}/mod_expires.so
+LoadModule headers_module libexec/{$apache_version}/mod_headers.so
+LoadModule usertrack_module libexec/{$apache_version}/mod_usertrack.so
+LoadModule unique_id_module libexec/{$apache_version}/mod_unique_id.so
+LoadModule setenvif_module libexec/{$apache_version}/mod_setenvif.so
+LoadModule version_module libexec/{$apache_version}/mod_version.so
+LoadModule proxy_module libexec/{$apache_version}/mod_proxy.so
+LoadModule proxy_connect_module libexec/{$apache_version}/mod_proxy_connect.so
+LoadModule proxy_ftp_module libexec/{$apache_version}/mod_proxy_ftp.so
+LoadModule proxy_http_module libexec/{$apache_version}/mod_proxy_http.so
+LoadModule proxy_ajp_module libexec/{$apache_version}/mod_proxy_ajp.so
+LoadModule proxy_balancer_module libexec/{$apache_version}/mod_proxy_balancer.so
+LoadModule ssl_module libexec/{$apache_version}/mod_ssl.so
+LoadModule mime_module libexec/{$apache_version}/mod_mime.so
+LoadModule status_module libexec/{$apache_version}/mod_status.so
+LoadModule autoindex_module libexec/{$apache_version}/mod_autoindex.so
+LoadModule asis_module libexec/{$apache_version}/mod_asis.so
+LoadModule info_module libexec/{$apache_version}/mod_info.so
+LoadModule cgi_module libexec/{$apache_version}/mod_cgi.so
+LoadModule vhost_alias_module libexec/{$apache_version}/mod_vhost_alias.so
+LoadModule negotiation_module libexec/{$apache_version}/mod_negotiation.so
+LoadModule dir_module libexec/{$apache_version}/mod_dir.so
+LoadModule imagemap_module libexec/{$apache_version}/mod_imagemap.so
+LoadModule actions_module libexec/{$apache_version}/mod_actions.so
+LoadModule speling_module libexec/{$apache_version}/mod_speling.so
+LoadModule userdir_module libexec/{$apache_version}/mod_userdir.so
+LoadModule alias_module libexec/{$apache_version}/mod_alias.so
+LoadModule rewrite_module libexec/{$apache_version}/mod_rewrite.so
 {$mod_mem_cache}
 
 <IfModule !mpm_netware_module>
 <IfModule !mpm_winnt_module>
 #
 # If you wish httpd to run as a different user or group, you must run
-# httpd as root initially and it will switch.  
+# httpd as root initially and it will switch.
 #
 # User/Group: The name (or #number) of the user/group to run httpd as.
 # It is usually good practice to create a dedicated user and group for
@@ -682,15 +609,15 @@ ServerAdmin {$global_site_email}
 # documents. By default, all requests are taken from this directory, but
 # symbolic links and aliases may be used to point to other locations.
 #
-DocumentRoot "/usr/local/apachemodsecurity"
+DocumentRoot "{$apache_dir}/www/{$apache_version}"
 
 #
 # Each directory to which Apache has access can be configured with respect
 # to which services and features are allowed and/or disabled in that
-# directory (and its subdirectories). 
+# directory (and its subdirectories).
 #
-# First, we configure the "default" to be a very restrictive set of 
-# features.  
+# First, we configure the "default" to be a very restrictive set of
+# features.
 #
 <Directory />
     AllowOverride None
@@ -708,7 +635,7 @@ DocumentRoot "/usr/local/apachemodsecurity"
 #
 # This should be changed to whatever you set DocumentRoot to.
 #
-#<Directory "/usr/local/www/apachemodsecurity/">
+#<Directory "{$apache_dir}/www/apachemodsecurity/">
 #    #
 #    # Possible values for the Options directive are "None", "All",
 #    # or any combination of:
@@ -747,8 +674,8 @@ DocumentRoot "/usr/local/apachemodsecurity"
 #</IfModule>
 #
 #
-# The following lines prevent .htaccess and .htpasswd files from being 
-# viewed by Web clients. 
+# The following lines prevent .htaccess and .htpasswd files from being
+# viewed by Web clients.
 #
 #<FilesMatch "^\.ht">
 #    Order allow,deny
@@ -803,8 +730,8 @@ LogLevel warn
 
 #<IfModule alias_module>
 #    #
-#    # Redirect: Allows you to tell clients about documents that used to 
-#    # exist in your server's namespace, but do not anymore. The client 
+#    # Redirect: Allows you to tell clients about documents that used to
+#    # exist in your server's namespace, but do not anymore. The client
 #    # will make a new request for the document at its new location.
 #    # Example:
 #    # Redirect permanent /foo http://www.example.com/bar
@@ -821,14 +748,14 @@ LogLevel warn
 #    # the filesystem path.
 #
 #    #
-#    # ScriptAlias: This controls which directories contain server scripts. 
+#    # ScriptAlias: This controls which directories contain server scripts.
 #    # ScriptAliases are essentially the same as Aliases, except that
 #    # documents in the target directory are treated as applications and
 #    # run by the server when requested rather than as documents sent to the
 #    # client.  The same rules about trailing "/" apply to ScriptAlias
 #    # directives as to Alias.
 #    #
-#    ScriptAlias /cgi-bin/ "/usr/local/www/apache22/cgi-bin/"
+#    ScriptAlias /cgi-bin/ "{$apache_dir}/www/{$apache_version}/cgi-bin/"
 #
 #</IfModule>
 
@@ -844,7 +771,7 @@ LogLevel warn
 # "/usr/local/www/apache22/cgi-bin" should be changed to whatever your ScriptAliased
 # CGI directory exists, if you have that configured.
 #
-#<Directory "/usr/local/www/apache22/cgi-bin">
+#<Directory "{$apache_dir}/www/{$apache_version}/cgi-bin">
 #    AllowOverride None
 #    Options None
 #    Order allow,deny
@@ -867,7 +794,7 @@ DefaultType text/plainm
     # TypesConfig points to the file containing the list of mappings from
     # filename extension to MIME-type.
     #
-    TypesConfig etc/apache22/mime.types
+    TypesConfig etc/{$apache_version}/mime.types
 
     #
     # AddType allows you to add to or override the MIME configuration
@@ -915,7 +842,7 @@ DefaultType text/plainm
 # contents of the file itself to determine its type.  The MIMEMagicFile
 # directive tells the module where the hint definitions are located.
 #
-#MIMEMagicFile etc/apache22/magic
+#MIMEMagicFile etc/{$apache_version}/magic
 
 #
 # Customizable error responses come in three flavors:
@@ -932,10 +859,10 @@ DefaultType text/plainm
 #
 
 #
-# EnableMMAP and EnableSendfile: On systems that support it, 
+# EnableMMAP and EnableSendfile: On systems that support it,
 # memory-mapping or the sendfile syscall is used to deliver
 # files.  This usually improves server performance, but must
-# be turned off when serving from networked-mounted 
+# be turned off when serving from networked-mounted
 # filesystems or if support for these functions is otherwise
 # broken on your system.
 #
@@ -944,43 +871,43 @@ DefaultType text/plainm
 
 # Supplemental configuration
 #
-# The configuration files in the etc/apache22/extra/ directory can be 
-# included to add extra features or to modify the default configuration of 
-# the server, or you may simply copy their contents here and change as 
+# The configuration files in the etc/{$apache_version}/extra/ directory can be
+# included to add extra features or to modify the default configuration of
+# the server, or you may simply copy their contents here and change as
 # necessary.
 
 # Server-pool management (MPM specific)
-#Include etc/apache22/extra/httpd-mpm.conf
+#Include etc/{$apache_version}/extra/httpd-mpm.conf
 
 # Multi-language error messages
-#Include etc/apache22/extra/httpd-multilang-errordoc.conf
+#Include etc/{$apache_version}/extra/httpd-multilang-errordoc.conf
 
 # Fancy directory listings
-#Include etc/apache22/extra/httpd-autoindex.conf
+#Include etc/{$apache_version}/extra/httpd-autoindex.conf
 
 # Language settings
-#Include etc/apache22/extra/httpd-languages.conf
+#Include etc/{$apache_version}/extra/httpd-languages.conf
 
 # User home directories
-#Include etc/apache22/extra/httpd-userdir.conf
+#Include etc/{$apache_version}/extra/httpd-userdir.conf
 
 # Real-time info on requests and configuration
-#Include etc/apache22/extra/httpd-info.conf
+#Include etc/{$apache_version}/extra/httpd-info.conf
 
 # Virtual hosts
-#Include etc/apache22/extra/httpd-vhosts.conf
+#Include etc/{$apache_version}/extra/httpd-vhosts.conf
 
 # Local access to the Apache HTTP Server Manual
-#Include etc/apache22/extra/httpd-manual.conf
+#Include etc/{$apache_version}/extra/httpd-manual.conf
 
 # Distributed authoring and versioning (WebDAV)
-#Include etc/apache22/extra/httpd-dav.conf
+#Include etc/{$apache_version}/extra/httpd-dav.conf
 
 # Various default settings
-#Include etc/apache22/extra/httpd-default.conf
+#Include etc/{$apache_version}/extra/httpd-default.conf
 
 # Secure (SSL/TLS) connections
-#Include etc/apache22/extra/httpd-ssl.conf
+#Include etc/{$apache_version}/extra/httpd-ssl.conf
 #
 # Note: The following must must be present to support
 #       starting without SSL on platforms with no /dev/random equivalent
@@ -993,6 +920,7 @@ SSLRandomSeed connect builtin
 
 # Cache settings
 {$mem_cache}
+{$disk_cache}
 {$cache_root}
 
 # Mod security
@@ -1002,21 +930,79 @@ SSLRandomSeed connect builtin
 {$mod_proxy}
 
 # Include anything else
-Include etc/apache22/Includes/*.conf
+Include etc/{$apache_version}/Includes/*.conf
 
 EOF;
-	if (!is_dir('/usr/local/etc/apache22')) {
-		mkdir('/usr/local/etc/apache22', 0775, true);
-	}
-	$fd = fopen("/usr/local/etc/apache22/httpd.conf", "w");
-	if(!$fd) {
+
+	$fd = fopen(APACHEDIR . "/etc/". APACHEVERSION . "/httpd.conf", "w");
+	if (!$fd) {
 		$error_text = "Could not open httpd.conf for writing!";
-		echo $error_text;
 		log_error($error_text);
 		exit;
 	}
 	fwrite($fd, $apache_config);
 	fclose($fd);
+}
+
+function apache_mod_security_upgrade_config() {
+	global $config, $modsec_config;
+	$modsec_config =& $config['installedpackages']['apachemodsecuritysettings']['config'][0];
+	$changes = 0;
+	if (!is_array($modsec_config)) {
+		$modsec_config = array();
+	}
+	if (isset($modsec_config['modsecuritycustom'])) {
+		$modsec_config['modsecuritycustom_adv'] = base64_encode($modsec_config['modsecuritycustom']);
+		unset($modsec_config['modsecuritycustom']);
+		$changes++;
+	}
+	if (isset($modsec_config['errordocument'])) {
+		$modsec_config['errordocument_custom'] = base64_encode($modsec_config['errordocument']);
+		unset($modsec_config['errordocument']);
+		$changes++;
+	}
+	if ($changes > 0 ) {
+		write_config("[apache_mod_security] Upgraded old package configuration.");
+	}
+}
+
+function apache_mod_security_validate_input($post, &$input_errors) {
+	if (!empty($post['hostname'])) {
+		if (!is_hostname($post['hostname'])) {
+			$input_errors[] = "'Server Hostname' must be either empty, or a valid hostname.";
+		}
+	}
+	if (!empty($post['globalbindtoipaddr'])) {
+		if (!is_ipaddr($post['globalbindtoipaddr'])) {
+			$input_errors[] = "'Default Bind to IP Address' must be either empty, or a valid IP address.";
+		}
+	}
+	if (!empty($post['globalbindtoport'])) {
+		if (!is_port($post['globalbindtoport'])) {
+			$input_errors[] = "'Default Bind to Port' must be either empty, or a valid port.";
+		}
+	}
+	if (!empty($post['mod_mem_cache_size'])) {
+		if (!is_numericint($post['mod_mem_cache_size'])) {
+			$input_errors[] = "'mod_mem_cache Memory Usage' must be either empty, or a non-negative integer.";
+		}
+	}
+	if (!empty($post['mod_disk_cache_max_filesize'])) {
+		if (!is_numericint($post['mod_disk_cache_max_filesize'])) {
+			$input_errors[] = "'mod_disk_cache CacheMaxFileSize' must be either empty, or a non-negative integer.";
+		}
+	}
+	if (!empty($post['SecRequestBodyInMemoryLimit'])) {
+		if (!is_numericint($post['SecRequestBodyInMemoryLimit'])) {
+			$input_errors[] = "'SecRequestBodyInMemoryLimit' must be either empty, or a non-negative integer.";
+		}
+	}
+	if (!empty($post['SecRequestBodyLimit'])) {
+		if (!is_numericint($post['SecRequestBodyLimit'])) {
+			$input_errors[] = "'SecRequestBodyLimit' must be either empty, or a non-negative integer.";
+		}
+	}
+
 }
 
 ?>
