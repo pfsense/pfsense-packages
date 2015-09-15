@@ -1,6 +1,6 @@
 <?php
 /*
-	apache_mod_security_view_logs.php
+	apache_mod_security.inc
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2009, 2010 Scott Ullrich
 	Copyright (C) 2015 ESF, LLC
