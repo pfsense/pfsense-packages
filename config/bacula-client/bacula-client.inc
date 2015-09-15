@@ -50,6 +50,7 @@ function baculaclient_custom_php_deinstall_command(){
 
 function baculaclient_custom_php_write_config(){
 	global $config, $LocalDirector;
+	$RemoteDirector = "";
 	conf_mount_rw();
 
 	// Check config_file
@@ -72,21 +73,22 @@ function baculaclient_custom_php_write_config(){
 			switch ($bc['type']) {
 				case "Director":
 					$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-dir #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n}\n";
+					$RemoteDirector = $bc['director'];
 					break;
 				case "Monitor":
 					$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-mon #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n\tMonitor = yes\n}\n";
 					break;
 				case "Local":
-					$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-dir #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n}\n";
-					$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-mon #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n\tMonitor = yes\n}\n";
+					$baculaclient_conf .= "Director { \n\tName = {$bc['director']}-fd #{$bc['description']}\n\tPassword = \"{$bc['password']}\"\n}\n";
 					$LocalDirector = $bc['director'];
 			}
 
 		}
 
-		// Create Messages
-		if (!empty($LocalDirector)) {
-			$baculaclient_conf .= "Messages { \n\tName = Standard \n\tdirector  = {$LocalDirector}-dir = all, !skipped, !restored\n}\n";
+		// Create Messages.
+		// Messages should be sent to the master Director
+		if (!empty($RemoteDirector)) {
+			$baculaclient_conf .= "Messages { \n\tName = Standard #send messages here\n\tdirector  = {$RemoteDirector}-dir = all, !skipped, !restored\n}\n";
 		}
 		// Create FileDaemon
 		if (is_array($config['installedpackages']['baculaclientfd']['config'])) {
@@ -94,7 +96,7 @@ function baculaclient_custom_php_write_config(){
 			$jobs = $config['installedpackages']['baculaclientfd']['config'][0]['jobs'] ?: '20';
 		}
 		if (!empty($LocalDirector)) {
-			$baculaclient_conf .= "FileDaemon { \n\tName = {$LocalDirector}-fd #\n\tFDport = {$port}\n\tWorkingDirectory = /var/db/bacula\n\tPid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n}\n";
+			$baculaclient_conf .= "FileDaemon { \n\tName = {$LocalDirector}-fd #this is the local pfSense Director\n\tFDport = {$port}\n\tWorkingDirectory = /var/db/bacula\n\tPid Directory = /var/run\n\tMaximum Concurrent Jobs = {$jobs}\n}\n";
 		}
 
 		// Write config file and start service

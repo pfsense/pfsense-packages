@@ -62,12 +62,10 @@ include("head.inc");
 			<div id="mainarea">
 				<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 					<tr><td class="tabcont">
-						<textarea id="varnishlogs" rows="50" cols="87%">
-						<?php
+						<textarea rows="50" cols="87%"><?php
 						$config_file = file_get_contents(BACULA_LOCALBASE."/etc/bacula/bacula-fd.conf");
 						echo $config_file;
-						?>
-						</textarea>
+						?></textarea>
 					</td></tr>
 				</table>
 			</div>
