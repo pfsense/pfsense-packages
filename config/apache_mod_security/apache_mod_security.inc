@@ -1,8 +1,9 @@
 <?php
 /*
-	apache_mod_security.inc
-	part of apache_mod_security package (http://www.pfSense.com)
+	apache_mod_security_view_logs.php
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2009, 2010 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,6 +27,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("/etc/inc/pkg-utils.inc");
 
 $pf_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 if ($pf_version == "2.1" || $pf_version == "2.2") {
