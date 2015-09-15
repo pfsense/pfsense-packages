@@ -373,7 +373,7 @@
 		<port_category>www</port_category>
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
-		<version>0.8.1</version>
+		<version>0.8.2</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
