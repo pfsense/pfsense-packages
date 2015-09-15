@@ -27,6 +27,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+
+require_once('service-utils.inc');
+
 //sort array
 function sort_host($a, $b) {
 	return strcmp($a["host"], $b["host"]);
