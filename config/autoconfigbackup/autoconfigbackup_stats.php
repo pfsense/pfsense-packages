@@ -92,7 +92,7 @@ if ($_REQUEST['delhostname']) {
 	}
 }
 
-$pgtitle = "Diagnostics: Auto Configuration Stats";
+$pgtitle = "Diagnostics: Auto Configuration Backup Stats";
 include("head.inc");
 
 ?>
