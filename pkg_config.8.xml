@@ -459,26 +459,6 @@
 		<configurationfile>vhosts.xml</configurationfile>
 	</package>
 	<package>
-		<name>snort</name>
-		<pkginfolink>https://doc.pfsense.org/index.php/Setup_Snort_Package</pkginfolink>
-		<website>http://www.snort.org</website>
-		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
-		<category>Security</category>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>snort-2.9.7.2-i386.pbi</depends_on_package_pbi>
-		<build_pbi>
-			<port>security/snort</port>
-			<ports_after>security/barnyard2</ports_after>
-		</build_pbi>
-		<build_options>barnyard2_UNSET=ODBC PGSQL PRELUDE;barnyard2_SET=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET=PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET=PULLEDPORK FILEINSPECT HA;perl_SET=THREADS</build_options>
-		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
-		<version>2.9.7.2 pkg v3.2.5</version>
-		<required_version>2.1</required_version>
-		<status>Stable</status>
-		<configurationfile>/snort.xml</configurationfile>
-		<after_install_info>Please visit the Snort settings tab first and select your desired rules. Afterwards visit the update rules tab to download your configured rules.</after_install_info>
-	</package>
-	<package>
 		<name>olsrd</name>
 		<website>http://www.olsr.org/</website>
 		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
