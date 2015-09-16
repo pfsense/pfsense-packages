@@ -89,7 +89,7 @@ function ntopng_sync_package() {
 		return;
 	}
 
-	global $g, $config, $pf_version;
+	global $g, $config, $pf_version, $ntopng_config;
 	$pf_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 
 	$ifaces = "";
