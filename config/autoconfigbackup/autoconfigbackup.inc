@@ -74,7 +74,7 @@ function acb_custom_php_validation_command($post, &$input_errors) {
 }
 
 function acb_custom_php_resync_config_command() {
-	if (is_file("/cf/conf/lastpfSbackup.txt") {
+	if (is_file("/cf/conf/lastpfSbackup.txt")) {
 		conf_mount_rw();
 		unlink("/cf/conf/lastpfSbackup.txt");
 		conf_mount_ro();
@@ -109,7 +109,11 @@ function test_connection($post) {
 	global $savemsg, $config, $g;
 
 	// Do nothing when booting
-	if (platform_booting()) {
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
 	}
 
