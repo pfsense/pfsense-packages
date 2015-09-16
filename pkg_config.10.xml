@@ -227,7 +227,7 @@
 		<website>http://www.modsecurity.org/</website>
 		<descr>ModSecurity is a web application firewall that can work either embedded or as a reverse proxy. It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis. In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.</descr>
 		<category>Network Management</category>
-		<version>0.1.7</version>
+		<version>0.1.8</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<maximum_version>2.2.999</maximum_version>

@@ -1,52 +1,57 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    apache_mod_security_settings.xml
-	part of apache_mod_security package (http://www.pfSense.com)
-    Copyright (C) 2008, 2009, 2010 Scott Ullrich
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	apache_mod_security_settings.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008-2010 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>apache_mod_security_settings</name>
-	<version>1.0</version>
+	<version>0.1.8</version>
 	<title>Services: Mod_Security+Apache+Proxy: Settings</title>
-	<aftersaveredirect>pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>
+	<aftersaveredirect>pkg_edit.php?xml=apache_mod_security_settings.xml</aftersaveredirect>
+	<advanced_options>enabled</advanced_options>
 	<tabs>
 		<tab>
 			<text>Proxy Server Settings</text>
-			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0</url>
-			<active/>			
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Site Proxies</text>
@@ -59,19 +64,23 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Global site E-mail administrator</fielddescr>
-			<fieldname>globalsiteadminemail</fieldname>
-			<description>Enter the site administrators e-mail address</description>
-			<type>input</type>
+			<name>General Proxy Settings</name>
+			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Server hostname</fielddescr>
+			<fielddescr>Global Site Administrator E-Mail Address</fielddescr>
+			<fieldname>globalsiteadminemail</fieldname>
+			<description>Enter the e-mail address of the global site administrator.</description>
+			<type>input</type>
+			<default_value>admin@example.com</default_value>
+		</field>
+		<field>
+			<fielddescr>Server Hostname</fielddescr>
 			<fieldname>hostname</fieldname>
 			<description>
 				<![CDATA[
-					Enter the servers hostname
-					<br/>
-					NOTE: Leave blank to use this devices hostname.
+				Enter the server's hostname.<br />
+				NOTE: Leave blank to use the hostname of this device.
 				]]>
 			</description>
 			<type>input</type>
@@ -81,47 +90,43 @@
 			<fieldname>globalbindtoipaddr</fieldname>
 			<description>
 				<![CDATA[
-					This is the IP address the Proxy Server will listen on. 
-					<br/>
-					NOTE: Leave blank to bind to *
+				This is the IP address the Proxy Server will listen on.<br />
+				NOTE: Leave blank to bind to * (any).
 				]]>
 			</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Default Bind to port</fielddescr>
+			<fielddescr>Default Bind to Port</fielddescr>
 			<fieldname>globalbindtoport</fieldname>
 			<description>
 				<![CDATA[
-					This is the port the Proxy Server will listen on. 
-					<br/>
-					NOTE: Leave blank to bind to 80
-				]]>					
+				This is the port the Proxy Server will listen on.<br />
+				NOTE: Leaving this blank will bind to default port 80.
+				]]>
 			</description>
 			<type>input</type>
+			<default_value>80</default_value>
 		</field>
 		<field>
 			<fielddescr>
 				<![CDATA[
-					Additional Addresses<br/>
-					Do not edit. This field will be automatically populated from Site Proxies settings.
+				Additional Addresses<br />
+				<strong>DO NOT EDIT!</strong> This field will be automatically populated from Site Proxies settings.
 				]]>
 			</fielddescr>
 			<fieldname>additionaladdresses</fieldname>
-			<description></description>
 			<type>rowhelper</type>
 			<rowhelper>
 				<rowhelperfield>
 					<fielddescr>IP Address</fielddescr>
 					<fieldname>ipaddress</fieldname>
-					<description></description>
 					<type>input</type>
 					<size>45</size>
 				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr>Port</fielddescr>
 					<fieldname>ipport</fieldname>
-					<description></description>
 					<type>input</type>
 					<size>10</size>
 				</rowhelperfield>
@@ -132,99 +137,133 @@
 			<fieldname>mod_mem_cache</fieldname>
 			<description>
 				<![CDATA[
-					Enables mod_mem_cache which stores cached documents in memory.
-				]]>					
+				Enables mod_mem_cache which stores cached documents in memory.
+				]]>
 			</description>
 			<type>checkbox</type>
+			<enablefields>mod_mem_cache_size</enablefields>
 		</field>
 		<field>
-			<fielddescr>mod_mem_cache memory usage</fielddescr>
+			<fielddescr>mod_mem_cache Memory Usage</fielddescr>
 			<fieldname>mod_mem_cache_size</fieldname>
 			<description>
 				<![CDATA[
-					Sets the memory usage in megabytes.
-				]]>					
+				The maximum amount of memory used by mod_mem_cache in KBytes. (Default: 100)
+				]]>
 			</description>
 			<type>input</type>
+			<default_value>100</default_value>
 		</field>
 		<field>
 			<fielddescr>Use mod_disk_cache</fielddescr>
 			<fieldname>mod_disk_cache</fieldname>
 			<description>
 				<![CDATA[
-					mod_disk_cache implements a disk based storage manager. It is primarily of use in conjunction with mod_cache.
-				]]>					
+				mod_disk_cache implements a disk based storage manager. It is primarily of use in conjunction with mod_cache.
+				]]>
 			</description>
 			<type>checkbox</type>
+			<enablefields>mod_disk_cache_max_filesize</enablefields>
 		</field>
 		<field>
-			<fielddescr>mod_disk_cache memory usage</fielddescr>
-			<fieldname>mod_disk_cache_size</fieldname>
+			<fielddescr>mod_disk_cache CacheMaxFileSize</fielddescr>
+			<fieldname>mod_disk_cache_max_filesize</fieldname>
 			<description>
 				<![CDATA[
-					Sets the memory usage in Kbytes.
-				]]>					
+				The maximum size (in bytes) of a document to be placed in the cache. (Default: 1000000)
+				]]>
 			</description>
 			<type>input</type>
+			<default_value>1000000</default_value>
 		</field>
 		<field>
-			<fielddescr>Limits number of POSTS accepted from same IP address</fielddescr>
-			<fieldname>SecReadStateLimit</fieldname>
-			<description>
-				<![CDATA[
-					Help prevent the effects of a Slowloris-type of attack.  More information about this attack can be found here: http://blog.spiderlabs.com/2010/11/advanced-topic-of-the-week-mitigating-slow-http-dos-attacks.html
-				]]>					
-			</description>
-			<type>input</type>
+			<name>mod_security Settings</name>
+			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Configures the maximum request body size ModSecurity will store in memory.</fielddescr>
-			<fieldname>secrequestbodyinmemorylimit</fieldname>
-			<description>Configures the maximum request body size ModSecurity will store in memory.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Configures the maximum request body size ModSecurity will accept for buffering.</fielddescr>
-			<fieldname>secrequestbodylimit</fieldname>
-			<description>Configures the maximum request body size ModSecurity will accept for buffering.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Enable mod_security protection</fielddescr>
+			<fielddescr>Enable mod_security Protection</fielddescr>
 			<fieldname>enablemodsecurity</fieldname>
-			<description>Enables mod_security protection for all sites being proxied</description>
+			<description>Enables mod_security protection for all sites being proxied.</description>
 			<type>checkbox</type>
+			<enablefields>secrequestbodyinmemorylimit,secrequestbodylimit</enablefields>
 		</field>
 		<field>
-			<fielddescr>Configures the audit logging engine.</fielddescr>
+			<fielddescr>SecRequestBodyInMemoryLimit</fielddescr>
+			<fieldname>secrequestbodyinmemorylimit</fieldname>
+			<description>
+				<![CDATA[
+				Configures the maximum request body size (in bytes) ModSecurity will store in memory. (Default: 131072)
+				]]>
+			</description>
+			<type>input</type>
+			<default_value>131072</default_value>
+		</field>
+		<field>
+			<fielddescr>SecRequestBodyLimit</fielddescr>
+			<fieldname>secrequestbodylimit</fieldname>
+			<description>
+				<![CDATA[
+				Configures the maximum request body size (in bytes) ModSecurity will accept for buffering. Default: 10485760)
+				]]>
+				</description>
+			<type>input</type>
+			<default_value>10485760</default_value>
+		</field>
+		<field>
+			<fielddescr>SecAuditEngine</fielddescr>
 			<fieldname>secauditengine</fieldname>
-			<description>Configures the audit logging engine.</description>
-			<type>select</type>			
+			<description>
+				<![CDATA[
+				Configures the audit logging engine.<br /><br />
+				<strong>On:</strong> Log all transactions.<br />
+				<strong>Off:</strong> Do not log any transactions.<br />
+				<strong>RelevantOnly:</strong> Only the log transactions that have triggered a warning or an error, or have a status code that is considered to be relevant.
+				]]>
+			</description>
+			<type>select</type>
 			<options>
-			    <option><name>RelevantOnly</name><value>RelevantOnly</value></option>
-			    <option><name>All</name><value>On</value></option>
-			    <option><name>Off</name><value>Off</value></option>
+				<option><name>RelevantOnly</name><value>RelevantOnly</value></option>
+				<option><name>All</name><value>On</value></option>
+				<option><name>Off</name><value>Off</value></option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Custom mod_security ErrorDocument</fielddescr>
-			<fieldname>errordocument</fieldname>
-			<description></description>
+			<fieldname>errordocument_custom</fieldname>
 			<type>textarea</type>
-	      	<rows>10</rows>
-	      	<cols>75</cols>			
+			<rows>10</rows>
+			<cols>75</cols>
+			<description>
+				<![CDATA[
+				See <a href="http://httpd.apache.org/docs/2.2/mod/core.html#errordocument">Apache Core Features - ErrorDocument Directive</a> for documentation.<br /><br />
+				Example:<br />
+				ErrorDocument 403 "Sorry, can't allow you access today"<br />
+				ErrorDocument 404 http://banned.example.com/notfound.php<br />
+				ErrorDocument 500 /denied.html
+				]]>
+			</description>
+			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>Custom mod_security rules</fielddescr>
-			<fieldname>modsecuritycustom</fieldname>
-			<description>Paste any custom mod_security rules that you would like to use</description>
+			<fielddescr>Custom mod_security Rules</fielddescr>
+			<fieldname>modsecuritycustom_adv</fieldname>
+			<description>
+				<![CDATA[
+				Paste any custom mod_security rules that you would like to use.<br />
+				See <a href="https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual">ModSecurity Reference Manual</a>.
+				]]>
+			</description>
 			<type>textarea</type>
-	      	<rows>10</rows>
-	      	<cols>75</cols>			
+			<rows>10</rows>
+			<cols>75</cols>
+			<encoding>base64</encoding>
+			<advancedfield/>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();
 	</custom_php_resync_config_command>
-	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+	<custom_php_validation_command>
+		apache_mod_security_validate_input($_POST, $input_errors);
+	</custom_php_validation_command>
 </packagegui>
