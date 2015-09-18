@@ -1125,9 +1125,9 @@ cache_mem $memory_cache_size MB
 maximum_object_size_in_memory {$max_objsize_in_mem} KB
 memory_replacement_policy {$memory_policy}
 cache_replacement_policy {$cache_policy}
-$disk_cache_opts
 minimum_object_size {$min_objsize} KB
 maximum_object_size {$max_objsize}
+$disk_cache_opts
 offline_mode {$offline_mode}
 
 EOD;
@@ -2387,7 +2387,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	$xml['squid'] = $config['installedpackages']['squid'];
 	$xml['squidupstream'] = $config['installedpackages']['squidupstream'];
 	$xml['squidcache'] = $config['installedpackages']['squidcache'];
-	$xml['squidantivirus'] = $config['installedpackages']['squidanitivirus'];
+	$xml['squidantivirus'] = $config['installedpackages']['squidantivirus'];
 	$xml['squidnac'] = $config['installedpackages']['squidnac'];
 	$xml['squidtraffic'] = $config['installedpackages']['squidtraffic'];
 	$xml['squidreversegeneral'] = $config['installedpackages']['squidreversegeneral'];
