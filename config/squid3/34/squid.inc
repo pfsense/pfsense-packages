@@ -1073,7 +1073,8 @@ function squid_resync_cache() {
 		$conf.='acl dynamic urlpath_regex cgi-bin \?'."\n";
 		$conf.="cache deny dynamic\n";
 	} else if (preg_match('/youtube/',$settings['refresh_patterns'])) {
-		$conf.=<<< EOC
+// Broken (Bug #3847) and not working (http://wiki.squid-cache.org/ConfigExamples/DynamicContent/YouTube#Discussion)
+/*		$conf.=<<< EOC
 # Break HTTP standard for flash videos. Keep them in cache even if asked not to.
 refresh_pattern -i \.flv$ 10080 90% 999999 ignore-no-cache override-expire ignore-private
 
@@ -1082,6 +1083,7 @@ acl youtube dstdomain .youtube.com
 cache allow youtube
 
 EOC;
+*/
 	}
 	if (preg_match('/windows/',$settings['refresh_patterns'])) {
 		$conf.=<<< EOC
