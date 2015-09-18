@@ -74,20 +74,23 @@ define('HVFORM_AVSET',		'havpavset');
 * ------------------------------------------------------------------------------
 */
 /* HAVP */
+global $pf_version;
+$pf_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 define('HVDEF_ADDR',		'127.0.0.1');
 define('HVDEF_PROXYPORT',	'8080');
 define('HVDEF_MAXSCANSIZE',	'5000000'); // [bytes] ! do not enter 0 or big size !
 define('HVDEF_MAXARCSCANSIZE',	'5000000'); // [bytes] ! do not enter 0 or big size !
 define('HVDEF_PID_FILE',	'/var/run/havp.pid');
 
-$pf_version=substr(trim(file_get_contents("/etc/version")), 0, 3);
 if ($pf_version == "2.1" || $pf_version == "2.2") {
 	define("HVDEF_WORK_DIR", 	"/usr/pbi/havp-" . php_uname("m") . "/local/etc");
+	define("HVDEF_HAVP_PATH", 	"/usr/pbi/havp-" . php_uname("m") . "/local/sbin/havp");
 	define('HVDEF_TEMPLATES',	"/usr/pbi/havp-" . php_uname("m") . "/local/share/examples/havp/templates");
 	define('HVDEF_TEMPLATES_EX',	HVDEF_TEMPLATES . '_ex');
 } else {
 	define("HVDEF_WORK_DIR", 	"/usr/local/etc/havp");
 	define('HVDEF_TEMPLATES',	'/usr/local/share/examples/havp/templates');
+	define("HVDEF_HAVP_PATH", 	"/usr/local/sbin/havp");
 	define('HVDEF_TEMPLATES_EX',	HVDEF_TEMPLATES . '_ex');
 }
 
@@ -112,10 +115,22 @@ define('HVDEF_AVLOG_DIR',	'/var/log/clamav');
 define('HVDEF_CLAM_SOCKET',	HVDEF_CLAM_RUNDIR . '/clamd.sock');
 define('HVDEF_CLAM_PID',	HVDEF_CLAM_RUNDIR . '/clamd.pid');
 define('HVDEF_CLAM_LOG',	HVDEF_AVLOG_DIR . '/clamd.log');
-define('HVDEF_CLAM_WORKDIR',	'/usr/local/etc');
-define('HVDEF_CLAM_CONFIG',	'/usr/local/etc/clamd.conf');
+if ($pf_version == "2.1" || $pf_version == "2.2") {
+	define('HVDEF_CLAM_WORKDIR',	HVDEF_WORK_DIR);
+	define('HVDEF_CLAM_CONFIG',	HVDEF_WORK_DIR . '/clamd.conf');
+	define('HVDEF_FRESHCLAM_CONF',	HVDEF_WORK_DIR . '/freshclam.conf');
+	define("HVDEF_CLAMD_PATH", 	"/usr/pbi/havp-" . php_uname("m") . "/local/sbin/clamd");
+	define('HVDEF_FRESHCLAM_PATH',	"/usr/pbi/havp-" . php_uname("m") . "/local/bin/freshclam");
+	define('HVDEF_SIGTOOL_PATH',	"/usr/pbi/havp-" . php_uname("m") . "/local/bin/sigtool");
+} else {
+	define('HVDEF_CLAM_WORKDIR',	'/usr/local/etc');
+	define('HVDEF_CLAM_CONFIG',	'/usr/local/etc/clamd.conf');
+	define('HVDEF_FRESHCLAM_CONF',	'/usr/local/etc/freshclam.conf');
+	define("HVDEF_CLAMD_PATH", 	"/usr/local/sbin/clamd");
+	define('HVDEF_FRESHCLAM_PATH',	"/usr/local/bin/freshclam");
+	define('HVDEF_SIGTOOL_PATH',	"/usr/local/bin/sigtool");
+}
 define('HVDEF_CLAM_TCPSOCKET',	'3310');
-define('HVDEF_FRESHCLAM_CONF',	'/usr/local/etc/freshclam.conf');
 define('HVDEF_FRESHCLAM_LOG',	HVDEF_AVLOG_DIR . '/freshclam.log');
 define('HVDEF_CLAMSCAN_LOG',	'/var/log/clamscan.log');
 define('HVDEF_STATUS_FILE',	'/var/tmp/havp.status');
@@ -1271,17 +1286,19 @@ function havp_update_AV() {
 */
 /* AV update script */
 function havp_AVupdate_script() {
+	$hvdef_freshclam_path = HVDEF_FRESHCLAM_PATH;
+	$hvdef_sigtool_path = HVDEF_SIGTOOL_PATH;
 	$f = HVDEF_UPD_STATUS_FILE;
 	$u = HVDEF_FRESHCLAM_STATUS_FILE;
 	return <<< EOD
 #!/bin/sh
 /bin/date +"%Y.%m.%d %H:%M:%S Antivirus update started." > $f
 /bin/date +"%Y.%m.%d %H:%M:%S Antivirus database already is updated." > $u
-/usr/local/bin/freshclam
+{$hvdef_freshclam_path}
 wait
-cat $u >> $f
-/usr/local/bin/sigtool --unpack-current daily.cvd
-/usr/local/bin/sigtool --unpack-current main.cvd
+/bin/cat $u >> $f
+{$hvdef_sigtool_path} --unpack-current daily.cvd
+{$hvdef_sigtool_path} --unpack-current main.cvd
 wait
 /bin/date +"%Y.%m.%d %H:%M:%S Antivirus update end." >> $f
 EOD;
@@ -1324,7 +1341,7 @@ function havp_startup_script() {
 		$s[] = "\t\tfi";
 		$s[] = "";
 	}
-	$s[] = "\t\t/usr/local/sbin/havp -c " . HVDEF_HAVP_CONFIG . " 2>/dev/null";
+	$s[] = "\t\t" . HVDEF_HAVP_PATH . " -c " . HVDEF_HAVP_CONFIG . " 2>/dev/null";
 	$s[] = "\t\twait";
 	$s[] = "\tfi";
 
@@ -1370,7 +1387,7 @@ function hv_clamd_startup_script() {
 
 	$s[] = "# start";
 	$s[] = "\tif [ -z \"`{$clamdchk}`\" ]; then";
-	$s[] = "\t\t/usr/local/sbin/clamd -c " . HVDEF_CLAM_CONFIG . " 2>/dev/null";
+	$s[] = "\t\t" . HVDEF_CLAMD_PATH . " -c " . HVDEF_CLAM_CONFIG . " 2>/dev/null";
 	$s[] = "\t\twait";
 	$s[] = "\tfi";
 	$s[] = "\techo 'Started' > " . HVDEF_CLAM_STATUS_FILE;
