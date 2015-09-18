@@ -36,11 +36,6 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('service-utils.inc');
 
-if (!function_exists("filter_configure")) {
-	require_once("filter.inc");
-}
-
-
 /*
 * ------------------------------------------------------------------------------
 * Globals
@@ -101,7 +96,6 @@ define('HVDEF_TEMP_DIR',	'/var/tmp');
 define('HVDEF_HAVPTEMP_DIR',	HVDEF_TEMP_DIR . '/havp');
 define('HVDEF_RAMTEMP_DIR',	HVDEF_TEMP_DIR . '/havpRAM');
 define('HVDEF_SCANTEMPFILE',	'/havp-XXXXXX');
-define('HVDEF_FILTER_RULES',	'/tmp/rules.havp');
 define('HVDEF_HAVP_CONFIG',	HVDEF_WORK_DIR . '/havp.config');
 define('HVDEF_HAVP_XMLCONF',	HVDEF_WORK_DIR . '/havp_conf.xml');
 define('HVDEF_HAVP_WHITELIST',	HVDEF_WORK_DIR . '/whitelist');
@@ -129,7 +123,6 @@ define('HVDEF_STATUS_FILE',	'/var/tmp/havp.status');
 /* Scripts */
 define('HVDEF_SCRIPT_DIR',		'/usr/local/etc/rc.d');
 define('HVDEF_AVCRON_SCRIPT',		'/clamav-freshclam');
-define('HVDEF_FILTER_RESYNC_SCRIPT',	'/usr/local/pkg/pf/havp_filter_resync.sh');
 define('HVDEF_HAVP_STARTUP_SCRIPT',	HVDEF_SCRIPT_DIR . '/havp.sh');
 define('HVDEF_CLAM_STARTUP_SCRIPT',	HVDEF_SCRIPT_DIR . '/clamd');
 define('HVDEF_AVUPD_SCRIPT',		HVDEF_SCRIPT_DIR . '/havp_avupdate');
@@ -234,7 +227,6 @@ function havp_deinstall() {
 	install_cron_job($crontask, false);
 	mwexec("/usr/bin/killall -9 havp");
 	unlink_if_exists(HVDEF_HAVP_STARTUP_SCRIPT);
-	unlink_if_exists(HVDEF_FILTER_RESYNC_SCRIPT);
 	unlink_if_exists(HVDEF_PID_FILE);
 	// unlink_if_exists(HVDEF_CLAM_STARTUP_SCRIPT);
 	// unlink_if_exists(HVDEF_AVUPD_SCRIPT);
@@ -375,8 +367,6 @@ function havp_resync() {
 	havp_reconfigure_freshclam();
 	havp_reconfigure_cron();
 
-	/* Configure firewall */
-	filter_configure();
 }
 
 function havp_avset_resync() {
@@ -496,9 +486,6 @@ function havp_check_system() {
 	/* Startup scripts (HAVP and clamd) */
 	havp_startup_script();
 	hv_clamd_startup_script();
-
-	/* Delete stale script that was used for pfSense 1.2.x */
-	unlink_if_exists(HVDEF_FILTER_RESYNC_SCRIPT);
 
 	/* mount RAMDisk */
 	mountRAMdisk(true);
@@ -1257,43 +1244,17 @@ function havp_generate_rules($type = 'filter') {
 		$rules[] = "";
 	}
 
-	if ($type == 'pfearly') {
-		return;
-	}
-
-	if ($type == 'pflate') {
-		return;
-	}
-
 	return implode("\n", $rules);
 }
 
-function havp_filter_update_3() {
-
-	$rules_file = '/tmp/rules.debug';
-	if (file_exists($rules_file)) {
-		$newrules = array();
-		$rules = file_get_contents($rules_file);
-		$rules = explode("\n", $rules);
-
-		foreach ($rules as $val) {
-			$newrules[] = $val;
-			// rdr
-			if (trim($val) === "rdr-anchor \"miniupnpd\"") {
-				$newrules[] = "# havp rdr";
-				$newrules[] = havp_generate_rules('nat');
-				$newrules[] = "";
-			} elseif (trim($val) === "anchor \"miniupnpd\"") {
-				// rules
-				$newrules[] = "# havp rules";
-				$newrules[] = havp_generate_rules('filter');
-				$newrules[] = "";
-			}
-			$rules = implode("\n", $newrules);
-		}
-	file_put_contents($rules_file, $rules);
-	mwexec("/sbin/pfctl -f $rules_file");
-	}
+function havp_filter_update() {
+	$newrules = array();
+	$newrules[] = "# HAVP Rules Start";
+	$newrules[] = havp_generate_rules('nat');
+	$newrules[] = havp_generate_rules('filter');
+	$newrules[] = "# HAVP Rules End";
+	$newrules[] = "";
+	return implode("\n", $newrules);
 }
 
 /* AV update script */
@@ -1428,23 +1389,6 @@ function hv_clamd_startup_script() {
 	unset($s);
 
 	write_rcfile($rc);
-}
-
-
-/* HAVP filter resync script */
-function havp_filter_resync_script() {
-
-	return <<<EOD
-#!/usr/local/bin/php -f
-<?php
-// havp filter hook
-if (file_exists('/usr/local/pkg/havp.inc')) {
-	require_once('havp.inc');
-	havp_filter_update_3();
-}
-?>
-EOD;
-
 }
 
 /*
