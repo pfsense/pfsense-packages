@@ -976,9 +976,9 @@ cache_mem $memory_cache_size MB
 maximum_object_size_in_memory {$max_objsize_in_mem} KB
 memory_replacement_policy {$memory_policy}
 cache_replacement_policy {$cache_policy}
-$disk_cache_opts
 minimum_object_size {$min_objsize} KB
 maximum_object_size {$max_objsize}
+$disk_cache_opts
 offline_mode {$offline_mode}
 EOD;
 
