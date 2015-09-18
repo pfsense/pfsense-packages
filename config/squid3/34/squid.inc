@@ -2390,7 +2390,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	$xml['squid'] = $config['installedpackages']['squid'];
 	$xml['squidupstream'] = $config['installedpackages']['squidupstream'];
 	$xml['squidcache'] = $config['installedpackages']['squidcache'];
-	$xml['squidantivirus'] = $config['installedpackages']['squidanitivirus'];
+	$xml['squidantivirus'] = $config['installedpackages']['squidantivirus'];
 	$xml['squidnac'] = $config['installedpackages']['squidnac'];
 	$xml['squidtraffic'] = $config['installedpackages']['squidtraffic'];
 	$xml['squidreversegeneral'] = $config['installedpackages']['squidreversegeneral'];
