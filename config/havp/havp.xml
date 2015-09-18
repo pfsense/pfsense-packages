@@ -45,7 +45,7 @@
 	<name>havp</name>
 	<title>Antivirus: HTTP proxy (HAVP + ClamAV)</title>
 	<category>Status</category>
-	<version>1.06</version>
+	<version>1.10.0</version>
 	<include_file>/usr/local/pkg/havp.inc</include_file>
 	<menu>
 		<name>Antivirus</name>
@@ -381,4 +381,7 @@
 	<custom_php_deinstall_command>
 		havp_deinstall();
 	</custom_php_deinstall_command>
+	<filter_rules_needed>
+		havp_filter_update();
+	</filter_rules_needed>
 </packagegui>
