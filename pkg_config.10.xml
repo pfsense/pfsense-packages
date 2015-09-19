@@ -1208,6 +1208,7 @@
 		<configurationfile>havp.xml</configurationfile>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<after_install_info>Please check the HAVP settings.</after_install_info>
+		<noembedded>true</noembedded>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
