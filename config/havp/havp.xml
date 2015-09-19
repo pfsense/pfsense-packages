@@ -382,6 +382,6 @@
 		havp_deinstall();
 	</custom_php_deinstall_command>
 	<filter_rules_needed>
-		havp_filter_update();
+		havp_generate_rules
 	</filter_rules_needed>
 </packagegui>
