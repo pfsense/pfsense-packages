@@ -1181,7 +1181,7 @@ function check_bw_domain($_dm) {
 * Filter rules
 * ------------------------------------------------------------------------------
 */
-function havp_generate_rules($type = 'filter') {
+function havp_generate_rules($type) {
 
 	global $config, $havp_config;
 	$rules = array();
@@ -1260,16 +1260,6 @@ function havp_generate_rules($type = 'filter') {
 	}
 
 	return implode("\n", $rules);
-}
-
-function havp_filter_update() {
-	$newrules = array();
-	$newrules[] = "# HAVP Rules Start";
-	$newrules[] = havp_generate_rules('nat');
-	$newrules[] = havp_generate_rules('filter');
-	$newrules[] = "# HAVP Rules End";
-	$newrules[] = "";
-	return implode("\n", $newrules);
 }
 
 /* AV update script */
