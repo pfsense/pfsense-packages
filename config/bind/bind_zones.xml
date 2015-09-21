@@ -496,7 +496,7 @@
 	<custom_php_validation_command>
 		<![CDATA[
 		if ($_POST['type'] == "master" and $_POST['serial'] == "") {
-			$_POST['serial'] = date("U") + 1000000000);
+			$_POST['serial'] = (date("U") + 1000000000);
 		}
 		bind_zone_validate($_POST, $input_errors);
 		]]>
