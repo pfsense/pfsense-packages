@@ -1073,7 +1073,8 @@ function squid_resync_cache() {
 		$conf.='acl dynamic urlpath_regex cgi-bin \?'."\n";
 		$conf.="cache deny dynamic\n";
 	} else if (preg_match('/youtube/',$settings['refresh_patterns'])) {
-		$conf.=<<< EOC
+// Broken (Bug #3847) and not working (http://wiki.squid-cache.org/ConfigExamples/DynamicContent/YouTube#Discussion)
+/*		$conf.=<<< EOC
 # Break HTTP standard for flash videos. Keep them in cache even if asked not to.
 refresh_pattern -i \.flv$ 10080 90% 999999 ignore-no-cache override-expire ignore-private
 
@@ -1082,6 +1083,7 @@ acl youtube dstdomain .youtube.com
 cache allow youtube
 
 EOC;
+*/
 	}
 	if (preg_match('/windows/',$settings['refresh_patterns'])) {
 		$conf.=<<< EOC
@@ -1142,9 +1144,9 @@ cache_mem $memory_cache_size MB
 maximum_object_size_in_memory {$max_objsize_in_mem} KB
 memory_replacement_policy {$memory_policy}
 cache_replacement_policy {$cache_policy}
-$disk_cache_opts
 minimum_object_size {$min_objsize} KB
 maximum_object_size {$max_objsize}
+$disk_cache_opts
 offline_mode {$offline_mode}
 
 EOD;
@@ -2390,7 +2392,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	$xml['squid'] = $config['installedpackages']['squid'];
 	$xml['squidupstream'] = $config['installedpackages']['squidupstream'];
 	$xml['squidcache'] = $config['installedpackages']['squidcache'];
-	$xml['squidantivirus'] = $config['installedpackages']['squidanitivirus'];
+	$xml['squidantivirus'] = $config['installedpackages']['squidantivirus'];
 	$xml['squidnac'] = $config['installedpackages']['squidnac'];
 	$xml['squidtraffic'] = $config['installedpackages']['squidtraffic'];
 	$xml['squidreversegeneral'] = $config['installedpackages']['squidreversegeneral'];
