@@ -163,7 +163,11 @@ function upload_config($reasonm = "") {
 	global $config, $g, $input_errors;
 
 	// Do nothing when booting
-	if (platform_booting()) {
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
 	}
 
