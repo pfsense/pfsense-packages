@@ -72,6 +72,7 @@ if ($_GET['act'] == "del") {
 
 			// Delete the SSL files and service
 			if ($ssl) {
+//				# XXX remove not needed code to handle HTTPS conf artifacts
 				unlink_if_exists("/var/etc/vhosts-{$ipaddress}-{$port}-ssl.conf");
 				unlink_if_exists("/var/etc/cert-vhosts-{$ipaddress}-{$port}.pem");
 				unlink_if_exists("/usr/local/etc/rc.d/vhosts-{$ipaddress}-{$port}-ssl.sh");
@@ -81,8 +82,10 @@ if ($_GET['act'] == "del") {
 					unset($config['installedpackages']['service'][$service_id]);
 				}
 			}
+			// # NOTE virtualhost directory and files are not removed
 
 			write_config();
+			vhosts_sync_package(); // Update conf file
 			header("Location: vhosts_php.php");
 			exit;
 		}
