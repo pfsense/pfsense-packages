@@ -233,6 +233,14 @@ include("head.inc");
 		tblrow('Status:', $disp_status);
 
 		tblrowbar('Load:', $ups['ups.load'], '%', '100-80', '79-60', '59-0');
+
+		if($ups['ups.power'] || $ups['ups.realpower']) {
+			$power = $ups['ups.realpower'] ? $ups['ups.realpower'] . 'W' : '';
+			if($ups['ups.power']) $power .= ($power ? ', ' : '') . $ups['ups.power'] . 'VA';
+			if($ups['output.powerfactor']) $power .= ' (' . ($ups['output.powerfactor'] * 100) . '%)';
+			tblrow('Consumption:', $power);
+		}
+
 		tblrowbar('Battery Charge:', $ups['battery.charge'], '%', '0-29' ,'30-79', '80-100');
 
 		tblclose();
