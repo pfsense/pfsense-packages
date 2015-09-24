@@ -1323,6 +1323,7 @@ function squid_resync_antivirus() {
 	if ($antivirus_config['enable']=="on") {
 		switch ($antivirus_config['client_info']) {
 		case "both":
+		default:
 			$icap_send_client_ip="on";
 			$icap_send_client_username="on";
 			break;
