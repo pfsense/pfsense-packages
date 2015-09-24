@@ -1335,6 +1335,7 @@ function squid_resync_antivirus() {
 			$icap_send_client_username="on";
 			break;
 		case "none":
+		default:
 			$icap_send_client_ip="off";
 			$icap_send_client_username="off";
 			break;
