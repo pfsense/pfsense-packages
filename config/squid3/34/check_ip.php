@@ -49,7 +49,6 @@ foreach ($files as $file) {
 		$result = squid_cp_read_db("{$g['vardb_path']}/{$file}");
 		foreach ($result as $rownum => $row) {
 			$cp_db[$rownum] = implode(",", $row);
-			}
 		}
 	}
 
@@ -85,7 +84,6 @@ function squid_cp_read_db($file) {
 		}
 		$DB->close();
 	}
-
 	return $cpdb;
 }
 
