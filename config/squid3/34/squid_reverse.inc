@@ -30,10 +30,11 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 require_once('certs.inc');
-require_once('squid.inc');
+/* This file is currently only being included in squid.inc and not used separately */
+// require_once('squid.inc');
 
 function squid_resync_reverse() {
-	global $config, $settings, $reverse_peers, $reverse_maps, $reverse_redir, $casnr;
+	global $config;
 
 	// config file
 	if (is_array($config['installedpackages']['squidreversegeneral'])) {
