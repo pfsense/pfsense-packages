@@ -110,7 +110,7 @@
 			<fieldname>client_info</fieldname>
       <description><![CDATA[Select what client info to forward to clamav.]]></description>
   		<type>select</type>
-			<default_value>strip</default_value>
+			<default_value>none</default_value>
 			<options>
 				<option><name>Send Both client username and ip info(Default)</name><value>both</value></option>
 				<option><name>Send only client username</name><value>username</value></option>
