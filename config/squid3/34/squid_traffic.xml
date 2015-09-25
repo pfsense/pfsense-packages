@@ -103,7 +103,7 @@
 				]]>
 			</description>
 			<type>input</type>
-			<size>10</size> 
+			<size>10</size>
 			<required/>
 			<default_value>0</default_value>
 		</field>
