@@ -181,7 +181,7 @@
 			</description>
 			<type>input</type>
 			<size>60</size>
-		</field>	
+		</field>
 		<field>
 			<name>Squid Hard Disk Cache Settings</name>
 			<type>listtopic</type>
@@ -227,7 +227,7 @@
 				]]>
 			</description>
 			<type>checkbox</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>Level 1 Directories</fielddescr>
 			<fieldname>level1_subdirs</fieldname>
@@ -326,7 +326,7 @@
 			<size>10</size>
 			<required/>
 			<default_value>256</default_value>
-		</field>		
+		</field>
 		<field>
 			<fielddescr>Memory Replacement Policy</fielddescr>
 			<fieldname>memory_replacement_policy</fieldname>
