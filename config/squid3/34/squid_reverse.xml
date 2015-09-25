@@ -250,6 +250,10 @@
 			<default_value>on</default_value>
 		</field>
 		<field>
+			<name>OWA Reverse Proxy General Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Enable OWA Reverse Proxy</fielddescr>
 			<fieldname>reverse_owa</fieldname>
 			<description>If checked, Squid will act as an accelerator/SSL offloader for Outlook Web App.</description>
