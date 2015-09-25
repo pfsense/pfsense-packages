@@ -92,11 +92,11 @@
 		<columnitem>
 			<fielddescr>Protocol</fielddescr>
 			<fieldname>Protocol</fieldname>
-		</columnitem>	
+		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-		</columnitem>	
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
