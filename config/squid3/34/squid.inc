@@ -675,8 +675,8 @@ function squid_validate_traffic($post, &$input_errors) {
 
 	if (!empty($post['quick_abort_min'])) {
 		$value = trim($post['quick_abort_min']);
-		if (!is_numericint($value)) {
-			$input_errors[] = "'Finish when remaining KB' must contain a positive integer.";
+		if ((!is_numericint($value)) && ($value !== -1)) {
+			$input_errors[] = "'Finish when remaining KB' must contain a positive integer or '-1'.";
 		}
 	}
 
