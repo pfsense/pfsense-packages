@@ -1119,10 +1119,10 @@ function squid_resync_cache() {
 	$cachedir = ($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$disk_cache_size = ($settings['harddisk_cache_size'] ? $settings['harddisk_cache_size'] : 100);
 	$level1 = ($settings['level1_subdirs'] ? $settings['level1_subdirs'] : 16);
-	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 8);
+	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 64);
 	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size'] . " MB" : "4 MB");
 	$min_objsize = ($settings['minimum_object_size'] ? $settings['minimum_object_size'] : 0);
-	$max_objsize_in_mem = ($settings['maximum_objsize_in_mem'] ? $settings['maximum_objsize_in_mem'] : 32);
+	$max_objsize_in_mem = ($settings['maximum_objsize_in_mem'] ? $settings['maximum_objsize_in_mem'] : 256);
 	$cache_policy = ($settings['cache_replacement_policy'] ? $settings['cache_replacement_policy'] : 'heap LFUDA');
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
