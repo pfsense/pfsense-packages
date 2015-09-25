@@ -383,7 +383,7 @@
 			<fieldname>defined_ip_proxy_off_dest</fieldname>
 			<description>
 				<![CDATA[
-				Do not proxy traffic going to these <strong>destination<strong> IPs, CIDR nets, hostnames, or aliases, but let it pass directly through the firewall.<br/>
+				Do not proxy traffic going to these <strong>destination</strong> IPs, CIDR nets, hostnames, or aliases, but let it pass directly through the firewall.<br/>
 				(Applies only to transparent mode.)<br/><br/>
 				<strong>Note: Separate entries by semi-colons (;)</strong>
 				]]>
