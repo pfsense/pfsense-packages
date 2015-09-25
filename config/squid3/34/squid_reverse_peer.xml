@@ -163,9 +163,6 @@
 			<size>60</size>
 		</field>
 	</fields>
-	<custom_php_command_before_form>
-		squid_before_form_general($pkg);
-	</custom_php_command_before_form>
 	<custom_php_validation_command>
 		squid_validate_reverse($_POST, $input_errors);
 	</custom_php_validation_command>
