@@ -398,42 +398,6 @@ function squid_deinstall_command() {
 	filter_configure();
 }
 
-function squid_before_form_general(&$pkg) {
-	$values = get_dir(SQUID_CONFBASE . '/errors/');
-	/*
-	 * XXX: This logic is broken. Probably the idea in the past
-	 * was to skip '.', '..'. 'COPYRIGHT' and 'TRANSLATORS' and
-	 * errors subdirectories used to be more meaning, like 'English'
-	 * or Brazillian_Portuguese.
-	 *
-	 * Nowadays they are 'en', 'pt-br', ... and also there is a
-	 * 'templates' directory to be skipped
-	 */
-	// Get rid of '..' and '.' and ...
-	array_shift($values);
-	array_shift($values);
-	array_shift($values);
-	array_shift($values);
-
-	$name = array();
-	foreach ($values as $value) {
-		$names[] = implode(" ", explode("_", $value));
-	}
-
-	$i = 0;
-	foreach ($pkg['fields']['field'] as $field) {
-		if ($field['fieldname'] == 'error_language') {
-			break;
-		}
-		$i++;
-	}
-	$field = &$pkg['fields']['field'][$i];
-
-	for ($i = 0; $i < count($values) - 1; $i++) {
-		$field['options']['option'][] = array('name' => $names[$i], 'value' => $values[$i]);
-	}
-}
-
 function squid_validate_antivirus($post, &$input_errors) {
 	global $config;
 
