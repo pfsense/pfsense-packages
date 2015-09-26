@@ -1022,11 +1022,15 @@
 	</package>
 	<package>
 		<name>squid</name>
-		<descr>High performance web proxy cache.</descr>
+		<descr><![CDATA[
+			High performance web proxy cache.<br/>
+			<strong>NOTE: Squid 2.7 is abandoned, unmaintained and unsupported. Use Squid3 package instead.</strong>
+			]]>
+		</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
 		<version>4.3.9</version>
-		<status>Stable</status>
+		<status>Unsupported</status>
 		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_pbi>squid-2.7.9_4-##ARCH##.pbi</depends_on_package_pbi>
