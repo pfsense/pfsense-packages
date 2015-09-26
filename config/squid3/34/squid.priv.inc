@@ -33,31 +33,31 @@ $priv_list['page-services-squid3']['name'] = "WebCfg - Services: Squid3 package"
 $priv_list['page-services-squid3']['descr'] = "Allow access to Squid3 package GUI";
 $priv_list['page-services-squid3']['match'] = array();
 
-$priv_list['page-services-squid3']['match'][] = pkg.php?xml=squid_reverse_peer.xml*
-$priv_list['page-services-squid3']['match'][] = pkg.php?xml=squid_reverse_redir.xml
-$priv_list['page-services-squid3']['match'][] = pkg.php?xml=squid_reverse_uri.xml*
-$priv_list['page-services-squid3']['match'][] = pkg.php?xml=squid_upstream.xml*
-$priv_list['page-services-squid3']['match'][] = pkg.php?xml=squid_users.xml*
+$priv_list['page-services-squid3']['match'][] = "pkg.php?xml=squid_reverse_peer.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg.php?xml=squid_reverse_redir.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg.php?xml=squid_reverse_uri.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg.php?xml=squid_upstream.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg.php?xml=squid_users.xml*";
 
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_antivirus.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_auth.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_cache.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_nac.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_reverse.xml
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_reverse_general.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_reverse_peer.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_reverse_redir.xml
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_reverse_sync.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_reverse_uri.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_sync.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_traffic.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_upstream.xml*
-$priv_list['page-services-squid3']['match'][] = pkg_edit.php?xml=squid_users.xml*
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_antivirus.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_auth.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_cache.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_nac.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_reverse.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_reverse_general.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_reverse_peer.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_reverse_redir.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_reverse_sync.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_reverse_uri.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_sync.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_traffic.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_upstream.xml*";
+$priv_list['page-services-squid3']['match'][] = "pkg_edit.php?xml=squid_users.xml*";
 
-$priv_list['page-services-squid3']['match'][] = shortcuts/pkg_squid.inc*
-$priv_list['page-services-squid3']['match'][] = squid_monitor.php*
-$priv_list['page-services-squid3']['match'][] = squid_monitor_data.php*
-$priv_list['page-services-squid3']['match'][] = squid_log_parser.php*
+$priv_list['page-services-squid3']['match'][] = "shortcuts/pkg_squid.inc*";
+$priv_list['page-services-squid3']['match'][] = "squid_monitor.php*";
+$priv_list['page-services-squid3']['match'][] = "squid_monitor_data.php*";
+$priv_list['page-services-squid3']['match'][] = "squid_log_parser.php*";
 
 ?>
