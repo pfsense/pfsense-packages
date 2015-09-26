@@ -336,6 +336,13 @@ function squid_install_command() {
 		"stop" => "/bin/ps awux | /usr/bin/grep \"sqpmon\" | /usr/bin/grep -v \"grep\" | /usr/bin/grep -v \"php\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill")
 	);
 
+	// make a backup of default c-icap config file on install; also see squid_resync_antivirus() function below
+	if (!file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
+		if (file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample")) {
+			copy(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample", SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default");
+		}
+	}
+
 	foreach (array(SQUID_CONFBASE, SQUID_ACLDIR, SQUID_SSL_DB) as $dir) {
 		safe_mkdir($dir, 0755);
 		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
