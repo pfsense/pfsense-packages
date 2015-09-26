@@ -1438,17 +1438,29 @@ EOF;
 			}
 		}
 		// c-icap.conf
-		if (!file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample")) {
-			if (file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
-				$sample_file = file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default");
-				if (!preg_match("/squid_clamav/", $sample_file)) {
-					$sample_file .= "\nService squid_clamav squidclamav.so\n";
-				}
-				$cicap_m[0] = "@Manager:Apassword\S+@";
-				$cicap_r[0] = "";
-				file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample", preg_replace($cicap_m, $cicap_r, $sample_file), LOCK_EX);
-			}
+		// make a backup of default c-icap.conf.sample first
+		// unlike with other config files, the file distributed in package is called c-icap.conf.sample, not c-icap.conf.default
+		if (!file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
+			copy(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample", SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default");
 		}
+		if (file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
+			$sample_file = file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default");
+			if (!preg_match("/squid_clamav/", $sample_file)) {
+				$sample_file .= "\nService squid_clamav squidclamav.so\n";
+			}
+			$cicap_m[0] = "@Manager:Apassword\S+@";
+			$cicap_r[0] = "";
+			// XXX: Bug #4615
+			$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
+			$cicap_m[1] = "@DebugLevel\s1@";
+			$cicap_r[1] = "DebugLevel 0";
+			$cicap_m[2] = "@AccessLog /var/log/c-icap/access.log@";
+			$cicap_r[2] = "AccessLog $logdir/c-icap-access.log";
+			$cicap_m[3] = "@ServerLog /var/log/c-icap/server.log@";
+			$cicap_r[3] = "ServerLog $logdir/c-icap-server.log";
+			file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample", preg_replace($cicap_m, $cicap_r, $sample_file), LOCK_EX);
+		}
+
 		// check squidclamav files until PBIs are gone (https://redmine.pfsense.org/issues/4197)
 		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
 		foreach ($ln_icap as $ln) {
