@@ -42,12 +42,16 @@
 	]]>
 	</copyright>
 	<name>checkmk</name>
-	<version>0.1.4</version>
+	<version>0.1.5</version>
 	<title>check_mk Agent</title>
 	<include_file>/usr/local/pkg/checkmk.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
