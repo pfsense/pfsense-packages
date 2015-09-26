@@ -54,4 +54,8 @@
 		<prefix>/usr/local/www/</prefix>
 		<item>https://packages.pfsense.org/packages/config/diag_states_pt/diag_new_states.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/diag_states_pt/diag_new_states.priv.inc</item>
+	</additional_files_needed>
 </packagegui>
