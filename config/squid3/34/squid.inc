@@ -810,7 +810,7 @@ function squid_install_cron($should_install) {
 	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php clean; ";
 	if ($should_install) {
 		if ($settings['clear_cache'] == 'on' ) {
-			install_cron_job("{$swapstate_cmd}", true, "*/15");
+			install_cron_job("{$swapstate_cmd}", true, "*/360");
 		} else {
 			install_cron_job("{$swapstate_cmd}", false);
 		}
