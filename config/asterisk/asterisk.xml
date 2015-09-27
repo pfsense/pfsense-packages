@@ -69,10 +69,6 @@
 		<prefix>/usr/local/www/shortcuts/</prefix>
 		<item>https://packages.pfsense.org/packages/config/asterisk/pkg_asterisk.inc</item>
 	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/etc/inc/priv/</prefix>
-		<item>https://packages.pfsense.org/packages/config/asterisk/asterisk.priv.inc</item>
-	</additional_files_needed>
 	<menu>
 		<name>Asterisk</name>
 		<tooltiptext>Asterisk</tooltiptext>
