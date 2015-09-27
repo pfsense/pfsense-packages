@@ -728,7 +728,6 @@
 		update_status("Checking Squid cache... One moment please...");
 		update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
 		squid_install_command();
-		squid_resync();
 		exec("/bin/rm -f /usr/local/etc/rc.d/squid");
 	]]>
 	</custom_php_install_command>
