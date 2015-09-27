@@ -1952,20 +1952,25 @@ function squid_resync($via_rpc = "no") {
 
 	$log_dir = "";
 	$squid_enabled = false;
-	// check if Squid is enabled
 	if (is_array($config['installedpackages']['squid']['config'])) {
+		// check if Squid is enabled
 		if ($config['installedpackages']['squid']['config'][0]['active_interface'] != "") {
-			$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'] . '/';
 			$squid_enabled = true;
 		}
 	} elseif (is_array($config['installedpackages']['squidreversegeneral']['config'])) {
 		// check if squidreverse is enabled
 		if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
-			$log_dir = "/var/squid/logs/";
 			$squid_enabled = true;
 		}
 	}
 	// create log dir if required
+	if (is_array($config['installedpackages']['squid']['config'])) {
+		if ($config['installedpackages']['squid']['config'][0]['active_interface'] != "") {
+			$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'] . '/';
+		}
+	} else {
+		$log_dir = "/var/squid/logs/";
+	}
 	if (!is_dir($log_dir)) {
 		log_error("Creating Squid log dir $log_dir");
 		safe_mkdir($log_dir, 0755);
