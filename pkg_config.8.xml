@@ -34,7 +34,7 @@
 		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br />Asterisk turns an ordinary computer into a communications server.]]></descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>1.8.26.1 pkg v0.3.3</version>
+		<version>1.8.26.1 pkg v0.3.4</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
@@ -74,7 +74,7 @@
 		<category>File Management</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/Filer_package</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/filer/filer.xml</config_file>
-		<version>0.60.1</version>
+		<version>0.60.5</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>
@@ -100,7 +100,7 @@
 		<category>Diagnostics</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,26974.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
-		<version>0.1.4</version>
+		<version>0.2.2</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
@@ -316,7 +316,7 @@
 		</build_pbi>
 		<depends_on_package>avahi-app-0.6.29_1.tbz</depends_on_package>
 		<depends_on_package_pbi>avahi-0.6.31-i386.pbi</depends_on_package_pbi>
-		<version>0.6.31 pkg v1.10.2</version>
+		<version>0.6.31 pkg v1.10.3</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
@@ -424,7 +424,7 @@
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/backup/backup.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.1.7</version>
+		<version>0.2.1</version>
 		<status>Beta</status>
 		<required_version>1.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -438,7 +438,7 @@
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/cron/cron.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.1.9</version>
+		<version>0.3.2</version>
 		<status>Beta</status>
 		<required_version>1.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -844,7 +844,7 @@
 		<descr>Broadcasts a who-has ARP packet on the network and prints answers. </descr>
 		<website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
 		<category>Services</category>
-		<version>2.09.1 v1.1</version>
+		<version>2.09.1 v1.2.1</version>
 		<status>Stable</status>
 		<required_version>1.0.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arping/arping.xml</config_file>
@@ -913,7 +913,7 @@
 		<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
 		<website>http://www.addressplus.net</website>
 		<category>Network Management</category>
-		<version>0.2</version>
+		<version>0.3.1</version>
 		<maintainer>ptaylor@addressplus.net</maintainer>
 		<required_version>1.2.1</required_version>
 		<status>BETA</status>
@@ -928,7 +928,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>darkstat-3.0.714.tbz</depends_on_package>
 		<depends_on_package_pbi>darkstat-3.0.715-i386.pbi</depends_on_package_pbi>
-		<version>3.0.714</version>
+		<version>3.1.1</version>
 		<status>Stable</status>
 		<required_version>1.2.1</required_version>
 		<maintainer>sullrich+pfsp@gmail.com</maintainer>
@@ -1021,7 +1021,7 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>2.0.1_5 pkg v.0.5</version>
+		<version>2.0.1_5 pkg v0.6.3</version>
 		<status>BETA</status>
 		<required_version>1.2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -1235,7 +1235,7 @@
 		<depends_on_package>arpwatch-2.1.a15_6.tbz</depends_on_package>
 		<depends_on_package_pbi>arpwatch-2.1.a15_6-i386.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
-		<version>2.1.a15_6 pkg v1.1.2</version>
+		<version>2.1.a15_6 pkg v1.1.3</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arpwatch/arpwatch.xml</config_file>
@@ -1390,7 +1390,7 @@
 		<name>blinkled</name>
 		<descr>Allows you to use LEDs for network activity on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
 		<category>System</category>
-		<version>0.4.3</version>
+		<version>0.4.6</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<required_version>1.2.3</required_version>
@@ -1410,7 +1410,7 @@
 		<name>gwled</name>
 		<descr>Allows you to use LEDs for gateway status on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
 		<category>System</category>
-		<version>0.2.1</version>
+		<version>0.2.3</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<required_version>2.0</required_version>
@@ -1533,7 +1533,7 @@
 		</build_pbi>
 		<build_options></build_options>
 		<config_file>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.xml</config_file>
-		<version>v0.1.2</version>
+		<version>v0.1.5</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
@@ -1595,7 +1595,7 @@
 		<descr><![CDATA[Bacula is a set of Open Source, computer programs that permit you (or the system administrator) to manage backup, recovery, and verification of computer data across a network of computers of different kinds.]]></descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>5.2.12_3 pkg v 1.0.11</version>
+		<version>5.2.12_3 pkg v 1.0.12</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
