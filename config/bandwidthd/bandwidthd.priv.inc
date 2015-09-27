@@ -34,12 +34,4 @@ $priv_list['page-diagnostics-bandwidthd-settings']['descr'] = "Allow access to B
 $priv_list['page-diagnostics-bandwidthd-settings']['match'] = array();
 $priv_list['page-diagnostics-bandwidthd-settings']['match'][] = "pkg_edit.php?xml=bandwidthd.xml*";
 
-$priv_list['page-diagnostics-bandwidthd-graphs'] = array();
-$priv_list['page-diagnostics-bandwidthd-graphs']['name'] = "WebCfg - Diagnostics: BandwidthD graphs";
-$priv_list['page-diagnostics-bandwidthd-graphs']['descr'] = "Allow access to BandwidthD graphs";
-$priv_list['page-diagnostics-bandwidthd-graphs']['match'] = array();
-$priv_list['page-diagnostics-bandwidthd-graphs']['match'][] = "bandwidthd/*.html*";
-$priv_list['page-diagnostics-bandwidthd-graphs']['match'][] = "bandwidthd/*.gif*";
-$priv_list['page-diagnostics-bandwidthd-graphs']['match'][] = "bandwidthd/*.png*";
-
 ?>
