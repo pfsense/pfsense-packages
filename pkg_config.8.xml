@@ -34,7 +34,7 @@
 		<descr><![CDATA[Asterisk is an open source framework for building communications applications.<br />Asterisk turns an ordinary computer into a communications server.]]></descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>1.8.26.1 pkg v0.3.4</version>
+		<version>1.8.26.1 pkg v0.3.3</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
