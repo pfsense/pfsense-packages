@@ -35,10 +35,6 @@ $priv_list['page-diagnostics-filemgr']['descr'] = "Allow access to File Manager 
 $priv_list['page-diagnostics-filemgr']['match'] = array();
 $priv_list['page-diagnostics-filemgr']['match'][] = "packages/filemgr/file_manager.php*";
 $priv_list['page-diagnostics-filemgr']['match'][] = "packages/filemgr/index.php*";
-$priv_list['page-diagnostics-filemgr']['match'][] = "packages/filemgr/rbfmimg/*.png*";
-$priv_list['page-diagnostics-filemgr']['match'][] = "packages/filemgr/rbfmimg/index.html*";
 $priv_list['page-diagnostics-filemgr']['match'][] = "packages/filemgr/rbfminc/*.php*";
-$priv_list['page-diagnostics-filemgr']['match'][] = "packages/filemgr/rbfminc/index.html*";
-$priv_list['page-diagnostics-filemgr']['match'][] = "packages/filemgr/rbfminc/file_editor_style.css*";
 
 ?>
