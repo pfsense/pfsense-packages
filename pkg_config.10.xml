@@ -39,7 +39,7 @@
 		</descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>0.3.3</version>
+		<version>0.3.4</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
@@ -82,7 +82,7 @@
 		<category>File Management</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/Filer_package</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/filer/filer.xml</config_file>
-		<version>0.60.4</version>
+		<version>0.60.5</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>
@@ -96,7 +96,7 @@
 		<category>Diagnostics</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,26974.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
-		<version>0.2.1</version>
+		<version>0.2.2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
@@ -261,7 +261,7 @@
 			<ports_after>net/avahi-app devel/dbus</ports_after>
 		</build_pbi>
 		<depends_on_package_pbi>avahi-0.6.31-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.10.2</version>
+		<version>1.10.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
@@ -349,7 +349,7 @@
 		<descr>Tool to Backup and Restore files and directories.</descr>
 		<category>System</category>
 		<config_file>https://packages.pfsense.org/packages/config/backup/backup.xml</config_file>
-		<version>0.2.0</version>
+		<version>0.2.1</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -360,7 +360,7 @@
 		<descr>The cron utility is used to manage commands on a schedule.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/cron/cron.xml</config_file>
-		<version>0.3.1</version>
+		<version>0.3.2</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
@@ -757,7 +757,7 @@
 		<descr>Broadcasts a who-has ARP packet on the network and prints answers.</descr>
 		<website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
 		<category>Services</category>
-		<version>1.2</version>
+		<version>1.2.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arping/arping.xml</config_file>
@@ -832,7 +832,7 @@
 		<name>diag_new_states</name>
 		<descr>Paul Taylor's version of Diagnostics States which utilizes pftop.</descr>
 		<category>Network Management</category>
-		<version>0.3</version>
+		<version>0.3.1</version>
 		<maintainer>ptaylor@addressplus.net</maintainer>
 		<required_version>2.2</required_version>
 		<status>BETA</status>
@@ -846,7 +846,7 @@
 		<descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
 		<category>Network Management</category>
 		<depends_on_package_pbi>darkstat-3.0.718-##ARCH##.pbi</depends_on_package_pbi>
-		<version>3.1</version>
+		<version>3.1.1</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<maintainer>coreteam@pfsense.org</maintainer>
@@ -929,7 +929,7 @@
 		<website>http://bandwidthd.sourceforge.net/</website>
 		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
 		<category>System</category>
-		<version>0.6.2</version>
+		<version>0.6.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>bandwidthd-2.0.1_6-##ARCH##.pbi</depends_on_package_pbi>
@@ -1123,7 +1123,7 @@
 		<build_pbi>
 			<port>net-mgmt/arpwatch</port>
 		</build_pbi>
-		<version>1.1.4</version>
+		<version>1.1.5</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arpwatch/arpwatch.xml</config_file>
@@ -1215,7 +1215,7 @@
 		<name>blinkled</name>
 		<descr>Allows you to use LEDs for monitoring network activity on supported platforms (ALIX, WRAP, Soekris, etc.)</descr>
 		<category>System</category>
-		<version>0.4.5</version>
+		<version>0.4.6</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<required_version>2.2</required_version>
@@ -1234,7 +1234,7 @@
 		<name>gwled</name>
 		<descr>Allows you to use LEDs for monitoring gateway status on supported platforms (ALIX, WRAP, Soekris, etc.)</descr>
 		<category>System</category>
-		<version>0.2.2</version>
+		<version>0.2.3</version>
 		<status>Beta</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<port_category>sysutils</port_category>
@@ -1322,7 +1322,7 @@
 			<port>sysutils/muse</port>
 		</build_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.xml</config_file>
-		<version>0.1.4</version>
+		<version>0.1.5</version>
 		<status>RC1</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
@@ -1398,7 +1398,7 @@
 		<descr>Bacula is a set of Open Source computer programs that permit managings backups, recovery, and verification of computer data across a network of computers of different kinds.</descr>
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
-		<version>1.0.11</version>
+		<version>1.0.12</version>
 		<status>Stable</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
@@ -1725,7 +1725,7 @@
 		<descr>Basic FTP Client Proxy using ftp-proxy from FreeBSD.</descr>
 		<pkginfolink>https://forum.pfsense.org/index.php?topic=89841.0</pkginfolink>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.2.1</version>
+		<version>0.2.2</version>
 		<category>Services</category>
 		<status>Beta</status>
 		<port_category>ftp</port_category>
