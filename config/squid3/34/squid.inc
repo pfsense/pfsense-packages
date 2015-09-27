@@ -1965,7 +1965,7 @@ function squid_resync($via_rpc = "no") {
 	}
 	// create log dir if required
 	if (is_array($config['installedpackages']['squid']['config'])) {
-		if ($config['installedpackages']['squid']['config'][0]['active_interface'] != "") {
+		if ($config['installedpackages']['squid']['config'][0]['log_dir'] != "") {
 			$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'] . '/';
 		}
 	} else {
