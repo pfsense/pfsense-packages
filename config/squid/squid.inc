@@ -926,6 +926,16 @@ EOD;
 function squid_resync_auth() {
 	global $config, $valid_acls;
 
+	if (!is_array($config['installedpackages']['squidauth'])) {
+		$config['installedpackages']['squidauth']['config'][0] = array();
+	}
+	if (!is_array($config['installedpackages']['squidnac'])) {
+		$config['installedpackages']['squidnac']['config'][0] = array();
+	}
+	if (!is_array($config['installedpackages']['squid'])) {
+		$config['installedpackages']['squid']['config'][0] = array();
+	}
+
 	$settings = $config['installedpackages']['squidauth']['config'][0];
 	$settingsnac = $config['installedpackages']['squidnac']['config'][0];
 	$settingsconfig = $config['installedpackages']['squid']['config'][0];
