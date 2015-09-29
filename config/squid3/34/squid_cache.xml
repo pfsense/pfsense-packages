@@ -175,7 +175,7 @@
 			<fieldname>ext_cachemanager</fieldname>
 			<description>
 				<![CDATA[
-				Enter the IPs for the external <a href="http://wiki.squid-cache.org/Features/CacheManager">Cache Managers</a> to be granted access to this proxy.
+				Enter the IPs for the external <a href="http://wiki.squid-cache.org/Features/CacheManager">Cache Managers</a> to be granted access to this proxy.<br/>
 				<strong>Note: Separate entries by semi-colons (;)</strong>
 				]]>
 			</description>
