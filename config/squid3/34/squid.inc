@@ -353,26 +353,73 @@ function squid_install_command() {
 function squid_deinstall_command() {
 	global $config, $g;
 
-	$plswait_txt = "This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.";
+	/* remove cronjob */
 	squid_install_cron(false);
-	if (is_array($config['installedpackages']['squidcache'])) {
-		$settings = $config['installedpackages']['squidcache']['config'][0];
-	} else {
-		$settings = array();
+
+	update_status("Stopping services...");
+	/* kill all running services */
+	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
+	if (is_process_running("c-icap")) {
+		mwexec('/usr/local/etc/rc.d/c-icap stop');
 	}
-	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
-	update_status("Removing cache ... One moment please...");
-	update_output_window("$plswait_txt");
-	// XXX: Is it ok to remove cache and logs? It's going to happen every time package is updated
-	mwexec_bg("/bin/rm -rf {$cachedir}");
-	mwexec("/bin/rm -rf {$logdir}");
-	update_status("Finishing package cleanup.");
-	mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
-	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
+	if (is_process_running("clamd")) {
+		mwexec('/usr/local/etc/rc.d/clamav-clamd stop');
+	}
+	if (is_process_running("freshclam")) {
+		mwexec('/usr/local/etc/rc.d/clamav-freshclam stop');
+	}
 	mwexec("/bin/ps awux | /usr/bin/grep \"squid\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep \"dnsserver\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep \"unlinkd\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	/* delete rc scripts */
+	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
+	unlink_if_exists('/usr/local/etc/rc.d/c-icap');
+	unlink_if_exists('/usr/local/etc/rc.d/clamav-clamd');
+	unlink_if_exists('/usr/local/etc/rc.d/clamav-freshclam');
+
+	/* clean up created directories */
+	update_status("Removing cache and logs ... One moment please...");
+	update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$cachesettings = array();
+	}
+	$cachedir =($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
+	if (is_array($config['installedpackages']['squid'])) {
+		$squidsettings = $config['installedpackages']['squid']['config'][0];
+	} else {
+		$squidsettings = array();
+	}
+	$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
+	// XXX: Is it ok to remove cache and logs? It's going to happen every time package is updated
+	if (is_dir("{$cachedir}")) {
+		mwexec_bg("/bin/rm -rf {$cachedir}");
+	}
+	if (is_dir("{$logdir}")) {
+		mwexec("/bin/rm -rf {$logdir}");
+	}
+	$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav");
+	foreach ($dirs as $dir) {
+		if (is_dir("{$dir}")) {
+			mwexec("/bin/rm -rf {$dir}");
+		}
+	}
+	/* clean up created PBI symlinks */
+	update_status("Finishing package cleanup.");
+	if (SQUID_LOCALBASE != '/usr/local') {
+		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
+		foreach ($ln_icap as $ln) {
+			if (is_link("/usr/local/{$ln}")) {
+				unlink("/usr/local/{$ln}");
+			}
+		}
+		if (is_link("/usr/local/lib/libicapapi.so.3")) {
+			unlink("/usr/local/lib/libicapapi.so.3");
+		}
+	}
+
+
 	update_status("Reloading filter...");
 	filter_configure();
 }
