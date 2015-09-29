@@ -1996,8 +1996,10 @@ function squid_resync($via_rpc = "no") {
 		log_error("Stopping any running proxy monitors");
 		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
 		sleep(1);
-		log_error("Stopping Squid");
-		stop_service("squid");
+		if (is_service_running('squid')) {
+			log_error("Stopping Squid");
+			stop_service("squid");
+		}
 	}
 
 	filter_configure();
