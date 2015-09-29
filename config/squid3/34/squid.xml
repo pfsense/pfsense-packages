@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squid</name>
-	<version>0.3.5</version>
+	<version>0.3.5.1</version>
 	<title>Proxy Server: General Settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<menu>

@@ -84,7 +84,8 @@ function squid_get_real_interface_address($iface) {
 }
 
 function squid_chown_recursive($dir, $user, $group) {
-	if ($dir == '/usr/local') {
+	if (empty($dir) || ($dir == '/') || ($dir == '/usr/local') || !is_dir($dir)) {
+		log_error(gettext("Squid attempted to chown an invalid directory: {$dir}"));
 		return;
 	}
 
@@ -92,8 +93,8 @@ function squid_chown_recursive($dir, $user, $group) {
 	chgrp($dir, $group);
 	$handle = opendir($dir) ;
 	while (($item = readdir($handle)) !== false) {
-		if (($item != ".") && ($item != "..")) {
-			$path = "$dir/$item";
+		if (!empty($item) && ($item != ".") && ($item != "..")) {
+			$path = "{$dir}/{$item}";
 			// Recurse unless it's the cache dir, that is slow and rarely necessary.
 			if (is_dir($path) && (basename($dir) != "cache")) {
 				squid_chown_recursive($path, $user, $group);
