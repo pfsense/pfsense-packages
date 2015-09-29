@@ -44,12 +44,16 @@
 	]]>
 	</copyright>
 	<name>filer</name>
-	<version>0.60.4</version>
+	<version>0.60.5</version>
 	<title>Filer</title>
 	<include_file>/usr/local/pkg/filer.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/filer/filer.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filer/filer.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>

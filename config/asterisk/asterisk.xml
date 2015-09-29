@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>asterisk</name>
-	<version>0.3.2</version>
+	<version>0.3.3</version>
 	<title>asterisk</title>
 	<include_file>/usr/local/pkg/asterisk.inc</include_file>
 	<additional_files_needed>

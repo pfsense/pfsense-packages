@@ -1,23 +1,12 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
-<packagegui>
-	<copyright>
-<![CDATA[
-/* $Id$ */
-/* ====================================================================================== */
+<?php
 /*
-	diag_new_states.xml
-	part of pfSense (https://www.pfSense.org/)
-	Copyright (C) 2002 Paul Taylor
+	backup.priv.inc
+	part of pfSense (http://www.pfSense.org/)
 	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
-*/
-/* ====================================================================================== */
-/*
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-
 
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
@@ -25,7 +14,6 @@
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
-
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -38,24 +26,14 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-/* ====================================================================================== */
-	]]>
-	</copyright>
-	<name>diag_new_states</name>
-	<version>0.3</version>
-	<title>Diagnostics: States New</title>
-	<menu>
-		<name>States New</name>
-		<tooltiptext>States by Paul Taylor</tooltiptext>
-		<section>Diagnostics</section>
-		<url>diag_new_states.php</url>
-	</menu>
-	<additional_files_needed>
-		<prefix>/usr/local/www/</prefix>
-		<item>https://packages.pfsense.org/packages/config/diag_states_pt/diag_new_states.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/etc/inc/priv/</prefix>
-		<item>https://packages.pfsense.org/packages/config/diag_states_pt/diag_new_states.priv.inc</item>
-	</additional_files_needed>
-</packagegui>
+global $priv_list;
+
+$priv_list['page-diagnostics-backup'] = array();
+$priv_list['page-diagnostics-backup']['name'] = "WebCfg - Diagnostics: Backup package";
+$priv_list['page-diagnostics-backup']['descr'] = "Allow access to Backup package GUI";
+
+$priv_list['page-diagnostics-backup']['match'] = array();
+$priv_list['page-diagnostics-backup']['match'][] = "packages/backup/backup.php*";
+$priv_list['page-diagnostics-backup']['match'][] = "packages/backup/backup_edit.php*";
+
+?>

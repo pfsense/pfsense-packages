@@ -44,7 +44,7 @@
 	<description>PHP File Manager</description>
 	<faq>https://forum.pfsense.org/index.php/topic,26974.0.html</faq>
 	<name>File Manager</name>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<title>Diagnostics: File Manager</title>
 	<menu>
 		<name>File Manager</name>
@@ -63,6 +63,10 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/filemgr/filemgr.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/filemgr.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/packages/filemgr/</prefix>
