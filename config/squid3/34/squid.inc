@@ -959,6 +959,7 @@ function squid_resync_general() {
 
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	if (!is_dir($logdir)) {
+		log_error("Creating Squid log dir $logdir");
 		safe_mkdir($logdir, 0755);
 		squid_chown_recursive($logdir, SQUID_UID, SQUID_GID);
 	}
@@ -1951,7 +1952,6 @@ function squid_resync($via_rpc = "no") {
 		chgrp(SQUID_LOCALBASE . "/libexec/squid/pinger", SQUID_GID);
 	}
 
-	$log_dir = "";
 	$squid_enabled = false;
 	if (is_array($config['installedpackages']['squid']['config'])) {
 		// check if Squid is enabled
@@ -1963,19 +1963,6 @@ function squid_resync($via_rpc = "no") {
 		if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
 			$squid_enabled = true;
 		}
-	}
-	// create log dir if required
-	if (is_array($config['installedpackages']['squid']['config'])) {
-		if ($config['installedpackages']['squid']['config'][0]['log_dir'] != "") {
-			$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'] . '/';
-		}
-	} else {
-		$log_dir = "/var/squid/logs/";
-	}
-	if (!is_dir($log_dir)) {
-		log_error("Creating Squid log dir $log_dir");
-		safe_mkdir($log_dir, 0755);
-		squid_chown_recursive($log_dir, SQUID_UID, SQUID_GID);
 	}
 
 	// check cache dir and create if necessary
