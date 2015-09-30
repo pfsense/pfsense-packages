@@ -403,22 +403,10 @@
 			<encoding>base64</encoding>
 		</field>
 	</fields>
-	<custom_php_command_before_form>
-	<![CDATA[
-		if ($_POST['harddisk_cache_size'] != $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size']) {
-			$needs_dash_z = true;
-		}
-	]]>
-	</custom_php_command_before_form>
 	<custom_php_validation_command>
 		squid_validate_cache($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
-	<![CDATA[
 		squid_resync();
-		if ($needs_dash_z) {
-			squid_dash_z();
-		}
-	]]>
 	</custom_php_resync_config_command>
 </packagegui>
