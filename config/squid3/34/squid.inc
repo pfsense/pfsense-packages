@@ -2465,6 +2465,8 @@ if [ -z "`ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; th
 EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
+	// force delete the PBI initscript that keeps creeping back
+	unlink_if_exists("/usr/local/etc/rc.d/squid");
 	conf_mount_ro();
 }
 
