@@ -394,8 +394,9 @@ function squid_install_command() {
 		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
 	}
 
-	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
+	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default')) {
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
+	}
 
 }
 
@@ -1534,7 +1535,7 @@ adaptation_access service_avi_resp allow all
 
 EOF;
 
-		// check if icap is enabled on rc.conf.local
+		// check if clamav/c_icap is enabled in rc.conf.local
 		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
 		if (file_exists("/etc/rc.conf.local")) {
 			$rc_old_file = file("/etc/rc.conf.local");
