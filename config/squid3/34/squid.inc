@@ -2442,6 +2442,9 @@ EOD;
 {$squid_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
 # Just to be sure...
 sleep 5
+if [ -n "`/bin/ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; then
+	{$squid_base}/sbin/squid -k kill -f {$squid_conffile_var}
+fi
 
 if [ -x /usr/bin/ipcs ]; then
 # http://man.chinaunix.net/newsoft/squid/Squid_FAQ/FAQ-22.html#ss22.8
