@@ -1513,9 +1513,9 @@ EOF;
 			if (file_exists(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.default")) {
 				$sample_file = file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.default");
 				$clamav_m[0] = "@/var/run/clamav/clamd.ctl@";
-				$clamav_m[1] = "@cgi-bin/clwarn.cgi@";
+				$clamav_m[1] = "@http\://proxy.domain.dom/cgi-bin/clwarn.cgi@";
 				$clamav_r[0] = "/var/run/clamav/clamd.sock";
-				$clamav_r[1] = "squid_clwarn.php";
+				$clamav_r[1] = "{$config['system']['webgui']['protocol']}://{$config['system']['hostname']}.{$config['system']['domain']}/squid_clwarn.php";
 				file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.sample", preg_replace($clamav_m, $clamav_r, $sample_file), LOCK_EX);
 			}
 		}
