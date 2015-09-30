@@ -394,18 +394,12 @@ function squid_deinstall_command() {
 	update_status("Stopping services...");
 	/* kill all running services */
 	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
-	if (is_process_running("c-icap")) {
-		mwexec('/usr/local/etc/rc.d/c-icap stop');
-	}
-	if (is_process_running("clamd")) {
-		mwexec('/usr/local/etc/rc.d/clamav-clamd stop');
-	}
-	if (is_process_running("freshclam")) {
-		mwexec('/usr/local/etc/rc.d/clamav-freshclam stop');
-	}
-	mwexec("/bin/ps awux | /usr/bin/grep \"squid\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-	mwexec("/bin/ps awux | /usr/bin/grep \"dnsserver\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-	mwexec("/bin/ps awux | /usr/bin/grep \"unlinkd\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[c]-icap' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[f]reshclam' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[s]quid' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[d]nsserver' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[u]nlinkd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	/* delete rc scripts */
 	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
 	unlink_if_exists('/usr/local/etc/rc.d/c-icap');
@@ -434,7 +428,7 @@ function squid_deinstall_command() {
 	if (is_dir("{$logdir}")) {
 		mwexec("/bin/rm -rf {$logdir}");
 	}
-	$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav");
+	$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav", "/var/run/squid", "/var/squid");
 	foreach ($dirs as $dir) {
 		if (is_dir("{$dir}")) {
 			mwexec("/bin/rm -rf {$dir}");
@@ -453,7 +447,6 @@ function squid_deinstall_command() {
 			unlink("/usr/local/lib/libicapapi.so.3");
 		}
 	}
-
 
 	update_status("Reloading filter...");
 	filter_configure();
