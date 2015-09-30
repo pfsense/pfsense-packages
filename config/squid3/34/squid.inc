@@ -138,10 +138,23 @@ function squid_dash_z($cache_action = 'none') {
 	}
 
 	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
+	// If it already exists, delete it.
 	if ($cachesettings['harddisk_cache_system'] == "null") {
+		if (is_dir($cachedir)) {
+			log_error("Deleting Squid cache dir {$cachedir} since 'Hard Disk Cache System' is set to null.");
+			// cannot nuke disk cache while Squid is running
+			squid_stop_monitor();
+			if (is_service_running('squid')) {
+				stop_service("squid");
+			}
+			rename($cachedir, "{$cachedir}.old");
+			mwexec_bg("/bin/rm -rf {$cachedir}.old");
+			squid_restart_services();
+		}
 		return;
 	}
-	// Re-create the cachedir if clean is forced by cronjob/manually, or
+
+	// Re-create the cachedir if clean is forced by cronjob/manually,
 	// or if the cachedir changed, or level1_subdirs don't exist or the number of level1_subdirs changed
 	if ($cache_action == "clean" || ((!is_dir($cachedir)) || (!is_dir($cachedir . '/00'))) || ($numdirs !== $currentdirs)) {
 		// cannot nuke disk cache while Squid is running
