@@ -192,7 +192,6 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-		<field>
 			<type>info</type>
 			<description>
 				<![CDATA[
@@ -205,6 +204,7 @@
 				]]>
 			</description>
 		</field>
+		<field>
 			<fielddescr>Finish transfer if less than x KB remaining</fielddescr>
 			<fieldname>quick_abort_min</fieldname>
 			<description>If the transfer has less than x KB remaining, it will finish the retrieval.</description>

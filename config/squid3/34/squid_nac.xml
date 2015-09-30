@@ -171,7 +171,7 @@
 			<fieldname>block_user_agent</fieldname>
 			<description>
 				<![CDATA[
-				Enter user agents that will be blocked for the users that are allowed to use the proxy.
+				Enter user agents that will be blocked for the users that are allowed to use the proxy.<br/>
 				<strong>Note: Put each entry on a separate line.</strong> You also can use regular expressions.
 				]]>
 			</description>

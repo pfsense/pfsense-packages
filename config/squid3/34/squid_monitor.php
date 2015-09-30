@@ -120,9 +120,9 @@ include("head.inc");
 						<input name="strfilter" type="text" class="formfld search" id="strfilter" size="50" value="" />
 						<br/>
 						<span class="vexpl">
-							<?=gettext("Enter a grep like string/pattern to filterlog.");?><br/>
-							<?=gettext("eg. username, ip addr, url.");?><br/>
-							<?=gettext("Use <b>!</b> to invert the sense of matching, to select non-matching lines.");?>
+							<?=gettext("Enter a grep-like string/pattern to filter the log entries.");?><br/>
+							<?=gettext("E.g.: username, IP address, URL.");?><br/>
+							<?=gettext("Use <strong>!</strong> to invert the sense of matching (to select non-matching lines).");?>
 						</span>
 					</td>
 				</tr>

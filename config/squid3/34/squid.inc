@@ -123,24 +123,49 @@ function squid_check_clamav_user($user) {
 function squid_dash_z($cache_action = 'none') {
 	global $config;
 
-	//Do nothing if there is no cache config
-	if (!is_array($config['installedpackages']['squidcache']['config'])) {
-		return;
+	// We need cache created on package install
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$cachesettings = array();
 	}
-
-	$settings = $config['installedpackages']['squidcache']['config'][0];
+	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
+	$numdirs = ($cachesettings['level1_subdirs'] ? $cachesettings['level1_subdirs'] : 16);
+	if (is_dir($cachedir)) {
+		$currentdirs = count(glob("{$cachedir}/*", GLOB_ONLYDIR));
+	} else {
+		$currentdirs = 0;
+	}
 
 	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
-	if ($settings['harddisk_cache_system'] == "null") {
+	if ($cachesettings['harddisk_cache_system'] == "null") {
 		return;
 	}
-
-	$cachedir = ($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-
-	if ($cache_action == "clean" && file_exists($cachedir)) {
-		rename($cachedir, "{$cachedir}.old");
-		mwexec_bg("/bin/rm -rf {$cachedir}.old");
+	// Re-create the cachedir if clean is forced by cronjob/manually, or
+	// or if the cachedir changed, or level1_subdirs don't exist or the number of level1_subdirs changed
+	if ($cache_action == "clean" || ((!is_dir($cachedir)) || (!is_dir($cachedir . '/00'))) || ($numdirs !== $currentdirs)) {
+		// cannot nuke disk cache while Squid is running
+		squid_stop_monitor();
+		if (is_service_running('squid')) {
+			stop_service("squid");
+		}
+		if (is_dir($cachedir)) {
+			rename($cachedir, "{$cachedir}.old");
+			mwexec_bg("/bin/rm -rf {$cachedir}.old");
+		}
+		squid_create_cachedir();
+		squid_restart_services();
 	}
+}
+
+function squid_create_cachedir() {
+	global $config;
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$cachesettings = array();
+	}
+	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
 
 	if (!is_dir($cachedir)) {
 		log_error("Creating Squid cache dir {$cachedir}");
@@ -151,11 +176,8 @@ function squid_dash_z($cache_action = 'none') {
 
 	if (!is_dir($cachedir . '/00')) {
 		log_error("Creating Squid cache subdirs in $cachedir");
-		mwexec(SQUID_BASE. "/sbin/squid -k shutdown -f " . SQUID_CONFFILE);
-		sleep(5);
-		mwexec(SQUID_BASE. "/sbin/squid -k kill -f " . SQUID_CONFFILE);
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
-		mwexec("/usr/sbin/chown -R " . SQUID_UID . ":" . SQUID_GID . " $cachedir");
+		squid_chown_recursive($cachedir, SQUID_UID, SQUID_GID);
 		mwexec(SQUID_BASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
 	}
 
@@ -353,26 +375,73 @@ function squid_install_command() {
 function squid_deinstall_command() {
 	global $config, $g;
 
-	$plswait_txt = "This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.";
+	/* remove cronjob */
 	squid_install_cron(false);
-	if (is_array($config['installedpackages']['squidcache'])) {
-		$settings = $config['installedpackages']['squidcache']['config'][0];
-	} else {
-		$settings = array();
+
+	update_status("Stopping services...");
+	/* kill all running services */
+	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
+	if (is_process_running("c-icap")) {
+		mwexec('/usr/local/etc/rc.d/c-icap stop');
 	}
-	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
-	update_status("Removing cache ... One moment please...");
-	update_output_window("$plswait_txt");
-	// XXX: Is it ok to remove cache and logs? It's going to happen every time package is updated
-	mwexec_bg("/bin/rm -rf {$cachedir}");
-	mwexec("/bin/rm -rf {$logdir}");
-	update_status("Finishing package cleanup.");
-	mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
-	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
+	if (is_process_running("clamd")) {
+		mwexec('/usr/local/etc/rc.d/clamav-clamd stop');
+	}
+	if (is_process_running("freshclam")) {
+		mwexec('/usr/local/etc/rc.d/clamav-freshclam stop');
+	}
 	mwexec("/bin/ps awux | /usr/bin/grep \"squid\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep \"dnsserver\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep \"unlinkd\" | /usr/bin/grep -v \"grep\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	/* delete rc scripts */
+	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
+	unlink_if_exists('/usr/local/etc/rc.d/c-icap');
+	unlink_if_exists('/usr/local/etc/rc.d/clamav-clamd');
+	unlink_if_exists('/usr/local/etc/rc.d/clamav-freshclam');
+
+	/* clean up created directories */
+	update_status("Removing cache and logs ... One moment please...");
+	update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$cachesettings = array();
+	}
+	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
+	if (is_array($config['installedpackages']['squid'])) {
+		$squidsettings = $config['installedpackages']['squid']['config'][0];
+	} else {
+		$squidsettings = array();
+	}
+	$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
+	// XXX: Is it ok to remove cache and logs? It's going to happen every time package is updated
+	if (is_dir("{$cachedir}")) {
+		mwexec_bg("/bin/rm -rf {$cachedir}");
+	}
+	if (is_dir("{$logdir}")) {
+		mwexec("/bin/rm -rf {$logdir}");
+	}
+	$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav");
+	foreach ($dirs as $dir) {
+		if (is_dir("{$dir}")) {
+			mwexec("/bin/rm -rf {$dir}");
+		}
+	}
+	/* clean up created PBI symlinks */
+	update_status("Finishing package cleanup.");
+	if (SQUID_LOCALBASE != '/usr/local') {
+		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
+		foreach ($ln_icap as $ln) {
+			if (is_link("/usr/local/{$ln}")) {
+				unlink("/usr/local/{$ln}");
+			}
+		}
+		if (is_link("/usr/local/lib/libicapapi.so.3")) {
+			unlink("/usr/local/lib/libicapapi.so.3");
+		}
+	}
+
+
 	update_status("Reloading filter...");
 	filter_configure();
 }
@@ -546,8 +615,6 @@ function squid_validate_cache($post, &$input_errors) {
 			}
 		}
 	}
-
-	squid_dash_z();
 }
 
 function squid_validate_nac($post, &$input_errors) {
@@ -959,6 +1026,7 @@ function squid_resync_general() {
 
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	if (!is_dir($logdir)) {
+		log_error("Creating Squid log dir $logdir");
 		safe_mkdir($logdir, 0755);
 		squid_chown_recursive($logdir, SQUID_UID, SQUID_GID);
 	}
@@ -1951,7 +2019,39 @@ function squid_resync($via_rpc = "no") {
 		chgrp(SQUID_LOCALBASE . "/libexec/squid/pinger", SQUID_GID);
 	}
 
-	$log_dir = "";
+	// check cache dir and create if necessary
+	squid_dash_z();
+
+	// restart Squid if enabled and reconfigure filter
+	squid_restart_services();
+	filter_configure();
+	conf_mount_ro();
+}
+
+function squid_stop_monitor() {
+	/* kill any running proxy alarm scripts */
+	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+		log_error("Stopping any running proxy monitors");
+		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
+	}
+	sleep(1);
+}
+
+function squid_start_monitor() {
+	if (!exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+		log_error("Starting a proxy monitor script");
+		mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
+	}
+	sleep(1);
+}
+
+function squid_restart_services() {
+	global $config;
+	// reconfigure and (re)start service as needed if enabled, otherwise stop them
+	// do not (re)start squid services on boot
+	if (platform_booting()) {
+		return;
+	}
 	$squid_enabled = false;
 	if (is_array($config['installedpackages']['squid']['config'])) {
 		// check if Squid is enabled
@@ -1964,30 +2064,11 @@ function squid_resync($via_rpc = "no") {
 			$squid_enabled = true;
 		}
 	}
-	// create log dir if required
-	if (is_array($config['installedpackages']['squid']['config'])) {
-		if ($config['installedpackages']['squid']['config'][0]['log_dir'] != "") {
-			$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'] . '/';
-		}
-	} else {
-		$log_dir = "/var/squid/logs/";
-	}
-	if (!is_dir($log_dir)) {
-		log_error("Creating Squid log dir $log_dir");
-		safe_mkdir($log_dir, 0755);
-		squid_chown_recursive($log_dir, SQUID_UID, SQUID_GID);
-	}
 
-	// check cache dir and create if necessary
-	squid_dash_z();
-
-	// reconfigure and (re)start service as needed if enabled, otherwise stop them
-	// do not (re)start squid services on boot
-	if ((!isset($boot_process)) && ($squid_enabled)) {
+	if ($squid_enabled) {
 		/* kill any running proxy alarm scripts */
-		log_error("Stopping any running proxy monitors");
-		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
-		sleep(1);
+		squid_stop_monitor();
+
 		if (!is_service_running('squid')) {
 			log_error("Starting Squid");
 			mwexec(SQUID_BASE . "/sbin/squid -f " . SQUID_CONFFILE);
@@ -2002,19 +2083,16 @@ function squid_resync($via_rpc = "no") {
 			}
 		}
 		/* restart proxy alarm scripts */
-		log_error("Starting a proxy monitor script");
-		mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
-	} elseif (!$squid_enabled) {
-		/* Squid is disabled - kill any running proxy alarm scripts and stop Squid services */
-		log_error("Stopping any running proxy monitors");
-		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
-		sleep(1);
-		log_error("Stopping Squid");
-		stop_service("squid");
-	}
+		squid_start_monitor();
 
-	filter_configure();
-	conf_mount_ro();
+	} else {
+		/* Squid is disabled - kill any running proxy alarm scripts and stop Squid services */
+		squid_stop_monitor();
+		if (is_service_running('squid')) {
+			log_error("Stopping Squid");
+			stop_service("squid");
+		}
+	}
 }
 
 function squid_print_javascript_auth() {
@@ -2369,6 +2447,9 @@ EOD;
 {$squid_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
 # Just to be sure...
 sleep 5
+if [ -n "`/bin/ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; then
+	{$squid_base}/sbin/squid -k kill -f {$squid_conffile_var}
+fi
 
 if [ -x /usr/bin/ipcs ]; then
 # http://man.chinaunix.net/newsoft/squid/Squid_FAQ/FAQ-22.html#ss22.8
@@ -2389,6 +2470,8 @@ if [ -z "`ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; th
 EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
+	// force delete the PBI initscript that keeps creeping back
+	unlink_if_exists("/usr/local/etc/rc.d/squid");
 	conf_mount_ro();
 }
 

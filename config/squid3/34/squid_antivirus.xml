@@ -87,8 +87,7 @@
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=squid_sync.xml</url>
 		</tab>
-		</tabs>
-	<advanced_options>enabled</advanced_options>
+	</tabs>
 	<fields>
 		<field>
 			<name>ClamAV Anti-Virus Integration Using C-ICAP</name>
@@ -118,14 +117,17 @@
 			</options>
 		</field>
 		<field>
+			<name>Advanced Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>squidclamav.conf</fielddescr>
 			<fieldname>squidclamav</fieldname>
 			<description>squidclamav.conf file. Leave empty to load sample file. Edit only if you know what are you doing.</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
-			<cols>75</cols>
+			<cols>85</cols>
 			<rows>15</rows>
-			<advancedfield/>
 		</field>
 		<field>
 			<fielddescr>c-icap.conf</fielddescr>
@@ -133,9 +135,8 @@
 			<description>c-icap.conf file. Leave empty to load sample file. Edit only if you know what are you doing.</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
-			<cols>75</cols>
+			<cols>85</cols>
 			<rows>15</rows>
-			<advancedfield/>
 		</field>
 		<field>
 			<fielddescr>c-icap.magic</fielddescr>
@@ -143,9 +144,8 @@
 			<description>c-icap.conf file. Leave empty to load sample file. Edit only if you know what are you doing.</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
-			<cols>75</cols>
+			<cols>85</cols>
 			<rows>15</rows>
-			<advancedfield/>
 		</field>
 	</fields>
 	<custom_php_validation_command>
