@@ -136,18 +136,18 @@ function squid_dash_z($cache_action = 'none') {
 		return;
 	}
 
-	if ($cache_action == "clean" && is_dir($cachedir)) {
+	if ($cache_action == "clean" || (!is_dir($cachedir))) {
 		// cannot nuke disk cache while Squid is running
 		squid_stop_monitor();
 		if (is_service_running('squid')) {
 			stop_service("squid");
 		}
-		rename($cachedir, "{$cachedir}.old");
-		mwexec_bg("/bin/rm -rf {$cachedir}.old");
+		if (is_dir($cachedir)) {
+			rename($cachedir, "{$cachedir}.old");
+			mwexec_bg("/bin/rm -rf {$cachedir}.old");
+		}
 		squid_create_cachedir();
 		squid_restart_services();
-	} else {
-		squid_create_cachedir();
 	}
 }
 
