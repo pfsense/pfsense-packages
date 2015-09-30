@@ -123,21 +123,20 @@ function squid_check_clamav_user($user) {
 function squid_dash_z($cache_action = 'none') {
 	global $config;
 
-	//Do nothing if there is no cache config
-	if (!is_array($config['installedpackages']['squidcache']['config'])) {
-		return;
+	// We need cache created on package install
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$cachesettings = array();
 	}
-
-	$settings = $config['installedpackages']['squidcache']['config'][0];
+	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
 
 	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
-	if ($settings['harddisk_cache_system'] == "null") {
+	if ($cachesettings['harddisk_cache_system'] == "null") {
 		return;
 	}
 
-	$cachedir = ($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-
-	if ($cache_action == "clean" && file_exists($cachedir)) {
+	if ($cache_action == "clean" && is_dir($cachedir)) {
 		rename($cachedir, "{$cachedir}.old");
 		mwexec_bg("/bin/rm -rf {$cachedir}.old");
 	}
@@ -151,11 +150,13 @@ function squid_dash_z($cache_action = 'none') {
 
 	if (!is_dir($cachedir . '/00')) {
 		log_error("Creating Squid cache subdirs in $cachedir");
-		mwexec(SQUID_BASE. "/sbin/squid -k shutdown -f " . SQUID_CONFFILE);
-		sleep(5);
-		mwexec(SQUID_BASE. "/sbin/squid -k kill -f " . SQUID_CONFFILE);
+		if (is_process_running('squid')) {
+			mwexec(SQUID_BASE. "/sbin/squid -k shutdown -f " . SQUID_CONFFILE);
+			sleep(5);
+			mwexec(SQUID_BASE. "/sbin/squid -k kill -f " . SQUID_CONFFILE);
+		}
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
-		mwexec("/usr/sbin/chown -R " . SQUID_UID . ":" . SQUID_GID . " $cachedir");
+		squid_chown_recursive($cachedir, SQUID_UID, SQUID_GID);
 		mwexec(SQUID_BASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
 	}
 
@@ -385,7 +386,7 @@ function squid_deinstall_command() {
 	} else {
 		$cachesettings = array();
 	}
-	$cachedir =($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
+	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
 	if (is_array($config['installedpackages']['squid'])) {
 		$squidsettings = $config['installedpackages']['squid']['config'][0];
 	} else {
