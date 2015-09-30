@@ -137,9 +137,28 @@ function squid_dash_z($cache_action = 'none') {
 	}
 
 	if ($cache_action == "clean" && is_dir($cachedir)) {
+		// cannot nuke disk cache while Squid is running
+		squid_stop_monitor();
+		if (is_service_running('squid')) {
+			stop_service("squid");
+		}
 		rename($cachedir, "{$cachedir}.old");
 		mwexec_bg("/bin/rm -rf {$cachedir}.old");
+		squid_create_cachedir();
+		squid_restart_services();
+	} else {
+		squid_create_cachedir();
 	}
+}
+
+function squid_create_cachedir() {
+	global $config;
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$cachesettings = array();
+	}
+	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
 
 	if (!is_dir($cachedir)) {
 		log_error("Creating Squid cache dir {$cachedir}");
@@ -150,11 +169,6 @@ function squid_dash_z($cache_action = 'none') {
 
 	if (!is_dir($cachedir . '/00')) {
 		log_error("Creating Squid cache subdirs in $cachedir");
-		if (is_process_running('squid')) {
-			mwexec(SQUID_BASE. "/sbin/squid -k shutdown -f " . SQUID_CONFFILE);
-			sleep(5);
-			mwexec(SQUID_BASE. "/sbin/squid -k kill -f " . SQUID_CONFFILE);
-		}
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		squid_chown_recursive($cachedir, SQUID_UID, SQUID_GID);
 		mwexec(SQUID_BASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
@@ -2027,6 +2041,7 @@ function squid_start_monitor() {
 }
 
 function squid_restart_services() {
+	global $config;
 	// reconfigure and (re)start service as needed if enabled, otherwise stop them
 	// do not (re)start squid services on boot
 	if (platform_booting()) {
