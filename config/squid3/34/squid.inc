@@ -1533,7 +1533,12 @@ EOF;
 			$cicap_m[0] = "@Manager:Apassword\S+@";
 			$cicap_r[0] = "";
 			// XXX: Bug #4615
-			$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
+			if (is_array($config['installedpackages']['squid'])) {
+				$squidsettings = $config['installedpackages']['squid']['config'][0];
+			} else {
+				$squidsettings = array();
+			}
+			$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
 			$cicap_m[1] = "@DebugLevel\s1@";
 			$cicap_r[1] = "DebugLevel 0";
 			$cicap_m[2] = "@AccessLog /var/log/c-icap/access.log@";
