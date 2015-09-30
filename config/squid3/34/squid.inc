@@ -130,13 +130,20 @@ function squid_dash_z($cache_action = 'none') {
 		$cachesettings = array();
 	}
 	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
+	$numdirs = ($cachesettings['level1_subdirs'] ? $cachesettings['level1_subdirs'] : 16);
+	if (is_dir($cachedir)) {
+		$currentdirs = count(glob("{$cachedir}/*", GLOB_ONLYDIR));
+	} else {
+		$currentdirs = 0;
+	}
 
 	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
 	if ($cachesettings['harddisk_cache_system'] == "null") {
 		return;
 	}
-
-	if ($cache_action == "clean" || (!is_dir($cachedir))) {
+	// Re-create the cachedir if clean is forced by cronjob/manually, or
+	// or if the cachedir changed, or level1_subdirs don't exist or the number of level1_subdirs changed
+	if ($cache_action == "clean" || ((!is_dir($cachedir)) || (!is_dir($cachedir . '/00'))) || ($numdirs !== $currentdirs)) {
 		// cannot nuke disk cache while Squid is running
 		squid_stop_monitor();
 		if (is_service_running('squid')) {
