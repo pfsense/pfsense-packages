@@ -1621,11 +1621,7 @@ EOF;
 			file_put_contents(SQUID_LOCALBASE . "/etc/freshclam.conf.sample", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
 		}
 		// freshclam cronjob
-		if ($antivirus_config['enable'] == "on") {
-			squid_install_freshclam_cron(true);
-		} else {
-			squid_install_freshclam_cron(false);
-		}
+		squid_install_freshclam_cron(true);
 
 		// check squidclamav files until PBIs are gone (https://redmine.pfsense.org/issues/4197)
 		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
