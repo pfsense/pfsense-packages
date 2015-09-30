@@ -2000,6 +2000,38 @@ function squid_resync($via_rpc = "no") {
 		chgrp(SQUID_LOCALBASE . "/libexec/squid/pinger", SQUID_GID);
 	}
 
+	// check cache dir and create if necessary
+	squid_dash_z();
+
+	// restart Squid if enabled and reconfigure filter
+	squid_restart_services();
+	filter_configure();
+	conf_mount_ro();
+}
+
+function squid_stop_monitor() {
+	/* kill any running proxy alarm scripts */
+	log_error("Stopping any running proxy monitors");
+	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
+	}
+	sleep(1);
+}
+
+function squid_start_monitor() {
+	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+		log_error("Starting a proxy monitor script");
+		mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
+	}
+	sleep(1);
+}
+
+function squid_restart_services() {
+	// reconfigure and (re)start service as needed if enabled, otherwise stop them
+	// do not (re)start squid services on boot
+	if (platform_booting()) {
+		return;
+	}
 	$squid_enabled = false;
 	if (is_array($config['installedpackages']['squid']['config'])) {
 		// check if Squid is enabled
@@ -2013,16 +2045,10 @@ function squid_resync($via_rpc = "no") {
 		}
 	}
 
-	// check cache dir and create if necessary
-	squid_dash_z();
-
-	// reconfigure and (re)start service as needed if enabled, otherwise stop them
-	// do not (re)start squid services on boot
-	if ((!isset($boot_process)) && ($squid_enabled)) {
+	if ($squid_enabled) {
 		/* kill any running proxy alarm scripts */
-		log_error("Stopping any running proxy monitors");
-		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
-		sleep(1);
+		squid_stop_monitor();
+
 		if (!is_service_running('squid')) {
 			log_error("Starting Squid");
 			mwexec(SQUID_BASE . "/sbin/squid -f " . SQUID_CONFFILE);
@@ -2037,21 +2063,16 @@ function squid_resync($via_rpc = "no") {
 			}
 		}
 		/* restart proxy alarm scripts */
-		log_error("Starting a proxy monitor script");
-		mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
-	} elseif (!$squid_enabled) {
+		squid_start_monitor();
+
+	} else {
 		/* Squid is disabled - kill any running proxy alarm scripts and stop Squid services */
-		log_error("Stopping any running proxy monitors");
-		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
-		sleep(1);
+		squid_stop_monitor();
 		if (is_service_running('squid')) {
 			log_error("Stopping Squid");
 			stop_service("squid");
 		}
 	}
-
-	filter_configure();
-	conf_mount_ro();
 }
 
 function squid_print_javascript_auth() {
