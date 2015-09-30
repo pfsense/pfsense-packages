@@ -1564,6 +1564,10 @@ EOF;
 			$clamav_m[1] = "@http\://proxy.domain.dom/cgi-bin/clwarn.cgi@";
 			$clamav_r[0] = "/var/run/clamav/clamd.sock";
 			$clamav_r[1] = "{$config['system']['webgui']['protocol']}://{$config['system']['hostname']}.{$config['system']['domain']}/squid_clwarn.php";
+			if ($antivirus_config['clamav_safebrowsing'] == "on") {
+				$clamav_m[2] = "@safebrowsing\s0@";
+				$clamav_r[2] = "safebrowsing 1";
+			}
 			file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.sample", preg_replace($clamav_m, $clamav_r, $sample_file), LOCK_EX);
 		}
 		// c-icap.conf
@@ -1615,6 +1619,10 @@ EOF;
 			if ($clamav_mirrors != "") {
 				$freshclam_m[1] = "@#DatabaseMirror db.XY.clamav.net@";
 				$freshclam_r[1] = "{$clamav_mirrors}";
+			}
+			if ($antivirus_config['clamav_safebrowsing'] == "on") {
+				$freshclam_m[2] = "@#SafeBrowsing yes@";
+				$freshclam_r[2] = "SafeBrowsing yes";
 			}
 			file_put_contents(SQUID_LOCALBASE . "/etc/freshclam.conf.sample", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
 		}
@@ -1682,7 +1690,10 @@ EOF;
 		// Check clamav database
 		if (count(glob("/var/db/clamav/*d")) == 0) {
 			log_error("Squid - Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam in background.");
-			mwexec_bg(SQUID_BASE . "/bin/freshclam");
+			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
+		} elseif (($antivirus_config['clamav_safebrowsing'] == "on") && (!is_file("/var/db/clamav/safebrowsing.cvd"))) {
+			log_error("Squid - Google Safe Browsing is enabled but missing safebrowsing.cvd definitions. Running freshclam in background.");
+			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 		}
 
 		// check antivirus daemons
