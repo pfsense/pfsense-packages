@@ -141,15 +141,20 @@ function squid_dash_z($cache_action = 'none') {
 	// If it already exists, delete it.
 	if ($cachesettings['harddisk_cache_system'] == "null") {
 		if (is_dir($cachedir)) {
-			log_error("Deleting Squid cache dir {$cachedir} since 'Hard Disk Cache System' is set to null.");
-			// cannot nuke disk cache while Squid is running
-			squid_stop_monitor();
-			if (is_service_running('squid')) {
-				stop_service("squid");
+			if (substr($cachedir, 0, 11) === "/var/squid/") {
+				log_error("Deleting Squid cache dir {$cachedir} since 'Hard Disk Cache System' is set to null.");
+				// cannot nuke disk cache while Squid is running
+				squid_stop_monitor();
+				if (is_service_running('squid')) {
+					stop_service("squid");
+				}
+				rename($cachedir, "{$cachedir}.old");
+				mwexec_bg("/bin/rm -rf {$cachedir}.old");
+				squid_restart_services();
+			} else {
+				log_error("'Hard Disk Cache System' is set to null.");
+				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
 			}
-			rename($cachedir, "{$cachedir}.old");
-			mwexec_bg("/bin/rm -rf {$cachedir}.old");
-			squid_restart_services();
 		}
 		return;
 	}
@@ -163,8 +168,12 @@ function squid_dash_z($cache_action = 'none') {
 			stop_service("squid");
 		}
 		if (is_dir($cachedir)) {
-			rename($cachedir, "{$cachedir}.old");
-			mwexec_bg("/bin/rm -rf {$cachedir}.old");
+			if (substr($cachedir, 0, 11) === "/var/squid/") {
+				rename($cachedir, "{$cachedir}.old");
+				mwexec_bg("/bin/rm -rf {$cachedir}.old");
+			} else {
+				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+			}
 		}
 		squid_create_cachedir();
 		squid_restart_services();
@@ -423,10 +432,18 @@ function squid_deinstall_command() {
 	$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
 	// XXX: Is it ok to remove cache and logs? It's going to happen every time package is updated
 	if (is_dir("{$cachedir}")) {
-		mwexec_bg("/bin/rm -rf {$cachedir}");
+		if (substr($cachedir, 0, 11) === "/var/squid/") {
+			mwexec_bg("/bin/rm -rf {$cachedir}");
+		} else {
+			log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+		}
 	}
 	if (is_dir("{$logdir}")) {
-		mwexec("/bin/rm -rf {$logdir}");
+		if (substr($logdir, 0, 11) === "/var/squid/") {
+			mwexec("/bin/rm -rf {$logdir}");
+		} else {
+			log_error("Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
+		}
 	}
 	$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav", "/var/run/squid", "/var/squid");
 	foreach ($dirs as $dir) {
@@ -620,6 +637,18 @@ function squid_validate_cache($post, &$input_errors) {
 				$input_errors[] = "The host '$host' is not a valid IP or hostname.";
 			}
 		}
+	}
+
+	if (substr($post['harddisk_cache_location'], -1, 1) == '/') {
+		$input_errors[] = 'Log location must not end with a / character.';
+	}
+
+	if ($post['harddisk_cache_location']{0} != '/') {
+		$input_errors[] = 'Log location must start with a / character.';
+	}
+
+	if (strlen($post['harddisk_cache_location']) <= 3) {
+		$input_errors[] = "Configured log location directory is not valid.";
 	}
 }
 
