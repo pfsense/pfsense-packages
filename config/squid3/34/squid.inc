@@ -2019,7 +2019,7 @@ function squid_stop_monitor() {
 }
 
 function squid_start_monitor() {
-	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+	if (!exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
 		log_error("Starting a proxy monitor script");
 		mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
 	}
