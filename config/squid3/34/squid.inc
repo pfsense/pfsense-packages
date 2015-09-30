@@ -608,8 +608,6 @@ function squid_validate_cache($post, &$input_errors) {
 			}
 		}
 	}
-
-	squid_dash_z();
 }
 
 function squid_validate_nac($post, &$input_errors) {
@@ -2025,8 +2023,8 @@ function squid_resync($via_rpc = "no") {
 
 function squid_stop_monitor() {
 	/* kill any running proxy alarm scripts */
-	log_error("Stopping any running proxy monitors");
 	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+		log_error("Stopping any running proxy monitors");
 		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
 	}
 	sleep(1);
