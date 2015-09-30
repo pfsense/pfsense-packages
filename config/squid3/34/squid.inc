@@ -1729,7 +1729,34 @@ EOF;
 		} else {
 			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd start");
 		}
+	} else {
+		// stop AV services and disable all C-ICAP/AV features
+		log_error("Squid antivirus features disabled.");
+		if (is_process_running("clamd")) {
+			log_error("Stopping ClamAV...");
+			mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+		}
+		if (is_process_running("c-icap")) {
+			log_error("Stopping C-ICAP...");
+			mwexec_bg("/usr/local/etc/rc.d/c-icap stop");
+		}
+		// freshclam cronjob
+		log_error("Removing freshclam cronjob...");
+		squid_install_freshclam_cron(false);
+
+		// check if clamav/c_icap is enabled in rc.conf.local
+		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
+		if (file_exists("/etc/rc.conf.local")) {
+			log_error("Removing antivirus services from /etc/rc.conf.local...");
+			$sample_file = file_get_contents("/etc/rc.conf.local");
+			$rcconf_local_m[0] = "@c_icap_enable(.*)\n@";
+			$rcconf_local_m[1] = "@clamav_clamd_enable(.*)\n@";
+			$rcconf_local_r[0] = "";
+			$rcconf_local_r[1] = "";
+			file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
+		}
 	}
+
 	return $conf;
 }
 
