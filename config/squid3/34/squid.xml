@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squid</name>
-	<version>0.3.7</version>
+	<version>0.3.8</version>
 	<title>Proxy Server: General Settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<menu>
@@ -235,6 +235,18 @@
 		<field>
 			<name>Squid General Settings</name>
 			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Keep Settings/Data</fielddescr>
+			<fieldname>keep_squid_data</fieldname>
+			<description>
+				<![CDATA[
+				If enabled, the settings, logs, cache, AV defs and other data will be preserved across package reinstalls.<br/>
+				<strong><span class="errmsg">Note:</span> If disabled, all settings and data will be wiped on package uninstall/reinstall/upgrade.</strong>
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>Proxy Interface(s)</fielddescr>
