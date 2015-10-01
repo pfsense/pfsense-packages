@@ -1590,23 +1590,7 @@ adaptation_access service_avi_resp allow all
 
 EOF;
 
-		// check if clamav is enabled in rc.conf.local
-		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
-		if (file_exists("/etc/rc.conf.local")) {
-			$rc_old_file = file("/etc/rc.conf.local");
-			foreach ($rc_old_file as $rc_line) {
-				if (preg_match("/^clamav_clamd_enable/", $rc_line, $matches)) {
-					$rc_file .= $matches[1] . '="YES"' . "\n";
-					${$matches[1]} = "ok";
-				} else {
-					$rc_file .= $rc_line;
-				}
-			}
-		}
-		if (!isset($clamav_clamd_enable)) {
-			$rc_file .= 'clamav_clamd_enable="YES"' . "\n";
-		}
-		file_put_contents("/etc/rc.conf.local", $rc_file, LOCK_EX);
+		// check clamav user
 		squid_check_clamav_user('clamav');
 		// patch sample files to pfsense dirs
 		// squidclamav.conf
@@ -2341,15 +2325,6 @@ function squid_restart_antivirus() {
 			}
 		}
 
-		// check if clamav is enabled in rc.conf.local
-		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
-		if (file_exists("/etc/rc.conf.local")) {
-			log_error("Removing antivirus services from /etc/rc.conf.local...");
-			$sample_file = file_get_contents("/etc/rc.conf.local");
-			$rcconf_local_m[0] = "@clamav_clamd_enable(.*)\n@";
-			$rcconf_local_r[0] = "";
-			file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
-		}
 		// check c-icap rcfile
 		if (is_process_running("c-icap")) {
 			log_error("Stopping and disabling C-ICAP...");
