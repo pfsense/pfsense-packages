@@ -2328,7 +2328,7 @@ function squid_restart_antivirus() {
 		// check c-icap rcfile
 		if (is_process_running("c-icap")) {
 			log_error("Stopping and disabling C-ICAP...");
-			mwexec_bg("/usr/local/etc/rc.d/c-icap.sh stop");
+			mwexec('/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl');
 		}
 		unlink_if_exists("/usr/local/etc/rc.d/c-icap");
 		unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
