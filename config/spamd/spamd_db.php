@@ -55,7 +55,7 @@ if ($spamtrapemail) {
 /* handle AJAX operations */
 if ($_GET['action'] or $_POST['action']) {
 	/* echo back buttonid so it can be turned  back off when request is completed. */
-	echo $_GET['buttonid'] . "|";
+	echo htmlspecialchars($_GET['buttonid']) . "|";
 	if ($_GET['action']) {
 		$action = $_GET['action'];
 	}
