@@ -1399,20 +1399,6 @@ function squid_resync_upstream() {
 	return $conf;
 }
 
-function squid_resync_redirector() {
-	global $config;
-
-	// XXX: What port provide squirm binary? It's not present
-	$httpav_enabled = ($config['installedpackages']['clamav']['config'][0]['scan_http'] == 'on');
-	$redirector = "/usr/local/bin/squirm";
-	if (($httpav_enabled) && is_executable($redirector)) {
-		$conf = "url_rewrite_program /usr/local/bin/squirm\n";
-	} else {
-		$conf = "# No redirector configured\n";
-	}
-	return $conf;
-}
-
 function squid_resync_nac() {
 	global $config, $valid_acls;
 
@@ -2163,7 +2149,6 @@ function squid_resync($via_rpc = "no") {
 	}
 	$conf = squid_resync_general() . "\n";
 	$conf .= squid_resync_cache() . "\n";
-	$conf .= squid_resync_redirector() . "\n";
 	$conf .= squid_resync_upstream() . "\n";
 	$conf .= squid_resync_nac() . "\n";
 	$conf .= squid_resync_traffic() . "\n";
