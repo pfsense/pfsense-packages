@@ -153,7 +153,7 @@ function squid_dash_z($cache_action = 'none') {
 				if (is_service_running('squid')) {
 					stop_service("squid");
 				}
-				rename($cachedir, "{$cachedir}.old");
+				@rename($cachedir, "{$cachedir}.old");
 				mwexec_bg("/bin/rm -rf {$cachedir}.old");
 				squid_restart_services();
 			} else {
@@ -174,7 +174,7 @@ function squid_dash_z($cache_action = 'none') {
 		}
 		if (is_dir($cachedir)) {
 			if (substr($cachedir, 0, 11) === "/var/squid/") {
-				rename($cachedir, "{$cachedir}.old");
+				@rename($cachedir, "{$cachedir}.old");
 				mwexec_bg("/bin/rm -rf {$cachedir}.old");
 			} else {
 				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
