@@ -980,7 +980,7 @@ function squid_install_cron($should_install) {
 	install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
 
 	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php clean; ";
-	if ($should_install) {
+	if (($should_install) && (squid_enabled())) {
 		if ($settings['clear_cache'] == 'on' ) {
 			install_cron_job("{$swapstate_cmd}", true, "*/360");
 		} else {
@@ -1005,7 +1005,7 @@ function squid_install_freshclam_cron($should_install) {
 	}
 
 	$freshclam_cmd = (SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
-	if ($should_install) {
+	if (($should_install) && (squid_enabled())) {
 		if ($antivirus_config['clamav_update'] != "0") {
 			$minutes = ($antivirus_config['clamav_update'] * 60);
 			install_cron_job("{$freshclam_cmd}", true, "*/{$minutes}", "*", "*", "*", "*", "clamav");
@@ -1553,7 +1553,7 @@ function squid_resync_antivirus() {
 		$antivirus_config = array();
 	}
 
-	if ($antivirus_config['enable'] == "on") {
+	if (squid_enabled() && ($antivirus_config['enable'] == "on")) {
 		switch ($antivirus_config['client_info']) {
 			case "both":
 			default:
@@ -1619,6 +1619,9 @@ EOF;
 			if ($antivirus_config['clamav_safebrowsing'] == "on") {
 				$clamav_m[2] = "@safebrowsing\s0@";
 				$clamav_r[2] = "safebrowsing 1";
+			} else {
+				$clamav_m[2] = "@safebrowsing\s1@";
+				$clamav_r[2] = "safebrowsing 0";
 			}
 			file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.sample", preg_replace($clamav_m, $clamav_r, $sample_file), LOCK_EX);
 		}
@@ -1675,6 +1678,11 @@ EOF;
 			if ($antivirus_config['clamav_safebrowsing'] == "on") {
 				$freshclam_m[2] = "@#SafeBrowsing yes@";
 				$freshclam_r[2] = "SafeBrowsing yes";
+			} else {
+				if (!preg_match("@#SafeBrowsing yes@", file_get_contents($sample_file))) {
+					$freshclam_m[2] = "@SafeBrowsing yes@";
+					$freshclam_r[2] = "#SafeBrowsing yes";
+				}
 			}
 			file_put_contents(SQUID_LOCALBASE . "/etc/freshclam.conf.sample", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
 		}
@@ -1738,74 +1746,10 @@ EOF;
 		file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf", base64_decode($antivirus_config['c-icap_conf']), LOCK_EX);
 		file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.magic", base64_decode($antivirus_config['c-icap_magic']), LOCK_EX);
 		file_put_contents(SQUID_LOCALBASE . "/etc/freshclam.conf", base64_decode($antivirus_config['freshclam_conf']), LOCK_EX);
-
-		// Check clamav database
-		if (count(glob("/var/db/clamav/*d")) == 0) {
-			log_error("Squid - Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam in background.");
-			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
-		} elseif (($antivirus_config['clamav_safebrowsing'] == "on") && (!is_file("/var/db/clamav/safebrowsing.cvd"))) {
-			log_error("Squid - Google Safe Browsing is enabled but missing safebrowsing.cvd definitions. Running freshclam in background.");
-			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
-		}
-
-		// check antivirus daemons
-		// check icap
-		$c_icap_rcfile = "/usr/local/etc/rc.d/c-icap.sh";
-		if (!file_exists($c_icap_rcfile)) {
-			squid_write_cicap_rcfile();
-		}
-		if (is_process_running("c-icap")) {
-			mwexec_bg('/bin/echo -n "reconfigure" > /var/run/c-icap/c-icap.ctl');
-		} else {
-			mwexec_bg("{$c_icap_rcfile} start");
-		}
-		// check clamav/freshclam
-		$rc_files = array("clamav-freshclam", "clamav-clamd");
-		$clamm[0] = "@/usr/local/(bin|sbin)@";
-		$clamm[1] = "@/local/(bin|sbin)@";
-		$clamm[2] = "@/usr/local/etc@";
-		$clamm[3] = "@enable:=NO@";
-		$clamr[0] = SQUID_BASE . "/bin";
-		$clamr[1] = "/bin";
-		$clamr[2] = SQUID_LOCALBASE . "/etc";
-		$clamr[3] = "enable:=YES";
-		foreach ($rc_files as $rc_file) {
-			$clamav_rcfile = "/usr/local/etc/rc.d/{$rc_file}";
-			if (file_exists($clamav_rcfile)) {
-				$sample_file = file_get_contents($clamav_rcfile);
-				file_put_contents($clamav_rcfile, preg_replace($clamm, $clamr, $sample_file), LOCK_EX);
-			}
-		}
-		if (is_process_running("clamd")) {
-			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd reload");
-		} else {
-			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd start");
-		}
-	} else {
-		// stop AV services and disable all C-ICAP/AV features
-		log_error("Squid antivirus features disabled.");
-		if (is_process_running("clamd")) {
-			log_error("Stopping ClamAV...");
-			mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-		}
-		if (is_process_running("c-icap")) {
-			log_error("Stopping C-ICAP...");
-			mwexec_bg("/usr/local/etc/rc.d/c-icap.sh stop");
-		}
-		// freshclam cronjob
-		log_error("Removing freshclam cronjob...");
-		squid_install_freshclam_cron(false);
-
-		// check if clamav is enabled in rc.conf.local
-		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
-		if (file_exists("/etc/rc.conf.local")) {
-			log_error("Removing antivirus services from /etc/rc.conf.local...");
-			$sample_file = file_get_contents("/etc/rc.conf.local");
-			$rcconf_local_m[0] = "@clamav_clamd_enable(.*)\n@";
-			$rcconf_local_r[0] = "";
-			file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
-		}
 	}
+	// this will (re)start or stop/disable services as needed
+	// depending on whether Squid proxy and/or antivirus features are enabled
+	squid_restart_antivirus();
 
 	return $conf;
 }
@@ -2239,11 +2183,38 @@ function squid_stop_monitor() {
 }
 
 function squid_start_monitor() {
-	if (!exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
-		log_error("Starting a proxy monitor script");
-		mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
+	if (squid_enabled()) {
+		if (!exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+			log_error("Starting a proxy monitor script");
+			mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
+		}
+		sleep(1);
+	} else {
+		log_error("Squid is disabled. Not starting a proxy monitor script");
 	}
-	sleep(1);
+}
+
+function squid_enabled() {
+	global $config, $proxy_enabled;
+	$proxy_enabled = false;
+
+	if (is_array($config['installedpackages']['squid']['config'])) {
+		// check whether Squid is enabled ...
+		if ($config['installedpackages']['squid']['config'][0]['enable_squid'] == "on") {
+			// ... and has at least one interface configured ...
+			if ($config['installedpackages']['squid']['config'][0]['active_interface'] != "") {
+				$proxy_enabled = true;
+			} else {
+			// ... or has at least one reverse interface configured
+				if (is_array($config['installedpackages']['squidreversegeneral']['config'])) {
+					if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
+						$proxy_enabled = true;
+					}
+				}
+			}
+		}
+	}
+	return $proxy_enabled;
 }
 
 function squid_restart_services() {
@@ -2253,20 +2224,8 @@ function squid_restart_services() {
 	if (platform_booting()) {
 		return;
 	}
-	$squid_enabled = false;
-	if (is_array($config['installedpackages']['squid']['config'])) {
-		// check if Squid is enabled
-		if ($config['installedpackages']['squid']['config'][0]['active_interface'] != "") {
-			$squid_enabled = true;
-		}
-	} elseif (is_array($config['installedpackages']['squidreversegeneral']['config'])) {
-		// check if squidreverse is enabled
-		if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
-			$squid_enabled = true;
-		}
-	}
 
-	if ($squid_enabled) {
+	if (squid_enabled()) {
 		/* kill any running proxy alarm scripts */
 		squid_stop_monitor();
 
@@ -2293,6 +2252,111 @@ function squid_restart_services() {
 			log_error("Stopping Squid");
 			stop_service("squid");
 		}
+	}
+}
+
+function squid_restart_antivirus() {
+	global $config;
+	if (is_array($config['installedpackages']['squidantivirus'])) {
+		$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];
+	} else {
+		$antivirus_config = array();
+	}
+
+	// reconfigure and (re)start service as needed if enabled, otherwise stop them
+	// do not (re)start antivirus services on boot
+	if (platform_booting()) {
+		return;
+	}
+
+	if (squid_enabled() && ($antivirus_config['enable'] == "on")) {
+		// Check clamav database
+		if (count(glob("/var/db/clamav/*d")) == 0) {
+			log_error("Squid - Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam in background.");
+			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
+		} elseif ($antivirus_config['clamav_safebrowsing'] == "on" && !is_file("/var/db/clamav/safebrowsing.cvd")) {
+			log_error("Squid - Google Safe Browsing is enabled but missing safebrowsing.cvd definitions. Running freshclam in background.");
+			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
+		} elseif ($antivirus_config['clamav_safebrowsing'] != "on" && is_file("/var/db/clamav/safebrowsing.cvd")) {
+			log_error("Squid - Google Safe Browsing is disabled. Removing safebrowsing.cvd definitions.");
+			mwexec("/bin/rm -f /var/db/clamav/safebrowsing.cvd");
+		}
+
+		// check clamav/freshclam rcfiles
+		$rc_files = array("clamav-freshclam", "clamav-clamd");
+		$clamm[0] = "@/usr/local/(bin|sbin)@";
+		$clamm[1] = "@/local/(bin|sbin)@";
+		$clamm[2] = "@/usr/local/etc@";
+		$clamm[3] = "@enable:=NO@";
+		$clamr[0] = SQUID_BASE . "/bin";
+		$clamr[1] = "/bin";
+		$clamr[2] = SQUID_LOCALBASE . "/etc";
+		$clamr[3] = "enable:=YES";
+		foreach ($rc_files as $rc_file) {
+			$clamav_rcfile = "/usr/local/etc/rc.d/{$rc_file}";
+			if (file_exists($clamav_rcfile)) {
+				$sample_file = file_get_contents($clamav_rcfile);
+				file_put_contents($clamav_rcfile, preg_replace($clamm, $clamr, $sample_file), LOCK_EX);
+			}
+		}
+		if (is_process_running("clamd")) {
+			log_error("Reloading ClamAV...");
+			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd reload");
+		} else {
+			log_error("Starting ClamAV...");
+			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd start");
+		}
+
+		// check c-icap rcfile
+		$c_icap_rcfile = "/usr/local/etc/rc.d/c-icap.sh";
+		if (!file_exists($c_icap_rcfile)) {
+			squid_write_cicap_rcfile();
+		}
+		if (is_process_running("c-icap")) {
+			mwexec_bg('/bin/echo -n "reconfigure" > /var/run/c-icap/c-icap.ctl');
+		} else {
+			mwexec_bg("{$c_icap_rcfile} start");
+		}
+	} else {
+		// stop AV services and disable all C-ICAP/AV features
+		log_error("Squid antivirus features disabled.");
+		if (is_process_running("clamd")) {
+			log_error("Stopping and disabling ClamAV...");
+			mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+		}
+
+		// freshclam cronjob
+		log_error("Removing freshclam cronjob...");
+		squid_install_freshclam_cron(false);
+
+		// check clamav/freshclam rcfiles
+		$rc_files = array("clamav-freshclam", "clamav-clamd");
+		$clamm[0] = "@enable:=YES@";
+		$clamr[0] = "enable:=NO";
+		foreach ($rc_files as $rc_file) {
+			$clamav_rcfile = "/usr/local/etc/rc.d/{$rc_file}";
+			if (file_exists($clamav_rcfile)) {
+				$sample_file = file_get_contents($clamav_rcfile);
+				file_put_contents($clamav_rcfile, preg_replace($clamm, $clamr, $sample_file), LOCK_EX);
+			}
+		}
+
+		// check if clamav is enabled in rc.conf.local
+		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
+		if (file_exists("/etc/rc.conf.local")) {
+			log_error("Removing antivirus services from /etc/rc.conf.local...");
+			$sample_file = file_get_contents("/etc/rc.conf.local");
+			$rcconf_local_m[0] = "@clamav_clamd_enable(.*)\n@";
+			$rcconf_local_r[0] = "";
+			file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
+		}
+		// check c-icap rcfile
+		if (is_process_running("c-icap")) {
+			log_error("Stopping and disabling C-ICAP...");
+			mwexec_bg("/usr/local/etc/rc.d/c-icap.sh stop");
+		}
+		unlink_if_exists("/usr/local/etc/rc.d/c-icap");
+		unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
 	}
 }
 
@@ -2520,6 +2584,13 @@ function squid_generate_rules($type) {
 	if ($found_rule > 0) {
 		file_put_contents($cp_file, $new_cp_inc, LOCK_EX);
 	}
+
+	// do not install any firewall rules if Squid is disabled
+	if (!squid_enabled()) {
+		log_error("Squid is installed but disabled. Not installing \"{$type}\" rules.");
+		return;
+	}
+
 	// normal squid rule check
 	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
