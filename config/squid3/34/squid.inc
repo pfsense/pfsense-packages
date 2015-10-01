@@ -2413,6 +2413,48 @@ function squid_print_javascript_auth2() {
 	print("<script type=\"text/javascript\">on_auth_method_changed()</script>\n");
 }
 
+function squid_print_antivirus_advanced_config() {
+	$javascript = <<< EOD
+<script type="text/javascript">
+//<![CDATA[
+function on_antivirus_advanced_config_changed() {
+	var field = document.iform.enable_advanced;
+	var enable_advanced = field.options[field.selectedIndex].value;
+	
+	if (enable_advanced === 'disabled') {
+		document.iform['client_info'].disabled = 0;
+		document.iform['clamav_safebrowsing'].disabled = 0;
+		document.iform['clamav_update'].disabled = 0;
+		document.iform['clamav_dbregion'].disabled = 0;
+		document.iform['clamav_dbservers'].disabled = 0;
+		document.iform['squidclamav'].disabled = 1;
+		document.iform['c-icap_conf'].disabled = 1;
+		document.iform['c-icap_magic'].disabled = 1;
+		document.iform['freshclam_conf'].disabled = 1;
+	} else {
+		document.iform['client_info'].disabled = 1;
+		document.iform['clamav_safebrowsing'].disabled = 1;
+		document.iform['clamav_update'].disabled = 1;
+		document.iform['clamav_dbregion'].disabled = 1;
+		document.iform['clamav_dbservers'].disabled = 1;
+		document.iform['squidclamav'].disabled = 0;
+		document.iform['c-icap_conf'].disabled = 0;
+		document.iform['c-icap_magic'].disabled = 0;
+		document.iform['freshclam_conf'].disabled = 0;
+	}
+}
+//]]>
+</script>
+
+EOD;
+	print($javascript);
+
+}
+
+function squid_print_antivirus_advanced_config2() {
+	print('<script type="text/javascript">on_antivirus_advanced_config_changed()</script>\n');
+}
+
 function squid_generate_rules($type) {
 	global $config, $pfs_version;
 
