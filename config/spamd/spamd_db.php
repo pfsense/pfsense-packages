@@ -51,7 +51,7 @@ if ($_POST['spamtrapemail']) {
 if ($spamtrapemail) {
 	$spamtrapemailarg = escapeshellarg($spamtrapemail);
 }
-	
+
 /* handle AJAX operations */
 if ($_GET['action'] or $_POST['action']) {
 	/* echo back buttonid so it can be turned  back off when request is completed. */
@@ -87,7 +87,7 @@ if ($_GET['action'] or $_POST['action']) {
 		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
 		delete_from_blacklist($srcip);
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
-		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");		
+		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 	} elseif ($action == "trapped") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
@@ -113,8 +113,8 @@ if ($_GET['getstatus'] != "") {
 	} elseif (stristr($status, "SPAMTRAP") == true) {
 		echo "SPAMTRAP";
 	} else {
-		echo "NOT FOUND";	
-	}	
+		echo "NOT FOUND";
+	}
 	exit;
 }
 
@@ -180,7 +180,7 @@ if (file_exists("/var/db/whitelist.txt")) {
 } else {
 	$whitelist_items = 0;
 }
-	
+
 if (file_exists("/var/db/blacklist.txt")) {
 	$blacklist_items = shell_exec("/bin/cat /var/db/blacklist.txt | /usr/bin/wc -l");
 } else {
@@ -335,9 +335,9 @@ function formatspamddatetime($dt) {
 				$cmd = "/bin/cat /var/db/blacklist.txt | /usr/bin/grep -v \"" . escapeshellarg($filter) . "\" ";
 				exec($cmd, $pkgdba);
 				foreach($pkgdba as $pkg) {
-					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";	
-				}				
-			}			
+					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";
+				}
+			}
 		} else {
 			$cmd = "/usr/local/sbin/spamdb | /usr/bin/grep " . escapeshellarg($filter) . " | /usr/bin/tail -n {$limit}";
 			exec($cmd, $pkgdb);
@@ -390,8 +390,8 @@ function formatspamddatetime($dt) {
 				$first = "";
 				$pass = "";
 				$expire = "";
-				$attempts = htmlentities($pkgdb_split[8]);			
-				break;			
+				$attempts = htmlentities($pkgdb_split[8]);
+				break;
 			case "TRAPPED":
 				$recordtype = htmlentities($pkgdb_split[0]);
 				$srcip = htmlentities($pkgdb_split[1]);
@@ -410,7 +410,7 @@ function formatspamddatetime($dt) {
 				$first = formatspamddatetime($pkgdb_split[5]);
 				$pass = formatspamddatetime($pkgdb_split[6]);
 				$expire = formatspamddatetime($pkgdb_split[7]);
-				$attempts = htmlentities($pkgdb_split[8]);			
+				$attempts = htmlentities($pkgdb_split[8]);
 				break;
 			case "WHITE":
 				$recordtype = htmlentities($pkgdb_split[0]);
@@ -420,16 +420,16 @@ function formatspamddatetime($dt) {
 				$first = formatspamddatetime($pkgdb_split[4]);
 				$pass = formatspamddatetime($pkgdb_split[5]);
 				$expire = formatspamddatetime($pkgdb_split[6]);
-				$attempts = htmlentities($pkgdb_split[8]);			
+				$attempts = htmlentities($pkgdb_split[8]);
 				break;
 		}
 		if ($srcip == "" and $fromaddress == "" and $toaddress == "") {
 			continue;
 		}
 		echo "<tr id=\"{$rows}\">";
-		echo "<td class=\"listr\">{$recordtype}</td>";		
+		echo "<td class=\"listr\">{$recordtype}</td>";
 		echo "<td class=\"listr\">{$srcip}</td>";
-		echo "<td class=\"listr\">{$fromaddress}</td>";		
+		echo "<td class=\"listr\">{$fromaddress}</td>";
 		echo "<td class=\"listr\">{$toaddress}</td>";
 		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . $first . "</span></td>";
 		echo "<td class=\"listr\"><span style='white-space: nowrap;'>" . $pass . "</span></td>";
@@ -468,7 +468,7 @@ function formatspamddatetime($dt) {
 	<?php
 		echo "{$whitelist_items} total items in the whitelist.<br />";
 		echo "{$blacklist_items} total items in the blacklist.<br />";
-		echo "{$spamdb_grey} total items in the greylist.<br />";			
+		echo "{$spamdb_grey} total items in the greylist.<br />";
 		echo "{$spamdb_items} total items in the SpamDB.<br />";
 	?>
 	</font>
