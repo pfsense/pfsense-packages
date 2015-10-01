@@ -383,7 +383,7 @@ function squid_install_command() {
 		"start" => "/usr/local/pkg/sqpmon.sh &",
 		"stop" => "/bin/ps awux | /usr/bin/grep \"sqpmon\" | /usr/bin/grep -v \"grep\" | /usr/bin/grep -v \"php\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill")
 	);
-	
+
 	// create c-icap rcfile
 	squid_write_cicap_rcfile();
 
@@ -944,7 +944,7 @@ function squid_install_cron($should_install) {
 
 function squid_install_freshclam_cron($should_install) {
 	global $config;
-	
+
 	if (platform_booting()) {
 		return;
 	}
@@ -2405,7 +2405,7 @@ function squid_print_antivirus_advanced_config() {
 function on_antivirus_advanced_config_changed() {
 	var field = document.iform.enable_advanced;
 	var enable_advanced = field.options[field.selectedIndex].value;
-	
+
 	if (enable_advanced === 'disabled') {
 		document.iform['client_info'].disabled = 0;
 		document.iform['clamav_safebrowsing'].disabled = 0;
@@ -2449,7 +2449,7 @@ function squid_generate_rules($type) {
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
 	$cp_inc = file($cp_file);
 	$new_cp_inc = "";
-	$found_rule=0;
+	$found_rule = 0;
 	foreach ($cp_inc as $line) {
 		$new_line = $line;
 		//remove applied squid patch
@@ -2487,13 +2487,13 @@ function squid_generate_rules($type) {
 		$transparent_ifaces = explode(",", $squid_conf['transparent_active_interface']);
 		$transparent_ifaces = array_map('convert_friendly_interface_to_real_interface_name', $transparent_ifaces);
 	} else {
-		$transparent_ifaces=array();
+		$transparent_ifaces = array();
 	}
 	if ($squid_conf['ssl_proxy'] == "on") {
 		$ssl_ifaces = explode(",", $squid_conf['ssl_active_interface']);
 		$ssl_ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ssl_ifaces);
 	} else {
-		$ssl_ifaces=array();
+		$ssl_ifaces = array();
 	}
 
 	$port = ($squid_conf['proxy_port'] ? $squid_conf['proxy_port'] : 3128);
@@ -2741,22 +2741,13 @@ function squid_sync_on_changes() {
 function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	global $config, $g;
 
-	if (!$username) {
-		return;
-	}
-
-	if (!$password) {
-		return;
-	}
-
-	if (!$sync_to_ip) {
+	if (!$username || !$password || !$sync_to_ip) {
 		return;
 	}
 
 	if (!$synctimeout) {
 		$synctimeout = 250;
 	}
-
 
 	$xmlrpc_sync_neighbor = $sync_to_ip;
 	if ($config['system']['webgui']['protocol'] != "") {
@@ -2766,10 +2757,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	$port = $config['system']['webgui']['port'];
 	/* If port is empty let's rely on the protocol selection */
 	if ($port == "") {
-		if ($config['system']['webgui']['protocol'] == "http")
-			$port = "80";
-		else
-			$port = "443";
+		$port = $config['system']['webgui']['protocol'] == "http" ? "80" : "443";
 	}
 	$synchronizetoip .= $sync_to_ip;
 
