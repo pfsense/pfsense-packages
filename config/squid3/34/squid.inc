@@ -166,7 +166,7 @@ function squid_dash_z($cache_action = 'none') {
 
 	// Re-create the cachedir if clean is forced by cronjob/manually,
 	// or if the cachedir changed, or level1_subdirs don't exist or the number of level1_subdirs changed
-	if ($cache_action == "clean" || ((!is_dir($cachedir)) || (!is_dir($cachedir . '/00'))) || ($numdirs !== $currentdirs)) {
+	if ($cache_action == "clean" || !is_dir($cachedir) || !is_dir($cachedir . '/00') || $numdirs != $currentdirs) {
 		// cannot nuke disk cache while Squid is running
 		squid_stop_monitor();
 		if (is_service_running('squid')) {
