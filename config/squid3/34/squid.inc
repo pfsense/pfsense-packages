@@ -406,14 +406,14 @@ function squid_install_command() {
 }
 
 function squid_deinstall_command() {
-	global $config, $g;
+	global $config, $g, $keep;
 
 	/* remove cronjobs */
 	squid_install_cron(false);
 	squid_install_freshclam_cron(false);
 
-	update_status("Stopping services...");
 	/* kill all running services */
+	update_output_window("Stopping and removing services...");
 	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
 	if (is_process_running("c-icap")) {
 		mwexec('/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl');
@@ -430,9 +430,7 @@ function squid_deinstall_command() {
 	unlink_if_exists('/usr/local/etc/rc.d/clamav-clamd');
 	unlink_if_exists('/usr/local/etc/rc.d/clamav-freshclam');
 
-	/* clean up created directories */
-	update_status("Removing cache and logs ... One moment please...");
-	update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
+	/* clean up created directories if 'Keep Settings/Data' is disabled */
 	if (is_array($config['installedpackages']['squidcache'])) {
 		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
 	} else {
@@ -445,30 +443,36 @@ function squid_deinstall_command() {
 		$squidsettings = array();
 	}
 	$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
-	// XXX: Is it ok to remove cache and logs? It's going to happen every time package is updated
-	if (is_dir("{$cachedir}")) {
-		if (substr($cachedir, 0, 11) === "/var/squid/") {
-			mwexec_bg("/bin/rm -rf {$cachedir}");
-		} else {
-			log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+	$keep = ($squidsettings['keep_squid_data'] ? true : false);
+
+	if (!$keep) {
+		update_output_window("Removing cache and logs ... One moment please...");
+		update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
+		if (is_dir("{$cachedir}")) {
+			if (substr($cachedir, 0, 11) === "/var/squid/") {
+				mwexec_bg("/bin/rm -rf {$cachedir}");
+			} else {
+				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+			}
 		}
-	}
-	if (is_dir("{$logdir}")) {
-		if (substr($logdir, 0, 11) === "/var/squid/") {
-			mwexec("/bin/rm -rf {$logdir}");
-		} else {
-			log_error("Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
+		if (is_dir("{$logdir}")) {
+			if (substr($logdir, 0, 11) === "/var/squid/") {
+				mwexec("/bin/rm -rf {$logdir}");
+			} else {
+				log_error("Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
+			}
 		}
-	}
-	$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav", "/var/run/squid", "/var/squid");
-	foreach ($dirs as $dir) {
-		if (is_dir("{$dir}")) {
-			mwexec("/bin/rm -rf {$dir}");
+
+		$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav", "/var/run/squid", "/var/squid");
+		foreach ($dirs as $dir) {
+			if (is_dir("{$dir}")) {
+				mwexec("/bin/rm -rf {$dir}");
+			}
 		}
 	}
 
 	/* clean up created PBI symlinks */
-	update_status("Finishing package cleanup.");
+	update_output_window("Finishing package cleanup.");
 	if (SQUID_LOCALBASE != '/usr/local') {
 		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
 		foreach ($ln_icap as $ln) {
@@ -483,7 +487,7 @@ function squid_deinstall_command() {
 
 	/* check if clamav/c_icap is enabled in rc.conf.local */
 	if (file_exists("/etc/rc.conf.local")) {
-		update_status("Removing antivirus services from /etc/rc.conf.local...");
+		update_output_window("Removing antivirus services from /etc/rc.conf.local...");
 		$sample_file = file_get_contents("/etc/rc.conf.local");
 		$rcconf_local_m[0] = "@c_icap_enable(.*)\n@";
 		$rcconf_local_m[1] = "@clamav_clamd_enable(.*)\n@";
@@ -492,8 +496,53 @@ function squid_deinstall_command() {
 		file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
 	}
 
-	update_status("Reloading filter...");
+	update_output_window("Reloading filter...");
 	filter_configure();
+
+	/* Remove package settings from config if 'Keep Settings/Data' is disabled */
+	if (!$keep) {
+		log_error("Removing all Squid settings since 'Keep Settings/Data' is disabled...");
+		if (is_array($config['installedpackages']['squid'])) {
+			unset($config['installedpackages']['squid']);
+		}
+		if (is_array($config['installedpackages']['squidantivirus'])) {
+			unset($config['installedpackages']['squidantivirus']);
+		}
+		if (is_array($config['installedpackages']['squidauth'])) {
+			unset($config['installedpackages']['squidauth']);
+		}
+		if (is_array($config['installedpackages']['squidcache'])) {
+			unset($config['installedpackages']['squidcache']);
+		}
+		if (is_array($config['installedpackages']['squidnac'])) {
+			unset($config['installedpackages']['squidnac']);
+		}
+		if (is_array($config['installedpackages']['squidreverse'])) {
+			unset($config['installedpackages']['squidreverse']);
+		}
+		if (is_array($config['installedpackages']['squidreversegeneral'])) {
+			unset($config['installedpackages']['squidreversegeneral']);
+		}
+		if (is_array($config['installedpackages']['squidreversepeer'])) {
+			unset($config['installedpackages']['squidreversepeer']);
+		}
+		if (is_array($config['installedpackages']['squidreverseredir'])) {
+			unset($config['installedpackages']['squidreverseredir']);
+		}
+		if (is_array($config['installedpackages']['squidsync'])) {
+			unset($config['installedpackages']['squidsync']);
+		}
+		if (is_array($config['installedpackages']['squidtraffic'])) {
+			unset($config['installedpackages']['squidtraffic']);
+		}
+		if (is_array($config['installedpackages']['squidremote'])) {
+			unset($config['installedpackages']['squidremote']);
+		}
+		if (is_array($config['installedpackages']['squidusers'])) {
+			unset($config['installedpackages']['squidusers']);
+		}
+	}
+	update_output_window("Squid3 has been uninstalled.");
 }
 
 function squid_validate_antivirus($post, &$input_errors) {
