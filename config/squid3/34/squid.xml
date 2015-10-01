@@ -237,6 +237,17 @@
 			<type>listtopic</type>
 		</field>
 		<field>
+			<fielddescr>Enable Squid Proxy</fielddescr>
+			<fieldname>enable_squid</fieldname>
+			<description>
+				<![CDATA[
+				Check to enable the Squid proxy.<br/>
+				Note: If unchecked, <strong>all</strong> Squid services will be disabled and stopped.<br/>
+				]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Keep Settings/Data</fielddescr>
 			<fieldname>keep_squid_data</fieldname>
 			<description>
