@@ -369,6 +369,7 @@ function squid_install_command() {
 		chgrp(SQUID_LOCALBASE . "/libexec/squid/pinger", SQUID_GID);
 	}
 
+	// create squid rcfile
 	squid_write_rcfile();
 
 	// XXX: Is it really necessary? mode is set to 0755 in squid.xml
@@ -376,11 +377,15 @@ function squid_install_command() {
 		@chmod("/usr/local/pkg/swapstate_check.php", 0755);
 	}
 
+	// create squid monitor rcfile
 	write_rcfile(array(
 		"file" => "sqp_monitor.sh",
 		"start" => "/usr/local/pkg/sqpmon.sh &",
 		"stop" => "/bin/ps awux | /usr/bin/grep \"sqpmon\" | /usr/bin/grep -v \"grep\" | /usr/bin/grep -v \"php\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill")
 	);
+	
+	// create c-icap rcfile
+	squid_write_cicap_rcfile();
 
 	// make a backup of default c-icap config file on install; also see squid_resync_antivirus() function below
 	if (!file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
@@ -410,7 +415,9 @@ function squid_deinstall_command() {
 	update_status("Stopping services...");
 	/* kill all running services */
 	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
-	mwexec("/bin/ps awux | /usr/bin/grep '[c]-icap' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	if (is_process_running("c-icap")) {
+		mwexec('/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl');
+	}
 	mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep '[f]reshclam' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep '[s]quid' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
@@ -419,6 +426,7 @@ function squid_deinstall_command() {
 	/* delete rc scripts */
 	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
 	unlink_if_exists('/usr/local/etc/rc.d/c-icap');
+	unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
 	unlink_if_exists('/usr/local/etc/rc.d/clamav-clamd');
 	unlink_if_exists('/usr/local/etc/rc.d/clamav-freshclam');
 
@@ -458,6 +466,7 @@ function squid_deinstall_command() {
 			mwexec("/bin/rm -rf {$dir}");
 		}
 	}
+
 	/* clean up created PBI symlinks */
 	update_status("Finishing package cleanup.");
 	if (SQUID_LOCALBASE != '/usr/local') {
@@ -470,6 +479,17 @@ function squid_deinstall_command() {
 		if (is_link("/usr/local/lib/libicapapi.so.3")) {
 			unlink("/usr/local/lib/libicapapi.so.3");
 		}
+	}
+
+	/* check if clamav/c_icap is enabled in rc.conf.local */
+	if (file_exists("/etc/rc.conf.local")) {
+		update_status("Removing antivirus services from /etc/rc.conf.local...");
+		$sample_file = file_get_contents("/etc/rc.conf.local");
+		$rcconf_local_m[0] = "@c_icap_enable(.*)\n@";
+		$rcconf_local_m[1] = "@clamav_clamd_enable(.*)\n@";
+		$rcconf_local_r[0] = "";
+		$rcconf_local_r[1] = "";
+		file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
 	}
 
 	update_status("Reloading filter...");
@@ -1535,21 +1555,18 @@ adaptation_access service_avi_resp allow all
 
 EOF;
 
-		// check if clamav/c_icap is enabled in rc.conf.local
+		// check if clamav is enabled in rc.conf.local
 		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
 		if (file_exists("/etc/rc.conf.local")) {
 			$rc_old_file = file("/etc/rc.conf.local");
 			foreach ($rc_old_file as $rc_line) {
-				if (preg_match("/^(c_icap_enable|clamav_clamd_enable)/", $rc_line, $matches)) {
+				if (preg_match("/^clamav_clamd_enable/", $rc_line, $matches)) {
 					$rc_file .= $matches[1] . '="YES"' . "\n";
 					${$matches[1]} = "ok";
 				} else {
 					$rc_file .= $rc_line;
 				}
 			}
-		}
-		if (!isset($c_icap_enable)) {
-			$rc_file .= 'c_icap_enable="YES"' . "\n";
 		}
 		if (!isset($clamav_clamd_enable)) {
 			$rc_file .= 'clamav_clamd_enable="YES"' . "\n";
@@ -1698,20 +1715,14 @@ EOF;
 
 		// check antivirus daemons
 		// check icap
+		$c_icap_rcfile = "/usr/local/etc/rc.d/c-icap.sh";
+		if (!file_exists($c_icap_rcfile)) {
+			squid_write_cicap_rcfile();
+		}
 		if (is_process_running("c-icap")) {
 			mwexec_bg('/bin/echo -n "reconfigure" > /var/run/c-icap/c-icap.ctl');
 		} else {
-			// check c-icap user on startup file
-			$c_icap_rcfile = "/usr/local/etc/rc.d/c-icap";
-			if (file_exists($c_icap_rcfile)) {
-				$sample_file = file_get_contents($c_icap_rcfile);
-				$cicapm[0] = "@c_icap_user=.*}@";
-				$cicapr[0] = 'c_icap_user="clamav"}';
-				$cicapm[1] = "@/usr/local@";
-				$cicapr[1] = SQUID_LOCALBASE;
-				file_put_contents($c_icap_rcfile, preg_replace($cicapm, $cicapr, $sample_file), LOCK_EX);
-			}
-			mwexec_bg("/usr/local/etc/rc.d/c-icap start");
+			mwexec_bg("{$c_icap_rcfile} start");
 		}
 		// check clamav/freshclam
 		$rc_files = array("clamav-freshclam", "clamav-clamd");
@@ -1744,21 +1755,19 @@ EOF;
 		}
 		if (is_process_running("c-icap")) {
 			log_error("Stopping C-ICAP...");
-			mwexec_bg("/usr/local/etc/rc.d/c-icap stop");
+			mwexec_bg("/usr/local/etc/rc.d/c-icap.sh stop");
 		}
 		// freshclam cronjob
 		log_error("Removing freshclam cronjob...");
 		squid_install_freshclam_cron(false);
 
-		// check if clamav/c_icap is enabled in rc.conf.local
+		// check if clamav is enabled in rc.conf.local
 		// XXX: This whole thing sucks and should be redone to install/enable services in pfSense way
 		if (file_exists("/etc/rc.conf.local")) {
 			log_error("Removing antivirus services from /etc/rc.conf.local...");
 			$sample_file = file_get_contents("/etc/rc.conf.local");
-			$rcconf_local_m[0] = "@c_icap_enable(.*)\n@";
-			$rcconf_local_m[1] = "@clamav_clamd_enable(.*)\n@";
+			$rcconf_local_m[0] = "@clamav_clamd_enable(.*)\n@";
 			$rcconf_local_r[0] = "";
-			$rcconf_local_r[1] = "";
 			file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
 		}
 	}
@@ -2630,6 +2639,25 @@ EOD;
 	write_rcfile($rc);
 	// force delete the PBI initscript that keeps creeping back
 	unlink_if_exists("/usr/local/etc/rc.d/squid");
+	conf_mount_ro();
+}
+
+function squid_write_cicap_rcfile() {
+	$c_icap_rcfile = "c-icap.sh";
+	$cicap_libdir = SQUID_LOCALBASE . "/lib";
+	$cicap_bin = SQUID_LOCALBASE . "/bin/c-icap";
+	$cicap_conf = SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf";
+	$cicap_start_cmd = "LD_LIBRARY_PATH={$cicap_libdir} {$cicap_bin} -f {$cicap_conf}";
+	$cicap_stop_cmd = '/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl';
+	conf_mount_rw();
+	write_rcfile(array(
+		"file" => "{$c_icap_rcfile}",
+		"start" => "{$cicap_start_cmd}",
+		"stop" => "{$cicap_stop_cmd}"
+		)
+	);
+	// force delete the PBI initscript that keeps creeping back
+	unlink_if_exists("/usr/local/etc/rc.d/c-icap");
 	conf_mount_ro();
 }
 
