@@ -204,7 +204,7 @@ EOF;
 	} else {
 		start_service("spamd");
 	}
-	
+
 	log_error("[spamd] Reconfiguring filter");
 	filter_configure();
 	log_error("[spamd] Package setup completed");
@@ -303,7 +303,7 @@ function sync_spamd_config_to_backup() {
 	global $config;
 	if (is_array($config['installedpackages']['carpsettings']['config'])) {
 		foreach ($config['installedpackages']['carpsettings']['config'] as $carp) {
-			if ($carp['synchronizetoip'] != "" ) {
+			if ($carp['synchronizetoip'] != "") {
 				$synctoip = $carp['synchronizetoip'];
 				$password = $carp['password'];
 				if ($config['system']['username']) {
@@ -365,7 +365,7 @@ function custom_php_deinstall_command() {
 		exec("/usr/sbin/pw groupdel _spamd");
 	}
 	/* unmount fdescfs if needed */
-	if (trim(shell_exec("/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l")) != 0 ) {
+	if (trim(shell_exec("/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l")) != 0) {
 		log_error("[spamd] Unmounting fdescfs.");
 		mwexec("/sbin/umount /dev/fd");
 	}
@@ -376,7 +376,61 @@ function custom_php_deinstall_command() {
 function spamd_validate_input($post, &$input_errors) {
 	if (!empty($post["next_mta"])) {
 		if (!is_ipaddrv4($post['next_mta'])) {
-			$input_errors[] = "NextMTA is not a valid IPv4 address";
+			$input_errors[] = "'NextMTA' is not a valid IPv4 address";
+		}
+	}
+
+	if (isset($post['maxblack']) && $post['maxblack'] != "") {
+		if (!is_numericint($post['maxblack']) || $post['maxblack'] < 1) {
+			$input_errors[] = "'Maximum Blacklisted Connections' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['maxcon']) && $post['maxcon'] != "") {
+		if (!is_numericint($post['maxcon']) || $post['maxcon'] < 1) {
+			$input_errors[] = "'Max Concurrent Connections' must be a positive integer or empty.";
+		}
+	}
+
+	if (!empty($post['maxblack']) && is_numericint($post['maxblack']) && !empty($post['maxcon']) && is_numericint($post['maxcon'])) {
+		if ($post['maxblack'] >  $post['maxcon']) {
+			$input_errors[] = "'Maximum Blacklisted Connections' must not be higher than 'Max Concurrent Connections'.";
+		}
+	}
+
+	if (isset($post['passtime']) && $post['passtime'] != "") {
+		if (!is_numericint($post['passtime']) || $post['passtime'] < 1) {
+			$input_errors[] = "'Passtime' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['greyexp']) && $post['greyexp'] != "") {
+		if (!is_numericint($post['greyexp']) || $post['greyexp'] < 1) {
+			$input_errors[] = "'White Exp' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['whiteexp']) && $post['whiteexp'] != "") {
+		if (!is_numericint($post['whiteexp']) || $post['whiteexp'] < 1) {
+			$input_errors[] = "'White Exp' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['stuttersecs']) && $post['stuttersecs'] != "") {
+		if (!is_numericint($post['stuttersecs']) || $post['stuttersecs'] < 1) {
+			$input_errors[] = "'Stutter Secs' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['delaysecs']) && $post['delaysecs'] != "") {
+		if (!is_numericint($post['delaysecs']) || $post['delaysecs'] < 1) {
+			$input_errors[] = "'Delay Secs' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['window']) && $post['window'] != "") {
+		if (!is_numericint($post['window']) || $post['window'] < 1) {
+			$input_errors[] = "'Window Size' must be a positive integer or empty.";
 		}
 	}
 }
