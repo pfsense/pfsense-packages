@@ -88,6 +88,10 @@
 	</service>
 	<fields>
 		<field>
+			<name></name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>ospfd.conf</fielddescr>
 			<fieldname>ospfd</fieldname>
 			<description>
