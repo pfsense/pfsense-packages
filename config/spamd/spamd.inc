@@ -179,9 +179,9 @@ EOF;
 
 	$rc['stop']  = <<< EOF
 
-/usr/bin/killall spamd-setup
-/usr/bin/killall spamlogd
-/usr/bin/killall spamd
+/usr/bin/killall spamd-setup 2>/dev/null
+/usr/bin/killall spamlogd 2>/dev/null
+/usr/bin/killall spamd 2>/dev/null
 sleep 3
 if [ `/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l` -gt 0 ]; then
 	/sbin/umount /dev/fd
