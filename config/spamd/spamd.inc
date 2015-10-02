@@ -171,6 +171,7 @@ fi
 if [ ! -f "/var/db/spamd" ]; then
 	/usr/bin/touch /var/db/spamd
 fi
+/usr/sbin/chown _spamd:proxy /var/db/spamd
 /usr/local/sbin/spamd-setup -d -D {$spamd_setup_opts}
 {$localpath}/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &
 {$localpath}/libexec/spamlogd
