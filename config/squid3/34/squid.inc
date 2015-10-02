@@ -228,7 +228,8 @@ function squid_is_valid_acl($acl) {
 function squid_install_command() {
 	global $config, $g;
 
-	update_status("Checking if there is configuration to migrate... One moment please...");
+	update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
+	update_output_window("Checking if there is configuration to migrate... One moment please...");
 	/* migrate existing csv config fields */
 	if (is_array($config['installedpackages']['squidauth']['config'])) {
 		$settingsauth = $config['installedpackages']['squidauth']['config'][0];
@@ -360,7 +361,7 @@ function squid_install_command() {
 		}
 	}
 
-	update_status("Writing configuration... One moment please...");
+	update_output_window("Writing configuration... One moment please...");
 	write_config();
 
 	/* make sure pinger is executable and suid root */
@@ -394,6 +395,9 @@ function squid_install_command() {
 		}
 	}
 
+	// create clamd rcfile
+	squid_write_clamd_rcfile();
+
 	foreach (array(SQUID_CONFBASE, SQUID_ACLDIR, SQUID_SSL_DB) as $dir) {
 		safe_mkdir($dir, 0755);
 		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
@@ -402,6 +406,12 @@ function squid_install_command() {
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default')) {
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
 	}
+
+	// remove unwanted PBI rcfiles
+	unlink_if_exists("/usr/local/etc/rc.d/squid");
+	unlink_if_exists("/usr/local/etc/rc.d/c-icap");
+	unlink_if_exists("/usr/local/etc/rc.d/clamav-clamd");
+	unlink_if_exists("/usr/local/etc/rc.d/clamav-freshclam");
 
 }
 
@@ -425,10 +435,9 @@ function squid_deinstall_command() {
 	mwexec("/bin/ps awux | /usr/bin/grep '[u]nlinkd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	/* delete rc scripts */
 	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
-	unlink_if_exists('/usr/local/etc/rc.d/c-icap');
+	unlink_if_exists('/usr/local/etc/rc.d/squid.sh');
 	unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
-	unlink_if_exists('/usr/local/etc/rc.d/clamav-clamd');
-	unlink_if_exists('/usr/local/etc/rc.d/clamav-freshclam');
+	unlink_if_exists('/usr/local/etc/rc.d/clamd.sh');
 
 	/* clean up created directories if 'Keep Settings/Data' is disabled */
 	if (is_array($config['installedpackages']['squidcache'])) {
@@ -2259,29 +2268,18 @@ function squid_restart_antivirus() {
 			mwexec("/bin/rm -f /var/db/clamav/safebrowsing.cvd");
 		}
 
-		// check clamav/freshclam rcfiles
-		$rc_files = array("clamav-freshclam", "clamav-clamd");
-		$clamm[0] = "@/usr/local/(bin|sbin)@";
-		$clamm[1] = "@/local/(bin|sbin)@";
-		$clamm[2] = "@/usr/local/etc@";
-		$clamm[3] = "@enable:=NO@";
-		$clamr[0] = SQUID_BASE . "/bin";
-		$clamr[1] = "/bin";
-		$clamr[2] = SQUID_LOCALBASE . "/etc";
-		$clamr[3] = "enable:=YES";
-		foreach ($rc_files as $rc_file) {
-			$clamav_rcfile = "/usr/local/etc/rc.d/{$rc_file}";
-			if (file_exists($clamav_rcfile)) {
-				$sample_file = file_get_contents($clamav_rcfile);
-				file_put_contents($clamav_rcfile, preg_replace($clamm, $clamr, $sample_file), LOCK_EX);
-			}
+		// start/reload clamav
+		$clamd_rcfile = "/usr/local/etc/rc.d/clamd.sh";
+		if (!file_exists($clamd_rcfile)) {
+			squid_write_clamd_rcfile();
 		}
 		if (is_process_running("clamd")) {
 			log_error("Reloading ClamAV...");
-			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd reload");
+			$reload_cmd = SQUID_BASE . "/bin/clamdscan --reload";
+			mwexec_bg("{$reload_cmd}");
 		} else {
 			log_error("Starting ClamAV...");
-			mwexec_bg("/usr/local/etc/rc.d/clamav-clamd start");
+			mwexec_bg("{$clamd_rcfile} start");
 		}
 
 		// check c-icap rcfile
@@ -2299,31 +2297,19 @@ function squid_restart_antivirus() {
 		log_error("Squid antivirus features disabled.");
 		if (is_process_running("clamd")) {
 			log_error("Stopping and disabling ClamAV...");
-			mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+			mwexec("/usr/bin/killall clamd");
 		}
+		unlink_if_exists("/usr/local/etc/rc.d/clamd.sh");
 
 		// freshclam cronjob
 		log_error("Removing freshclam cronjob...");
 		squid_install_freshclam_cron(false);
-
-		// check clamav/freshclam rcfiles
-		$rc_files = array("clamav-freshclam", "clamav-clamd");
-		$clamm[0] = "@enable:=YES@";
-		$clamr[0] = "enable:=NO";
-		foreach ($rc_files as $rc_file) {
-			$clamav_rcfile = "/usr/local/etc/rc.d/{$rc_file}";
-			if (file_exists($clamav_rcfile)) {
-				$sample_file = file_get_contents($clamav_rcfile);
-				file_put_contents($clamav_rcfile, preg_replace($clamm, $clamr, $sample_file), LOCK_EX);
-			}
-		}
 
 		// check c-icap rcfile
 		if (is_process_running("c-icap")) {
 			log_error("Stopping and disabling C-ICAP...");
 			mwexec('/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl');
 		}
-		unlink_if_exists("/usr/local/etc/rc.d/c-icap");
 		unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
 	}
 }
@@ -2762,6 +2748,37 @@ function squid_write_cicap_rcfile() {
 		"stop" => "{$cicap_stop_cmd}"
 		)
 	);
+	conf_mount_ro();
+}
+
+function squid_write_clamd_rcfile() {
+	$squid_base = SQUID_BASE;
+	$rc = array();
+	$rc['file'] = 'clamd.sh';
+	$rc['start'] = <<< EOD
+
+if [ ! -f /var/db/clamav/main.cvd -a ! -f /var/db/clamav/main.cld ];then
+	echo "Missing /var/db/clamav/*.cvd or *.cld files.  You must run freshclam first"
+        exit 1
+fi
+
+{$squid_base}/bin/clamd --config-file="{$squid_base}/local/etc/clamd.conf"
+
+EOD;
+
+	$rc['stop'] = <<< EOD
+
+/usr/bin/killall clamd 2>/dev/null
+# Just to be sure...
+sleep 5
+if [ -n "`/bin/ps auxw | /usr/bin/grep "[c]lamd" | /usr/bin/awk '{print $2}'`" ]; then
+	/usr/bin/killall -9 clamd 2>/dev/null
+fi
+
+EOD;
+
+	conf_mount_rw();
+	write_rcfile($rc);
 	conf_mount_ro();
 }
 
