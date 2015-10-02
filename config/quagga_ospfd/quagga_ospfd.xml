@@ -112,6 +112,10 @@
 	</plugins>
 	<fields>
 		<field>
+			<name></name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Master Password</fielddescr>
 			<fieldname>password</fieldname>
 			<description>Password to access the Zebra and OSPF management daemons. Required.</description>
