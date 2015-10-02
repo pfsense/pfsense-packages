@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidantivirus</name>
-	<version>0.3.7</version>
+	<version>0.3.8</version>
 	<title>Proxy server: Antivirus</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
@@ -99,6 +99,26 @@
 			<description>Enable Squid antivirus check using ClamAV.</description>
 			<type>checkbox</type>
 		</field>
+		<!--
+		<field>
+			<fielddescr>Enable Manual Configuration</fielddescr>
+			<fieldname>enable_advanced</fieldname>
+			<description>
+				<![CDATA[
+				When enabled, the options under 'ClamAV Anti-Virus Integration Using C-ICAP' no longer have any effect.<br/>
+				You must edit the configuration files directly in the 'Advanced Options'.<br/>
+				<strong><span class="errmsg">Warning:</span> Only enable this if you know what are you doing.</strong>
+				]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option><value>disabled</value><name>disabled</name></option>
+				<option><value>enabled</value><name>enabled</name></option>
+			</options>
+			<default_value>disabled</default_value>
+			<onchange>on_antivirus_advanced_config_changed()</onchange>
+		</field>
+		-->
 		<field>
 			<fielddescr>Client Forward Options</fielddescr>
 			<fieldname>client_info</fieldname>
@@ -238,6 +258,17 @@
 			<rows>15</rows>
 		</field>
 	</fields>
+	<!--
+	<custom_php_after_head_command>
+		squid_print_antivirus_advanced_config();
+	</custom_php_after_head_command>
+	<custom_php_before_form_command>
+		squid_print_antivirus_advanced_config2();
+	</custom_php_before_form_command>
+	<custom_php_after_form_command>
+		squid_print_antivirus_advanced_config2();
+	</custom_php_after_form_command>
+	-->
 	<custom_php_validation_command>
 		squid_validate_antivirus($_POST, $input_errors);
 	</custom_php_validation_command>
