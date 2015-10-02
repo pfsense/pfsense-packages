@@ -91,18 +91,22 @@ function squid_chown_recursive($dir, $user, $group) {
 
 	chown($dir, $user);
 	chgrp($dir, $group);
-	$handle = opendir($dir) ;
-	while (($item = readdir($handle)) !== false) {
-		if (!empty($item) && ($item != ".") && ($item != "..")) {
-			$path = "{$dir}/{$item}";
-			// Recurse unless it's the cache dir, that is slow and rarely necessary.
-			if (is_dir($path) && (basename($dir) != "cache")) {
-				squid_chown_recursive($path, $user, $group);
-			} elseif (is_file($path)) {
-				chown($path, $user);
-				chgrp($path, $group);
+	$handle = opendir($dir);
+	if ($handle) {
+		while (($item = readdir($handle)) !== false) {
+			if (!empty($item) && ($item != ".") && ($item != "..")) {
+				$path = "{$dir}/{$item}";
+				// Recurse unless it's the cache dir, that is slow and rarely necessary.
+				if (is_dir($path) && (basename($dir) != "cache")) {
+					squid_chown_recursive($path, $user, $group);
+				} elseif (is_file($path)) {
+					chown($path, $user);
+					chgrp($path, $group);
+				}
 			}
 		}
+	} else {
+		log_error(gettext("Squid squid_chown_recursive call failed; permissions not set for directory: {$dir}"));
 	}
 }
 
