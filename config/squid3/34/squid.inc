@@ -2745,8 +2745,6 @@ EOD;
 
 	conf_mount_rw();
 	write_rcfile($rc);
-	// force delete the PBI initscript that keeps creeping back
-	unlink_if_exists("/usr/local/etc/rc.d/squid");
 	conf_mount_ro();
 }
 
@@ -2764,8 +2762,6 @@ function squid_write_cicap_rcfile() {
 		"stop" => "{$cicap_stop_cmd}"
 		)
 	);
-	// force delete the PBI initscript that keeps creeping back
-	unlink_if_exists("/usr/local/etc/rc.d/c-icap");
 	conf_mount_ro();
 }
 
