@@ -41,8 +41,9 @@ function sync_package_spamd() {
 		$localpath = "/usr/pbi/spamd-$ARCH/local";
 	}
 
+	// write config file
 	conf_mount_rw();
-	$fd = fopen("/etc/spamd.conf","w");
+	$fd = fopen("/etc/spamd.conf", "w");
 	/* all header */
 	fwrite($fd, "all:\\\n\t:whitelist:blacklist");
 	if ($config['installedpackages']['spamdsources']['config']) {
@@ -92,6 +93,22 @@ function sync_package_spamd() {
 		}
 	}
 	fclose($fd);
+
+	/* if the package is disabled, remove the cronjob, rcfile and do nothing else here ... */
+	if (!spamd_enabled()) {
+		log_error("[spamd] Removing cron job");
+		install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup", false);
+		if (is_service_running("spamd")) {
+			log_error("[spamd] Stopping and disabling SpamD service");
+			stop_service("spamd");
+		}
+		unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
+		log_error("[spamd] Reconfiguring filter");
+		filter_configure();
+		log_error("[spamd] Package successfully disabled.");
+		return;
+	}
+	/* ... otherwise, create the rcfile and (re)start spamd */
 	$passtime = "5";
 	$greyexp = "4";
 	$whiteexp = "864";
@@ -115,6 +132,7 @@ function sync_package_spamd() {
 			// Default is greylisting, turn on blacklisting if not checked.
 			if ($ss['greylisting'] != "on") {
 				$greylisting = " -b";
+				$spamd_setup_opts = "-b";
 			}
 			if ($ss['maxblack'] != "") {
 				$maxblack = " -B " . $ss['maxblack'];
@@ -143,36 +161,68 @@ function sync_package_spamd() {
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
-	$start = "if [ `/sbin/mount | /usr/bin/grep -v grep | /usr/bin/grep fdescfs | /usr/bin/wc -l` -lt 1 ]; then \n" .
-		 "/sbin/mount -t fdescfs fdescfs /dev/fd\n" .
-		 "fi\n" .
-	     "/usr/local/sbin/spamd-setup -d &\n" .
-		 "/sbin/pflogd &\n" .
-		 "$localpath/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &\n" .
-		 "$localpath/libexec/spamlogd\n";
-	$stop  = "/usr/bin/killall spamd-setup\n" .
-		 "/usr/bin/killall spamlogd\n" .
-		 "/usr/bin/killall spamd\n" .
-		 "/usr/bin/killall pflogd\n" .
-		 "sleep 3";
+	$rc = array();
+	$rc['file'] = "spamd.sh";
+	$rc['start'] = <<< EOF
+
+if [ `/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l` -lt 1 ]; then
+	/sbin/mount -t fdescfs fdescfs /dev/fd
+fi
+if [ ! -f "/var/db/spamd" ]; then
+	/usr/bin/touch /var/db/spamd
+fi
+/usr/local/sbin/spamd-setup -d -D {$spamd_setup_opts}
+{$localpath}/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &
+{$localpath}/libexec/spamlogd
+EOF;
+
+	$rc['stop']  = <<< EOF
+
+/usr/bin/killall spamd-setup
+/usr/bin/killall spamlogd
+/usr/bin/killall spamd
+sleep 3
+if [ `/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l` -gt 0 ]; then
+	/sbin/umount /dev/fd
+fi
+EOF;
+
 	log_error("[spamd] Writing rc_file");
-	write_rcfile(array(
-				"file" => "spamd.sh",
-				"start" => $start,
-				"stop" =>  $stop
-			    )
-	);
+	write_rcfile($rc);
+
 	log_error("[spamd] Installing cron job");
 	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup", true, "*/120");
 	log_error("[spamd] Setting up spamd.conf symlink");
-	unlink_if_exists("$localpath/etc/spamd/spamd.conf");
-	symlink("/etc/spamd.conf", "$localpath/etc/spamd/spamd.conf");
+	unlink_if_exists("{$localpath}/etc/spamd/spamd.conf");
+	symlink("/etc/spamd.conf", "{$localpath}/etc/spamd/spamd.conf");
 	conf_mount_ro();
-	log_error("[spamd] Restarting spamd");
-	restart_service("spamd");
+
+	log_error("[spamd] (Re)starting spamd");
+	if (is_service_running("spamd")) {
+		restart_service("spamd");
+	} else {
+		start_service("spamd");
+	}
+	
 	log_error("[spamd] Reconfiguring filter");
 	filter_configure();
 	log_error("[spamd] Package setup completed");
+}
+
+function spamd_enabled() {
+	global $config, $spamd_enabled;
+	$spamd_enabled = false;
+
+	if (is_array($config['installedpackages']['spamdsettings'])) {
+		$spamdsettings = $config['installedpackages']['spamdsettings']['config'][0];
+	} else {
+		$spamdsettings = array();
+	}
+	if ($spamdsettings['spamd_enable'] == "on") {
+		$spamd_enabled = true;
+	}
+
+	return $spamd_enabled;
 }
 
 function sync_package_spamd_whitelist() {
@@ -194,6 +244,11 @@ function sync_package_spamd_whitelist() {
 
 function spamd_generate_rules($type) {
 	global $config;
+
+	// do not install any rules if disabled
+	if (!spamd_enabled()) {
+		return;
+	}
 
 	$natrules = "";
 	switch($type) {
@@ -308,6 +363,12 @@ function custom_php_deinstall_command() {
 	if (exec("/usr/sbin/pw groupshow _spamd")) {
 		exec("/usr/sbin/pw groupdel _spamd");
 	}
+	/* unmount fdescfs if needed */
+	if (trim(shell_exec("/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l")) != 0 ) {
+		log_error("[spamd] Unmounting fdescfs.");
+		mwexec("/sbin/umount /dev/fd");
+	}
+	unlink_if_exists("/var/db/spamd");
 	filter_configure();
 }
 
