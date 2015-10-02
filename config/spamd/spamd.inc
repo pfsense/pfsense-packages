@@ -406,7 +406,7 @@ function spamd_validate_input($post, &$input_errors) {
 
 	if (isset($post['greyexp']) && $post['greyexp'] != "") {
 		if (!is_numericint($post['greyexp']) || $post['greyexp'] < 1) {
-			$input_errors[] = "'White Exp' must be a positive integer or empty.";
+			$input_errors[] = "'Grey Expiration' must be a positive integer or empty.";
 		}
 	}
 
