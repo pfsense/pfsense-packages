@@ -2749,14 +2749,7 @@ fi
 /usr/bin/killall pinger 2>/dev/null
 
 EOD;
-	$rc['restart'] = <<< EOD
-if [ -z "`ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; then
-		{$squid_base}/sbin/squid -f {$squid_conffile_var}
-	else
-		{$squid_base}/sbin/squid -k reconfigure -f {$squid_conffile_var}
-	fi
 
-EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
 	// force delete the PBI initscript that keeps creeping back
