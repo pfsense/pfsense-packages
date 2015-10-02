@@ -68,12 +68,19 @@
 	<configpath>['installedpackages']['spamd']['config']</configpath>
 	<fields>
 		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>spamd_enable</fieldname>
+			<description>Check to enable SpamD Greylisting Daemon.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Intercept on Interfaces</fielddescr>
 			<fieldname>spamdbinds_array</fieldname>
 			<description>These are the interfaces SpamD will intercept SMTP connections on.</description>
 			<type>interfaces_selection</type>
 			<multiple>true</multiple>
 			<hideinterfaceregex>loopback</hideinterfaceregex>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Identifier</fielddescr>
