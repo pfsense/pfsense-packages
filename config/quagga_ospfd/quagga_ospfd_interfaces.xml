@@ -98,6 +98,10 @@
 	</service>
 	<fields>
 		<field>
+			<name></name>
+			<type>listtopic</type>
+		</field>	
+		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>interface</fieldname>
 			<description>Enter the desired participating interface here.</description>
