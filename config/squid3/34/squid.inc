@@ -1718,13 +1718,6 @@ EOF;
 			squid_chown_recursive($dir_path, $dir_user, "wheel");
 		}
 
-		$rcd_files = scandir(SQUID_LOCALBASE."/etc/rc.d");
-		foreach ($rcd_files as $rcd_file) {
-			if (SQUID_LOCALBASE != '/usr/local' && !file_exists("/usr/local/etc/rc.d/{$rcd_file}")) {
-				symlink(SQUID_LOCALBASE . "/etc/rc.d/{$rcd_file}", "/usr/local/etc/rc.d/{$rcd_file}");
-			}
-		}
-
 		// write advanced clamav/icap config files
 		file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf", base64_decode($antivirus_config['squidclamav']), LOCK_EX);
 		file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf", base64_decode($antivirus_config['c-icap_conf']), LOCK_EX);
