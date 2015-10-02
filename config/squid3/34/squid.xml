@@ -515,23 +515,23 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Enable Logging</fielddescr>
+			<fielddescr>Enable Access Logging</fielddescr>
 			<fieldname>log_enabled</fieldname>
 			<description>
 				<![CDATA[
-				This will enable the access log.
+				This will enable the <strong>access</strong> log.
 				<strong>Warning:</strong> Do not switch this on if you don't have much disk space left.
 				]]>
 			</description>
 			<type>checkbox</type>
-			<enablefields>log_dir,log_rotate</enablefields>
+			<enablefields>log_rotate</enablefields>
 		</field>
 		<field>
 			<fielddescr>Log Store Directory</fielddescr>
 			<fieldname>log_dir</fieldname>
 			<description>
 				<![CDATA[
-				The directory where the log will be stored.<br/>
+				The directory where the logs will be stored. This is also used for logs other than the Access Log above.<br/>
 				Default: /var/squid/logs<br/>
 				<strong>Note: Do NOT include the trailing / when setting a custom location.</strong>
 				]]>
