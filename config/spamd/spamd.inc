@@ -191,7 +191,7 @@ EOF;
 	write_rcfile($rc);
 
 	log_error("[spamd] Installing cron job");
-	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup", true, "*/120");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup -d -D {$spamd_setup_opts}", true, "*/120");
 	log_error("[spamd] Setting up spamd.conf symlink");
 	unlink_if_exists("{$localpath}/etc/spamd/spamd.conf");
 	symlink("/etc/spamd.conf", "{$localpath}/etc/spamd/spamd.conf");
