@@ -65,7 +65,7 @@
 	</service>
 	<service>
 		<name>clamd</name>
-		<rcfile>clamav-clamd</rcfile>
+		<rcfile>clamd.sh</rcfile>
 		<executable>clamd</executable>
 		<description>ClamAV Antivirus</description>
 	</service>
@@ -748,10 +748,11 @@
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 	<![CDATA[
-		update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
 		squid_install_command();
 		unlink_if_exists("/usr/local/etc/rc.d/squid");
 		unlink_if_exists("/usr/local/etc/rc.d/c-icap");
+		unlink_if_exists("/usr/local/etc/rc.d/clamav-clamd");
+		unlink_if_exists("/usr/local/etc/rc.d/clamav-freshclam");
 	]]>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
