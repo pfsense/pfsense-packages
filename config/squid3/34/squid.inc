@@ -77,10 +77,16 @@ if ($uname['machine'] == 'amd64') {
 	ini_set('memory_limit', '250M');
 }
 
+/*
+ * Utility functions
+ */
+
+/* Handle base64 encoding and linebreaks in textarea configuration fields */
 function sq_text_area_decode($text) {
 	return preg_replace('/\r\n/', "\n", base64_decode($text));
 }
 
+/* Get interface IP and netmask for Squid interfaces */
 function squid_get_real_interface_address($iface) {
 	if (!function_exists("get_interface_ip")) {
 		require_once("interfaces.inc");
@@ -89,6 +95,18 @@ function squid_get_real_interface_address($iface) {
 	return array(get_interface_ip($iface), gen_subnet_mask(get_interface_subnet($iface)));
 }
 
+/* Check whether ACL is valid */
+function squid_is_valid_acl($acl) {
+	global $valid_acls;
+
+	if (!is_array($valid_acls)) {
+		return;
+	}
+
+	return in_array($acl, $valid_acls);
+}
+
+/* Recursively change ownership of directories */
 function squid_chown_recursive($dir, $user, $group) {
 	if (empty($dir) || ($dir == '/') || ($dir == '/usr/local') || !is_dir($dir)) {
 		log_error(gettext("Squid attempted to chown an invalid directory: {$dir}"));
@@ -116,7 +134,87 @@ function squid_chown_recursive($dir, $user, $group) {
 	}
 }
 
-/* setup cache */
+/* Check whether Squid is enabled */
+function squid_enabled() {
+	global $config, $proxy_enabled;
+	$proxy_enabled = false;
+
+	if (is_array($config['installedpackages']['squid']['config'])) {
+		// check whether Squid is enabled ...
+		if ($config['installedpackages']['squid']['config'][0]['enable_squid'] == "on") {
+			// ... and has at least one interface configured ...
+			if ($config['installedpackages']['squid']['config'][0]['active_interface'] != "") {
+				$proxy_enabled = true;
+			} else {
+			// ... or has at least one reverse interface configured
+				if (is_array($config['installedpackages']['squidreversegeneral']['config'])) {
+					if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
+						$proxy_enabled = true;
+					}
+				}
+			}
+		}
+	}
+	return $proxy_enabled;
+}
+
+/* Get list of certificates for SSL proxy */
+function squid_get_server_certs() {
+	global $config;
+	$cert_arr = array();
+	$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
+	foreach ($config['cert'] as $cert) {
+		$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
+	}
+	return $cert_arr;
+}
+
+/* Handle root CA certificates bundle */
+function squid_check_ca_hashes() {
+	global $config, $g;
+
+	// check certificates
+	$cert_count = 0;
+	if (is_dir(SQUID_LOCALBASE . '/share/certs')) {
+		if ($handle = opendir(SQUID_LOCALBASE . '/share/certs')) {
+			while (false !== ($file = readdir($handle))) {
+				if (preg_match ("/\d+.0/", $file)) {
+					$cert_count++;
+				}
+			}
+			closedir($handle);
+		}
+	}
+	if ($cert_count < 10) {
+		conf_mount_rw();
+		// create ca-root hashes from ca-root-nss package
+		log_error("Creating root certificate bundle hashes from the Mozilla Project");
+		$cas = file(SQUID_LOCALBASE . '/share/certs/ca-root-nss.crt');
+		$cert = 0;
+		foreach ($cas as $ca) {
+			if (preg_match("/--BEGIN CERTIFICATE--/", $ca)) {
+				$cert = 1;
+			}
+			if ($cert == 1) {
+				$crt .= $ca;
+			}
+			if (preg_match("/-END CERTIFICATE-/", $ca)) {
+				file_put_contents("/tmp/cert.pem", $crt, LOCK_EX);
+				$cert_hash = array();
+				exec("/usr/bin/openssl x509 -hash -noout -in /tmp/cert.pem", $cert_hash);
+				file_put_contents(SQUID_LOCALBASE . "/share/certs/" . $cert_hash[0] . ".0", $crt, LOCK_EX);
+				$crt = "";
+				$cert = 0;
+			}
+		}
+	}
+}
+
+/*
+ * Squid cache setup
+ */
+
+ /* Create Squid disk cache directories */
 function squid_dash_z($cache_action = 'none') {
 	global $config;
 
@@ -177,6 +275,7 @@ function squid_dash_z($cache_action = 'none') {
 	}
 }
 
+/* Helper function for squid_dash_z() */
 function squid_create_cachedir() {
 	global $config;
 	if (is_array($config['installedpackages']['squidcache'])) {
@@ -207,15 +306,147 @@ function squid_create_cachedir() {
 	}
 }
 
-function squid_is_valid_acl($acl) {
-	global $valid_acls;
 
-	if (!is_array($valid_acls)) {
+/*
+ * rc scripts, services and cronjobs
+ */
+
+/* Handle cronjob install/uninstall */
+function squid_install_cron($should_install) {
+	global $config;
+
+	if (platform_booting()) {
 		return;
 	}
 
-	return in_array($acl, $valid_acls);
+	parse_config(true);
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$settings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$settings = array();
+	}
+
+	$cron_cmd = ($settings['clear_cache'] == 'on' ? "/usr/local/pkg/swapstate_check.php clean; " : "");
+	$cron_cmd .= SQUID_BASE . "/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+	install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
+
+	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php clean; ";
+	if (($should_install) && (squid_enabled())) {
+		if ($settings['clear_cache'] == 'on' ) {
+			install_cron_job("{$swapstate_cmd}", true, "*/360");
+		} else {
+			install_cron_job("{$swapstate_cmd}", false);
+		}
+	} else {
+		install_cron_job("{$swapstate_cmd}", false);
+	}
 }
+
+/* Create /usr/local/etc/rc.d/squid.sh rc script */
+function squid_write_rcfile() {
+	/* Declare a variable for the SQUID_CONFFILE constant. */
+	/* Then the variable can be referenced easily in the heredoc text that generates the rc file. */
+	$squid_conffile_var = SQUID_CONFFILE;
+	$squid_base = SQUID_BASE;
+	$rc = array();
+	$rc['file'] = 'squid.sh';
+	$rc['start'] = <<< EOD
+#/sbin/sysctl net.inet.ip.portrange.reservedhigh=0
+if [ -z "`/bin/ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; then
+	{$squid_base}/sbin/squid -f {$squid_conffile_var}
+fi
+
+EOD;
+
+	$rc['stop'] = <<< EOD
+{$squid_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
+# Just to be sure...
+sleep 5
+if [ -n "`/bin/ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; then
+	{$squid_base}/sbin/squid -k kill -f {$squid_conffile_var}
+fi
+
+if [ -x /usr/bin/ipcs ]; then
+# http://man.chinaunix.net/newsoft/squid/Squid_FAQ/FAQ-22.html#ss22.8
+/usr/bin/ipcs | /usr/bin/grep '^[mq]' | /usr/bin/awk '{printf "ipcrm -%s %s\\n", $1, $2}' | /bin/sh
+fi
+
+/usr/bin/killall -9 squid 2>/dev/null
+/usr/bin/killall pinger 2>/dev/null
+
+EOD;
+
+	conf_mount_rw();
+	write_rcfile($rc);
+	conf_mount_ro();
+}
+
+/* Start sqp_monitor.sh watchdog script */
+function squid_start_monitor() {
+	if (squid_enabled()) {
+		if (!exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+			log_error("Starting a proxy monitor script");
+			mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
+		}
+		sleep(1);
+	} else {
+		log_error("Squid is disabled. Not starting a proxy monitor script");
+	}
+}
+
+/* Stop sqp_monitor.sh watchdog script */
+function squid_stop_monitor() {
+	/* kill any running proxy alarm scripts */
+	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
+		log_error("Stopping any running proxy monitors");
+		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
+	}
+	sleep(1);
+}
+
+/* Start and/or stop services according to Squid configuration */
+function squid_restart_services() {
+	global $config;
+
+	// do not (re)start squid services on boot
+	if (platform_booting()) {
+		return;
+	}
+
+	if (squid_enabled()) {
+		/* kill any running proxy alarm scripts */
+		squid_stop_monitor();
+
+		if (!is_service_running('squid')) {
+			log_error("Starting Squid");
+			mwexec(SQUID_BASE . "/sbin/squid -f " . SQUID_CONFFILE);
+		} else {
+			log_error("Reloading Squid for configuration sync");
+			mwexec(SQUID_BASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
+		}
+		// sleep for a couple seconds to give squid a chance to fire up fully.
+		for ($i = 0; $i < 10; $i++) {
+			if (!is_service_running('squid')) {
+				sleep(1);
+			}
+		}
+		/* restart proxy alarm scripts */
+		squid_start_monitor();
+
+	} else {
+		/* Squid is disabled - kill any running proxy alarm scripts and stop Squid services */
+		squid_stop_monitor();
+		if (is_service_running('squid')) {
+			log_error("Stopping Squid");
+			stop_service("squid");
+		}
+	}
+}
+
+
+/*
+ * Squid package install/uninstall
+ */
 
 function squid_install_command() {
 	global $config, $g;
@@ -334,7 +565,7 @@ function squid_install_command() {
 		if (!is_array($config['installedpackages']['squidreverseuri'])) {
 			foreach (explode("\n", sq_text_area_decode($old_reverse_settings['reverse_acl'])) as $acls) {
 				foreach (explode(";", $acls) as $acl) {
-					array_push(${'peer_'.$acl[0]},$acl[1]);
+					array_push(${'peer_'.$acl[0]}, $acl[1]);
 				}
 			}
 			foreach (explode("\n", sq_text_area_decode($old_reverse_settings['reverse_uri'])) as $uris) {
@@ -546,6 +777,11 @@ function squid_deinstall_command() {
 	update_output_window("Squid3 has been uninstalled.");
 }
 
+/*
+ * Squid input validation
+ */
+
+/* Proxy Server: General Settings input validation */
 function squid_validate_general($post, &$input_errors) {
 	global $config;
 
@@ -626,6 +862,7 @@ function squid_validate_general($post, &$input_errors) {
 	}
 }
 
+/* Proxy Server: Remote Proxy Settings input validation */
 function squid_validate_upstream($post, &$input_errors) {
 	if ($post['enabled'] != 'on') {
 		return;
@@ -652,6 +889,7 @@ function squid_validate_upstream($post, &$input_errors) {
 	}
 }
 
+/* Proxy Server: Cache Management input validation */
 function squid_validate_cache($post, &$input_errors) {
 	$num_fields = array(
 		'harddisk_cache_size' => 'Hard disk cache size',
@@ -707,6 +945,7 @@ function squid_validate_cache($post, &$input_errors) {
 	}
 }
 
+/* Proxy Server: Access Control input validation */
 function squid_validate_nac($post, &$input_errors) {
 	$allowed_subnets = explode("\n", $post['allowed_subnets']);
 	foreach ($allowed_subnets as $subnet) {
@@ -758,6 +997,7 @@ function squid_validate_nac($post, &$input_errors) {
 	}
 }
 
+/* Proxy server: Traffic Management input validation */
 function squid_validate_traffic($post, &$input_errors) {
 	$num_fields = array(
 		'max_download_size' => 'Maximum download size',
@@ -795,6 +1035,7 @@ function squid_validate_traffic($post, &$input_errors) {
 	}
 }
 
+/* Proxy Server: Authentication input validation */
 function squid_validate_auth($post, &$input_errors) {
 	$num_fields = array(
 		array('auth_processes', 'Authentication processes', 1),
@@ -856,76 +1097,7 @@ function squid_validate_auth($post, &$input_errors) {
 	}
 }
 
-function squid_install_cron($should_install) {
-	global $config;
-
-	if (platform_booting()) {
-		return;
-	}
-
-	parse_config(true);
-	if (is_array($config['installedpackages']['squidcache'])) {
-		$settings = $config['installedpackages']['squidcache']['config'][0];
-	} else {
-		$settings = array();
-	}
-
-	$cron_cmd = ($settings['clear_cache'] == 'on' ? "/usr/local/pkg/swapstate_check.php clean; " : "");
-	$cron_cmd .= SQUID_BASE . "/sbin/squid -k rotate -f " . SQUID_CONFFILE;
-	install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
-
-	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php clean; ";
-	if (($should_install) && (squid_enabled())) {
-		if ($settings['clear_cache'] == 'on' ) {
-			install_cron_job("{$swapstate_cmd}", true, "*/360");
-		} else {
-			install_cron_job("{$swapstate_cmd}", false);
-		}
-	} else {
-		install_cron_job("{$swapstate_cmd}", false);
-	}
-}
-
-function squid_check_ca_hashes() {
-	global $config, $g;
-
-	// check certificates
-	$cert_count = 0;
-	if (is_dir(SQUID_LOCALBASE . '/share/certs')) {
-		if ($handle = opendir(SQUID_LOCALBASE . '/share/certs')) {
-			while (false !== ($file = readdir($handle))) {
-				if (preg_match ("/\d+.0/",$file)) {
-					$cert_count++;
-				}
-			}
-			closedir($handle);
-		}
-	}
-	if ($cert_count < 10) {
-		conf_mount_rw();
-		// create ca-root hashes from ca-root-nss package
-		log_error("Creating root certificate bundle hashes from the Mozilla Project");
-		$cas = file(SQUID_LOCALBASE . '/share/certs/ca-root-nss.crt');
-		$cert = 0;
-		foreach ($cas as $ca) {
-			if (preg_match("/--BEGIN CERTIFICATE--/", $ca)) {
-				$cert = 1;
-			}
-			if ($cert == 1) {
-				$crt .= $ca;
-			}
-			if (preg_match("/-END CERTIFICATE-/", $ca)) {
-				file_put_contents("/tmp/cert.pem", $crt, LOCK_EX);
-				$cert_hash = array();
-				exec("/usr/bin/openssl x509 -hash -noout -in /tmp/cert.pem", $cert_hash);
-				file_put_contents(SQUID_LOCALBASE . "/share/certs/" . $cert_hash[0] . ".0", $crt, LOCK_EX);
-				$crt = "";
-				$cert = 0;
-			}
-		}
-	}
-}
-
+/* Proxy Server: General Settings configuration handler */
 function squid_resync_general() {
 	global $g, $config, $valid_acls;
 
@@ -1016,7 +1188,7 @@ function squid_resync_general() {
 		$iface_ip = squid_get_real_interface_address($iface);
 		if ($iface_ip[0]) {
 			$real_ifaces[] = $iface_ip;
-			if (in_array($iface,$ssl_ifaces)) {
+			if (in_array($iface, $ssl_ifaces)) {
 				$conf .= "http_port {$iface_ip[0]}:{$port} {$ssl_interception}\n";
 			} else {
 				$conf .= "http_port {$iface_ip[0]}:{$port}\n";
@@ -1138,6 +1310,7 @@ EOD;
 	return $conf;
 }
 
+/* Proxy Server: Cache Management configuration handler */
 function squid_resync_cache() {
 	global $config, $g;
 
@@ -1276,6 +1449,7 @@ EOD;
 	return $conf.$refresh_conf;
 }
 
+/* Proxy Server: Remote Proxy Settings configuration handler */
 function squid_resync_upstream() {
 	global $config;
 
@@ -1317,6 +1491,7 @@ function squid_resync_upstream() {
 	return $conf;
 }
 
+/* Proxy Server: Access Control configuration handler */
 function squid_resync_nac() {
 	global $config, $valid_acls;
 
@@ -1413,6 +1588,7 @@ EOD;
 	return $conf;
 }
 
+/* Proxy server: Traffic Management configuration handler */
 function squid_resync_traffic() {
 	global $config, $valid_acls;
 
@@ -1509,16 +1685,7 @@ EOD;
 	return $conf;
 }
 
-function squid_get_server_certs() {
-	global $config;
-	$cert_arr = array();
-	$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
-	foreach ($config['cert'] as $cert) {
-		$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
-	}
-	return $cert_arr;
-}
-
+/* Proxy Server: Authentication configuration handler */
 function squid_resync_auth() {
 	global $config, $valid_acls;
 	$write_config = 0;
@@ -1741,6 +1908,7 @@ EOD;
 	return $conf;
 }
 
+/* Proxy server: Local users configuration handler */
 function squid_resync_users() {
 	global $config;
 
@@ -1756,6 +1924,7 @@ function squid_resync_users() {
 	chmod(SQUID_PASSWD, 0600);
 }
 
+/* Proxy server: NT Domain configuration handler */
 function squid_resync_msnt() {
 	global $config;
 
@@ -1773,6 +1942,7 @@ function squid_resync_msnt() {
 	chmod(SQUID_CONFBASE . "/msntauth.conf", 0600);
 }
 
+/* Wrapper function to sync whole Squid configuration */
 function squid_resync($via_rpc = "no") {
 	global $config;
 
@@ -1829,87 +1999,9 @@ function squid_resync($via_rpc = "no") {
 	conf_mount_ro();
 }
 
-function squid_stop_monitor() {
-	/* kill any running proxy alarm scripts */
-	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
-		log_error("Stopping any running proxy monitors");
-		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
-	}
-	sleep(1);
-}
-
-function squid_start_monitor() {
-	if (squid_enabled()) {
-		if (!exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
-			log_error("Starting a proxy monitor script");
-			mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
-		}
-		sleep(1);
-	} else {
-		log_error("Squid is disabled. Not starting a proxy monitor script");
-	}
-}
-
-function squid_enabled() {
-	global $config, $proxy_enabled;
-	$proxy_enabled = false;
-
-	if (is_array($config['installedpackages']['squid']['config'])) {
-		// check whether Squid is enabled ...
-		if ($config['installedpackages']['squid']['config'][0]['enable_squid'] == "on") {
-			// ... and has at least one interface configured ...
-			if ($config['installedpackages']['squid']['config'][0]['active_interface'] != "") {
-				$proxy_enabled = true;
-			} else {
-			// ... or has at least one reverse interface configured
-				if (is_array($config['installedpackages']['squidreversegeneral']['config'])) {
-					if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
-						$proxy_enabled = true;
-					}
-				}
-			}
-		}
-	}
-	return $proxy_enabled;
-}
-
-function squid_restart_services() {
-	global $config;
-	// reconfigure and (re)start service as needed if enabled, otherwise stop them
-	// do not (re)start squid services on boot
-	if (platform_booting()) {
-		return;
-	}
-
-	if (squid_enabled()) {
-		/* kill any running proxy alarm scripts */
-		squid_stop_monitor();
-
-		if (!is_service_running('squid')) {
-			log_error("Starting Squid");
-			mwexec(SQUID_BASE . "/sbin/squid -f " . SQUID_CONFFILE);
-		} else {
-			log_error("Reloading Squid for configuration sync");
-			mwexec(SQUID_BASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
-		}
-		// sleep for a couple seconds to give squid a chance to fire up fully.
-		for ($i = 0; $i < 10; $i++) {
-			if (!is_service_running('squid')) {
-				sleep(1);
-			}
-		}
-		/* restart proxy alarm scripts */
-		squid_start_monitor();
-
-	} else {
-		/* Squid is disabled - kill any running proxy alarm scripts and stop Squid services */
-		squid_stop_monitor();
-		if (is_service_running('squid')) {
-			log_error("Stopping Squid");
-			stop_service("squid");
-		}
-	}
-}
+/*
+ * Squid firewall rules configuration
+ */
 
 function squid_generate_rules($type) {
 	global $config, $pfs_version;
@@ -2100,45 +2192,11 @@ function squid_generate_rules($type) {
 	return $rules;
 }
 
-function squid_write_rcfile() {
-	/* Declare a variable for the SQUID_CONFFILE constant. */
-	/* Then the variable can be referenced easily in the heredoc text that generates the rc file. */
-	$squid_conffile_var = SQUID_CONFFILE;
-	$squid_base = SQUID_BASE;
-	$rc = array();
-	$rc['file'] = 'squid.sh';
-	$rc['start'] = <<< EOD
-#/sbin/sysctl net.inet.ip.portrange.reservedhigh=0
-if [ -z "`/bin/ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; then
-	{$squid_base}/sbin/squid -f {$squid_conffile_var}
-fi
+/*
+ * Squid XMLRPC sync
+ */
 
-EOD;
-
-	$rc['stop'] = <<< EOD
-{$squid_base}/sbin/squid -k shutdown -f {$squid_conffile_var}
-# Just to be sure...
-sleep 5
-if [ -n "`/bin/ps auxw | /usr/bin/grep "[s]quid " | /usr/bin/awk '{print $2}'`" ]; then
-	{$squid_base}/sbin/squid -k kill -f {$squid_conffile_var}
-fi
-
-if [ -x /usr/bin/ipcs ]; then
-# http://man.chinaunix.net/newsoft/squid/Squid_FAQ/FAQ-22.html#ss22.8
-/usr/bin/ipcs | /usr/bin/grep '^[mq]' | /usr/bin/awk '{printf "ipcrm -%s %s\\n", $1, $2}' | /bin/sh
-fi
-
-/usr/bin/killall -9 squid 2>/dev/null
-/usr/bin/killall pinger 2>/dev/null
-
-EOD;
-
-	conf_mount_rw();
-	write_rcfile($rc);
-	conf_mount_ro();
-}
-
-/* Uses XMLRPC to synchronize the changes to a remote node */
+/* XMLRPC sync configuration */
 function squid_sync_on_changes() {
 	global $config, $g;
 	if (is_array($config['installedpackages']['squidsync']['config'])) {
@@ -2187,7 +2245,8 @@ function squid_sync_on_changes() {
 		}
 	}
 }
-/* Do the actual XMLRPC sync */
+
+/* Perform the actual XMLRPC sync */
 function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	global $config, $g;
 
