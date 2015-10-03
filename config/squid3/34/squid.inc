@@ -41,6 +41,10 @@ require_once('service-utils.inc');
 if (!function_exists("filter_configure")) {
 	require_once("filter.inc");
 }
+/* Squid reverse proxy */
+require_once('/usr/local/pkg/squid_reverse.inc');
+/* Squid javascript helpers */
+require_once('/usr/local/pkg/squid_js.inc');
 
 $shortcut_section = "squid";
 
@@ -1850,9 +1854,6 @@ function squid_get_server_certs() {
 	return $cert_arr;
 }
 
-// squid reverse
-include('/usr/local/pkg/squid_reverse.inc');
-
 function squid_resync_auth() {
 	global $config, $valid_acls;
 	$write_config = 0;
@@ -2316,199 +2317,6 @@ function squid_restart_antivirus() {
 		}
 		unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
 	}
-}
-
-function squid_print_javascript_auth() {
-	global $config;
-	$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
-
-	// No authentication for transparent proxy
-	if ($transparent_proxy and preg_match("/(local|ldap|radius|msnt|ntlm)/",$config['installedpackages']['squidauth']['config'][0]['auth_method'])) {
-		$javascript = <<< EOD
-<script type="text/javascript">
-<!--
-function on_auth_method_changed() {
-	document.iform.auth_method.disabled = 1;
-	document.iform.auth_server.disabled = 1;
-	document.iform.auth_ntdomain.disabled = 1;
-	document.iform.auth_server_port.disabled = 1;
-	document.iform.ldap_user.disabled = 1;
-	document.iform.ldap_version.disabled = 1;
-	document.iform.ldap_userattribute.disabled = 1;
-	document.iform.ldap_filter.disabled = 1;
-	document.iform.ldap_pass.disabled = 1;
-	document.iform.ldap_basedomain.disabled = 1;
-	document.iform.radius_secret.disabled = 1;
-	document.iform.msnt_secondary.disabled = 1;
-	document.iform.auth_prompt.disabled = 1;
-	document.iform.auth_processes.disabled = 1;
-	document.iform.auth_ttl.disabled = 1;
-	document.iform.unrestricted_auth.disabled = 1;
-	document.iform.no_auth_hosts.disabled = 1;
-}
--->
-</script>
-
-EOD;
-	} else {
-		$javascript = <<< EOD
-<script type="text/javascript">
-<!--
-function on_auth_method_changed() {
-	var field = document.iform.auth_method;
-	var auth_method = field.options[field.selectedIndex].value;
-
-	if (auth_method == 'none') {
-		document.iform.auth_server.disabled = 1;
-		document.iform.auth_server_port.disabled = 1;
-		document.iform.auth_ntdomain.disabled = 1;
-		document.iform.ldap_user.disabled = 1;
-		document.iform.ldap_version.disabled = 1;
-		document.iform.ldap_userattribute.disabled = 1;
-		document.iform.ldap_filter.disabled = 1;
-		document.iform.ldap_pass.disabled = 1;
-		document.iform.ldap_basedomain.disabled = 1;
-		document.iform.radius_secret.disabled = 1;
-		document.iform.msnt_secondary.disabled = 1;
-		document.iform.auth_prompt.disabled = 1;
-		document.iform.auth_processes.disabled = 1;
-		document.iform.auth_ttl.disabled = 1;
-		document.iform.unrestricted_auth.disabled = 1;
-		document.iform.no_auth_hosts.disabled = 1;
-	} else {
-		document.iform.auth_prompt.disabled = 0;
-		document.iform.auth_processes.disabled = 0;
-		document.iform.auth_ttl.disabled = 0;
-		document.iform.unrestricted_auth.disabled = 0;
-		document.iform.no_auth_hosts.disabled = 0;
-	}
-
-	switch (auth_method) {
-	case 'local':
-		document.iform.auth_server.disabled = 1;
-		document.iform.auth_server_port.disabled = 1;
-		document.iform.auth_ntdomain.disabled = 1;
-		document.iform.ldap_user.disabled = 1;
-		document.iform.ldap_pass.disabled = 1;
-		document.iform.ldap_version.disabled = 1;
-		document.iform.ldap_userattribute.disabled = 1;
-		document.iform.ldap_filter.disabled = 1;
-		document.iform.ldap_basedomain.disabled = 1;
-		document.iform.radius_secret.disabled = 1;
-		document.iform.msnt_secondary.disabled = 1;
-		break;
-	case 'ldap':
-		document.iform.auth_server.disabled = 0;
-		document.iform.auth_server_port.disabled = 0;
-		document.iform.ldap_user.disabled = 0;
-		document.iform.ldap_pass.disabled = 0;
-		document.iform.ldap_version.disabled = 0;
-		document.iform.ldap_userattribute.disabled = 0;
-		document.iform.ldap_filter.disabled = 0;
-		document.iform.ldap_basedomain.disabled = 0;
-		document.iform.radius_secret.disabled = 1;
-		document.iform.msnt_secondary.disabled = 1;
-		document.iform.auth_ntdomain.disabled = 1;
-		break;
-	case 'radius':
-		document.iform.auth_server.disabled = 0;
-		document.iform.auth_server_port.disabled = 0;
-		document.iform.ldap_user.disabled = 1;
-		document.iform.ldap_pass.disabled = 1;
-		document.iform.ldap_version.disabled = 1;
-		document.iform.ldap_userattribute.disabled = 1;
-		document.iform.ldap_filter.disabled = 1;
-		document.iform.ldap_basedomain.disabled = 1;
-		document.iform.radius_secret.disabled = 0;
-		document.iform.msnt_secondary.disabled = 1;
-		document.iform.auth_ntdomain.disabled = 1;
-		break;
-	case 'msnt':
-		document.iform.auth_server.disabled = 0;
-		document.iform.auth_server_port.disabled = 1;
-		document.iform.auth_ntdomain.disabled = 0;
-		document.iform.ldap_user.disabled = 1;
-		document.iform.ldap_pass.disabled = 1;
-		document.iform.ldap_version.disabled = 1;
-		document.iform.ldap_userattribute.disabled = 1;
-		document.iform.ldap_filter.disabled = 1;
-		document.iform.ldap_basedomain.disabled = 1;
-		document.iform.radius_secret.disabled = 1;
-		document.iform.msnt_secondary.disabled = 0;
-		break;
-	case 'cp':
-		document.iform.auth_server.disabled = 1;
-		document.iform.auth_server_port.disabled = 1;
-		document.iform.auth_ntdomain.disabled = 1;
-		document.iform.ldap_user.disabled = 1;
-		document.iform.ldap_version.disabled = 1;
-		document.iform.ldap_userattribute.disabled = 1;
-		document.iform.ldap_filter.disabled = 1;
-		document.iform.ldap_pass.disabled = 1;
-		document.iform.ldap_basedomain.disabled = 1;
-		document.iform.radius_secret.disabled = 1;
-		document.iform.msnt_secondary.disabled = 1;
-		document.iform.auth_prompt.disabled = 1;
-		document.iform.auth_processes.disabled = 0;
-		document.iform.auth_ttl.disabled = 0;
-		document.iform.unrestricted_auth.disabled = 1;
-		document.iform.no_auth_hosts.disabled = 1;
-		break;
-	}
-}
--->
-</script>
-
-EOD;
-	}
-
-	print($javascript);
-}
-
-function squid_print_javascript_auth2() {
-	print("<script type=\"text/javascript\">on_auth_method_changed()</script>\n");
-}
-
-function squid_print_antivirus_advanced_config() {
-	$javascript = <<< EOD
-<script type="text/javascript">
-//<![CDATA[
-function on_antivirus_advanced_config_changed() {
-	var field = document.iform.enable_advanced;
-	var enable_advanced = field.options[field.selectedIndex].value;
-
-	if (enable_advanced === 'disabled') {
-		document.iform['client_info'].disabled = 0;
-		document.iform['clamav_safebrowsing'].disabled = 0;
-		document.iform['clamav_update'].disabled = 0;
-		document.iform['clamav_dbregion'].disabled = 0;
-		document.iform['clamav_dbservers'].disabled = 0;
-		document.iform['squidclamav'].disabled = 1;
-		document.iform['c-icap_conf'].disabled = 1;
-		document.iform['c-icap_magic'].disabled = 1;
-		document.iform['freshclam_conf'].disabled = 1;
-	} else {
-		document.iform['client_info'].disabled = 1;
-		document.iform['clamav_safebrowsing'].disabled = 1;
-		document.iform['clamav_update'].disabled = 1;
-		document.iform['clamav_dbregion'].disabled = 1;
-		document.iform['clamav_dbservers'].disabled = 1;
-		document.iform['squidclamav'].disabled = 0;
-		document.iform['c-icap_conf'].disabled = 0;
-		document.iform['c-icap_magic'].disabled = 0;
-		document.iform['freshclam_conf'].disabled = 0;
-	}
-}
-//]]>
-</script>
-
-EOD;
-	print($javascript);
-
-}
-
-function squid_print_antivirus_advanced_config2() {
-	print('<script type="text/javascript">on_antivirus_advanced_config_changed()</script>\n');
 }
 
 function squid_generate_rules($type) {
