@@ -33,6 +33,7 @@ require_once('certs.inc');
 /* This file is currently only being included in squid.inc and not used separately */
 // require_once('squid.inc');
 
+/* Reverse Proxy Server configuration handler */
 function squid_resync_reverse() {
 	global $config;
 
@@ -262,6 +263,7 @@ function squid_resync_reverse() {
 	return $conf;
 }
 
+/* Reverse Proxy Server input validation */
 function squid_validate_reverse($post, &$input_errors) {
 	global $config;
 
