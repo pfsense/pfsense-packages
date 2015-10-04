@@ -234,7 +234,7 @@ EOD;
 }
 
 function squid_print_antivirus_advanced_config2() {
-	print('<script type="text/javascript">on_antivirus_advanced_config_changed()</script>\n');
+	print("<script type=\"text/javascript\">on_antivirus_advanced_config_changed()</script>\n");
 }
 
 ?>
