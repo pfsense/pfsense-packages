@@ -188,7 +188,7 @@ if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
 	$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
 }
 
-if (empty($pconfig['alertnumber']))
+if (empty($pconfig['alertnumber']) || !is_numeric($pconfig['alertnumber']))
 	$pconfig['alertnumber'] = '250';
 if (empty($pconfig['arefresh']))
 	$pconfig['arefresh'] = 'off';
@@ -249,7 +249,7 @@ if ($_POST['save']) {
 		header("Location: /snort/snort_alerts.php?instance={$instanceid}");
 		return;
 	} else {
-		$input_errors[] = "Alert number must be numeric";
+		$input_errors[] = gettext("Alert number must be numeric");
 	}
 }
 
