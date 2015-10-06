@@ -742,6 +742,14 @@ function squid_upgrade_config() {
 			}
 		}
 	}
+	
+	/* unset broken antivirus settings */
+	if (is_array($config['installedpackages']['squidantivirus'])) {
+		unset($config['installedpackages']['squidantivirus']['config'][0]['squidclamav']);
+		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_conf']);
+		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_magic']);
+		unset($config['installedpackages']['squidantivirus']['config'][0]['freshclam_conf']);
+	}
 
 	update_output_window("Writing configuration... One moment please...");
 	write_config();
