@@ -109,7 +109,7 @@ function squid_is_valid_acl($acl) {
 /* Recursively change ownership of directories */
 function squid_chown_recursive($dir, $user, $group) {
 	if (empty($dir) || ($dir == '/') || ($dir == '/usr/local') || !is_dir($dir)) {
-		log_error(gettext("Squid attempted to chown an invalid directory: {$dir}"));
+		log_error(gettext("[squid] Attempted to chown an invalid directory: '{$dir}'"));
 		return;
 	}
 
@@ -130,7 +130,7 @@ function squid_chown_recursive($dir, $user, $group) {
 			}
 		}
 	} else {
-		log_error(gettext("Squid squid_chown_recursive call failed; permissions not set for directory: {$dir}"));
+		log_error(gettext("[squid] squid_chown_recursive() call failed; permissions not set for directory: '{$dir}'"));
 	}
 }
 
@@ -188,7 +188,7 @@ function squid_check_ca_hashes() {
 	if ($cert_count < 10) {
 		conf_mount_rw();
 		// create ca-root hashes from ca-root-nss package
-		log_error("Creating root certificate bundle hashes from the Mozilla Project");
+		log_error("[squid] Creating root certificate bundle hashes from the Mozilla Project...");
 		$cas = file(SQUID_LOCALBASE . '/share/certs/ca-root-nss.crt');
 		$cert = 0;
 		foreach ($cas as $ca) {
@@ -220,8 +220,8 @@ function squid_dash_z($cache_action = 'none') {
 
 	// We need cache configured after initial package install
 	if (!is_array($config['installedpackages']['squidcache']['config'])) {
-		log_error("Squid - 'Local Cache' not configured, disk cache will be disabled.");
-		log_error("Squid - Please, configure and save 'Local Cache' settings before enabling Squid proxy.");
+		log_error("[squid] 'Local Cache' not configured, disk cache will be disabled.");
+		log_error("[squid] Please, configure and save 'Local Cache' settings before enabling Squid proxy.");
 		return;
 	}
 
@@ -243,7 +243,7 @@ function squid_dash_z($cache_action = 'none') {
 	if ($cachesettings['harddisk_cache_system'] == "null") {
 		if (is_dir($cachedir)) {
 			if (substr($cachedir, 0, 11) === "/var/squid/") {
-				log_error("Deleting Squid cache dir {$cachedir} since 'Hard Disk Cache System' is set to null.");
+				log_error("[squid] Deleting cache dir '{$cachedir}' since 'Hard Disk Cache System' is set to null...");
 				// cannot nuke disk cache while Squid is running
 				squid_stop_monitor();
 				if (is_service_running('squid')) {
@@ -253,8 +253,8 @@ function squid_dash_z($cache_action = 'none') {
 				mwexec_bg("/bin/rm -rf {$cachedir}.old");
 				squid_restart_services();
 			} else {
-				log_error("'Hard Disk Cache System' is set to null.");
-				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+				log_error("[squid] 'Hard Disk Cache System' is set to null.");
+				log_error("[squid] Will NOT delete cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
 			}
 		}
 		return;
@@ -273,7 +273,7 @@ function squid_dash_z($cache_action = 'none') {
 				@rename($cachedir, "{$cachedir}.old");
 				mwexec_bg("/bin/rm -rf {$cachedir}.old");
 			} else {
-				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+				log_error("[squid] Will NOT delete cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
 			}
 		}
 		squid_create_cachedir();
@@ -292,14 +292,14 @@ function squid_create_cachedir() {
 	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
 
 	if (!is_dir($cachedir)) {
-		log_error("Creating Squid cache dir {$cachedir}");
+		log_error("[squid] Creating cache dir '{$cachedir}' ...");
 		safe_mkdir($cachedir, 0755);
 		@chown($cachedir, SQUID_UID);
 		@chgrp($cachedir, SQUID_GID);
 	}
 
 	if (!is_dir($cachedir . '/00')) {
-		log_error("Creating Squid cache subdirs in $cachedir");
+		log_error("[squid] Creating Squid cache subdirs in {$cachedir} ...");
 		mwexec(SQUID_BASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		squid_chown_recursive($cachedir, SQUID_UID, SQUID_GID);
@@ -391,12 +391,12 @@ EOD;
 function squid_start_monitor() {
 	if (squid_enabled()) {
 		if (!exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
-			log_error("Starting a proxy monitor script");
+			log_error("[squid] Starting a proxy monitor script");
 			mwexec_bg("/usr/local/etc/rc.d/sqp_monitor.sh start");
 		}
 		sleep(1);
 	} else {
-		log_error("Squid is disabled. Not starting a proxy monitor script");
+		log_error("[squid] Squid is disabled. Not starting a proxy monitor script");
 	}
 }
 
@@ -404,7 +404,7 @@ function squid_start_monitor() {
 function squid_stop_monitor() {
 	/* kill any running proxy alarm scripts */
 	if (exec("/bin/ps auxw | /usr/bin/grep '[s]qpmon'")) {
-		log_error("Stopping any running proxy monitors");
+		log_error("[squid] Stopping any running proxy monitors");
 		mwexec("/usr/local/etc/rc.d/sqp_monitor.sh stop");
 	}
 	sleep(1);
@@ -424,10 +424,10 @@ function squid_restart_services() {
 		squid_stop_monitor();
 
 		if (!is_service_running('squid')) {
-			log_error("Starting Squid");
+			log_error("[squid] Starting service...");
 			mwexec(SQUID_BASE . "/sbin/squid -f " . SQUID_CONFFILE);
 		} else {
-			log_error("Reloading Squid for configuration sync");
+			log_error("[squid] Reloading for configuration sync...");
 			mwexec(SQUID_BASE . "/sbin/squid -k reconfigure -f " . SQUID_CONFFILE);
 		}
 		// sleep for a couple seconds to give squid a chance to fire up fully.
@@ -443,7 +443,7 @@ function squid_restart_services() {
 		/* Squid is disabled - kill any running proxy alarm scripts and stop Squid services */
 		squid_stop_monitor();
 		if (is_service_running('squid')) {
-			log_error("Stopping Squid");
+			log_error("[squid] Stopping service...");
 			stop_service("squid");
 		}
 	}
@@ -547,14 +547,14 @@ function squid_deinstall_command() {
 			if (substr($cachedir, 0, 11) === "/var/squid/") {
 				mwexec_bg("/bin/rm -rf {$cachedir}");
 			} else {
-				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+				log_error("[squid] Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
 			}
 		}
 		if (is_dir("{$logdir}")) {
 			if (substr($logdir, 0, 11) === "/var/squid/") {
 				mwexec("/bin/rm -rf {$logdir}");
 			} else {
-				log_error("Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
+				log_error("[squid] Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
 			}
 		}
 		update_output_window("Removing remaining Squid directories ... One moment please...");
@@ -574,7 +574,7 @@ function squid_deinstall_command() {
 
 	/* Remove package settings from config if 'Keep Settings/Data' is disabled */
 	if (!$keep) {
-		log_error("Removing all Squid settings since 'Keep Settings/Data' is disabled...");
+		log_error("[squid] Removing all Squid settings since 'Keep Settings/Data' is disabled...");
 		if (is_array($config['installedpackages']['squid'])) {
 			unset($config['installedpackages']['squid']);
 		}
@@ -1203,7 +1203,7 @@ function squid_resync_general() {
 
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	if (!is_dir($logdir)) {
-		log_error("Creating Squid log dir $logdir");
+		log_error("[squid] Creating Squid log dir '{$logdir}' ...");
 		safe_mkdir($logdir, 0755);
 		squid_chown_recursive($logdir, SQUID_UID, SQUID_GID);
 	}
@@ -1320,8 +1320,8 @@ function squid_resync_cache() {
 		if ($g['platform'] == "nanobsd") {
 			$disk_cache_system = 'null';
 		} elseif (!is_array($config['installedpackages']['squidcache']['config'])) {
-			log_error("Squid - 'Local Cache' not configured, disk cache will be disabled.");
-			log_error("Squid - Please, configure and save 'Local Cache' settings before enabling Squid proxy.");
+			log_error("[squid] 'Local Cache' not configured, disk cache will be disabled.");
+			log_error("[squid] Please, configure and save 'Local Cache' settings before enabling Squid proxy.");
 		} else {
 			$disk_cache_system = 'ufs';
 		}
@@ -1942,7 +1942,7 @@ function squid_resync($via_rpc = "no") {
 		}
 	}
 
-	log_error("[Squid] - Squid_resync function call pr:" . is_process_running('squid') . " bp:" . isset($boot_process) . " rpc:" . $via_rpc);
+	log_error("[squid] - squid_resync function call pr:" . is_process_running('squid') . " bp:" . isset($boot_process) . " rpc:" . $via_rpc);
 
 	if (is_process_running('squid') && isset($boot_process) && $via_rpc == "no") {
 		return;
@@ -2024,7 +2024,7 @@ function squid_generate_rules($type) {
 
 	// do not install any firewall rules if Squid is disabled
 	if (!squid_enabled()) {
-		log_error("Squid is installed but disabled. Not installing \"{$type}\" rules.");
+		log_error("[squid] Installed but disabled. Not installing '{$type}' rules.");
 		return;
 	}
 
@@ -2034,7 +2034,7 @@ function squid_generate_rules($type) {
 	}
 
 	if (!is_service_running('squid')) {
-		log_error("Squid is installed but not started. Not installing \"{$type}\" rules.");
+		log_error("[squid] Installed but not started. Not installing '{$type}' rules.");
 		return;
 	}
 	// Read assigned interfaces
@@ -2278,7 +2278,7 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 
 	/* Set a few variables needed for sync */
 	$url = $synchronizetoip;
-	log_error("[squid] Beginning Squid XMLRPC sync to {$url}:{$port}.");
+	log_error("[squid] Beginning XMLRPC sync to {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -2289,13 +2289,13 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	/* Send our XMLRPC message and timeout after defined sync timeout value*/
 	$resp = $cli->send($msg, $synctimeout);
 	if (!$resp) {
-		$error = "A communication error occurred while attempting Squid XMLRPC sync with {$url}:{$port}.";
+		$error = "[squid] Communication error occurred while attempting XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
 		file_notice("sync_settings", $error, "Squid Settings Sync", "");
 	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, $synctimeout);
-		$error = "An error code was received while attempting Squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "[squid] An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "Squid Settings Sync", "");
 	} else {
@@ -2318,17 +2318,17 @@ function squid_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout) {
 	$cli->setCredentials($username, $password);
 	$resp = $cli->send($msg, $synctimeout);
 	if (!$resp) {
-		$error = "A communication error occurred while attempting Squid XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		$error = "[squid] Communication error occurred while attempting XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "Squid Settings Sync", "");
 	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, $synctimeout);
-		$error = "[Squid] An error code was received while attempting Squid XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "[squid] An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "Squid Settings Sync", "");
 	} else {
-		log_error("Squid XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("[squid] XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
 }
 
