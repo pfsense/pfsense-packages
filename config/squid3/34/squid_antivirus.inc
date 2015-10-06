@@ -605,7 +605,7 @@ function squid_antivirus_put_raw_config($rawfiles) {
 /* Helper function for squid_antivirus_put_raw_config() */
 function squid_antivirus_write_conffile($dir, $file, $text) {
 	if ($file && $text) {
-		file_put_contents(SQUID_LOCALBASE . "/etc" . "{$dir}" . "/{$file}", base64_decode(preg_replace('/\r\n/', '\n', $text), LOCK_EX));
+		file_put_contents(SQUID_LOCALBASE . "/etc" . "{$dir}" . "/{$file}", preg_replace("/\r\n/", "\n", base64_decode($text)), LOCK_EX);
 		log_error("Squid - Saved {$file} configuration file.");
 	}
 }
