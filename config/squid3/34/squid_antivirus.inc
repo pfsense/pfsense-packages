@@ -46,7 +46,7 @@ function squid_check_clamav_user($user) {
 	$user_arg = ($sq_ex_return == 0 ? "mod" : "add");
 	$_gc = exec("/usr/sbin/pw user{$user_arg} {$user} -G wheel -u 9595 -s /sbin/nologin", $sq_ex_output, $sq_ex_return);
 	if ($sq_ex_return != 0) {
-		log_error("Squid - Could not change clamav user settings. " . serialize($sq_ex_output));
+		log_error("[squid] Could not change clamav user settings. " . serialize($sq_ex_output));
 	}
 }
 
@@ -67,19 +67,22 @@ function squid_install_freshclam_cron($should_install) {
 	$freshclam_cmd = (SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 	if (($should_install) && (squid_enabled())) {
 		if ($antivirus_config['clamav_update'] != "0") {
+			log_error("[squid] Adding freshclam cronjob.");
 			$minutes = ($antivirus_config['clamav_update'] * 60);
 			install_cron_job("{$freshclam_cmd}", true, "*/{$minutes}", "*", "*", "*", "*", "clamav");
 		} else {
+			log_error("[squid] Removing freshclam cronjob.");
 			install_cron_job("{$freshclam_cmd}", false);
 		}
 	} else {
+		log_error("[squid] Removing freshclam cronjob.");
 		install_cron_job("{$freshclam_cmd}", false);
 	}
 }
 
 /* Manually update ClamAV virus definitions via the GUI button */
 function squid_update_clamav() {
-	log_error("Updating ClamAV definitions now... This will take a while. Check /var/log/clamav/freshclam.log for progress information.");
+	log_error("[squid] Updating ClamAV definitions now... This will take a while. Check /var/log/clamav/freshclam.log for progress information.");
 	mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 }
 
@@ -291,7 +294,7 @@ EOF;
 				}
 				file_put_contents("{$cf}", preg_replace($squidclamav_m, $squidclamav_r, $sample_file), LOCK_EX);
 			} else {
-				log_error("Squid - template not found; could not generate {$cf} file!");
+				log_error("[squid] Template not found; could not generate '{$cf}' file!");
 			}
 
 			// c-icap.conf
@@ -316,7 +319,7 @@ EOF;
 				$cicap_r[2] = "ServerLog {$logdir}/c-icap-server.log";
 				file_put_contents("{$cf}", preg_replace($cicap_m, $cicap_r, $sample_file), LOCK_EX);
 			} else {
-				log_error("Squid - template not found; could not generate {$cf} file!");
+				log_error("[squid] Template not found; could not generate '{$cf}' file!");
 			}
 
 			// c-icap.magic
@@ -325,7 +328,7 @@ EOF;
 			if (file_exists("{$cf}.pfsense")) {
 				copy("{$cf}.pfsense", "{$cf}");
 			} else {
-				log_error("Squid - template not found; could not generate {$cf} file!");
+				log_error("[squid] Template not found; could not generate '{$cf}' file!");
 			}
 
 			// freshclam.conf
@@ -351,7 +354,7 @@ EOF;
 				}
 				file_put_contents("{$cf}", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
 			} else {
-				log_error("Squid - template not found; could not generate {$cf} file!");
+				log_error("[squid] Template not found; could not generate '{$cf}' file!");
 			}
 
 			// clamd.conf
@@ -360,7 +363,7 @@ EOF;
 			if (file_exists("{$cf}.pfsense")) {
 				copy("{$cf}.pfsense", "{$cf}");
 			} else {
-				log_error("Squid - template not found; could not generate {$cf} file!");
+				log_error("[squid] Template not found; could not generate '{$cf}' file!");
 			}
 			unset($cf);
 		}
@@ -400,7 +403,7 @@ function squid_antivirus_install_config_files() {
 		$squidclamav_r[2] = "{$config['system']['webgui']['protocol']}://{$config['system']['hostname']}.{$config['system']['domain']}/squid_clwarn.php";
 		file_put_contents("{$cf}.pfsense", preg_replace($squidclamav_m, $squidclamav_r, $sample_file), LOCK_EX);
 	} else {
-		log_error("Squid - could not patch {$cf} template file!");
+		log_error("[squid] Could not patch '{$cf}' template file!");
 	}
 
 	// c-icap.conf
@@ -424,7 +427,7 @@ function squid_antivirus_install_config_files() {
 		$cicap_r[3] = "ServerLog /var/squid/logs/c-icap-server.log";
 		file_put_contents("{$cf}.pfsense", preg_replace($cicap_m, $cicap_r, $sample_file), LOCK_EX);
 	} else {
-		log_error("Squid - could not patch {$cf} template file!");
+		log_error("[squid] Could not patch '{$cf}' template file!");
 	}
 
 	// c-icap.magic
@@ -453,7 +456,7 @@ function squid_antivirus_install_config_files() {
 		$clamd_r[2] = "";
 		file_put_contents("{$cf}.pfsense", preg_replace($clamd_m, $clamd_r, $sample_file), LOCK_EX);
 	} else {
-		log_error("Squid - could not patch {$cf} template file!");
+		log_error("[squid] Could not patch '{$cf}' template file!");
 	}
 
 	// freshclam.conf
@@ -472,7 +475,7 @@ function squid_antivirus_install_config_files() {
 		$freshclam_r[2] = "";
 		file_put_contents("{$cf}.pfsense", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
 	} else {
-		log_error("Squid - could not patch {$cf} template file!");
+		log_error("[squid] - could not patch '{$cf}' template file!");
 	}
 	unset($cf);
 }
@@ -516,7 +519,7 @@ function squid_antivirus_get_raw_config() {
 			if (file_exists($conffile)) {
 				if ($config['installedpackages']['squidantivirus']['config'][0][$confopt] == "") {
 					$config['installedpackages']['squidantivirus']['config'][0][$confopt] =  base64_encode(str_replace("\r", "", file_get_contents("{$conffile}")));
-					log_error("Squid - Successfully loaded {$conffile} configuration file");
+					log_error("[squid] Successfully loaded '{$conffile}' configuration file");
 					$loaded = true;
 				}
 			// Just a fallback attempt if people do things in weird order on a completely fresh install perhaps; should not be ever needed
@@ -524,17 +527,17 @@ function squid_antivirus_get_raw_config() {
 				squid_antivirus_install_config_files();
 				if (file_exists($conffile)) {
 					$config['installedpackages']['squidantivirus']['config'][0][$confopt] =  base64_encode(str_replace("\r", "", file_get_contents("{$conffile}")));
-					log_error("Squid - Successfully loaded {$conffile} configuration file");
+					log_error("[squid] Successfully loaded '{$conffile}' configuration file");
 					$loaded = true;
 				} else {
-					log_error("Squid - '{$conffile}' template does not exist; could not load advanced {$rawfile} configuration!");
+					log_error("[squid] '{$conffile}' template does not exist; could not load advanced {$rawfile} configuration!");
 				}
 			}
 		}
 	}
 	if ($loaded) {
 		write_config("Squid - Loaded raw configuration files", false);
-		log_error("Squid - Successfully loaded raw configuration files");
+		log_error("[squid] Successfully loaded raw configuration files");
 	}
 }
 
@@ -547,10 +550,10 @@ function squid_antivirus_toggle_raw_config($state) {
 		foreach ($opts as $opt) {
 			if (isset($config['installedpackages']['squidantivirus']['config'][0][$opt])) {
 				unset($config['installedpackages']['squidantivirus']['config'][0][$opt]);
-				log_error("Squid - Loaded {$opt} raw configuration file...");
+				log_error("[squid] Loaded '{$opt}' raw configuration file...");
 			}
 		}
-		log_error("Squid - Loading raw configuration files...");
+		log_error("[squid] Loading raw configuration files...");
 		squid_antivirus_get_raw_config();
 	} else {
 		// manual configuration disabled
@@ -558,7 +561,7 @@ function squid_antivirus_toggle_raw_config($state) {
 		foreach ($opts as $opt) {
 			if (isset($config['installedpackages']['squidantivirus']['config'][0][$opt])) {
 				unset($config['installedpackages']['squidantivirus']['config'][0][$opt]);
-				log_error("Squid - Unloaded {$opt} raw configuration file...");
+				log_error("[squid] Unloaded '{$opt}' raw configuration.");
 			}
 		}
 		$config['installedpackages']['squidantivirus']['config'][0]['enable_advanced'] = "disabled";
@@ -606,7 +609,7 @@ function squid_antivirus_put_raw_config($rawfiles) {
 function squid_antivirus_write_conffile($dir, $file, $text) {
 	if ($file && $text) {
 		file_put_contents(SQUID_LOCALBASE . "/etc" . "{$dir}" . "/{$file}", preg_replace("/\r\n/", "\n", base64_decode($text)), LOCK_EX);
-		log_error("Squid - Saved {$file} configuration file.");
+		log_error("[squid] Saved '{$file}' configuration file.");
 	}
 }
 
@@ -682,13 +685,13 @@ function squid_restart_antivirus() {
 	if (squid_enabled() && ($antivirus_config['enable'] == "on")) {
 		// Check clamav database
 		if (count(glob("/var/db/clamav/*d")) == 0) {
-			log_error("Squid - Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam in background.");
+			log_error("[squid] Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam in background.");
 			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 		} elseif ($antivirus_config['clamav_safebrowsing'] == "on" && !is_file("/var/db/clamav/safebrowsing.cvd")) {
-			log_error("Squid - Google Safe Browsing is enabled but missing safebrowsing.cvd definitions. Running freshclam in background.");
+			log_error("[squid] Google Safe Browsing is enabled but missing safebrowsing.cvd definitions. Running freshclam in background.");
 			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 		} elseif ($antivirus_config['clamav_safebrowsing'] != "on" && is_file("/var/db/clamav/safebrowsing.cvd")) {
-			log_error("Squid - Google Safe Browsing is disabled. Removing safebrowsing.cvd definitions.");
+			log_error("[squid] Google Safe Browsing is disabled. Removing safebrowsing.cvd definitions.");
 			mwexec("/bin/rm -f /var/db/clamav/safebrowsing.cvd");
 		}
 
@@ -698,11 +701,11 @@ function squid_restart_antivirus() {
 			squid_write_clamd_rcfile();
 		}
 		if (is_process_running("clamd")) {
-			log_error("Reloading ClamAV...");
+			log_error("[squid] Reloading ClamAV...");
 			$reload_cmd = SQUID_BASE . "/bin/clamdscan --reload";
 			mwexec_bg("{$reload_cmd}");
 		} else {
-			log_error("Starting ClamAV...");
+			log_error("[squid] Starting ClamAV...");
 			mwexec_bg("{$clamd_rcfile} start");
 		}
 
@@ -718,20 +721,19 @@ function squid_restart_antivirus() {
 		}
 	} else {
 		// stop AV services and disable all C-ICAP/AV features
-		log_error("Squid antivirus features disabled.");
+		log_error("[squid] Antivirus features disabled.");
 		if (is_process_running("clamd")) {
-			log_error("Stopping and disabling ClamAV...");
+			log_error("[squid] Stopping and disabling ClamAV...");
 			mwexec("/usr/bin/killall clamd");
 		}
 		unlink_if_exists("/usr/local/etc/rc.d/clamd.sh");
 
 		// freshclam cronjob
-		log_error("Removing freshclam cronjob...");
 		squid_install_freshclam_cron(false);
 
 		// check c-icap rcfile
 		if (is_process_running("c-icap")) {
-			log_error("Stopping and disabling C-ICAP...");
+			log_error("[squid] Stopping and disabling C-ICAP...");
 			mwexec('/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl');
 		}
 		unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
