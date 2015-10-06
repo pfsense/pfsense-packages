@@ -26,10 +26,16 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-/* Squid javascript helpers for GUI fields status manipulation */
+/*
+ * Squid javascript helpers for GUI fields status manipulation
+ */
 require_once('globals.inc');
 require_once('config.inc');
 
+/*
+ * Enable/disable and blank out various parts of the Authentication tab
+ * depending on selected 'Authentication Method' value
+ */
 function squid_print_javascript_auth() {
 	global $config;
 	if (is_array($config['installedpackages']['squid'])) {
@@ -190,12 +196,16 @@ EOD;
 	print($javascript);
 }
 
+/* onchange toggle helper for squid_print_javascript_auth() function */
 function squid_print_javascript_auth2() {
 	print("<script type=\"text/javascript\">on_auth_method_changed()</script>\n");
 }
 
+/*
+ * Enable/disable and blank out various parts of the Antivirus tab
+ * depending on selected 'Enable Manual Configuration' value
+ */
 function squid_print_antivirus_advanced_config() {
-
 	$javascript = <<< EOD
 <script type="text/javascript">
 //<![CDATA[
@@ -204,25 +214,47 @@ function on_antivirus_advanced_config_changed() {
 	var enable_advanced = field.options[field.selectedIndex].value;
 
 	if (enable_advanced === 'disabled') {
-		document.iform['client_info'].disabled = 0;
+		document.iform['clamav_url'].disabled = 0;
 		document.iform['clamav_safebrowsing'].disabled = 0;
 		document.iform['clamav_update'].disabled = 0;
 		document.iform['clamav_dbregion'].disabled = 0;
 		document.iform['clamav_dbservers'].disabled = 0;
-		document.iform['squidclamav'].disabled = 1;
-		document.iform['c-icap_conf'].disabled = 1;
-		document.iform['c-icap_magic'].disabled = 1;
-		document.iform['freshclam_conf'].disabled = 1;
+		document.iform['clamav_dbservers'].disabled = 0;
+		document.iform['clamav_dbservers'].disabled = 0;
+		document.getElementById("load_advanced").disabled = 1;
+		document.iform['raw_squidclamav_conf'].disabled = 1;
+		document.iform['raw_squidclamav_conf'].value = '';
+		document.iform['raw_cicap_conf'].disabled = 1;
+		document.iform['raw_cicap_conf'].value = '';
+		document.iform['raw_cicap_magic'].disabled = 1;
+		document.iform['raw_cicap_magic'].value = '';
+		document.iform['raw_freshclam_conf'].disabled = 1;
+		document.iform['raw_freshclam_conf'].value = '';
+		document.iform['raw_clamd_conf'].disabled = 1;
+		document.iform['raw_clamd_conf'].value = '';
 	} else {
-		document.iform['client_info'].disabled = 1;
+		document.iform['clamav_url'].disabled = 1;
 		document.iform['clamav_safebrowsing'].disabled = 1;
+		document.getElementById('clamav_safebrowsing').checked = 0;
 		document.iform['clamav_update'].disabled = 1;
+		document.getElementById("clamav_update").value = '';
 		document.iform['clamav_dbregion'].disabled = 1;
+		document.getElementById("clamav_dbregion").value = '';
 		document.iform['clamav_dbservers'].disabled = 1;
-		document.iform['squidclamav'].disabled = 0;
-		document.iform['c-icap_conf'].disabled = 0;
-		document.iform['c-icap_magic'].disabled = 0;
-		document.iform['freshclam_conf'].disabled = 0;
+		document.iform['clamav_dbservers'].value = '';
+		document.getElementById("load_advanced").disabled = 0;
+		document.iform['raw_squidclamav_conf'].disabled = 0;
+		document.iform['raw_cicap_conf'].disabled = 0;
+		document.iform['raw_cicap_magic'].disabled = 0;
+		document.iform['raw_freshclam_conf'].disabled = 0;
+		document.iform['raw_clamd_conf'].disabled = 0;
+
+	}
+
+	if (document.getElementById("enable").checked == 0) {
+		document.getElementById("update_av").disabled = 1;
+	} else {
+		document.getElementById("update_av").disabled = 0;
 	}
 }
 //]]>
@@ -233,6 +265,7 @@ EOD;
 
 }
 
+/* onchange toggle helper for squid_print_antivirus_advanced_config() function */
 function squid_print_antivirus_advanced_config2() {
 	print("<script type=\"text/javascript\">on_antivirus_advanced_config_changed()</script>\n");
 }
