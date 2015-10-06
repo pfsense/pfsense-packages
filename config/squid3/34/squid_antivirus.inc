@@ -32,8 +32,11 @@ require_once('config.inc');
 /* This file is currently only being included in squid.inc and not used separately */
 // require_once('squid.inc');
 
+/*
+ * Utility functions
+ */
 
-/* Only needed for PBI/pfSense <2.3 */
+/* clamav user account hadling (only needed for PBI/pfSense <2.3) */
 function squid_check_clamav_user($user) {
 	if (SQUID_BASE == '/usr/local') {
 		return;
@@ -47,57 +50,7 @@ function squid_check_clamav_user($user) {
 	}
 }
 
-/* Create /usr/local/etc/rc.d/clamd.sh rcfile */
-function squid_write_clamd_rcfile() {
-	$squid_base = SQUID_BASE;
-	$rc = array();
-	$rc['file'] = 'clamd.sh';
-	$rc['start'] = <<< EOD
-
-if [ ! -f /var/db/clamav/main.cvd -a ! -f /var/db/clamav/main.cld ];then
-	echo "Missing /var/db/clamav/*.cvd or *.cld files.  You must run freshclam first"
-        exit 1
-fi
-
-{$squid_base}/bin/clamd --config-file="{$squid_base}/local/etc/clamd.conf"
-
-EOD;
-
-	$rc['stop'] = <<< EOD
-
-/usr/bin/killall clamd 2>/dev/null
-# Just to be sure...
-sleep 5
-if [ -n "`/bin/ps auxw | /usr/bin/grep "[c]lamd" | /usr/bin/awk '{print $2}'`" ]; then
-	/usr/bin/killall -9 clamd 2>/dev/null
-fi
-
-EOD;
-
-	conf_mount_rw();
-	write_rcfile($rc);
-	conf_mount_ro();
-}
-
-/* Create /usr/local/etc/rc.d/c-icap.sh rcfile */
-function squid_write_cicap_rcfile() {
-	$c_icap_rcfile = "c-icap.sh";
-	$cicap_libdir = SQUID_LOCALBASE . "/lib";
-	$cicap_bin = SQUID_LOCALBASE . "/bin/c-icap";
-	$cicap_conf = SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf";
-	$cicap_start_cmd = "LD_LIBRARY_PATH={$cicap_libdir} {$cicap_bin} -f {$cicap_conf}";
-	$cicap_stop_cmd = '/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl';
-	conf_mount_rw();
-	write_rcfile(array(
-		"file" => "{$c_icap_rcfile}",
-		"start" => "{$cicap_start_cmd}",
-		"stop" => "{$cicap_stop_cmd}"
-		)
-	);
-	conf_mount_ro();
-}
-
-/* ClamAV antivirus definitions updates via cron */
+/* Antivirus definitions updates via cron */
 function squid_install_freshclam_cron($should_install) {
 	global $config;
 
@@ -124,13 +77,139 @@ function squid_install_freshclam_cron($should_install) {
 	}
 }
 
-/* Manually update ClamAV virus definitions (via the GUI button) */
+/* Manually update ClamAV virus definitions via the GUI button */
 function squid_update_clamav() {
 	log_error("Updating ClamAV definitions now... This will take a while. Check /var/log/clamav/freshclam.log for progress information.");
 	mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 }
 
-/* Antivirus features configuration */
+/*
+ * Squid package install/uninstall
+ */
+
+/* Run on Squid package install */
+function squid_antivirus_install_command() {
+	// antivirus rc scripts
+	squid_write_cicap_rcfile();
+	squid_write_clamd_rcfile();
+
+	// antivirus config files
+	squid_antivirus_install_config_files();
+
+	// check squidclamav files until PBIs are gone (https://redmine.pfsense.org/issues/4197)
+	$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
+	foreach ($ln_icap as $ln) {
+		if (SQUID_LOCALBASE != '/usr/local' && !file_exists("/usr/local/{$ln}") && file_exists(SQUID_LOCALBASE . "/{$ln}")) {
+			symlink(SQUID_LOCALBASE . "/{$ln}", "/usr/local/{$ln}");
+		}
+	}
+	if (SQUID_LOCALBASE != '/usr/local' && !file_exists("/usr/local/lib/libicapapi.so.3") && file_exists(SQUID_LOCALBASE . "/lib/libicapapi.so.3.0.5")) {
+		symlink(SQUID_LOCALBASE . "/lib/libicapapi.so.3.0.5", "/usr/local/lib/libicapapi.so.3");
+	}
+
+	// check dirs
+	$dirs = array(
+		"/var/run/c-icap" => "clamav",
+		"/var/log/c-icap" => "clamav",
+		"/var/log/clamav" => "clamav",
+		"/var/run/clamav" => "clamav",
+		"/var/db/clamav" => "clamav"
+	);
+	foreach ($dirs as $dir_path => $dir_user) {
+		safe_mkdir($dir_path, 0755);
+		squid_chown_recursive($dir_path, $dir_user, "wheel");
+	}
+
+	// remove unwanted PBI rc scripts
+	unlink_if_exists("/usr/local/etc/rc.d/c-icap");
+	unlink_if_exists("/usr/local/etc/rc.d/clamav-clamd");
+	unlink_if_exists("/usr/local/etc/rc.d/clamav-freshclam");
+}
+
+/* Run on Squid package uninstall */
+function squid_antivirus_deinstall_command() {
+	/* kill all running services */
+	if (is_process_running("c-icap")) {
+		mwexec('/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl');
+	}
+	mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[f]reshclam' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+
+	/* remove cronjobs */
+	squid_install_freshclam_cron(false);
+
+	/* delete rc scripts */
+	unlink_if_exists('/usr/local/etc/rc.d/squid.sh');
+	unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
+	unlink_if_exists('/usr/local/etc/rc.d/clamd.sh');
+
+	/* clean up created PBI symlinks */
+	update_output_window("Finishing package cleanup.");
+	if (SQUID_LOCALBASE != '/usr/local') {
+		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
+		foreach ($ln_icap as $ln) {
+			if (is_link("/usr/local/{$ln}")) {
+				unlink("/usr/local/{$ln}");
+			}
+		}
+		if (is_link("/usr/local/lib/libicapapi.so.3")) {
+			unlink("/usr/local/lib/libicapapi.so.3");
+		}
+	}
+
+	/* clean up created directories if 'Keep Settings/Data' is disabled */
+	if (is_array($config['installedpackages']['squid'])) {
+		$squidsettings = $config['installedpackages']['squid']['config'][0];
+	} else {
+		$squidsettings = array();
+	}
+	$keep = ($squidsettings['keep_squid_data'] ? true : false);
+
+	if (!$keep) {
+		update_output_window("Removing antivirus definitions and logs ... One moment please...");
+		$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav");
+		foreach ($dirs as $dir) {
+			if (is_dir("{$dir}")) {
+				mwexec("/bin/rm -rf {$dir}");
+			}
+		}
+	}
+
+	/* check if clamav/c_icap is enabled in rc.conf.local */
+	// XXX: This hasn't been used since 0.3.7; to be removed in future
+	if (file_exists("/etc/rc.conf.local")) {
+		update_output_window("Removing antivirus services from /etc/rc.conf.local...");
+		$sample_file = file_get_contents("/etc/rc.conf.local");
+		$rcconf_local_m[0] = "@c_icap_enable(.*)\n@";
+		$rcconf_local_m[1] = "@clamav_clamd_enable(.*)\n@";
+		$rcconf_local_r[0] = "";
+		$rcconf_local_r[1] = "";
+		file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
+	}
+}
+
+/*
+ * Antivirus features configuration
+ *
+ * <file>.conf is the actual configuration file used for services.
+ * <file>.conf.pfsense is a template file patched for pfSense; should be never altered beyond initial install.
+ * <file>.conf.{sample,default} are templates distributed directly with PBI/package;
+ * If <file>.conf.default does not exist, a backup copy is made from another distributed files before patching it for pfSense.
+ *
+ * Configuration via the GUI options:
+ * <file>.conf is always (re)generated from the <file>.conf.pfsense on package resync,
+ * with additional patches depending on the GUI configuration options configured by user.
+ * Directly editing files via 'Advanced Features' is disabled in the GUI.
+ *
+ * Manual Configuration
+ * When the user enables 'Manual Configuration' for the first time, the config.xml settings are
+ * serialized from <file>.conf.pfsense template patched for pfSense. After this initial configuration,
+ * <file>.conf is always (re)generated from config.xml as long as 'Manual Configuration' is enabled in settings.
+ * In this case, any additional configuration made in the Antivirus GUI outside of 'Advanced Features'
+ * is unset on saving settings; after that, those options are disabled in the GUI and have no effect any more.
+ */
+
+/* Proxy Server: Antivirus configuration handler */
 function squid_resync_antivirus() {
 	global $config;
 
@@ -140,6 +219,7 @@ function squid_resync_antivirus() {
 		$antivirus_config = array();
 	}
 
+	// squid.conf antivirus integration
 	if (squid_enabled() && ($antivirus_config['enable'] == "on")) {
 		switch ($antivirus_config['client_info']) {
 			case "both":
@@ -179,137 +259,115 @@ EOF;
 
 		// check clamav user
 		squid_check_clamav_user('clamav');
-		// patch sample files to pfsense dirs
-		// squidclamav.conf
-		if (file_exists(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.default")) {
-			$sample_file = file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.default");
-			$clamav_m[0] = "@/var/run/clamav/clamd.ctl@";
-			$clamav_m[1] = "@http\://proxy.domain.dom/cgi-bin/clwarn.cgi@";
-			$clamav_r[0] = "/var/run/clamav/clamd.sock";
-			$clamav_r[1] = "{$config['system']['webgui']['protocol']}://{$config['system']['hostname']}.{$config['system']['domain']}/squid_clwarn.php";
-			if ($antivirus_config['clamav_safebrowsing'] == "on") {
-				$clamav_m[2] = "@safebrowsing\s0@";
-				$clamav_r[2] = "safebrowsing 1";
-			} else {
-				$clamav_m[2] = "@safebrowsing\s1@";
-				$clamav_r[2] = "safebrowsing 0";
-			}
-			file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.sample", preg_replace($clamav_m, $clamav_r, $sample_file), LOCK_EX);
-		}
-		// c-icap.conf
-		// make a backup of default c-icap.conf.sample first
-		// unlike with other config files, the file distributed in package is called c-icap.conf.sample, not c-icap.conf.default
-		if (!file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
-			copy(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample", SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default");
-		}
-		if (file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
-			$sample_file = file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default");
-			if (!preg_match("/squid_clamav/", $sample_file)) {
-				$sample_file .= "\nService squid_clamav squidclamav.so\n";
-			}
-			$cicap_m[0] = "@Manager:Apassword\S+@";
-			$cicap_r[0] = "";
-			// XXX: Bug #4615
-			if (is_array($config['installedpackages']['squid'])) {
-				$squidsettings = $config['installedpackages']['squid']['config'][0];
-			} else {
-				$squidsettings = array();
-			}
-			$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
-			$cicap_m[1] = "@DebugLevel\s1@";
-			$cicap_r[1] = "DebugLevel 0";
-			$cicap_m[2] = "@AccessLog /var/log/c-icap/access.log@";
-			$cicap_r[2] = "AccessLog $logdir/c-icap-access.log";
-			$cicap_m[3] = "@ServerLog /var/log/c-icap/server.log@";
-			$cicap_r[3] = "ServerLog $logdir/c-icap-server.log";
-			file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample", preg_replace($cicap_m, $cicap_r, $sample_file), LOCK_EX);
-		}
-		// freshclam.conf
-		// make a backup of default freshclam.conf.sample first
-		if (!file_exists(SQUID_LOCALBASE . "/etc/freshclam.conf.default")) {
-			copy(SQUID_LOCALBASE . "/etc/freshclam.conf.sample", SQUID_LOCALBASE . "/etc/freshclam.conf.default");
-		}
-		if (file_exists(SQUID_LOCALBASE . "/etc/freshclam.conf.default")) {
-			$sample_file = file_get_contents(SQUID_LOCALBASE . "/etc/freshclam.conf.default");
-			$freshclam_m[0] = "@#Example@";
-			$freshclam_r[0] = "";
-			$clamav_mirrors = "";
-			if ($antivirus_config['clamav_dbregion'] != "") {
-				$clamav_mirrors .= "DatabaseMirror db.{$antivirus_config['clamav_dbregion']}.clamav.net\n";
-			}
-			if ($antivirus_config['clamav_dbservers'] != "") {
-				foreach (explode(";", $antivirus_config['clamav_dbservers']) as $dbserver) {
-					$clamav_mirrors .= "DatabaseMirror {$dbserver}\n";
+
+		if ($antivirus_config['enable_advanced'] == "enabled") {
+			// User is managing raw configuration, so we unset the configuration options set via GUI
+			squid_antivirus_toggle_raw_config(true);
+			// Generate the raw configuration if missing
+			$rawopts = array("raw_squidclamav_conf", "raw_cicap_conf", "raw_cicap_magic", "raw_freshclam_conf", "raw_clamd_conf");
+			foreach ($rawopts as $rawopt) {
+				if ($antivirus_config[$rawopt] == "") {
+					squid_antivirus_get_raw_config();
 				}
 			}
-			if ($clamav_mirrors != "") {
-				$freshclam_m[1] = "@#DatabaseMirror db.XY.clamav.net@";
-				$freshclam_r[1] = "{$clamav_mirrors}";
-			}
-			if ($antivirus_config['clamav_safebrowsing'] == "on") {
-				$freshclam_m[2] = "@#SafeBrowsing yes@";
-				$freshclam_r[2] = "SafeBrowsing yes";
-			} else {
-				if (!preg_match("@#SafeBrowsing yes@", file_get_contents($sample_file))) {
-					$freshclam_m[2] = "@SafeBrowsing yes@";
-					$freshclam_r[2] = "#SafeBrowsing yes";
+			// Create configuration files
+			squid_antivirus_put_raw_config($config['installedpackages']['squidantivirus']['config'][0]);
+		} else {
+			// unset raw configuration options
+			squid_antivirus_toggle_raw_config(false);
+
+			// patch sample files to pfsense dirs
+			// squidclamav.conf
+			$cf = SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf";
+			if (file_exists("{$cf}.pfsense")) {
+				$sample_file = file_get_contents("{$cf}.pfsense");
+				if ($antivirus_config['clamav_safebrowsing'] == "on") {
+					$squidclamav_m[0] = "@safebrowsing\s0@";
+					$squidclamav_r[0] = "safebrowsing 1";
 				}
+				if ($antivirus_config['clamav_url'] != "") {
+					$squidclamav_m[1] = "@redirect http@";
+					$squidclamav_r[1] = "{$antivirus_config['clamav_url']}";
+				}
+				file_put_contents("{$cf}", preg_replace($squidclamav_m, $squidclamav_r, $sample_file), LOCK_EX);
+			} else {
+				log_error("Squid - template not found; could not generate {$cf} file!");
 			}
-			file_put_contents(SQUID_LOCALBASE . "/etc/freshclam.conf.sample", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
+
+			// c-icap.conf
+			$cf = SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf";
+			if (file_exists("{$cf}.pfsense")) {
+				$sample_file = file_get_contents("{$cf}.pfsense");
+				if (!preg_match("/squid_clamav/", $sample_file)) {
+					$sample_file .= "\nService squid_clamav squidclamav.so\n";
+				}
+				// XXX: Bug #4615
+				if (is_array($config['installedpackages']['squid'])) {
+					$squidsettings = $config['installedpackages']['squid']['config'][0];
+				} else {
+					$squidsettings = array();
+				}
+				$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
+				$cicap_m[0] = "@DebugLevel\s1@";
+				$cicap_r[0] = "DebugLevel 0";
+				$cicap_m[1] = "@AccessLog /var/squid/logs/c-icap-access.log@";
+				$cicap_r[1] = "AccessLog {$logdir}/c-icap-access.log";
+				$cicap_m[2] = "@ServerLog /var/squid/logs/c-icap-server.log@";
+				$cicap_r[2] = "ServerLog {$logdir}/c-icap-server.log";
+				file_put_contents("{$cf}", preg_replace($cicap_m, $cicap_r, $sample_file), LOCK_EX);
+			} else {
+				log_error("Squid - template not found; could not generate {$cf} file!");
+			}
+
+			// c-icap.magic
+			// just make a copy of pfSense template, nothing configurable via GUI options here
+			$cf = SQUID_LOCALBASE . "/etc/c-icap/c-icap.magic";
+			if (file_exists("{$cf}.pfsense")) {
+				copy("{$cf}.pfsense", "{$cf}");
+			} else {
+				log_error("Squid - template not found; could not generate {$cf} file!");
+			}
+
+			// freshclam.conf
+			$cf = SQUID_LOCALBASE . "/etc/freshclam.conf";
+			if (file_exists("{$cf}.pfsense")) {
+				$sample_file = file_get_contents("{$cf}.pfsense");
+				$clamav_mirrors = "";
+				if ($antivirus_config['clamav_dbregion'] != "") {
+					$clamav_mirrors .= "DatabaseMirror db.{$antivirus_config['clamav_dbregion']}.clamav.net\n";
+				}
+				if ($antivirus_config['clamav_dbservers'] != "") {
+					foreach (explode(";", $antivirus_config['clamav_dbservers']) as $dbserver) {
+						$clamav_mirrors .= "DatabaseMirror {$dbserver}\n";
+					}
+				}
+				if ($clamav_mirrors != "") {
+					$freshclam_m[0] = "@#DatabaseMirror db.XY.clamav.net@";
+					$freshclam_r[0] = "{$clamav_mirrors}";
+				}
+				if ($antivirus_config['clamav_safebrowsing'] == "on") {
+					$freshclam_m[1] = "@#SafeBrowsing yes@";
+					$freshclam_r[1] = "SafeBrowsing yes";
+				}
+				file_put_contents("{$cf}", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
+			} else {
+				log_error("Squid - template not found; could not generate {$cf} file!");
+			}
+
+			// clamd.conf
+			// just make a copy of pfSense template, nothing configurable via GUI options here
+			$cf = SQUID_LOCALBASE . "/etc/clamd.conf";
+			if (file_exists("{$cf}.pfsense")) {
+				copy("{$cf}.pfsense", "{$cf}");
+			} else {
+				log_error("Squid - template not found; could not generate {$cf} file!");
+			}
+			unset($cf);
 		}
+
 		// freshclam cronjob
 		squid_install_freshclam_cron(true);
 
-		// check squidclamav files until PBIs are gone (https://redmine.pfsense.org/issues/4197)
-		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
-		foreach ($ln_icap as $ln) {
-			if (SQUID_LOCALBASE != '/usr/local' && !file_exists("/usr/local/{$ln}") && file_exists(SQUID_LOCALBASE . "/{$ln}")) {
-				symlink(SQUID_LOCALBASE . "/{$ln}", "/usr/local/{$ln}");
-			}
-		}
-		if (SQUID_LOCALBASE != '/usr/local' && !file_exists("/usr/local/lib/libicapapi.so.3") && file_exists(SQUID_LOCALBASE . "/lib/libicapapi.so.3.0.5")) {
-			symlink(SQUID_LOCALBASE . "/lib/libicapapi.so.3.0.5", "/usr/local/lib/libicapapi.so.3");
-		}
-
-		$loadsample = 0;
-		if ($antivirus_config['squidclamav'] == "" && file_exists(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.sample")) {
-			$config['installedpackages']['squidantivirus']['config'][0]['squidclamav'] = base64_encode(str_replace("\r", "", file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf.sample")));
-			$loadsample++;
-		}
-		if ($antivirus_config['c-icap_conf'] == "" && file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample")) {
-			$config['installedpackages']['squidantivirus']['config'][0]['c-icap_conf'] = base64_encode(str_replace("\r", "", file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample")));
-			$loadsample++;
-		}
-		if ($antivirus_config['c-icap_magic'] == "" && file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.magic.sample")) {
-			$config['installedpackages']['squidantivirus']['config'][0]['c-icap_magic'] = base64_encode(str_replace("\r", "", file_get_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.magic.sample")));
-			$loadsample++;
-		}
-		if ($antivirus_config['freshclam_conf'] == "" && file_exists(SQUID_LOCALBASE . "/etc/freshclam.conf.sample")) {
-			$config['installedpackages']['squidantivirus']['config'][0]['freshclam_conf'] = base64_encode(str_replace("\r", "", file_get_contents(SQUID_LOCALBASE . "/etc/freshclam.conf.sample")));
-			$loadsample++;
-		}
-		if ($loadsample > 0) {
-			write_config();
-			$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];
-		}
-		// check dirs
-		$dirs = array(
-			"/var/run/c-icap" => "clamav",
-			"/var/log/c-icap" => "clamav",
-			"/var/log/clamav" => "clamav",
-			"/var/run/clamav" => "clamav",
-			"/var/db/clamav" => "clamav"
-		);
-		foreach ($dirs as $dir_path => $dir_user) {
-			safe_mkdir($dir_path, 0755);
-			squid_chown_recursive($dir_path, $dir_user, "wheel");
-		}
-
-		// write advanced clamav/icap config files
-		file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf", base64_decode($antivirus_config['squidclamav']), LOCK_EX);
-		file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf", base64_decode($antivirus_config['c-icap_conf']), LOCK_EX);
-		file_put_contents(SQUID_LOCALBASE . "/etc/c-icap/c-icap.magic", base64_decode($antivirus_config['c-icap_magic']), LOCK_EX);
-		file_put_contents(SQUID_LOCALBASE . "/etc/freshclam.conf", base64_decode($antivirus_config['freshclam_conf']), LOCK_EX);
 	}
 	// this will (re)start or stop/disable services as needed
 	// depending on whether Squid proxy and/or antivirus features are enabled
@@ -318,7 +376,295 @@ EOF;
 	return $conf;
 }
 
-/* Antivirus services handling */
+/* Patch paths and settings in configuration files template for pfSense-specific values on install */
+function squid_antivirus_install_config_files() {
+	global $config;
+	if (is_array($config['installedpackages']['squid'])) {
+		$squidsettings = $config['installedpackages']['squid']['config'][0];
+	} else {
+		$squidsettings = array();
+	}
+	// squidclamav.conf
+	// there is no squidclamav.conf.sample packaged, use squidclamav.conf if really needed
+	$cf = SQUID_LOCALBASE . "/etc/c-icap/squidclamav.conf";
+	if (!file_exists("{$cf}.default")) {
+		copy("{$cf}", "{$cf}.default");
+	}
+	if (file_exists("{$cf}.default")) {
+		$sample_file = file_get_contents("{$cf}.default");
+		$squidclamav_m[0] = "@# SquidClamav default configuration file@";
+		$squidclamav_r[0] = "#This file was automatically generated by pfSense";
+		$squidclamav_m[1] = "@/var/run/clamav/clamd.ctl@";
+		$squidclamav_r[1] = "/var/run/clamav/clamd.sock";
+		$squidclamav_m[2] = "@http\://proxy.domain.dom/cgi-bin/clwarn.cgi@";
+		$squidclamav_r[2] = "{$config['system']['webgui']['protocol']}://{$config['system']['hostname']}.{$config['system']['domain']}/squid_clwarn.php";
+		file_put_contents("{$cf}.pfsense", preg_replace($squidclamav_m, $squidclamav_r, $sample_file), LOCK_EX);
+	} else {
+		log_error("Squid - could not patch {$cf} template file!");
+	}
+
+	// c-icap.conf
+	// there is no c-icap.conf.sample packaged, use c-icap.conf if really needed
+	$cf = SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf";
+	if (!file_exists("{$cf}.default")) {
+		copy("{$cf}", "{$cf}.default");
+	}
+	if (file_exists("{$cf}.default")) {
+		$sample_file = file_get_contents("{$cf}.default");
+		if (!preg_match("/squid_clamav/", $sample_file)) {
+			$sample_file .= "\nService squid_clamav squidclamav.so\n";
+		}
+		$cicap_m[0] = "@# This file contains the default settings for c-icap@";
+		$cicap_r[0] = "#This file was automatically generated by pfSense";
+		$cicap_m[1] = "@DebugLevel\s1@";
+		$cicap_r[1] = "DebugLevel 0";
+		$cicap_m[2] = "@AccessLog /var/log/c-icap/access.log@";
+		$cicap_r[2] = "AccessLog /var/squid/logs/c-icap-access.log";
+		$cicap_m[3] = "@ServerLog /var/log/c-icap/server.log@";
+		$cicap_r[3] = "ServerLog /var/squid/logs/c-icap-server.log";
+		file_put_contents("{$cf}.pfsense", preg_replace($cicap_m, $cicap_r, $sample_file), LOCK_EX);
+	} else {
+		log_error("Squid - could not patch {$cf} template file!");
+	}
+
+	// c-icap.magic
+	// just make a backup and pfSense template copies of default c-icap.magic, we are not patching anything here
+	$cf = SQUID_LOCALBASE . "/etc/c-icap/c-icap.magic";
+	if (!file_exists("{$cf}.default")) {
+		copy("{$cf}.sample", "{$cf}.default");
+	}
+	if (!file_exists("{$cf}.pfsense")) {
+		copy("{$cf}.sample", "{$cf}.pfsense");
+	}
+
+	// clamd.conf
+	// make a backup of default clamd.conf.sample first
+	$cf = SQUID_LOCALBASE . "/etc/clamd.conf";
+	if (!file_exists("{$cf}.default")) {
+		copy("{$cf}.sample", "{$cf}.default");
+	}
+	if (file_exists("{$cf}.default")) {
+		$sample_file = file_get_contents("{$cf}.default");
+		$clamd_m[0] = "@## Example config file for the Clam AV daemon@";
+		$clamd_r[0] = "#This file was automatically generated by pfSense";
+		$clamd_m[1] = "@# Comment or remove the line below.@";
+		$clamd_r[1] = "";
+		$clamd_m[2] = "@#Example@";
+		$clamd_r[2] = "";
+		file_put_contents("{$cf}.pfsense", preg_replace($clamd_m, $clamd_r, $sample_file), LOCK_EX);
+	} else {
+		log_error("Squid - could not patch {$cf} template file!");
+	}
+
+	// freshclam.conf
+	// make a backup of default freshclam.conf.sample first
+	$cf = SQUID_LOCALBASE . "/etc/freshclam.conf";
+	if (!file_exists("{$cf}.default")) {
+		copy("{$cf}.sample", "{$cf}.default");
+	}
+	if (file_exists("{$cf}.default")) {
+		$sample_file = file_get_contents("{$cf}.default");
+		$freshclam_m[0] = "@## Example config file for freshclam@";
+		$freshclam_r[0] = "#This file was automatically generated by pfSense";
+		$freshclam_m[1] = "@# Comment or remove the line below.@";
+		$freshclam_r[1] = "";
+		$freshclam_m[2] = "@#Example@";
+		$freshclam_r[2] = "";
+		file_put_contents("{$cf}.pfsense", preg_replace($freshclam_m, $freshclam_r, $sample_file), LOCK_EX);
+	} else {
+		log_error("Squid - could not patch {$cf} template file!");
+	}
+	unset($cf);
+}
+
+/* Get the raw pfSense template files for manual configuration and serialize them to config.xml */
+function squid_antivirus_get_raw_config() {
+	global $config;
+	$loaded = false;
+	$rawfiles = array("squidclamav.conf", "c-icap.conf", "c-icap.magic", "freshclam.conf", "clamd.conf");
+
+	foreach ($rawfiles as $rawfile) {
+		switch ($rawfile) {
+			case 'squidclamav.conf':
+				$confdir = "/c-icap";
+				$confopt = "raw_squidclamav_conf";
+				break;
+			case 'c-icap.conf':
+				$confdir = "/c-icap";
+				$confopt = "raw_cicap_conf";
+				break;
+			case 'c-icap.magic':
+				$confdir = "/c-icap";
+				$confopt = "raw_cicap_magic";
+				break;
+			case 'freshclam.conf':
+				$confdir = "";
+				$confopt = "raw_freshclam_conf";
+				break;
+			case 'clamd.conf':
+				$confdir = "";
+				$confopt = "raw_clamd_conf";
+				break;
+			default:
+				$confdir = "";
+				$confopt = "";
+				break;
+		}
+		// get the config from the files if not set (yet) in config.xml
+		if ($confopt) {
+			$conffile = SQUID_LOCALBASE . "/etc" . "{$confdir}" . "/{$rawfile}.pfsense";
+			if (file_exists($conffile)) {
+				if ($config['installedpackages']['squidantivirus']['config'][0][$confopt] == "") {
+					$config['installedpackages']['squidantivirus']['config'][0][$confopt] =  base64_encode(str_replace("\r", "", file_get_contents("{$conffile}")));
+					log_error("Squid - Successfully loaded {$conffile} configuration file");
+					$loaded = true;
+				}
+			// Just a fallback attempt if people do things in weird order on a completely fresh install perhaps; should not be ever needed
+			} else {
+				squid_antivirus_install_config_files();
+				if (file_exists($conffile)) {
+					$config['installedpackages']['squidantivirus']['config'][0][$confopt] =  base64_encode(str_replace("\r", "", file_get_contents("{$conffile}")));
+					log_error("Squid - Successfully loaded {$conffile} configuration file");
+					$loaded = true;
+				} else {
+					log_error("Squid - '{$conffile}' template does not exist; could not load advanced {$rawfile} configuration!");
+				}
+			}
+		}
+	}
+	if ($loaded) {
+		write_config("Squid - Loaded raw configuration files", false);
+		log_error("Squid - Successfully loaded raw configuration files");
+	}
+}
+
+/* Toggle the raw config state */
+function squid_antivirus_toggle_raw_config($state) {
+	global $config;
+	if ($state) {
+		// manual configuration enabled
+		$opts = array("clamav_url", "clamav_safebrowsing", "clamav_update", "clamav_dbregion", "clamav_dbservers");
+		foreach ($opts as $opt) {
+			if (isset($config['installedpackages']['squidantivirus']['config'][0][$opt])) {
+				unset($config['installedpackages']['squidantivirus']['config'][0][$opt]);
+				log_error("Squid - Loaded {$opt} raw configuration file...");
+			}
+		}
+		log_error("Squid - Loading raw configuration files...");
+		squid_antivirus_get_raw_config();
+	} else {
+		// manual configuration disabled
+		$opts = array("raw_squidclamav_conf", "raw_cicap_conf", "raw_cicap_magic", "raw_freshclam_conf", "raw_clamd_conf");
+		foreach ($opts as $opt) {
+			if (isset($config['installedpackages']['squidantivirus']['config'][0][$opt])) {
+				unset($config['installedpackages']['squidantivirus']['config'][0][$opt]);
+				log_error("Squid - Unloaded {$opt} raw configuration file...");
+			}
+		}
+		$config['installedpackages']['squidantivirus']['config'][0]['enable_advanced'] = "disabled";
+	}
+}
+
+/* Write the raw config files to disk from config.xml configuration */
+function squid_antivirus_put_raw_config($rawfiles) {
+	if (is_array($rawfiles)) {
+		foreach ($rawfiles as $rawfile => $rawconfig) {
+			switch ($rawfile) {
+				case 'raw_squidclamav_conf':
+					$confdir = "/c-icap";
+					$conffile = "/squidclamav.conf";
+					break;
+				case 'raw_cicap_conf':
+					$confdir = "/c-icap";
+					$conffile = "/c-icap.conf";
+					break;
+				case 'raw_cicap_magic':
+					$confdir = "/c-icap";
+					$conffile = "/c-icap.magic";
+					break;
+				case 'raw_freshclam_conf':
+					$confdir = "";
+					$conffile = "freshclam.conf";
+					break;
+				case 'raw_clamd_conf':
+					$confdir = "";
+					$conffile = "clamd.conf";
+					break;
+				default:
+					$confdir = "";
+					$conffile = "";
+					break;
+			}
+			if ($conffile && $rawconfig) {
+				squid_antivirus_write_conffile($confdir, $conffile, $rawconfig);
+			}
+		}
+	}
+}
+
+/* Helper function for squid_antivirus_put_raw_config() */
+function squid_antivirus_write_conffile($dir, $file, $text) {
+	if ($file && $text) {
+		file_put_contents(SQUID_LOCALBASE . "/etc" . "{$dir}" . "/{$file}", base64_decode(preg_replace('/\r\n/', '\n', $text), LOCK_EX));
+		log_error("Squid - Saved {$file} configuration file.");
+	}
+}
+
+/*
+ * rc scripts and services
+ */
+
+/* Create clamd.sh rc script */
+function squid_write_clamd_rcfile() {
+	$squid_base = SQUID_BASE;
+	$rc = array();
+	$rc['file'] = 'clamd.sh';
+	$rc['start'] = <<< EOD
+
+if [ ! -f /var/db/clamav/main.cvd -a ! -f /var/db/clamav/main.cld ]; then
+	echo "Missing /var/db/clamav/*.cvd or *.cld files. You must run freshclam first"
+        exit 1
+fi
+
+{$squid_base}/bin/clamd --config-file="{$squid_base}/local/etc/clamd.conf"
+
+EOD;
+
+	$rc['stop'] = <<< EOD
+
+/usr/bin/killall clamd 2>/dev/null
+# Just to be sure...
+sleep 5
+if [ -n "`/bin/ps auxw | /usr/bin/grep "[c]lamd" | /usr/bin/awk '{print $2}'`" ]; then
+	/usr/bin/killall -9 clamd 2>/dev/null
+fi
+
+EOD;
+
+	conf_mount_rw();
+	write_rcfile($rc);
+	conf_mount_ro();
+}
+
+/* Create c-icap.sh rc script */
+function squid_write_cicap_rcfile() {
+	$c_icap_rcfile = "c-icap.sh";
+	$cicap_libdir = SQUID_LOCALBASE . "/lib";
+	$cicap_bin = SQUID_LOCALBASE . "/bin/c-icap";
+	$cicap_conf = SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf";
+	$cicap_start_cmd = "LD_LIBRARY_PATH={$cicap_libdir} {$cicap_bin} -f {$cicap_conf}";
+	$cicap_stop_cmd = '/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl';
+	conf_mount_rw();
+	write_rcfile(array(
+		"file" => "{$c_icap_rcfile}",
+		"start" => "{$cicap_start_cmd}",
+		"stop" => "{$cicap_stop_cmd}"
+		)
+	);
+	conf_mount_ro();
+}
+
+/* (Re)start antivirus services if AV features are enabled; otherwise stop and disable them */
 function squid_restart_antivirus() {
 	global $config;
 	if (is_array($config['installedpackages']['squidantivirus'])) {
@@ -392,31 +738,41 @@ function squid_restart_antivirus() {
 	}
 }
 
-/* Input validation */
+/*
+ * Input validation
+ */
+
+/* Proxy server: Antivirus input validation */
+/* Also handles manual AV updates and switching 'Manual Configuration' on/off */
 function squid_validate_antivirus($post, &$input_errors) {
 	global $config;
+	if (is_array($config['installedpackages']['squidantivirus'])) {
+		$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];
+	} else {
+		$antivirus_config = array();
+	}
 
 	/* Manual ClamAV database update */
-	if ($post['submit'] == 'Update AV') {
+	if ($post['update_av'] == 'Update AV') {
 		squid_update_clamav();
 		return;
 	}
 
-	if ($post['enable'] != "on") {
+	/* Load the raw config files if manual configuration is enabled */
+	if ($post['load_advanced'] == 'Load Advanced') {
+		$config['installedpackages']['squidantivirus']['config'][0]['enable_advanced'] = "enabled";
+		squid_antivirus_toggle_raw_config(true);
 		return;
 	}
 
-	if ($post['squidclamav'] && preg_match("/(\S+proxy.domain\S+)/", $post['squidclamav'], $a_match)) {
+	if ($post['raw_squidclamav_conf'] && preg_match("/(\S+proxy.domain\S+)/", $post['raw_squidclamav_conf'], $a_match)) {
 		$input_errors[] = "SquidClamav warnings redirect points to sample config domain ({$a_match[1]})";
 		$input_errors[] = "Change redirect info on 'squidclamav.conf' field to pfSense GUI or an external host.";
 	}
-	if ($post['c-icap_conf']) {
-		if (!preg_match("/squid_clamav/", $post['c-icap_conf'])) {
+	if ($post['raw_cicap_conf']) {
+		if (!preg_match("/squid_clamav/", $post['raw_cicap_conf'])) {
 			$input_errors[] = "c-icap Squidclamav service definition is not present.";
 			$input_errors[] = "Add 'Service squid_clamav squidclamav.so'(without quotes) to 'c-icap.conf' field in order to get it working.";
-		}
-		if (preg_match("/(Manager:Apassword\S+)/", $post['c-icap_conf'], $c_match)) {
-			$input_errors[] = "Remove ldap configuration'{$c_match[1]}' from 'c-icap.conf' field.";
 		}
 	}
 
@@ -426,6 +782,12 @@ function squid_validate_antivirus($post, &$input_errors) {
 			if (!empty($dbserver) && !is_ipaddr($dbserver) && !is_hostname($dbserver)) {
 				$input_errors[] = "'Optional ClamAV Database Update Servers' entry '$dbserver' is not a valid IP address or hostname.";
 			}
+		}
+	}
+
+	if ($post['clamav_url']) {
+		if (!filter_var($post['clamav_url'], FILTER_VALIDATE_URL)) {
+			$input_errors[] = "'Redirect URL' is not a valid URL.";
 		}
 	}
 }
