@@ -218,7 +218,13 @@ function squid_check_ca_hashes() {
 function squid_dash_z($cache_action = 'none') {
 	global $config;
 
-	// We need cache created on package install
+	// We need cache configured after initial package install
+	if (!is_array($config['installedpackages']['squidcache']['config'])) {
+		log_error("Squid - 'Local Cache' not configured, disk cache will be disabled.");
+		log_error("Squid - Please, configure and save 'Local Cache' settings before enabling Squid proxy.");
+		return;
+	}
+
 	if (is_array($config['installedpackages']['squidcache'])) {
 		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
 	} else {
@@ -294,9 +300,9 @@ function squid_create_cachedir() {
 
 	if (!is_dir($cachedir . '/00')) {
 		log_error("Creating Squid cache subdirs in $cachedir");
+		mwexec(SQUID_BASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
 		// Double check permissions here, should be safe to recurse cache dir if it's small here.
 		squid_chown_recursive($cachedir, SQUID_UID, SQUID_GID);
-		mwexec(SQUID_BASE. "/sbin/squid -z -f " . SQUID_CONFFILE);
 	}
 
 	if (file_exists("/var/squid/cache/swap.state")) {
@@ -453,6 +459,168 @@ function squid_install_command() {
 
 	update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
 	update_output_window("Checking if there is configuration to migrate... One moment please...");
+
+	/* Set storage system for nanobsd */
+	if (!is_array($config['installedpackages']['squidcache'])) {
+		$config['installedpackages']['squidcache'] = array();
+	}
+	if ($g['platform'] == "nanobsd") {
+		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
+	}
+
+	// migrate configuration from old versions
+	squid_upgrade_config();
+
+	/* make sure pinger is executable and suid root */
+	// XXX: Bug #5114
+	if (file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger")) {
+		chgrp(SQUID_LOCALBASE . "/libexec/squid/pinger", SQUID_GID);
+	}
+
+	// another PBI hack
+	if (SQUID_BASE != '/usr/local' && file_exists('/usr/local/bin/check_ip.php') && !file_exists(SQUID_BASE . '/bin/check_ip.php')) {
+		symlink("/usr/local/bin/check_ip.php", SQUID_BASE . "/bin/check_ip.php");
+	}
+
+	// create squid rcfile
+	squid_write_rcfile();
+
+	// create squid monitor rcfile
+	write_rcfile(array(
+		"file" => "sqp_monitor.sh",
+		"start" => "/usr/local/pkg/sqpmon.sh &",
+		"stop" => "/bin/ps awux | /usr/bin/grep \"sqpmon\" | /usr/bin/grep -v \"grep\" | /usr/bin/grep -v \"php\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill")
+	);
+
+	// antivirus intergration
+	squid_antivirus_install_command();
+
+	foreach (array(SQUID_CONFBASE, SQUID_ACLDIR, SQUID_SSL_DB) as $dir) {
+		safe_mkdir($dir, 0755);
+		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
+	}
+
+	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default')) {
+		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
+	}
+
+	// remove unwanted PBI rc script
+	unlink_if_exists("/usr/local/etc/rc.d/squid");
+
+}
+
+function squid_deinstall_command() {
+	global $config, $g, $keep;
+
+	/* remove cronjobs */
+	squid_install_cron(false);
+
+	/* kill all running services */
+	update_output_window("Stopping and removing services...");
+	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
+	mwexec("/bin/ps awux | /usr/bin/grep '[s]quid' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[d]nsserver' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[u]nlinkd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+
+	/* delete rc scripts */
+	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
+
+	/* clean up created directories if 'Keep Settings/Data' is disabled */
+	if (is_array($config['installedpackages']['squidcache'])) {
+		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
+	} else {
+		$cachesettings = array();
+	}
+	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
+	if (is_array($config['installedpackages']['squid'])) {
+		$squidsettings = $config['installedpackages']['squid']['config'][0];
+	} else {
+		$squidsettings = array();
+	}
+	$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
+	$keep = ($squidsettings['keep_squid_data'] ? true : false);
+
+	if (!$keep) {
+		update_output_window("Removing cache and logs ... One moment please...");
+		update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
+		if (is_dir("{$cachedir}")) {
+			if (substr($cachedir, 0, 11) === "/var/squid/") {
+				mwexec_bg("/bin/rm -rf {$cachedir}");
+			} else {
+				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
+			}
+		}
+		if (is_dir("{$logdir}")) {
+			if (substr($logdir, 0, 11) === "/var/squid/") {
+				mwexec("/bin/rm -rf {$logdir}");
+			} else {
+				log_error("Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
+			}
+		}
+		update_output_window("Removing remaining Squid directories ... One moment please...");
+		$dirs = array("/var/run/squid", "/var/squid");
+		foreach ($dirs as $dir) {
+			if (is_dir("{$dir}")) {
+				mwexec("/bin/rm -rf {$dir}");
+			}
+		}
+	}
+
+	// remove antivirus integration features
+	squid_antivirus_deinstall_command();
+
+	update_output_window("Reloading filter...");
+	filter_configure();
+
+	/* Remove package settings from config if 'Keep Settings/Data' is disabled */
+	if (!$keep) {
+		log_error("Removing all Squid settings since 'Keep Settings/Data' is disabled...");
+		if (is_array($config['installedpackages']['squid'])) {
+			unset($config['installedpackages']['squid']);
+		}
+		if (is_array($config['installedpackages']['squidantivirus'])) {
+			unset($config['installedpackages']['squidantivirus']);
+		}
+		if (is_array($config['installedpackages']['squidauth'])) {
+			unset($config['installedpackages']['squidauth']);
+		}
+		if (is_array($config['installedpackages']['squidcache'])) {
+			unset($config['installedpackages']['squidcache']);
+		}
+		if (is_array($config['installedpackages']['squidnac'])) {
+			unset($config['installedpackages']['squidnac']);
+		}
+		if (is_array($config['installedpackages']['squidreverse'])) {
+			unset($config['installedpackages']['squidreverse']);
+		}
+		if (is_array($config['installedpackages']['squidreversegeneral'])) {
+			unset($config['installedpackages']['squidreversegeneral']);
+		}
+		if (is_array($config['installedpackages']['squidreversepeer'])) {
+			unset($config['installedpackages']['squidreversepeer']);
+		}
+		if (is_array($config['installedpackages']['squidreverseredir'])) {
+			unset($config['installedpackages']['squidreverseredir']);
+		}
+		if (is_array($config['installedpackages']['squidsync'])) {
+			unset($config['installedpackages']['squidsync']);
+		}
+		if (is_array($config['installedpackages']['squidtraffic'])) {
+			unset($config['installedpackages']['squidtraffic']);
+		}
+		if (is_array($config['installedpackages']['squidremote'])) {
+			unset($config['installedpackages']['squidremote']);
+		}
+		if (is_array($config['installedpackages']['squidusers'])) {
+			unset($config['installedpackages']['squidusers']);
+		}
+	}
+	update_output_window("Squid3 has been uninstalled.");
+}
+
+/* Migrate configuration from god knows which Squid package versions */
+/* None of these ever existed with Squid 3.4 package and this cruft should be most likely just removed */
+function squid_upgrade_config() {
 	/* migrate existing csv config fields */
 	if (is_array($config['installedpackages']['squidauth']['config'])) {
 		$settingsauth = $config['installedpackages']['squidauth']['config'][0];
@@ -465,15 +633,6 @@ function squid_install_command() {
 	}
 	if (is_array($config['installedpackages']['squid']['config'])) {
 		$settingsgen = $config['installedpackages']['squid']['config'][0];
-	}
-
-	if (SQUID_BASE != '/usr/local' && file_exists('/usr/local/bin/check_ip.php') && !file_exists(SQUID_BASE . '/bin/check_ip.php')) {
-		symlink("/usr/local/bin/check_ip.php", SQUID_BASE . "/bin/check_ip.php");
-	}
-
-	/* Set storage system */
-	if ($g['platform'] == "nanobsd") {
-		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
 	}
 
 	/* migrate auth settings */
@@ -586,196 +745,8 @@ function squid_install_command() {
 
 	update_output_window("Writing configuration... One moment please...");
 	write_config();
-
-	/* make sure pinger is executable and suid root */
-	// XXX: Bug #5114
-	if (file_exists(SQUID_LOCALBASE . "/libexec/squid/pinger")) {
-		chgrp(SQUID_LOCALBASE . "/libexec/squid/pinger", SQUID_GID);
-	}
-
-	// create squid rcfile
-	squid_write_rcfile();
-
-	// XXX: Is it really necessary? mode is set to 0755 in squid.xml
-	if (file_exists("/usr/local/pkg/swapstate_check.php")) {
-		@chmod("/usr/local/pkg/swapstate_check.php", 0755);
-	}
-
-	// create squid monitor rcfile
-	write_rcfile(array(
-		"file" => "sqp_monitor.sh",
-		"start" => "/usr/local/pkg/sqpmon.sh &",
-		"stop" => "/bin/ps awux | /usr/bin/grep \"sqpmon\" | /usr/bin/grep -v \"grep\" | /usr/bin/grep -v \"php\" | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill")
-	);
-
-	// create c-icap rcfile
-	squid_write_cicap_rcfile();
-
-	// make a backup of default c-icap config file on install; also see squid_resync_antivirus() function below
-	if (!file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default")) {
-		if (file_exists(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample")) {
-			copy(SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.sample", SQUID_LOCALBASE . "/etc/c-icap/c-icap.conf.default");
-		}
-	}
-
-	// create clamd rcfile
-	squid_write_clamd_rcfile();
-
-	foreach (array(SQUID_CONFBASE, SQUID_ACLDIR, SQUID_SSL_DB) as $dir) {
-		safe_mkdir($dir, 0755);
-		squid_chown_recursive($dir, SQUID_UID, SQUID_GID);
-	}
-
-	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default')) {
-		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
-	}
-
-	// remove unwanted PBI rcfiles
-	unlink_if_exists("/usr/local/etc/rc.d/squid");
-	unlink_if_exists("/usr/local/etc/rc.d/c-icap");
-	unlink_if_exists("/usr/local/etc/rc.d/clamav-clamd");
-	unlink_if_exists("/usr/local/etc/rc.d/clamav-freshclam");
-
 }
 
-function squid_deinstall_command() {
-	global $config, $g, $keep;
-
-	/* remove cronjobs */
-	squid_install_cron(false);
-	squid_install_freshclam_cron(false);
-
-	/* kill all running services */
-	update_output_window("Stopping and removing services...");
-	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
-	if (is_process_running("c-icap")) {
-		mwexec('/bin/echo -n "stop" > /var/run/c-icap/c-icap.ctl');
-	}
-	mwexec("/bin/ps awux | /usr/bin/grep '[c]lamd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-	mwexec("/bin/ps awux | /usr/bin/grep '[f]reshclam' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-	mwexec("/bin/ps awux | /usr/bin/grep '[s]quid' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-	mwexec("/bin/ps awux | /usr/bin/grep '[d]nsserver' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-	mwexec("/bin/ps awux | /usr/bin/grep '[u]nlinkd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
-	/* delete rc scripts */
-	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
-	unlink_if_exists('/usr/local/etc/rc.d/squid.sh');
-	unlink_if_exists("/usr/local/etc/rc.d/c-icap.sh");
-	unlink_if_exists('/usr/local/etc/rc.d/clamd.sh');
-
-	/* clean up created directories if 'Keep Settings/Data' is disabled */
-	if (is_array($config['installedpackages']['squidcache'])) {
-		$cachesettings = $config['installedpackages']['squidcache']['config'][0];
-	} else {
-		$cachesettings = array();
-	}
-	$cachedir = ($cachesettings['harddisk_cache_location'] ? $cachesettings['harddisk_cache_location'] : '/var/squid/cache');
-	if (is_array($config['installedpackages']['squid'])) {
-		$squidsettings = $config['installedpackages']['squid']['config'][0];
-	} else {
-		$squidsettings = array();
-	}
-	$logdir = ($squidsettings['log_dir'] ? $squidsettings['log_dir'] : '/var/squid/logs');
-	$keep = ($squidsettings['keep_squid_data'] ? true : false);
-
-	if (!$keep) {
-		update_output_window("Removing cache and logs ... One moment please...");
-		update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
-		if (is_dir("{$cachedir}")) {
-			if (substr($cachedir, 0, 11) === "/var/squid/") {
-				mwexec_bg("/bin/rm -rf {$cachedir}");
-			} else {
-				log_error("Will NOT delete Squid cache dir '{$cachedir}' since it is not located under /var/squid. Delete manually if required.");
-			}
-		}
-		if (is_dir("{$logdir}")) {
-			if (substr($logdir, 0, 11) === "/var/squid/") {
-				mwexec("/bin/rm -rf {$logdir}");
-			} else {
-				log_error("Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
-			}
-		}
-
-		$dirs = array("/var/run/c-icap", "/var/log/c-icap", "/var/log/clamav", "/var/run/clamav", "/var/db/clamav", "/var/run/squid", "/var/squid");
-		foreach ($dirs as $dir) {
-			if (is_dir("{$dir}")) {
-				mwexec("/bin/rm -rf {$dir}");
-			}
-		}
-	}
-
-	/* clean up created PBI symlinks */
-	update_output_window("Finishing package cleanup.");
-	if (SQUID_LOCALBASE != '/usr/local') {
-		$ln_icap = array('bin/c-icap', 'bin/c-icap-client', 'c-icap-config', 'c-icap-libicapapi-config', 'c-icap-stretch', 'lib/c_icap', 'share/c_icap', 'etc/c-icap');
-		foreach ($ln_icap as $ln) {
-			if (is_link("/usr/local/{$ln}")) {
-				unlink("/usr/local/{$ln}");
-			}
-		}
-		if (is_link("/usr/local/lib/libicapapi.so.3")) {
-			unlink("/usr/local/lib/libicapapi.so.3");
-		}
-	}
-
-	/* check if clamav/c_icap is enabled in rc.conf.local */
-	if (file_exists("/etc/rc.conf.local")) {
-		update_output_window("Removing antivirus services from /etc/rc.conf.local...");
-		$sample_file = file_get_contents("/etc/rc.conf.local");
-		$rcconf_local_m[0] = "@c_icap_enable(.*)\n@";
-		$rcconf_local_m[1] = "@clamav_clamd_enable(.*)\n@";
-		$rcconf_local_r[0] = "";
-		$rcconf_local_r[1] = "";
-		file_put_contents("/etc/rc.conf.local", preg_replace($rcconf_local_m, $rcconf_local_r, $sample_file), LOCK_EX);
-	}
-
-	update_output_window("Reloading filter...");
-	filter_configure();
-
-	/* Remove package settings from config if 'Keep Settings/Data' is disabled */
-	if (!$keep) {
-		log_error("Removing all Squid settings since 'Keep Settings/Data' is disabled...");
-		if (is_array($config['installedpackages']['squid'])) {
-			unset($config['installedpackages']['squid']);
-		}
-		if (is_array($config['installedpackages']['squidantivirus'])) {
-			unset($config['installedpackages']['squidantivirus']);
-		}
-		if (is_array($config['installedpackages']['squidauth'])) {
-			unset($config['installedpackages']['squidauth']);
-		}
-		if (is_array($config['installedpackages']['squidcache'])) {
-			unset($config['installedpackages']['squidcache']);
-		}
-		if (is_array($config['installedpackages']['squidnac'])) {
-			unset($config['installedpackages']['squidnac']);
-		}
-		if (is_array($config['installedpackages']['squidreverse'])) {
-			unset($config['installedpackages']['squidreverse']);
-		}
-		if (is_array($config['installedpackages']['squidreversegeneral'])) {
-			unset($config['installedpackages']['squidreversegeneral']);
-		}
-		if (is_array($config['installedpackages']['squidreversepeer'])) {
-			unset($config['installedpackages']['squidreversepeer']);
-		}
-		if (is_array($config['installedpackages']['squidreverseredir'])) {
-			unset($config['installedpackages']['squidreverseredir']);
-		}
-		if (is_array($config['installedpackages']['squidsync'])) {
-			unset($config['installedpackages']['squidsync']);
-		}
-		if (is_array($config['installedpackages']['squidtraffic'])) {
-			unset($config['installedpackages']['squidtraffic']);
-		}
-		if (is_array($config['installedpackages']['squidremote'])) {
-			unset($config['installedpackages']['squidremote']);
-		}
-		if (is_array($config['installedpackages']['squidusers'])) {
-			unset($config['installedpackages']['squidusers']);
-		}
-	}
-	update_output_window("Squid3 has been uninstalled.");
-}
 
 /*
  * Squid input validation
@@ -789,6 +760,11 @@ function squid_validate_general($post, &$input_errors) {
 		$settings = $config['installedpackages']['squid']['config'][0];
 	} else {
 		$settings = array();
+	}
+
+	// force users to configure cache
+	if (!is_array($config['installedpackages']['squidcache']['config'])) {
+		$input_errors[] = 'Please, configure and save \'Local Cache\' settings first.';
 	}
 
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
@@ -1333,8 +1309,11 @@ function squid_resync_cache() {
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
 	$conf = '';
 	if (!isset($settings['harddisk_cache_system'])) {
-		if ($g['platform'] == "nanobsd" || !is_array ($config['installedpackages']['squidcache']['config'])) {
+		if ($g['platform'] == "nanobsd") {
 			$disk_cache_system = 'null';
+		} elseif (!is_array($config['installedpackages']['squidcache']['config'])) {
+			log_error("Squid - 'Local Cache' not configured, disk cache will be disabled.");
+			log_error("Squid - Please, configure and save 'Local Cache' settings before enabling Squid proxy.");
 		} else {
 			$disk_cache_system = 'ufs';
 		}
