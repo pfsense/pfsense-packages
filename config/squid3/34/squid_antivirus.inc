@@ -50,6 +50,21 @@ function squid_check_clamav_user($user) {
 	}
 }
 
+/* check and fix ClamAV/C-ICAP antivirus dirs and permissions if needed */
+function squid_check_antivirus_dirs() {
+	$dirs = array(
+		"/var/run/c-icap" => "clamav",
+		"/var/log/c-icap" => "clamav",
+		"/var/log/clamav" => "clamav",
+		"/var/run/clamav" => "clamav",
+		"/var/db/clamav" => "clamav"
+	);
+	foreach ($dirs as $dir_path => $dir_user) {
+		safe_mkdir($dir_path, 0755);
+		squid_chown_recursive($dir_path, $dir_user, "wheel");
+	}
+}
+
 /* Antivirus definitions updates via cron */
 function squid_install_freshclam_cron($should_install) {
 	global $config;
@@ -82,6 +97,7 @@ function squid_install_freshclam_cron($should_install) {
 
 /* Manually update ClamAV virus definitions via the GUI button */
 function squid_update_clamav() {
+	squid_check_antivirus_dirs();
 	log_error("[squid] Updating ClamAV definitions now... This will take a while. Check /var/log/clamav/freshclam.log for progress information.");
 	mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 }
@@ -111,17 +127,7 @@ function squid_antivirus_install_command() {
 	}
 
 	// check dirs
-	$dirs = array(
-		"/var/run/c-icap" => "clamav",
-		"/var/log/c-icap" => "clamav",
-		"/var/log/clamav" => "clamav",
-		"/var/run/clamav" => "clamav",
-		"/var/db/clamav" => "clamav"
-	);
-	foreach ($dirs as $dir_path => $dir_user) {
-		safe_mkdir($dir_path, 0755);
-		squid_chown_recursive($dir_path, $dir_user, "wheel");
-	}
+	squid_check_antivirus_dirs();
 
 	// remove unwanted PBI rc scripts
 	unlink_if_exists("/usr/local/etc/rc.d/c-icap");
@@ -260,8 +266,9 @@ adaptation_access service_avi_resp allow all
 
 EOF;
 
-		// check clamav user
+		// check clamav user and dirs
 		squid_check_clamav_user('clamav');
+		squid_check_antivirus_dirs();
 
 		if ($antivirus_config['enable_advanced'] == "enabled") {
 			// User is managing raw configuration, so we unset the configuration options set via GUI
@@ -686,10 +693,10 @@ function squid_restart_antivirus() {
 		// Check clamav database
 		if (count(glob("/var/db/clamav/*d")) == 0) {
 			log_error("[squid] Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam in background.");
-			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
+			squid_update_clamav();
 		} elseif ($antivirus_config['clamav_safebrowsing'] == "on" && !is_file("/var/db/clamav/safebrowsing.cvd")) {
 			log_error("[squid] Google Safe Browsing is enabled but missing safebrowsing.cvd definitions. Running freshclam in background.");
-			mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
+			squid_update_clamav();
 		} elseif ($antivirus_config['clamav_safebrowsing'] != "on" && is_file("/var/db/clamav/safebrowsing.cvd")) {
 			log_error("[squid] Google Safe Browsing is disabled. Removing safebrowsing.cvd definitions.");
 			mwexec("/bin/rm -f /var/db/clamav/safebrowsing.cvd");
