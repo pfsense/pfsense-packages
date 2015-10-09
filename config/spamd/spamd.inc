@@ -41,8 +41,9 @@ function sync_package_spamd() {
 		$localpath = "/usr/pbi/spamd-$ARCH/local";
 	}
 
+	// write config file
 	conf_mount_rw();
-	$fd = fopen("/etc/spamd.conf","w");
+	$fd = fopen("/etc/spamd.conf", "w");
 	/* all header */
 	fwrite($fd, "all:\\\n\t:whitelist:blacklist");
 	if ($config['installedpackages']['spamdsources']['config']) {
@@ -92,6 +93,22 @@ function sync_package_spamd() {
 		}
 	}
 	fclose($fd);
+
+	/* if the package is disabled, remove the cronjob, rcfile and do nothing else here ... */
+	if (!spamd_enabled()) {
+		log_error("[spamd] Removing cron job");
+		install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup", false);
+		if (is_service_running("spamd")) {
+			log_error("[spamd] Stopping and disabling SpamD service");
+			stop_service("spamd");
+		}
+		unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
+		log_error("[spamd] Reconfiguring filter");
+		filter_configure();
+		log_error("[spamd] Package successfully disabled.");
+		return;
+	}
+	/* ... otherwise, create the rcfile and (re)start spamd */
 	$passtime = "5";
 	$greyexp = "4";
 	$whiteexp = "864";
@@ -115,6 +132,7 @@ function sync_package_spamd() {
 			// Default is greylisting, turn on blacklisting if not checked.
 			if ($ss['greylisting'] != "on") {
 				$greylisting = " -b";
+				$spamd_setup_opts = "-b";
 			}
 			if ($ss['maxblack'] != "") {
 				$maxblack = " -B " . $ss['maxblack'];
@@ -143,36 +161,69 @@ function sync_package_spamd() {
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
-	$start = "if [ `/sbin/mount | /usr/bin/grep -v grep | /usr/bin/grep fdescfs | /usr/bin/wc -l` -lt 1 ]; then \n" .
-		 "/sbin/mount -t fdescfs fdescfs /dev/fd\n" .
-		 "fi\n" .
-	     "/usr/local/sbin/spamd-setup -d &\n" .
-		 "/sbin/pflogd &\n" .
-		 "$localpath/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &\n" .
-		 "$localpath/libexec/spamlogd\n";
-	$stop  = "/usr/bin/killall spamd-setup\n" .
-		 "/usr/bin/killall spamlogd\n" .
-		 "/usr/bin/killall spamd\n" .
-		 "/usr/bin/killall pflogd\n" .
-		 "sleep 3";
+	$rc = array();
+	$rc['file'] = "spamd.sh";
+	$rc['start'] = <<< EOF
+
+if [ `/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l` -lt 1 ]; then
+	/sbin/mount -t fdescfs fdescfs /dev/fd
+fi
+if [ ! -f "/var/db/spamd" ]; then
+	/usr/bin/touch /var/db/spamd
+fi
+/usr/sbin/chown _spamd:proxy /var/db/spamd
+/usr/local/sbin/spamd-setup -d -D {$spamd_setup_opts}
+{$localpath}/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &
+{$localpath}/libexec/spamlogd
+EOF;
+
+	$rc['stop']  = <<< EOF
+
+/usr/bin/killall spamd-setup 2>/dev/null
+/usr/bin/killall spamlogd 2>/dev/null
+/usr/bin/killall spamd 2>/dev/null
+sleep 3
+if [ `/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l` -gt 0 ]; then
+	/sbin/umount /dev/fd
+fi
+EOF;
+
 	log_error("[spamd] Writing rc_file");
-	write_rcfile(array(
-				"file" => "spamd.sh",
-				"start" => $start,
-				"stop" =>  $stop
-			    )
-	);
+	write_rcfile($rc);
+
 	log_error("[spamd] Installing cron job");
-	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup", true, "*/120");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup -d -D {$spamd_setup_opts}", true, "*/120");
 	log_error("[spamd] Setting up spamd.conf symlink");
-	unlink_if_exists("$localpath/etc/spamd/spamd.conf");
-	symlink("/etc/spamd.conf", "$localpath/etc/spamd/spamd.conf");
+	unlink_if_exists("{$localpath}/etc/spamd/spamd.conf");
+	symlink("/etc/spamd.conf", "{$localpath}/etc/spamd/spamd.conf");
 	conf_mount_ro();
-	log_error("[spamd] Restarting spamd");
-	restart_service("spamd");
+
+	log_error("[spamd] (Re)starting spamd");
+	if (is_service_running("spamd")) {
+		restart_service("spamd");
+	} else {
+		start_service("spamd");
+	}
+
 	log_error("[spamd] Reconfiguring filter");
 	filter_configure();
 	log_error("[spamd] Package setup completed");
+}
+
+function spamd_enabled() {
+	global $config, $spamd_enabled;
+	$spamd_enabled = false;
+
+	if (is_array($config['installedpackages']['spamdsettings'])) {
+		$spamdsettings = $config['installedpackages']['spamdsettings']['config'][0];
+	} else {
+		$spamdsettings = array();
+	}
+	if ($spamdsettings['spamd_enable'] == "on") {
+		$spamd_enabled = true;
+	}
+
+	return $spamd_enabled;
 }
 
 function sync_package_spamd_whitelist() {
@@ -194,6 +245,11 @@ function sync_package_spamd_whitelist() {
 
 function spamd_generate_rules($type) {
 	global $config;
+
+	// do not install any rules if disabled
+	if (!spamd_enabled()) {
+		return;
+	}
 
 	$natrules = "";
 	switch($type) {
@@ -247,7 +303,7 @@ function sync_spamd_config_to_backup() {
 	global $config;
 	if (is_array($config['installedpackages']['carpsettings']['config'])) {
 		foreach ($config['installedpackages']['carpsettings']['config'] as $carp) {
-			if ($carp['synchronizetoip'] != "" ) {
+			if ($carp['synchronizetoip'] != "") {
 				$synctoip = $carp['synchronizetoip'];
 				$password = $carp['password'];
 				if ($config['system']['username']) {
@@ -308,13 +364,73 @@ function custom_php_deinstall_command() {
 	if (exec("/usr/sbin/pw groupshow _spamd")) {
 		exec("/usr/sbin/pw groupdel _spamd");
 	}
+	/* unmount fdescfs if needed */
+	if (trim(shell_exec("/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l")) != 0) {
+		log_error("[spamd] Unmounting fdescfs.");
+		mwexec("/sbin/umount /dev/fd");
+	}
+	unlink_if_exists("/var/db/spamd");
 	filter_configure();
 }
 
 function spamd_validate_input($post, &$input_errors) {
 	if (!empty($post["next_mta"])) {
 		if (!is_ipaddrv4($post['next_mta'])) {
-			$input_errors[] = "NextMTA is not a valid IPv4 address";
+			$input_errors[] = "'NextMTA' is not a valid IPv4 address";
+		}
+	}
+
+	if (isset($post['maxblack']) && $post['maxblack'] != "") {
+		if (!is_numericint($post['maxblack']) || $post['maxblack'] < 1) {
+			$input_errors[] = "'Maximum Blacklisted Connections' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['maxcon']) && $post['maxcon'] != "") {
+		if (!is_numericint($post['maxcon']) || $post['maxcon'] < 1) {
+			$input_errors[] = "'Max Concurrent Connections' must be a positive integer or empty.";
+		}
+	}
+
+	if (!empty($post['maxblack']) && is_numericint($post['maxblack']) && !empty($post['maxcon']) && is_numericint($post['maxcon'])) {
+		if ($post['maxblack'] >  $post['maxcon']) {
+			$input_errors[] = "'Maximum Blacklisted Connections' must not be higher than 'Max Concurrent Connections'.";
+		}
+	}
+
+	if (isset($post['passtime']) && $post['passtime'] != "") {
+		if (!is_numericint($post['passtime']) || $post['passtime'] < 1) {
+			$input_errors[] = "'Passtime' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['greyexp']) && $post['greyexp'] != "") {
+		if (!is_numericint($post['greyexp']) || $post['greyexp'] < 1) {
+			$input_errors[] = "'Grey Expiration' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['whiteexp']) && $post['whiteexp'] != "") {
+		if (!is_numericint($post['whiteexp']) || $post['whiteexp'] < 1) {
+			$input_errors[] = "'White Exp' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['stuttersecs']) && $post['stuttersecs'] != "") {
+		if (!is_numericint($post['stuttersecs']) || $post['stuttersecs'] < 1) {
+			$input_errors[] = "'Stutter Secs' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['delaysecs']) && $post['delaysecs'] != "") {
+		if (!is_numericint($post['delaysecs']) || $post['delaysecs'] < 1) {
+			$input_errors[] = "'Delay Secs' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['window']) && $post['window'] != "") {
+		if (!is_numericint($post['window']) || $post['window'] < 1) {
+			$input_errors[] = "'Window Size' must be a positive integer or empty.";
 		}
 	}
 }
