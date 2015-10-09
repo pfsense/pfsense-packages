@@ -56,7 +56,7 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<item>http://www.pfsense.com/packages/config/quagga_ospfd/quagga_ospfd_raw.xml</item>
+		<item>https://packages.pfsense.org/packages/config/quagga_ospfd/quagga_ospfd_raw.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
