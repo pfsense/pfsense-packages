@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squid</name>
-	<version>0.3.8</version>
+	<version>0.3.9</version>
 	<title>Proxy Server: General Settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<menu>
@@ -122,6 +122,14 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/squid3/34/squid.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/squid3/34/squid_antivirus.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/squid3/34/squid_js.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -743,13 +751,7 @@
 		squid_resync();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
-	<![CDATA[
 		squid_install_command();
-		unlink_if_exists("/usr/local/etc/rc.d/squid");
-		unlink_if_exists("/usr/local/etc/rc.d/c-icap");
-		unlink_if_exists("/usr/local/etc/rc.d/clamav-clamd");
-		unlink_if_exists("/usr/local/etc/rc.d/clamav-freshclam");
-	]]>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		squid_deinstall_command();
