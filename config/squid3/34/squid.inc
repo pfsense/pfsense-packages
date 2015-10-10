@@ -260,7 +260,7 @@ function squid_dash_z($cache_action = 'none') {
 		return;
 	}
 
-	// Re-create the cachedir if clean is forced by cronjob/manually,
+	// Re-create the cachedir if clean is forced by manually,
 	// or if the cachedir changed, or level1_subdirs don't exist or the number of level1_subdirs changed
 	if ($cache_action == "clean" || !is_dir($cachedir) || !is_dir($cachedir . '/00') || $numdirs != $currentdirs) {
 		// cannot nuke disk cache while Squid is running
@@ -319,32 +319,15 @@ function squid_create_cachedir() {
 
 /* Handle cronjob install/uninstall */
 function squid_install_cron($should_install) {
-	global $config;
-
 	if (platform_booting()) {
 		return;
 	}
 
-	parse_config(true);
-	if (is_array($config['installedpackages']['squidcache'])) {
-		$settings = $config['installedpackages']['squidcache']['config'][0];
-	} else {
-		$settings = array();
-	}
-
-	$cron_cmd = ($settings['clear_cache'] == 'on' ? "/usr/local/pkg/swapstate_check.php clean; " : "");
-	$cron_cmd .= SQUID_BASE . "/sbin/squid -k rotate -f " . SQUID_CONFFILE;
-	install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
-
-	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php clean; ";
+	$cron_cmd = SQUID_BASE . "/sbin/squid -k rotate -f " . SQUID_CONFFILE;
 	if (($should_install) && (squid_enabled())) {
-		if ($settings['clear_cache'] == 'on' ) {
-			install_cron_job("{$swapstate_cmd}", true, "*/360");
-		} else {
-			install_cron_job("{$swapstate_cmd}", false);
-		}
+		install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
 	} else {
-		install_cron_job("{$swapstate_cmd}", false);
+		install_cron_job("{$cron_cmd}", false);
 	}
 }
 
@@ -506,6 +489,9 @@ function squid_install_command() {
 
 	// remove unwanted PBI rc script
 	unlink_if_exists("/usr/local/etc/rc.d/squid");
+
+	// remove broken cronjob possibly left over after 'Clear Cache on Log Rotate' misfeature
+	install_cron_job("/usr/local/pkg/swapstate_check.php clean;", false);
 
 }
 
