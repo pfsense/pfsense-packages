@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidantivirus</name>
-	<version>0.3.9</version>
+	<version>0.3.9.2</version>
 	<title>Proxy server: Antivirus</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
@@ -179,13 +179,13 @@
 			<type>select</type>
 			<default_value>0</default_value>
 			<options>
-				<option><name>never	  </name><value>0</value></option>
+				<option><name>never	  </name><value></value></option>
 				<option><name>every 1  hours</name><value>1</value></option>
 				<option><name>every 2  hours</name><value>2</value></option>
 				<option><name>every 3  hours</name><value>3</value></option>
 				<option><name>every 4  hours</name><value>4</value></option>
-				<option><name>every 6  hours</name><value>5</value></option>
-				<option><name>every 8  hours</name><value>6</value></option>
+				<option><name>every 6  hours</name><value>6</value></option>
+				<option><name>every 8  hours</name><value>8</value></option>
 				<option><name>every 12 hours</name><value>12</value></option>
 				<option><name>every 24 hours</name><value>24</value></option>
 			</options>

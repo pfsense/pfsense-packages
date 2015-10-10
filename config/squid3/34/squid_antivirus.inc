@@ -73,15 +73,14 @@ function squid_install_freshclam_cron($should_install) {
 		return;
 	}
 
-	if (is_array($config['installedpackages']['squidantivirus'])) {
-		$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];
-	} else {
-		$antivirus_config = array();
-	}
-
 	$freshclam_cmd = (SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 	if (($should_install) && (squid_enabled())) {
-		if ($antivirus_config['clamav_update'] != "0") {
+		if (is_array($config['installedpackages']['squidantivirus'])) {
+			$antivirus_config = $config['installedpackages']['squidantivirus']['config'][0];
+		} else {
+			$antivirus_config = array();
+		}
+		if ($antivirus_config['clamav_update'] != "") {
 			log_error("[squid] Adding freshclam cronjob.");
 			$minutes = ($antivirus_config['clamav_update'] * 60);
 			install_cron_job("{$freshclam_cmd}", true, "*/{$minutes}", "*", "*", "*", "*", "clamav");

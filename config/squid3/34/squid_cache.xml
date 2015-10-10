@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidcache</name>
-	<version>0.3.5</version>
+	<version>0.3.9.2</version>
 	<title>Proxy Server: Cache management</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
@@ -215,17 +215,6 @@
 				<option><name>diskd</name><value>diskd</value></option>
 				<option><name>null</name><value>null</value></option>
 			</options>
-		</field>
-		<field>
-			<fielddescr>Clear Cache on Log Rotate</fielddescr>
-			<fieldname>clear_cache</fieldname>
-			<description>
-				<![CDATA[
-				If set, Squid will clear cache and swap.state every time the log is rotated.<br/>
-				Note: This action will be executed automatically if the swap.state file is taking up more than 75% of available space, or the filesystem is 90% full.
-				]]>
-			</description>
-			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Level 1 Directories</fielddescr>
