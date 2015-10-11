@@ -222,6 +222,18 @@ function squid_antivirus_deinstall_command() {
 	}
 }
 
+/* Migrate configuration from old Squid package versions */
+function squid_antivirus_upgrade_config() {
+	global $config;
+	/* unset broken antivirus settings */
+	if (is_array($config['installedpackages']['squidantivirus'])) {
+		unset($config['installedpackages']['squidantivirus']['config'][0]['squidclamav']);
+		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_conf']);
+		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_magic']);
+		unset($config['installedpackages']['squidantivirus']['config'][0]['freshclam_conf']);
+	}
+}
+
 /*
  * Antivirus features configuration
  *
