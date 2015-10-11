@@ -619,6 +619,7 @@ function squid_deinstall_command() {
 /* Migrate configuration from god knows which Squid package versions */
 /* None of these ever existed with Squid 3.4 package and this cruft should be most likely just removed */
 function squid_upgrade_config() {
+	global $config;
 	/* migrate existing csv config fields */
 	if (is_array($config['installedpackages']['squidauth']['config'])) {
 		$settingsauth = $config['installedpackages']['squidauth']['config'][0];
@@ -742,12 +743,7 @@ function squid_upgrade_config() {
 	}
 	
 	/* unset broken antivirus settings */
-	if (is_array($config['installedpackages']['squidantivirus'])) {
-		unset($config['installedpackages']['squidantivirus']['config'][0]['squidclamav']);
-		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_conf']);
-		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_magic']);
-		unset($config['installedpackages']['squidantivirus']['config'][0]['freshclam_conf']);
-	}
+	squid_antivirus_upgrade_config();
 
 	update_output_window("Writing configuration... One moment please...");
 	write_config();
