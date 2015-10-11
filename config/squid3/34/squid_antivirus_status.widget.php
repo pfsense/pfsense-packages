@@ -140,7 +140,7 @@ function squid_antivirus_statistics() {
 						preg_match("@(\d{1}).(\d{1}).(\d{2})@", shell_exec("{$squid_path} -v"), $squid_version);
 						$version = $squid_version[0];
 					}
-					$version .= "&nbsp (pkg v{$config['installedpackages']['package'][get_pkg_id("squid3")]['version']})";
+					$version .= "&nbsp; (pkg v{$config['installedpackages']['package'][get_pkg_id("squid3")]['version']})";
 				} else {
 					pkg_exec("query '%v' squid", $version, $err);
 				}
