@@ -323,8 +323,8 @@ EOF;
 					$squidclamav_r[1] = "safebrowsing 1";
 				}
 				if ($antivirus_config['clamav_url'] != "") {
-					$squidclamav_m[2] = "@redirect http@";
-					$squidclamav_r[2] = "{$antivirus_config['clamav_url']}";
+					$squidclamav_m[2] = "@(redirect http.*)@";
+					$squidclamav_r[2] = "redirect {$antivirus_config['clamav_url']}";
 				}
 				/* Trying to overwrite squidclamav.conf via file_put_contents() may fail when Squid is running */
 				if (!file_put_contents("{$cf}", preg_replace($squidclamav_m, $squidclamav_r, $sample_file), LOCK_EX)) {
