@@ -324,10 +324,22 @@ function squid_install_cron($should_install) {
 	}
 
 	$cron_cmd = SQUID_BASE . "/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+	/*
+	 * This is here to prevent Squid from filling disk completely on misconfigured boxes.
+	 * When 'Hard Disk Cache System' is set to null, the script silently returns, no need to check here.
+	 * Otherwise, swapstate_check.php will only clear the disk cache on the following conditions:
+	 * - if the swap.state file is taking up more than 75% of disk space,
+	 * - or the drive is 90% full and swap.state is larger than 1GB.
+	 */
+	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php";
 	if (($should_install) && (squid_enabled())) {
+		log_error("[squid] Adding cronjobs ...");
 		install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
+		install_cron_job("{$swapstate_cmd}", $should_install, "15", "0", "*", "*", "*", "root");
 	} else {
+		log_error("[squid] Removing cronjobs ...");
 		install_cron_job("{$cron_cmd}", false);
+		install_cron_job("{$swapstate_cmd}", false);
 	}
 }
 
@@ -861,6 +873,13 @@ function squid_validate_upstream($post, &$input_errors) {
 
 /* Proxy Server: Cache Management input validation */
 function squid_validate_cache($post, &$input_errors) {
+	/* Manually clear hard disk cache */
+	if ($post['clear_cache'] == 'Clear Disk Cache NOW') {
+		log_error("[squid] Clear disk cache forced via GUI. Clearing cache now...");
+		squid_dash_z("clean");
+		return;
+	}
+
 	$num_fields = array(
 		'harddisk_cache_size' => 'Hard disk cache size',
 		'memory_cache_size' => 'Memory cache size',
