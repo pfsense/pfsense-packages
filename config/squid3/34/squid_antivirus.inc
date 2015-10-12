@@ -615,7 +615,7 @@ function squid_antivirus_toggle_raw_config($state) {
 	global $config;
 	if ($state) {
 		// manual configuration enabled
-		$opts = array("clamav_url", "clamav_safebrowsing", "clamav_update", "clamav_dbregion", "clamav_dbservers");
+		$opts = array("clamav_url", "clamav_safebrowsing", "clamav_dbregion", "clamav_dbservers");
 		foreach ($opts as $opt) {
 			if (isset($config['installedpackages']['squidantivirus']['config'][0][$opt])) {
 				unset($config['installedpackages']['squidantivirus']['config'][0][$opt]);
