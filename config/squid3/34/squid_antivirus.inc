@@ -758,9 +758,11 @@ function squid_restart_antivirus() {
 		// Check clamav database
 		if (count(glob("/var/db/clamav/*d")) == 0) {
 			log_error("[squid] Missing /var/db/clamav/*.cvd or *.cld files. Running freshclam in background.");
+			log_error("[squid] Do NOT attempt to start ClamAV service until AV definitions are downloaded. Check /var/log/clamav/freshclam.log for progress information.");
 			squid_update_clamav();
 		} elseif ($antivirus_config['clamav_safebrowsing'] == "on" && !is_file("/var/db/clamav/safebrowsing.cvd")) {
 			log_error("[squid] Google Safe Browsing is enabled but missing safebrowsing.cvd definitions. Running freshclam in background.");
+			log_error("[squid] ClamAV will be automatically notified about the new definitions when finished. No manual action necessary.");
 			squid_update_clamav();
 		} elseif ($antivirus_config['clamav_safebrowsing'] != "on" && is_file("/var/db/clamav/safebrowsing.cvd")) {
 			log_error("[squid] Google Safe Browsing is disabled. Removing safebrowsing.cvd definitions.");
