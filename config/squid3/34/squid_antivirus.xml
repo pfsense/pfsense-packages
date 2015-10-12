@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidantivirus</name>
-	<version>0.3.9.2</version>
+	<version>0.4.0</version>
 	<title>Proxy server: Antivirus</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
@@ -289,7 +289,7 @@
 		<![CDATA[
 		squid_print_antivirus_advanced_config2();
 		if ($_POST['enable_advanced'] == "enabled") {
-			$opts = array("clamav_url", "clamav_safebrowsing", "clamav_update", "clamav_dbregion", "clamav_dbservers");
+			$opts = array("clamav_url", "clamav_safebrowsing", "clamav_dbregion", "clamav_dbservers");
 			foreach ($opts as $opt) {
 				if (isset($_POST[$opt])) {
 					unset($_POST[$opt]);

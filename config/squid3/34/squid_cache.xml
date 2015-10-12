@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidcache</name>
-	<version>0.3.9.2</version>
+	<version>0.4.0</version>
 	<title>Proxy Server: Cache management</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
@@ -215,6 +215,19 @@
 				<option><name>diskd</name><value>diskd</value></option>
 				<option><name>null</name><value>null</value></option>
 			</options>
+		</field>
+		<field>
+			<fielddescr>Clear Disk Cache NOW</fielddescr>
+			<description>
+				<![CDATA[
+				Hard Disk Cache is automatically managed by swapstate_check.php script which is scheduled to run daily via cron.<br/>
+				The script will only clear the disk cache on the following conditions:<br/>
+				- if the swap.state file is taking up more than 75% of disk space;<br/>
+				- or the drive is 90% full and swap.state is larger than 1GB.<br/><br/>
+				If you wish to clear cache <strong>immediately,</strong> press the <input name='clear_cache' id='clear_cache' type='submit' value='Clear Disk Cache NOW' /> button.
+				]]>
+			</description>
+			<type>info</type>
 		</field>
 		<field>
 			<fielddescr>Level 1 Directories</fielddescr>

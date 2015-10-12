@@ -324,10 +324,22 @@ function squid_install_cron($should_install) {
 	}
 
 	$cron_cmd = SQUID_BASE . "/sbin/squid -k rotate -f " . SQUID_CONFFILE;
+	/*
+	 * This is here to prevent Squid from filling disk completely on misconfigured boxes.
+	 * When 'Hard Disk Cache System' is set to null, the script silently returns, no need to check here.
+	 * Otherwise, swapstate_check.php will only clear the disk cache on the following conditions:
+	 * - if the swap.state file is taking up more than 75% of disk space,
+	 * - or the drive is 90% full and swap.state is larger than 1GB.
+	 */
+	$swapstate_cmd = "/usr/local/pkg/swapstate_check.php";
 	if (($should_install) && (squid_enabled())) {
+		log_error("[squid] Adding cronjobs ...");
 		install_cron_job("{$cron_cmd}", $should_install, "0", "0", "*", "*", "*", "root");
+		install_cron_job("{$swapstate_cmd}", $should_install, "15", "0", "*", "*", "*", "root");
 	} else {
+		log_error("[squid] Removing cronjobs ...");
 		install_cron_job("{$cron_cmd}", false);
+		install_cron_job("{$swapstate_cmd}", false);
 	}
 }
 
@@ -607,6 +619,7 @@ function squid_deinstall_command() {
 /* Migrate configuration from god knows which Squid package versions */
 /* None of these ever existed with Squid 3.4 package and this cruft should be most likely just removed */
 function squid_upgrade_config() {
+	global $config;
 	/* migrate existing csv config fields */
 	if (is_array($config['installedpackages']['squidauth']['config'])) {
 		$settingsauth = $config['installedpackages']['squidauth']['config'][0];
@@ -679,63 +692,11 @@ function squid_upgrade_config() {
 		$config['installedpackages']['squidnac']['config'][0]['block_reply_mime_type'] = $settingsnac['block_reply_mime_type'];
 	}
 
-	/* migrate reverse settings */
-	if (is_array($config['installedpackages']['squidreverse'])) {
-		$old_reverse_settings = $config['installedpackages']['squidreverse']['config'][0];
-
-		// settings
-		if (!is_array($config['installedpackages']['squidreversegeneral'])) {
-			$config['installedpackages']['squidreversegeneral']['config'][0] = $old_reverse_settings;
-			unset($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_cache_peer']);
-			unset($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_uri']);
-			unset($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_acl']);
-		}
-
-		// peers
-		if (!is_array($config['installedpackages']['squidreversepeer'])) {
-			foreach (explode("\n", sq_text_area_decode($old_reverse_settings['reverse_cache_peer'])) as $cache_peers) {
-				foreach (explode(";", $cache_peers) as $cache_peer) {
-					$config['installedpackages']['squidreversepeer']['config'][] = array(
-						'description' => 'migrated',
-						'enable' => 'on',
-						'name' => $cache_peer[0],
-						'port' => $cache_peer[1],
-						'protocol' => $cache_peer[2]
-					);
-				}
-			}
-		}
-
-		// mappings
-		if (!is_array($config['installedpackages']['squidreverseuri'])) {
-			foreach (explode("\n", sq_text_area_decode($old_reverse_settings['reverse_acl'])) as $acls) {
-				foreach (explode(";", $acls) as $acl) {
-					array_push(${'peer_'.$acl[0]}, $acl[1]);
-				}
-			}
-			foreach (explode("\n", sq_text_area_decode($old_reverse_settings['reverse_uri'])) as $uris) {
-				foreach (explode(";", $uris) as $uri) {
-					$peer_list = (is_array(${'peer_' . $uri[0]}) ? implode(",", ${'peer_' . $uri[0]}) : "");
-					$config['installedpackages']['squidreverseuri']['config'][] = array(
-						'description' => 'migrated',
-						'enable' => 'on',
-						'name' => $uri[0],
-						'uri' => $uri[1],
-						'vhost' => $uri[2],
-						'peers' => $peer_list
-					);
-				}
-			}
-		}
-	}
+	/* migrate reverse proxy settings */
+	squid_reverse_upgrade_config();
 	
 	/* unset broken antivirus settings */
-	if (is_array($config['installedpackages']['squidantivirus'])) {
-		unset($config['installedpackages']['squidantivirus']['config'][0]['squidclamav']);
-		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_conf']);
-		unset($config['installedpackages']['squidantivirus']['config'][0]['c-icap_magic']);
-		unset($config['installedpackages']['squidantivirus']['config'][0]['freshclam_conf']);
-	}
+	squid_antivirus_upgrade_config();
 
 	update_output_window("Writing configuration... One moment please...");
 	write_config();
@@ -861,6 +822,13 @@ function squid_validate_upstream($post, &$input_errors) {
 
 /* Proxy Server: Cache Management input validation */
 function squid_validate_cache($post, &$input_errors) {
+	/* Manually clear hard disk cache */
+	if ($post['clear_cache'] == 'Clear Disk Cache NOW') {
+		log_error("[squid] Clear disk cache forced via GUI. Clearing cache now...");
+		squid_dash_z("clean");
+		return;
+	}
+
 	$num_fields = array(
 		'harddisk_cache_size' => 'Hard disk cache size',
 		'memory_cache_size' => 'Memory cache size',
