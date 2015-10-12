@@ -236,8 +236,7 @@ function on_antivirus_advanced_config_changed() {
 		document.iform['clamav_url'].disabled = 1;
 		document.iform['clamav_safebrowsing'].disabled = 1;
 		document.getElementById('clamav_safebrowsing').checked = 0;
-		document.iform['clamav_update'].disabled = 1;
-		document.getElementById("clamav_update").value = '';
+		document.iform['clamav_update'].disabled = 0;
 		document.iform['clamav_dbregion'].disabled = 1;
 		document.getElementById("clamav_dbregion").value = '';
 		document.iform['clamav_dbservers'].disabled = 1;
