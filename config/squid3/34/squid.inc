@@ -1777,7 +1777,7 @@ function squid_resync_auth() {
 			$conf .= "http_access allow $acl\n";
 		}
 	} else {
-		$noauth = implode(' ', explode("\n", base64_decode($settings['no_auth_hosts'])));
+		$noauth = implode(' ', explode("\n", sq_text_area_decode($settings['no_auth_hosts'])));
 		if (!empty($noauth)) {
 			$conf .= "acl noauth src $noauth\n";
 			$valid_acls[] = 'noauth';
