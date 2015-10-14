@@ -603,6 +603,9 @@ function squid_deinstall_command() {
 		if (is_array($config['installedpackages']['squidreverseredir'])) {
 			unset($config['installedpackages']['squidreverseredir']);
 		}
+		if (is_array($config['installedpackages']['squidreverseuri'])) {
+			unset($config['installedpackages']['squidreverseuri']);
+		}
 		if (is_array($config['installedpackages']['squidsync'])) {
 			unset($config['installedpackages']['squidsync']);
 		}
