@@ -160,7 +160,6 @@
 			<description>Leave this checked to be able to choose the extensions that throttling will be applied to. Otherwise, all files will be throttled.</description>
 			<type>checkbox</type>
 			<enablefields>throttle_binaries,throttle_cdimages,throttle_multimedia,throttle_others</enablefields>
-			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>Throttle Binary Files</fielddescr>
