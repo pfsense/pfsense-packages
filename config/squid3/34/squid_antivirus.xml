@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidantivirus</name>
-	<version>0.4.0</version>
+	<version>0.4.1</version>
 	<title>Proxy server: Antivirus</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
@@ -148,7 +148,7 @@
 				]]>
 			</description>
 			<type>input</type>
-			<cols>60</cols>
+			<size>60</size>
 			
 		</field>
 		<field>
@@ -229,7 +229,7 @@
 				]]>
 			</description>
 			<type>input</type>
-			<cols>60</cols>
+			<size>60</size>
 		</field>
 		<field>
 			<fielddescr>squidclamav.conf</fielddescr>
