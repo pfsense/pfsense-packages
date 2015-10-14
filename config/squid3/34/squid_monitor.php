@@ -130,18 +130,35 @@ include("head.inc");
 			</table>
 			</form>
 
-			<!-- Squid Table -->
+			<!-- Squid Access Table -->
 			<table width="100%" border="0" cellpadding="0" cellspacing="0">
 				<tbody>
 				<tr><td>
 					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 						<tr>
-							<td colspan="6" class="listtopic" align="center"><?=gettext("Squid Logs"); ?></td>
+							<td colspan="6" class="listtopic" align="center"><?=gettext("Squid - Access Logs"); ?></td>
 						</tr>
 						<tbody id="squidView">
 							<script type="text/javascript">
 								// Call function to show squid log
 								showLog('squidView', 'squid_monitor_data.php', 'squid');
+							</script>
+						</tbody>
+					</table>
+				</td></tr>
+				</tbody>
+			</table>
+			<!-- Squid Cache Table -->
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+				<tr><td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="2" class="listtopic" align="center"><?=gettext("Squid - Cache Logs"); ?></td>
+						</tr>
+						<tbody id="squidCacheView">
+							<script type="text/javascript">
+								showLog('squidCacheView', 'squid_monitor_data.php', 'squid_cache');
 							</script>
 						</tbody>
 					</table>
@@ -159,7 +176,6 @@ include("head.inc");
 						</tr>
 						<tbody id="sguardView">
 							<script type="text/javascript">
-								// Call function to show squidGuard log
 								showLog('sguardView', 'squid_monitor_data.php', 'sguard');
 							</script>
 						</tbody>
@@ -167,18 +183,85 @@ include("head.inc");
 				</td></tr>
 				</tbody>
 			</table>
-			<!-- clamav Table -->
+			<!-- C-ICAP Virus Table -->
 			<table width="100%" border="0" cellpadding="0" cellspacing="0">
 				<tbody>
 				<tr><td>
 					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 						<tr>
-							<td colspan="6" class="listtopic" align="center"><?=gettext("clamav Logs"); ?></td>
+							<td colspan="6" class="listtopic" align="center"><?=gettext("C-ICAP - Virus Logs"); ?></td>
 						</tr>
-						<tbody id="clamView">
+						<tbody id="CICIAPVirusView">
 							<script type="text/javascript">
-								// Call function to show squidGuard log
-								showLog('clamView', 'squid_monitor_data.php', 'clamav');
+								showLog('CICIAPVirusView', 'squid_monitor_data.php', 'cicap_virus');
+							</script>
+						</tbody>
+					</table>
+				</td></tr>
+				</tbody>
+			</table>
+			<!-- C-ICAP Access Table -->
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+				<tr><td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="2" class="listtopic" align="center"><?=gettext("C-ICAP - Access Logs"); ?></td>
+						</tr>
+						<tbody id="CICAPAccessView">
+							<script type="text/javascript">
+								showLog('CICAPAccessView', 'squid_monitor_data.php', 'cicap_access');
+							</script>
+						</tbody>
+					</table>
+				</td></tr>
+				</tbody>
+			</table>
+			<!-- C-ICAP Server Table -->
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+				<tr><td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="2" class="listtopic" align="center"><?=gettext("C-ICAP - Server Logs"); ?></td>
+						</tr>
+						<tbody id="CICAPServerView">
+							<script type="text/javascript">
+								showLog('CICAPServerView', 'squid_monitor_data.php', 'cicap_server');
+							</script>
+						</tbody>
+					</table>
+				</td></tr>
+				</tbody>
+			</table>
+			<!-- freshclam Table -->
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+				<tr><td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="1" class="listtopic" align="center"><?=gettext("ClamAV - freshclam Logs"); ?></td>
+						</tr>
+						<tbody id="freshclamView">
+							<script type="text/javascript">
+								showLog('freshclamView', 'squid_monitor_data.php', 'freshclam');
+							</script>
+						</tbody>
+					</table>
+				</td></tr>
+				</tbody>
+			</table>
+			<!-- clamd Table -->
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tbody>
+				<tr><td>
+					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr>
+							<td colspan="1" class="listtopic" align="center"><?=gettext("ClamAV - clamd Logs"); ?></td>
+						</tr>
+						<tbody id="clamdView">
+							<script type="text/javascript">
+								showLog('clamdView', 'squid_monitor_data.php', 'clamd');
 							</script>
 						</tbody>
 					</table>
