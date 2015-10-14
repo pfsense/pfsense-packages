@@ -502,8 +502,9 @@ function squid_install_command() {
 	// remove unwanted PBI rc script
 	unlink_if_exists("/usr/local/etc/rc.d/squid");
 
-	// remove broken cronjob possibly left over after 'Clear Cache on Log Rotate' misfeature
+	// remove broken cronjobs possibly left over after 'Clear Cache on Log Rotate' misfeature
 	install_cron_job("/usr/local/pkg/swapstate_check.php clean;", false);
+	install_cron_job("/bin/rm /var/squid/cache/swap.state;", false);
 
 }
 
@@ -516,12 +517,14 @@ function squid_deinstall_command() {
 	/* kill all running services */
 	update_output_window("Stopping and removing services...");
 	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
-	mwexec("/bin/ps awux | /usr/bin/grep '[s]quid' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/egrep -i '[s]quid -f|\([s]quid\)' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
+	mwexec("/bin/ps awux | /usr/bin/grep '[d]iskd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep '[d]nsserver' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep '[u]nlinkd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 
 	/* delete rc scripts */
 	unlink_if_exists('/usr/local/etc/rc.d/sqp_monitor.sh');
+	unlink_if_exists('/usr/local/etc/rc.d/squid.sh');
 
 	/* clean up created directories if 'Keep Settings/Data' is disabled */
 	if (is_array($config['installedpackages']['squidcache'])) {
