@@ -1631,6 +1631,7 @@ EOD;
 		$conf .= "delay_access 1 allow throttle_exts\n";
 		$conf .= "delay_access 1 deny allsrc\n";
 	} else {
+		unlink_if_exists(SQUID_ACLDIR . '/throttle_exts.acl');
 		$conf .= "delay_access 1 allow allsrc\n";
 	}
 
