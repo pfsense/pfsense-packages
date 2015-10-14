@@ -274,9 +274,9 @@ include("head.inc");
 						</tr></thead>
 						<tbody id="clamdView">
 						<tr><td>
-							<div><script type="text/javascript">
+							<script type="text/javascript">
 								showLog('clamdView', 'squid_monitor_data.php', 'clamd');
-							</script></div>
+							</script>
 						</td></tr>
 						</tbody>
 					</table>
