@@ -697,6 +697,9 @@ function write_backend($configpath, $fd, $name, $pool, $backendsettings) {
 			$checkinter = " check inter {$pool['checkinter']}";
 		else 
 			$checkinter = " check inter 1000";
+
+		if($pool['checkport'])
+			$checkinter .= " port {$pool['checkport']}";
 	}
 	
 	//agent-check requires at least haproxy v1.5dev20

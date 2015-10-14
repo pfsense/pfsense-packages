@@ -59,7 +59,7 @@ if (isset($_GET['dup']))
 global $simplefields;
 $simplefields = array(
 "name","balance","transparent_clientip","transparent_interface",
-"check_type","checkinter","log-health-checks","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
+"check_type","checkinter","checkport","log-health-checks","httpcheck_method","monitor_uri","monitor_httpversion","monitor_username","monitor_domain","monitor_agentport",
 "agent_check","agent_port","agent_inter",
 "connection_timeout","server_timeout","retries",
 "stats_enabled","stats_username","stats_password","stats_uri","stats_scope","stats_realm","stats_admin","stats_node","stats_desc","stats_refresh",
@@ -232,6 +232,9 @@ if ($_POST) {
 	
 	if ($_POST['checkinter'] !== "" && !is_numeric($_POST['checkinter']))
 		$input_errors[] = "The field 'Check frequency' value is not a number.";
+
+	if ($_POST['checkport'] !== "" && !is_numeric($_POST['checkport']))
+		$input_errors[] = "The field 'Check Port' value is not a number.";
 	
 	if ($_POST['connection_timeout'] !== "" && !is_numeric($_POST['connection_timeout']))
 		$input_errors[] = "The field 'Connection timeout' value is not a number.";
@@ -648,6 +651,13 @@ foreach($simplefields as $field){
 			<td width="78%" class="vtable" colspan="2">
 				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?> size="20" /> milliseconds
 				<br/>For HTTP/HTTPS defaults to 1000 if left blank. For TCP no check will be performed if left empty.
+			</td>
+		</tr>
+		<tr align="left" class="haproxy_check_enabled">
+			<td width="22%" valign="top" class="vncell">Check port</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="checkport" type="text" <?if(isset($pconfig['checkport'])) echo "value=\"{$pconfig['checkport']}\"";?> size="20" />
+				<br/>Use an alternative port to send health-checks.
 			</td>
 		</tr>
 		<tr align="left" class="haproxy_check_enabled">
