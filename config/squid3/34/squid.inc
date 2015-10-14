@@ -974,6 +974,14 @@ function squid_validate_traffic($post, &$input_errors) {
 			$input_errors[] = "'Finish when remaining %' must contain valid percentage (1-100).";
 		}
 	}
+
+	if ($post['throttle_specific'] == "on") {
+		$others = trim($post['throttle_others']);
+		if ($post['throttle_binaries'] == "" && $post['throttle_cdimages'] == "" && $post['throttle_multimedia'] == "" && $others == "") {
+			$input_errors[] = "'Throttle Only Specific Extensions' enabled but no extensions specified. Select some options under 'Squid Transfer Extension Settings' or disable this option.";
+		}
+	}
+
 }
 
 /* Proxy Server: Authentication input validation */
