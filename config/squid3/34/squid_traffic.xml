@@ -42,8 +42,8 @@
 	]]>
 	</copyright>
 	<name>squidtraffic</name>
-	<version>0.3.5</version>
-	<title>Proxy server: Traffic Management</title>
+	<version>0.4.1</version>
+	<title>Proxy Server: Traffic Management</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
 		<tab>
