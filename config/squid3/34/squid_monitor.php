@@ -74,7 +74,7 @@ include("head.inc");
 			$tab_array[] = array(gettext("Web Servers"), false, "/pkg.php?xml=squid_reverse_peer.xml");
 			$tab_array[] = array(gettext("Mappings"), false, "/pkg.php?xml=squid_reverse_uri.xml");
 			$tab_array[] = array(gettext("Redirects"), false, "/pkg.php?xml=squid_reverse_redir.xml");
-			$tab_array[] = array(gettext("Real time"), true, "/squid_monitor.php?menu=reverse");
+			$tab_array[] = array(gettext("Real Time"), true, "/squid_monitor.php?menu=reverse");
 			$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=squid_reverse_sync.xml");
 		} else {
 			$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=squid.xml&amp;id=0");
@@ -85,7 +85,7 @@ include("head.inc");
 			$tab_array[] = array(gettext("Traffic Mgmt"), false, "/pkg_edit.php?xml=squid_traffic.xml&amp;id=0");
 			$tab_array[] = array(gettext("Authentication"), false, "/pkg_edit.php?xml=squid_auth.xml&amp;id=0");
 			$tab_array[] = array(gettext("Users"), false, "/pkg.php?xml=squid_users.xml");
-			$tab_array[] = array(gettext("Real time"), true, "/squid_monitor.php");
+			$tab_array[] = array(gettext("Real Time"), true, "/squid_monitor.php");
 			$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=squid_sync.xml");
 		}
 		display_top_tabs($tab_array);
