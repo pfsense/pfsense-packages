@@ -100,7 +100,7 @@ function squid_install_freshclam_cron($should_install) {
 /* Manually update ClamAV virus definitions via the GUI button */
 function squid_update_clamav() {
 	squid_check_antivirus_dirs();
-	log_error("[squid] Updating ClamAV definitions now... This will take a while. Check /var/log/clamav/freshclam.log for progress information.");
+	log_error("[squid] Updating ClamAV definitions now... This will take a while. Check freshclam log on the 'Real Time' tab for progress information.");
 	mwexec_bg(SQUID_BASE . "/bin/freshclam --config-file=" . SQUID_BASE . "/etc/freshclam.conf");
 }
 
