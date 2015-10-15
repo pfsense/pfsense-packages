@@ -1079,12 +1079,21 @@ function squid_resync_general() {
 				// cert, key, version, cipher, options, clientca, cafile, capath, crlfile, dhparams, sslflags, sslcontext
 				$crt_pk = SQUID_CONFBASE . "/serverkey.pem";
 				$crt_capath = SQUID_LOCALBASE . "/share/certs/";
+				/* XXX: Bug #4453
+				 * http://wiki.squid-cache.org/ConfigExamples/Intercept/SslBumpExplicit#Modern_DH.2Fciphers_usage
+				 */
+				//$sslproxy_cipher = "EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS";
+				$sslproxy_cipher = "EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA384:EECDH+ECDSA+SHA256:EECDH+aRSA+SHA384:EECDH+aRSA+SHA256:EECDH+aRSA+RC4:EECDH:EDH+aRSA:HIGH:!RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS";
+				$sslproxy_dhparams = "/etc/dh-parameters.2048";
+				$sslproxy_options = "NO_SSLv2,NO_SSLv3,SINGLE_DH_USE";
 				file_put_contents($crt_pk, base64_decode($srv_cert['prv']) . base64_decode($srv_cert['crt']));
 				$sslcrtd_children = ($settings['sslcrtd_children'] ? $settings['sslcrtd_children'] : 5);
-				$ssl_interception .= "ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=" . ($sslcrtd_children*2) . "MB cert={$crt_pk} capath={$crt_capath}\n";
+				$ssl_interception .= "ssl-bump generate-host-certificates=on dynamic_cert_mem_cache_size=" . ($sslcrtd_children*2) . "MB cert={$crt_pk} capath={$crt_capath} cipher={$sslproxy_cipher} dhparams={$sslproxy_dhparams} options={$sslproxy_options}\n";
 				$interception_checks = "sslcrtd_program " . SQUID_LOCALBASE . "/libexec/squid/ssl_crtd -s " . SQUID_SSL_DB . " -M 4MB -b 2048\n";
 				$interception_checks .= "sslcrtd_children {$sslcrtd_children}\n";
 				$interception_checks .= "sslproxy_capath {$crt_capath}\n";
+				$interception_checks .= "sslproxy_options {$sslproxy_options}\n";
+				$interception_checks .= "sslproxy_cipher {$sslproxy_cipher}\n";
 				if (preg_match("/sslproxy_cert_error/", $settings["interception_checks"])) {
 					$interception_checks .= "sslproxy_cert_error allow all\n";
 				}
