@@ -1160,7 +1160,7 @@
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
-		<version>1.5.7</version>
+		<version>1.5.8</version>
 		<status>Beta</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-devel-1.5_1-##ARCH##.pbi</depends_on_package_pbi>
