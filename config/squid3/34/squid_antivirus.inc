@@ -41,13 +41,20 @@ function squid_check_clamav_user() {
 	if (SQUID_BASE == '/usr/local') {
 		return;
 	} else {
-		if (!exec("/usr/sbin/pw usershow clamav")) {
-			log_error("[squid] Adding clamav user.");
-			mwexec("/usr/sbin/pw useradd clamav -G wheel -u 9595 -s /sbin/nologin");
-		}
-		if (!exec("/usr/sbin/pw groupshow wheel | /usr/bin/grep clamav")) {
-			log_error("[squid] Adding clamav user to wheel group.");
-			mwexec("/usr/sbin/pw usermod clamav -G wheel");
+		/*
+		 * Check whether clamav user already exists and is a member of wheel group.
+		 * If the account already exists, modify the UID to 9595, otherwise things blow up because the PBI clusterfuck adds the account with UID=106.
+		 * If the account does not exist yes because PBI screwed things once again, create it with the proper UID.
+		 * If clamav user is not a member of wheel group, add it there as well and avoid re-adding it to wheel everytime this code runs.
+		 * Note that the clamav group (GID=106) added by PBI is irrelevant because it's not used for anything.
+		 */
+		$_gc = exec("/usr/sbin/pw groupshow wheel | /usr/bin/grep clamav", $group_ex_output, $group_ex_return);
+		$group_arg = ($group_ex_return != 0 ? "-G wheel" : "");
+		$_gc = exec("/usr/sbin/pw usershow clamav", $user_ex_output, $user_ex_return);
+		$user_arg = ($user_ex_return == 0 ? "mod" : "add");
+		$_gc = exec("/usr/sbin/pw user{$user_arg} clamav {$group_arg} -u 9595 -s /sbin/nologin", $user_ex_output, $user_ex_return);
+		if ($user_ex_return != 0) {
+			log_error("[squid] Could not change clamav user settings. " . serialize($user_ex_output));
 		}
 	}
 }
@@ -57,14 +64,22 @@ function squid_check_antivirus_dirs() {
 	$dirs = array(
 		"/var/run/c-icap" => "clamav",
 		"/var/log/c-icap" => "clamav",
+
+	);
+	foreach ($dirs as $dir_path => $dir_user) {
+		safe_mkdir($dir_path, 0755);
+		chown($dir_path, $dir_user);
+		chgrp($dir_path, "wheel");
+	}
+	/* These ClamAV dirs MUST be chown-ed recursively, see the notes on PBI idiocy in squid_check_clamav_user() */
+	$dirs = array(
 		"/var/log/clamav" => "clamav",
 		"/var/run/clamav" => "clamav",
 		"/var/db/clamav" => "clamav"
 	);
 	foreach ($dirs as $dir_path => $dir_user) {
 		safe_mkdir($dir_path, 0755);
-		chown($dir_path, $dir_user);
-		chgrp($dir_path, "wheel");
+		squid_chown_recursive($dir_path, $dir_user, "wheel");
 	}
 }
 
