@@ -137,6 +137,7 @@ function lightsquid_install() {
 		}
 		symlink('/usr/local/share/lightsquid/tpl/' . $tpl, LS_TEMPLATEPATH . '/' . $tpl);
 	}
+	symlink("/usr/local/www/themes", "/usr/local/www/sqstat/themes");
 }
 
 function lightsquid_deinstall() {
@@ -144,6 +145,9 @@ function lightsquid_deinstall() {
 	lightsquid_setup_cron(false);
 	// undo PBI hacks
 	lightsquid_unfix_perl();
+	if (is_dir("/usr/local/www/sqstat/")) {
+		mwexec("/bin/rm -rf /usr/local/www/sqstat/");
+	}
 }
 
 /*
