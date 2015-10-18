@@ -102,7 +102,7 @@ class squidstat {
 		return $text;
 	}
 
-	function showError(){
+	function showError() {
 		$text = '<h1>SqStat error</h1>' . '<h2 style="color:red">Error (' . $this->errno . ') : ' . $this->errstr . '</h2>';
 		echo $this->formatXHTML($text, 0);
 	}
@@ -123,7 +123,7 @@ class squidstat {
 		$takes_time = array(604800, 86400, 3600, 60, 0);
 		$suffixes = array("w", "d", "h", "m", "s");
 		$output = "";
-		foreach ($takes_time as $key=>$val) {
+		foreach ($takes_time as $key => $val) {
 			${$suffixes[$key]} = ($val == 0) ? $seconds : floor(($seconds/$val));
 			$seconds -= ${$suffixes[$key]} * $val;
 			if (${$suffixes[$key]} > 0) {
@@ -187,7 +187,7 @@ class squidstat {
 		$header = 1;
 		$connection = 0;
 		$parsed["server_version"] = "Unknown";
-		foreach ($raw as $key=>$v) {
+		foreach ($raw as $key => $v) {
 			// cutoff http header
 			if ($header == 1 && $v == "") {
 				$header = 0;
@@ -232,7 +232,7 @@ class squidstat {
 					if (preg_match('/out.offset \d+, out.size (\d+)/', $v, $matches)) {
 						$parsed["con"][$connection]["bytes"] = $matches[1];
 					}
-					if (preg_match('/start \d+\.\d+ \((\d+).\d+ seconds ago\)/', $v, $matches)){
+					if (preg_match('/start \d+\.\d+ \((\d+).\d+ seconds ago\)/', $v, $matches)) {
 						$parsed["con"][$connection]["seconds"] = $matches[1];
 					}
 				}
@@ -327,7 +327,7 @@ class squidstat {
 			$session_data = $_SESSION['sqdata'];
 		}
 		$table = '';
-		foreach ($users as $key=>$v) {
+		foreach ($users as $key => $v) {
 			$ausers++;
 			$table .= '<tr><td style="border-right:0;" colspan="2"><b>' . (is_int($key) ? long2ip($key) : $key) . '</b></td>'
 			    . '<td style="border-left:0;" colspan="5">&nbsp;</td></tr>';
@@ -375,7 +375,7 @@ class squidstat {
 				$new_data[$con_id]['time'] = $is_time;
 				$new_data[$con_id]['size'] = $con['bytes'];
 
-				//sum speeds
+				// sum speeds
 				$total_avg += $avg_speed;
 				$user_avg += $avg_speed;
 				$total_curr += $curr_speed;
@@ -479,7 +479,7 @@ class squidstat {
 			$session_data = $_SESSION['sqdata'];
 		}
 
-		// users count & con cont
+		// users count & con count
 		$ausers = $acon = 0;
 		$total_avg = $total_curr = 0;
 		foreach ($users as $key => $v) {
