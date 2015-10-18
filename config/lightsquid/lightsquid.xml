@@ -262,7 +262,7 @@
 				Note: If using Squid 2.7 package, also do not forget to add '127.0.0.1' to Squid - Access Control - External Cache-Managers. (This is not needed for Squid 3.x.)<br/><br/>
 				3/ <strong>Configure 'Report Template Settings' and 'Reporting Settings and Scheduler' below and Save when finished.</strong><br/><br/>
 				4/ <strong>Use the Refresh buttons in the 'Manual Refresh' section below to create initial LightSquid reports</strong>; otherwise you will get an error diagnostic page.<br/>
-				- <em>"Refresh now"</em> will (re)parse today's entires only in Squid's current access.log.<br/>
+				- <em>"Refresh now"</em> will (re)parse today's entries only in Squid's current access.log.<br/>
 				- <em>"Refresh full"</em> will (re)parse all entries in all Squid's access logs, including the rotated ones. <strong>Note: This may take long time to finish!</strong><br/>
 				]]>
 			</description>
@@ -399,7 +399,7 @@
 			<fielddescr>Manual Refresh</fielddescr>
 			<description>
 				<![CDATA[
-				<input type="submit" name="refreshnow" id="refreshnow" value="Refresh now" /> will (re)parse today's entires only in Squid's current access.log.<br/><br/>
+				<input type="submit" name="refreshnow" id="refreshnow" value="Refresh now" /> will (re)parse today's entries only in Squid's current access.log.<br/><br/>
 				<input type="submit" name="refreshfull" id="refreshfull" value="Refresh full" /> will (re)parse all entries in all Squid's access logs, including the rotated ones.
 				<strong>Note: This may take long time to finish!</strong><br/><br/>
 				Press a button above to start background refresh (this will take some time).<br/>
