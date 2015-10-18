@@ -71,7 +71,7 @@ function squid_avdb_info($filename) {
 function squid_antivirus_bases_info() {
 	$db = '<table width="100%" border="0" cellspacing="0" cellpadding="1"><tbody>';
 	$db .= '<tr class="vncellt" ><td>Database</td><td>Date</td><td>Version</td><td>Builder</td></tr>';
-	$avdbs = array("daily.cvd", "daily.cld", "bytecode.cvd", "bytecode.cld", "main.cvd", "main.cld", "safebrowing.cvd", "safebrowing.cld");
+	$avdbs = array("daily.cvd", "daily.cld", "bytecode.cvd", "bytecode.cld", "main.cvd", "main.cld", "safebrowsing.cvd", "safebrowsing.cld");
 	foreach ($avdbs as $avdb) {
 		$db .= squid_avdb_info($avdb);
 	}
