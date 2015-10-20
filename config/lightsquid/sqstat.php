@@ -355,22 +355,13 @@ function sqstat_loadconfig() {
 
 	$squidclass->sqstat_version = SQSTAT_VERSION;
 
-	/* Load config from pfSense */
 	$iface = '127.0.0.1';
+	/* Load config from pfSense and find proxy port */
 	$iport = 3128;
 	if (is_array($config['installedpackages']['squid']['config'][0])) {
 		$squid_settings = $config['installedpackages']['squid']['config'][0];
 	} else {
 		$squid_settings = array();
-	}
-
-	// Squid interface IP & port
-	$realif = array();
-	$iface = ($squid_settings['active_interface'] ? $squid_settings['active_interface'] : 'lan');
-	$iface = explode(",", $iface);
-	foreach ($iface as $i => $if) {
-		$realif[] = sqstat_get_real_interface_address($if);
-		$iface = $realif[$i][0] ? $realif[$i][0] : '127.0.0.1';
 	}
 	$iport = $squid_settings['proxy_port'] ? $squid_settings['proxy_port'] : 3128;
 
@@ -389,16 +380,6 @@ function sqstat_loadconfig() {
 	}
 
 	return $squidclass->errno;
-}
-
-function sqstat_get_real_interface_address($iface) {
-	global $config;
-
-	$iface = convert_friendly_interface_to_real_interface_name($iface);
-	$line = trim(shell_exec("ifconfig $iface | grep inet | grep -v inet6"));
-	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
-
-	return array($ip, long2ip(hexdec($netmask)));
 }
 
 ?>
