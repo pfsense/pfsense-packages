@@ -456,18 +456,22 @@ function lightsquid_validate_input($post, &$input_errors) {
 		} else {
 			$ext_cachemanager = "";
 		}
-		if (strpos($ext_cachemanager, $ifmgr) === FALSE) {
+		if (strpos($ext_cachemanager, $ifmgr) === false) {
 			$input_errors[] = "Please, add '{$ifmgr}' to Squid - Access Control - External Cache-Managers first.";
 		}
 	}
-	/* SqStat - check that Squid listens on loopback */
+	/* SqStat - check that Squid listens on loopback unless the proxy is set as transparent (which makes it listen on localhost automatically) */
 	if (is_array($config['installedpackages']['squid']['config'])) {
 		$active_interfaces = ($config['installedpackages']['squid']['config'][0]['active_interface'] ?: "");
+		$transparent = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == "on" ? true : false);
 	} else {
 		$active_interfaces = "";
+		$transparent = false;
 	}
-	if (strpos($active_interfaces, "lo0") === FALSE) {
-		$input_errors[] = "Please, configure Squid - General - Proxy Interface(s) to include 'loopback' interface.";
+	if (!$transparent) {
+		if (strpos($active_interfaces, "lo0") === false) {
+			$input_errors[] = "Please, configure Squid - General - Proxy Interface(s) to include 'loopback' interface.";
+		}
 	}
 	
 	/* 'Skip URL(s)' validation */
