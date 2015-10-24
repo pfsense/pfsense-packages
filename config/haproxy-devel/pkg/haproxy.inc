@@ -1295,7 +1295,7 @@ function haproxy_updateocsp($socketupdate = true) {
 }
 
 function haproxy_writeconf($configpath) {
-	global $config;
+	global $config, $a_files_cache;
 	global $aliastable;
 	global $a_action;
 	if (!isset($aliastable)) {
@@ -1595,6 +1595,24 @@ function haproxy_writeconf($configpath) {
 			
 			fwrite ($fd, "\ttimeout client\t\t{$bind['client_timeout']}\n");
 
+			if (is_arrayset($bind,'a_errorfiles','item')) {
+				foreach($bind['a_errorfiles']['item'] as $errorfile) {
+					if (!is_array($a_files_cache)) {// load only once
+						$a_files_cache = haproxy_get_fileslist();
+					}
+					$file = $errorfile['errorfile'];
+					$errorcodes = explode(",",$errorfile['errorcode']);
+					foreach($errorcodes as $errorcode) {
+						$filename = "$configpath/errorfile_{$name}_{$errorcode}_{$file}";
+						$content = base64_decode($a_files_cache[$file]['content']);
+						$content = str_replace('{errormsg}', $a_error[$errorcode]['descr'], $content);
+						$content = str_replace('{errorcode}', $errorcode, $content);
+						file_put_contents($filename, $content);
+						fwrite ($fd, "\terrorfile\t\t\t" . $errorcode ." " . $filename . "\n");
+					}
+				}
+			}
+
 			// Advanced pass thru
 			if ($bind['advanced']) {
 				$advanced = explode("\n", base64_decode($bind['advanced']));
@@ -1647,11 +1665,7 @@ function haproxy_writeconf($configpath) {
 					$item['use_backendbackend'] = $frontend['backend_serverpool'];
 					$a_actionitems[] = $item;
 				}
-
-				//$backend = haproxy_find_backend($frontend['backend_serverpool']);
-				//$transparent_clientip = $backend["transparent_clientip"] == 'yes';
 				$transparent_clientip = frontend_usetransparentbackend($frontend);
-				
 				
 				$allowfordefaultbackend = true;
 				$ipv = array();

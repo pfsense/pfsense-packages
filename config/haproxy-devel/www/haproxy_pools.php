@@ -102,18 +102,31 @@ haproxy_css();
 		foreach ($a_pools as $pool){
 			$fe_list = "";
 			$sep = "";
-			foreach ($a_backends as $backend) {
-				 if($backend['backend_serverpool'] == $pool['name']) {
-					 $fe_list .= $sep . $backend['name'];
-					 $sep = ", ";
-				 }
+			foreach ($a_backends as $frontend) {
+				$used = false;
+				if($frontend['backend_serverpool'] == $pool['name']) {
+					$used = true;
+				}
+				$actions = $frontend['a_actionitems']['item'];
+				if (is_array($actions)) {
+					foreach($actions as $action) {
+						if ($action["action"] == "use_backend" && $action['use_backendbackend'] == $pool['name']) {
+							$used = true;
+						}
+					}
+				}
+				if ($used) {
+					$fe_list .= $sep . $frontend['name'];
+					$sep = ", ";
+				}
 			}
 			$textgray = $fe_list == "" ? " gray" : "";
 			
-			if (is_array($pool['ha_servers']))
+			if (is_array($pool['ha_servers'])) {
 				$count = count($pool['ha_servers']['item']);
-			else
-				 $count = 0;
+			} else {
+				$count = 0;
+			}
 ?>
 			<tr class="<?=$textgray?>">
 			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
