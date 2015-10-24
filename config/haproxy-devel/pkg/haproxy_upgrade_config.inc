@@ -1,6 +1,6 @@
 <?php
 /*
-    haproxy.inc
+    haproxy_upgrade_config.inc
 	Copyright (C) 2015 PiBa-NL
     All rights reserved.
 
@@ -26,7 +26,9 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("haproxy_utils.inc");
 require_once("pkg-utils.inc");
+require_once("haproxy.inc");
 
 function haproxy_upgrade_config() {
 	global $config, $static_output;
@@ -192,6 +194,75 @@ function haproxy_upgrade_config() {
 			}
 		}
 		$configversion = "00.19";
+	}
+	if ($configversion < "00.32") {
+		$frontends = array();
+		foreach ($config['installedpackages']['haproxy']['ha_backends']['item'] as &$frontend) {
+			$primaryfrontend = get_primaryfrontend($frontend);
+			$fe_name = $primaryfrontend['name'];
+			$frontends[$fe_name][] = &$frontend;
+		}
+		
+		foreach ($frontends as $primary) {
+			$acl_count = array();
+			foreach ($primary as &$frontend){
+				$acl_use = array();
+				$a_actions = &$frontend['a_actionitems']['item'];
+				if (!is_array($a_actions)) {
+					$a_actions = array();
+				}
+				
+				$primaryfrontend = get_primaryfrontend($frontend);
+				$frontendtype = $primaryfrontend['type'];
+				$is_default = true;
+				if (is_array($frontend['ha_acls']['item'])) {
+					$a_acl = &$frontend['ha_acls']['item'];
+
+					foreach ($a_acl as &$aclitem) {
+						$aclname = $aclitem['name'];
+						$acltype = haproxy_find_acl($aclitem['expression']);
+						if ($aclitem['expression'] == "backendservercount") {
+							$aclitem['backendservercountbackend'] = $frontend['backend_serverpool'];
+						}
+						if (!isset($acl_count[$aclname])) {
+							$acl_count[$aclname] = 1;
+						} else {
+							$acl_count[$aclname] += 1;
+							$aclitem['name'] .= "_{$acl_count[$aclname]}";
+						}
+						if (!isset($acltype))
+							continue;
+						if ($acltype['mode'] != '' && $acltype['mode'] != strtolower($frontendtype)) {
+							continue;
+						}
+						$acl_use[$aclname][] = $aclitem['name'];
+					}
+					foreach ($acl_use as $key => $acl_x) {
+						$aclx = $acl_count[$key];
+						$aclnames = "";
+						foreach($acl_x as $aclname) {
+							$aclnames .= " $aclname";
+						}
+						$aclnames = trim($aclnames);
+						$action['action'] = 'use_backend';
+						$action['use_backendbackend'] = $frontend['backend_serverpool'];
+						$action['acl'] = $aclnames;
+						$a_actions[] = $action;
+						$is_default = false;
+					}
+				}
+				if (!$is_default) {
+					/*
+					// default backends still exist ;) no need to convert them to 'actions'.
+					$action['action'] = 'use_backend';
+					$action['use_backendbackend'] = $frontend['backend_serverpool'];
+					$action['acl'] = ""; // default backend has no acl
+					$a_actions[] = $action;*/
+					$frontend['backend_serverpool'] = "";
+				}
+			}
+		}
+		$configversion = "00.32";
 	}
 	
 	$writeconfigupdate = $config['installedpackages']['haproxy']['configversion'] <> $configversion;

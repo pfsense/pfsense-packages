@@ -95,7 +95,7 @@ if ($_GET['act'] == "del") {
 
 $pgtitle = "Services: HAProxy: Frontends";
 include("head.inc");
-
+haproxy_css();
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
@@ -182,7 +182,7 @@ function js_callback(req) {
 		$first = true;		
 		$last_frontend_shared = false;
 		foreach ($a_frontend_grouped as $a_frontend) {
-			usort($a_frontend,'sort_sharedfrontends');
+			usort($a_frontend, 'sort_sharedfrontends');
 			if ((count($a_frontend) > 1 || $last_frontend_shared) && !$first) {
 				?> <tr class="<?=$textgray?>"><td colspan="7">&nbsp;</td></tr> <?	
 			}
@@ -297,14 +297,37 @@ function js_callback(req) {
 				  </td>
 				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
 					<div title='<?=$backend_serverpool_hint;?>'>
-					<a href="haproxy_pool_edit.php?id=<?=$frontend['backend_serverpool']?>">
-					<?=$frontend['backend_serverpool']?>
-					</a>
+					<?
+					$first = true;
+					if (is_array($frontend['a_actionitems']['item'])) {
+						foreach ($frontend['a_actionitems']['item'] as $actionitem) {
+							if ($actionitem['action'] == "use_backend") {
+								if ($first) {
+									$first = false;
+								} else {
+									echo "<br/>";
+								}
+								$backend = $actionitem['use_backendbackend'];
+								echo "<a href='haproxy_pool_edit.php?id={$backend}'>{$backend}</a>";
+								
+								if (!empty($actionitem['acl'])) {
+									echo " if({$actionitem['acl']})";
+								}
+							}
+						}
+					}
+					$backend = $frontend['backend_serverpool'];
+					if (!empty($backend)) {
+						if ($first) {
+							$first = false;
+						} else {
+							echo "<br/>";
+						}
+						echo "<a href='haproxy_pool_edit.php?id={$backend}'>{$backend}</a> (default)";
+					}
+					?>
 					</div>
 				  </td>
-				  <!--td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
-					<?=$frontend['secondary'] == 'yes' ? $frontend['primary_frontend'] : "";?>
-				  </td-->
 				  <td class="list" nowrap>
 					<table border="0" cellspacing="0" cellpadding="1">
 					  <tr>
