@@ -1299,46 +1299,6 @@
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
 	<package>
-		<name>Zabbix Agent</name>
-		<descr>Monitoring agent.</descr>
-		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix-agent/zabbix-agent.xml</config_file>
-		<version>1.8.10,2 pkg v1.1</version>
-		<status>FINAL</status>
-		<required_version>1.2.3</required_version>
-		<configurationfile>zabbix-agent.xml</configurationfile>
-		<maintainer>remco.verhoef@redfive.biz</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix-agent</build_port_path>
-		<build_pbi>
-			<custom_name>zabbix-agent</custom_name>
-			<port>net-mgmt/zabbix-agent</port>
-		</build_pbi>
-		<build_options>ca_root_nss_UNSET_FORCE=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET_FORCE=MYSQL</build_options>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix-agent-1.8.10,2.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix-agent-1.8.13-amd64.pbi</depends_on_package_pbi>
-	</package>
-	<package>
-		<name>Zabbix Proxy</name>
-		<descr>Monitoring agent proxy.</descr>
-		<category>Services</category>
-		<config_file>https://packages.pfsense.org/packages/config/zabbix-proxy/zabbix-proxy.xml</config_file>
-		<version>1.8.8,2 pkg v1.1</version>
-		<status>FINAL</status>
-		<required_version>1.2.3</required_version>
-		<configurationfile>zabbix-proxy.xml</configurationfile>
-		<maintainer>cmb@pfsense.org</maintainer>
-		<build_port_path>/usr/ports/net-mgmt/zabbix-proxy</build_port_path>
-		<build_pbi>
-			<custom_name>zabbix-proxy</custom_name>
-			<port>net-mgmt/zabbix-proxy</port>
-		</build_pbi>
-		<build_options>ca_root_nss_UNSET_FORCE=ETCSYMLINK;zabbix22_SET=LDAP SSH SQLITE;zabbix22_UNSET_FORCE=MYSQL</build_options>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix-proxy-1.8.8,2.tbz</depends_on_package>
-		<depends_on_package_pbi>zabbix-proxy-1.8.13-amd64.pbi</depends_on_package_pbi>
-	</package>
-	<package>
 		<name>OpenVPN Client Export Utility</name>
 		<descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
