@@ -54,6 +54,10 @@
 		<item>https://packages.pfsense.org/packages/config/zabbix2/zabbix2.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.priv.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
+	</additional_files_needed>
 	<menu>
 		<name>Zabbix-2 Agent</name>
 		<tooltiptext>Setup Zabbix Agent specific settings</tooltiptext>
