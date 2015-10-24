@@ -1,10 +1,9 @@
 /*
-	$Id: ups_status.js
-	
-	File location: 
-		\usr\local\www\widgets\javascript\
-	Used by:
-		\usr\local\www\widgets\widgets\ups_status.widget.php
+	ups_status.js
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2015 SunStroke <andrey.b.nikitin@gmail.com>
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -27,7 +26,6 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 //should be called from "ups_status.widget.php"
 function showUPSData() {
 
@@ -46,7 +44,7 @@ function showUPSData() {
 			updateUPSWidgetContent("Error getting data from [ups_status.widget.php]");
 		}
 	});
-	
+
 	//call itself in 11 seconds
 	window.setTimeout(showUPSData, 11000);
 }
