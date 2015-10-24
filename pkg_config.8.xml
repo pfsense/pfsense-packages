@@ -961,7 +961,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>widentd-1.03_1.tbz</depends_on_package>
 		<depends_on_package_pbi>widentd-1.03_1-i386.pbi</depends_on_package_pbi>
-		<version>1.03_1</version>
+		<version>1.05</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>1.2.1</required_version>
