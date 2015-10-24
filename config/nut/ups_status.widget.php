@@ -1,24 +1,20 @@
 <?php
 /*
-	$Id: ups_status.widget.php
-
+	ups_status.widget.php
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2015 SunStroke <andrey.b.nikitin@gmail.com>
-
-	File location:
-		\usr\local\www\widgets\widgets\
-	Depends on:
-		\usr\local\www\widgets\javascript\ups_status.js
-		\usr\local\www\widgets\include\ups_status.inc
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
 	1. Redistributions of source code must retain the above copyright notice,
-	this list of conditions and the following disclaimer.
+	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
-	notice, this list of conditions and the following disclaimer in the
-	documentation and/or other materials provided with the distribution.
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -30,16 +26,15 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
- */
-
+*/
 require_once("guiconfig.inc"); // NOTE: maybe not needed (no GUI settings)? Remove if so.
 require_once("/usr/local/www/widgets/include/ups_status.inc");
 
 //called by showUPSData() (jQuery Ajax call) in ups_status.js
 if (isset($_GET["getUPSData"])) {
-    //get UPS data and return it in ajax response
-    echo getUPSData();
-    return;
+	//get UPS data and return it in ajax response
+	echo getUPSData();
+	return;
 }
 
 function getUPSData() {
@@ -142,8 +137,8 @@ function getUPSData() {
 	if ($secs < 0 || $secs == "") {
 		$data .= ":" . gettext("n/a");
 	} else {
-		$m = (int)($secs / 60); 
-		$h = (int)($m / 60) % 24; 
+		$m = (int)($secs / 60);
+		$h = (int)($m / 60) % 24;
 		$m = $m % 60;
 		$s = $secs % 60;
 		$data .= ":" . $h."h " . $m."m " . $s."s";
