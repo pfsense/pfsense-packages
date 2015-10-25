@@ -49,16 +49,16 @@
 	<menu>
 		<name>vnstat2</name>
 		<section>Status</section>
-		<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=vnstat2.xml</url>
 	</menu>
 	<tabs>
 		<tab>
 			<text>Config</text>
-			<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=vnstat2.xml</url>
 		</tab>
 		<tab>
 			<text>Vnstati</text>
-			<url>/pkg_edit.php?xml=vnstati.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=vnstati.xml</url>
 		</tab>
 		<tab>
 			<text>Access vnstat php frontend</text>
@@ -66,7 +66,7 @@
 		</tab>
 		<tab>
 			<text>vnstat info</text>
-			<url>/pkg_edit.php?xml=vnstatoutput.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=vnstatoutput.xml</url>
 			<active/>
 		</tab>
 		<tab>
