@@ -439,8 +439,8 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<version>0.7.5</version>
-		<status>Stable</status>
+		<version>0.8.3</version>
+		<status>Beta</status>
 		<required_version>1.2.3</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>vhosts.xml</configurationfile>

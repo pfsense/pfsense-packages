@@ -43,7 +43,7 @@
 	</copyright>
 	<description>vHosts</description>
 	<name>vHosts Settings</name>
-	<version>0.8.0</version>
+	<version>0.8.3</version>
 	<title>vHosts Settings</title>
 	<include_file>/usr/local/pkg/vhosts.inc</include_file>
 	<menu>
@@ -63,6 +63,10 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/vhosts/vhosts.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/vhosts/vhosts.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/packages/vhosts/</prefix>

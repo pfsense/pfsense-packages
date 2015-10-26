@@ -273,7 +273,7 @@ EOF;
 
 					// Set the default port
 					if (strlen($port) == 0) {
-						$port = '8001';
+						$port = '10081';
 					}
 
 					if ($ipaddress . ':' . $port != $ipaddress_and_port_previous_value) {

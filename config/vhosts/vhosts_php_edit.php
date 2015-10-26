@@ -201,7 +201,7 @@ function openwindow(url) {
 			<td width="78%" class="vtable">
 				<input name="host" type="text" class="formfld" id="host" size="40" value="<?=htmlspecialchars($pconfig['host']);?>" />
 				<br />
-				Required. If the host is intended for internal you can use the DNS forwarder to set a host name that is valid inside the local network. default: vhost01.local
+				Required. If the host is intended for internal you can use the DNS forwarder to set a host name that is valid inside the local network. Default: vhost01.local
 			</td>
 		</tr>
 		<tr>
@@ -209,7 +209,7 @@ function openwindow(url) {
 			<td width="78%" class="vtable">
 				<input name="ipaddress" type="text" class="formfld" id="ipaddress" size="40" value="<?=htmlspecialchars($pconfig['ipaddress']);?>" />
 				<br />
-				Required. Make sure the IP and Port combination does not conflict with the local system. example: 192.168.0.1
+				Required. Make sure the IP and Port combination does not conflict with the local system. Example: 192.168.0.1
 			</td>
 		</tr>
 		<tr>
@@ -217,7 +217,7 @@ function openwindow(url) {
 			<td width="78%" class="vtable">
 				<input name="port" type="text" class="formfld" id="port" size="40" value="<?=htmlspecialchars($pconfig['port']);?>" />
 				<br />
-				Make sure the IP and Port combination does not conflict with the local system. default: 8001
+				Make sure the IP and Port combination does not conflict with the local system. Default: 10081
 			</td>
 		</tr>
 		<tr>
