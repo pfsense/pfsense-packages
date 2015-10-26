@@ -66,7 +66,12 @@ $a_acltypes["path_matches"] = array('name' => 'Path matches:',
 $a_acltypes["path_regex"] = array('name' => 'Path regex:',
 				'mode' => 'http', 'syntax' => 'path_reg -i %1$s');
 $a_acltypes["path_contains"] = array('name' => 'Path contains:',
-				'mode' => 'http', 'syntax' => 'path_dir -i %1$s');
+				'mode' => 'http', 'syntax' => 'path_sub -i %1$s');
+$a_acltypes["url_parameter"] = array('name' => 'Url parameter contains:',
+				'mode' => 'http', 'syntax' => 'url_param({parameter}) -i %1$s',
+	'fields' => array(
+		array('name'=>"parameter",'columnheader'=>"Parameter name",'type'=>"textbox",'size'=>"50",'mask'=>'urlparameter')
+	));
 $a_acltypes["ssl_c_verify_code"] = array('name' => 'SSL Client certificate verify error result:',
 				'mode' => 'http', 'syntax' => 'ssl_c_verify %1$s', 'require_client_cert' => '1');
 				// ssl_c_verify result codes: https://www.openssl.org/docs/apps/verify.html#DIAGNOSTICS
@@ -351,7 +356,7 @@ $a_action["tcp-response_content_accept"] = array('name' => "tcp-response content
 $a_action["tcp-response_content_close"] = array('name' => "tcp-response content close", 'mode'=> '', 'syntax' => 'tcp-response content close');
 $a_action["tcp-response_content_reject"] = array('name' => "tcp-response content reject", 'mode'=> '', 'syntax' => 'tcp-response content reject');
 if (haproxy_version() >= '1.6') {
-	$a_action["tcp-response_content_lua"] = array('name' => "tcp-response content lua script", 'mode'=> '',
+	$a_action["tcp-response_content_lua"] = array('name' => "tcp-response content lua script", 'mode'=> '', 'syntax' => 'tcp-response content lua.{lua-function}',
 	'fields' => array(
 		'lua-function' => array('name'=>"lua-function",'columnheader'=>"lua function",'type'=>"textbox",'size'=>"50",'mask'=>'lua-function')
 	));
@@ -992,6 +997,142 @@ function write_backend($configpath, $fd, $name, $pool, $backendsettings) {
 		}
 	}
 
+	global $a_action;
+	$config_acls = array();
+
+	$cert_acls = "";
+	$aclcrt_name = "";
+	$a_acl = get_backend_acls($pool, $frontendtype);
+	if (!is_array($a_acl)) {
+		$a_acl = array();
+	}
+	// ACL's
+	foreach ($a_acl as $entry) {
+		$aclitem = $entry['ref'];
+		$expression = $aclitem['expression'];
+		
+		$aclname = $aclitem['name'];
+		$acltype = haproxy_find_acl($expression);
+		if (!isset($acltype))
+			continue;
+		
+		// Filter out acls for different modes
+		if ($acltype['mode'] != '' && $acltype['mode'] != strtolower($frontendtype)) {
+			continue;
+		}
+		if ($acltype['inspect-delay'] != '') {
+			$inspectdelay = $acltype['inspect-delay'];
+		}
+		if ($acltype['advancedoptions'] != '') {
+			$advancedextra[$acltype['syntax']] = $acltype['advancedoptions']."\n";
+		}
+		if ($acltype['require_client_cert']) {
+			$needs_clientcert[$aclname] = true;
+		}
+		if ($aclitem['certacl']) {
+			$aclname = "aclcrt_{$frontend['name']}";
+			$aclcrt_name = $aclname;
+		}
+		
+		if (($expression == "source_ip") && is_alias($aclitem['value'])) {
+			$filename = "$configpath/ipalias_{$aclitem['value']}.lst";
+			$listitems = haproxy_hostoralias_to_list($aclitem['value']);
+			$fd_alias = fopen("$filename", "w");
+			foreach($listitems as $item) {
+				fwrite($fd_alias, $item."\r\n");
+			}
+			fclose($fd_alias);
+			$expr = "src -f $filename";
+		} else {
+			$expr = sprintf($acltype['syntax'], $aclitem['value']);
+			if (is_array($acltype['fields'])) {
+				foreach ($acltype['fields'] as $field) {
+					$fieldname = $field['name'];
+					$parameter = $aclitem[$expression . $fieldname];
+					if ($fieldname == "backend") {
+						$backendname = $parameter . "_" . strtolower($bind['type'])."_".$ipversion;
+						$parameter = $backendname;
+					}
+					$expr = str_replace("{{$fieldname}}", $parameter, $expr);
+				}
+			}
+		}
+		$config_acls ["\tacl\t\t\t" . $aclname . "\t" .  $expr . "\n"] = 1;
+	}
+	// Write acl's first, so they may be used by advanced text options written by user.
+	foreach($config_acls as $acl => $dummy) {
+		fwrite ($fd, $acl);
+	}
+
+	$a_actionitems = $pool['a_actionitems']['item'];
+	if (!is_array($a_actionitems)) {
+		$a_actionitems = array();
+	}
+	foreach ($a_actionitems as $actionitem) {
+		$actionid = $actionitem['action'];
+		$action = $a_action[$actionid];
+		
+		$action_cfg = $action['syntax'];
+		
+		if (is_array($action['fields'])) {
+			foreach ($action['fields'] as $field) {
+				$fieldname = $field['name'];
+				$parameter = $actionitem[$actionid . $field['name']];
+				
+				if ($fieldname == "backend") {
+					$backend = $parameter;
+					$backendname = $parameter . "_" . strtolower($bind['type'])."_".$ipversion;
+					if (!isset($a_pendingpl[$backendname])) {
+						$a_pendingpl[$backendname] = array();
+						$a_pendingpl[$backendname]['name'] = $backendname;
+						$a_pendingpl[$backendname]['backend'] = $backend;
+						$a_pendingpl[$backendname]['frontend'] = $bind;
+						$a_pendingpl[$backendname]['ipversion'] = $ipversion;
+					}
+					$parameter = $backendname;
+				}
+				$action_cfg = str_replace("{{$fieldname}}", $parameter, $action_cfg);
+			}
+		}
+		$condition = "";
+		if (!empty($actionitem['acl']) || !empty($systemacl)) {
+			$useclientcert = "";
+			$useracls = "";
+			$aclnames = explode(' ', $actionitem['acl']);
+			foreach($aclnames as $aclname) {
+				if ($needs_clientcert[$aclname]) {
+					$useclientcert = " aclsystem_ssl_c_used";
+				}
+				$not = "";
+				foreach ($a_acl as $entry) {
+					if ($entry['ref']['name'] == $aclname && $entry['ref']['not'] == 'yes') {
+						$not = "!";
+					}
+				}
+				$useracls .= " {$not}{$aclname}";
+			}
+			$condition = " if {$useracls}{$useclientcert} {$systemacl}";
+		}
+		
+		$action = "\t{$action_cfg} {$condition}\n";
+		
+		if ($actionid == "use_backend") {							
+			if (empty($condition)) {
+				$config_usedefaultbackends .= "\tdefault_backend {$parameter}{$condition}\n";
+			} else {
+				if (!empty($actionitem['acl'])){
+					$config_usebackends .= $action;
+				} else {
+					// add use_backend if ipv4/6 before default_backend if any exists..
+					$config_usedefaultbackends .= $action;
+				}
+			}
+		} else {
+			$config_actions .= $action;
+		}
+	}
+	fwrite ($fd, $config_actions);
+	
 	if ($pool['advanced']) {
 		$advanced = base64_decode($pool['advanced']);
 		$advanced_txt = " " . $advanced;
@@ -1346,15 +1487,15 @@ function haproxy_writeconf($configpath) {
 		}
 		
 		// lua-load
-		foreach($a_files as $file) {
-			if ($file['type'] == "luascript") {
-				$luafile = $configpath . "/luascript_" . $file['name'];
-				file_put_contents($luafile, base64_decode($file['content']), 0);
-				fwrite ($fd, "\tlua-load\t\t{$luafile}\n");
-				
+		if (is_array($a_files)) {
+			foreach($a_files as $file) {
+				if ($file['type'] == "luascript") {
+					$luafile = $configpath . "/luascript_" . $file['name'];
+					file_put_contents($luafile, base64_decode($file['content']), 0);
+					fwrite ($fd, "\tlua-load\t\t{$luafile}\n");
+				}
 			}
 		}
-		
 
 		// Keep the advanced options on the bottom of the global settings, to allow additional sections to be easely added
 		if ($a_global['advanced']) {
@@ -2542,6 +2683,32 @@ function get_frontend_acls($frontend) {
 					$result = array_merge($result, haproxy_get_cert_acls($cert, true));
 				}
 			}
+		}
+	}
+	return $result;
+}
+
+function get_backend_acls($backend, $type) {
+	$result = array();
+	$a_acl = &$backend['a_acl']['item'];
+	if (is_array($a_acl))
+	{
+		foreach ($a_acl as $entry) {
+			$acl = haproxy_find_acl($entry['expression']);
+			if (!$acl) {
+				continue;
+			}
+
+			// Filter out acls for different modes
+			if ($acl['mode'] != '' && $acl['mode'] != $type) {
+				continue;
+			}
+			$not = $entry['not'] == "yes" ? "not: " : "";
+			$acl_item = array();
+			$acl_item['descr'] = $acl['name'] . " " . (isset($acl['novalue']) ? "" : $not . $entry['value']);
+			$acl_item['ref'] = $entry;
+			
+			$result[] = $acl_item;
 		}
 	}
 	return $result;

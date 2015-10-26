@@ -134,7 +134,7 @@ class HaproxyHtmlList
 			} elseif ($itemtype == "checkbox") {
 				echo $itemvalue=='yes' ? gettext('yes') : gettext('no');
 			} elseif ($itemtype == "textarea") {
-				echo '<div style="overlow:scroll;max-height:120px;overflow-y: scroll;">';
+				echo "<div style='overlow:scroll;max-height:120px;max-width:{$item['colwidth']};overflow-y: scroll;'>";
 				echo str_replace(" ","&nbsp;", str_replace("\n","<br/>", htmlspecialchars(base64_decode($itemvalue))));
 				echo '</div>';
 			} elseif ($itemtype ==  "fixedtext") {
@@ -180,7 +180,7 @@ class HaproxyHtmlList
 						$itemname = $item['name'];
 						$itemvalue = $value[$itemname];
 						if (isset($item['customdrawcell'])) {
-							$item['customdrawcell']($this, $item, $itemvalue, false);
+							$item['customdrawcell']($this, $item, $itemvalue, false, $itemname, $counter);
 						} else {
 							$this->haproxy_htmllist_drawcell($item, $itemvalue, false, $itemname, $counter);
 						}

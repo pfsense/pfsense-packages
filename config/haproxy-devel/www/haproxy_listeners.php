@@ -311,7 +311,7 @@ function js_callback(req) {
 								echo "<a href='haproxy_pool_edit.php?id={$backend}'>{$backend}</a>";
 								
 								if (!empty($actionitem['acl'])) {
-									echo " if({$actionitem['acl']})";
+									echo "&nbsp;if({$actionitem['acl']})";
 								}
 							}
 						}
