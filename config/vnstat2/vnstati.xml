@@ -42,23 +42,23 @@
 	]]>
 	</copyright>
 	<name>vnstat2</name>
-	<version>1.12.5</version>
+	<version>1.12.8</version>
 	<title>Vnstat2</title>
 	<aftersaveredirect>/vnstati.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/vnstat2/vnstat2.inc</include_file>
 	<menu>
 		<name>vnstat2</name>
 		<section>Status</section>
-		<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=vnstat2.xml</url>
 	</menu>
 	<tabs>
 		<tab>
 			<text>Config</text>
-			<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=vnstat2.xml</url>
 		</tab>
 		<tab>
 			<text>Vnstati</text>
-			<url>/pkg_edit.php?xml=vnstati.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=vnstati.xml</url>
 			<active/>
 		</tab>
 		<tab>
@@ -67,7 +67,7 @@
 		</tab>
 		<tab>
 			<text>vnstat info</text>
-			<url>/pkg_edit.php?xml=vnstatoutput.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=vnstatoutput.xml</url>
 		</tab>
 		<tab>
 			<text>vnstat summary</text>
