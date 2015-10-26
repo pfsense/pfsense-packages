@@ -42,28 +42,32 @@
 	]]>
 	</copyright>
 	<name>widentd</name>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<title>Services: widentd</title>
 	<menu>
 		<name>widentd</name>
 		<tooltiptext>Modify widentd settings.</tooltiptext>
 		<section>Services</section>
-		<url>pkg_edit.php?xml=widentd.xml&amp;id=0</url>
+		<url>pkg_edit.php?xml=widentd.xml</url>
 	</menu>
 	<service>
 		<name>widentd</name>
 		<rcfile>widentd.sh</rcfile>
 		<executable>widentd</executable>
 	</service>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/widentd/widentd.priv.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
+	</additional_files_needed>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
-			<fielddescr>Enable widentd daemon</fielddescr>
+			<fielddescr>Enable widentd Daemon</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Listening interface</fielddescr>
+			<fielddescr>Listening Interface</fielddescr>
 			<fieldname>interface</fieldname>
 			<description>
 				<![CDATA[
@@ -87,7 +91,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>System name</fielddescr>
+			<fielddescr>System Name</fielddescr>
 			<fieldname>sysname</fieldname>
 			<description>
 				<![CDATA[
@@ -98,72 +102,65 @@
 			<type>input</type>
 		</field>
 	</fields>
-	<custom_php_global_functions>
+	<custom_php_resync_config_command>
 	<![CDATA[
-	function sync_package_widentd() {
 		conf_mount_rw();
 		global $config;
 
-		/* Write widentd.sh */
-		$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['widentd']['config'][0]['interface']);
-		$ip = find_interface_ip($int);
-		$user = $config['installedpackages']['widentd']['config'][0]['username'] ?: 'user';
-		$system = $config['installedpackages']['widentd']['config'][0]['sysname'] ?: 'UNIX';
-		$start = "/usr/local/sbin/widentd -u {$user} -o {$system} -i {$ip}";
-		$stop = "/usr/bin/killall widentd";
-		write_rcfile(array(
-			"file" => "widentd.sh",
-			"start" => $start,
-			"stop" => $stop
-			)
-		);
-
 		/* If the service is (being) disabled, stop it (if running) and do nothing else */
-		if (!($config['installedpackages']['widentd']['config'][0][enable])) {
-			if (is_process_running("widentd")) {
+		if ($config['installedpackages']['widentd']['config'][0][enable] != "on") {
+			if (is_service_running("widentd")) {
 				stop_service("widentd");
 			}
-			return;
+			unlink_if_exists("/usr/local/etc/rc.d/widentd.sh");
 		} else {
-			restart_service("widentd");
+			$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['widentd']['config'][0]['interface']);
+			$ip = find_interface_ip($int);
+			$user = $config['installedpackages']['widentd']['config'][0]['username'] ?: 'user';
+			$system = $config['installedpackages']['widentd']['config'][0]['sysname'] ?: 'UNIX';
+			$start = "/usr/local/sbin/widentd -u {$user} -o {$system} -i {$ip}";
+			$stop = "/usr/bin/killall widentd";
+			write_rcfile(array(
+				"file" => "widentd.sh",
+				"start" => $start,
+				"stop" => $stop
+				)
+			);
+			/* (Re)start service */
+			if (is_service_running("widentd")) {
+				restart_service("widentd");
+			} else {
+				start_service("widentd");
+			}
 		}
 		conf_mount_ro();
-	}
-
-
-	function validate_input_widentd($post, &$input_errors) {
+	]]>
+	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+	<![CDATA[
 		/* Only allow ^[a-zA-Z\.]+$ otherwise the daemon will not start; see widentd manpage */
-		if (($post['username'] != "") && !preg_match("/^[a-zA-Z\.]+$/", $post['username'])) {
-			$input_errors[] = 'Username may only contain uppercase and lowercase letters [a-zA-Z] and "." character.';
+		if ($_POST['username'] != "") {
+			if (!preg_match("/^[a-zA-Z\.]+$/", $_POST['username'])) {
+				$input_errors[] = 'Username may only contain uppercase and lowercase letters [a-zA-Z] and "." character.';
+			}
 		}
 
 		/* Technically, ^[A-Z][A-Z0-9\-.\/]+[A-Z0-9]$ should be valid characters here
 		https://www.iana.org/assignments/operating-system-names/operating-system-names.xhtml
 		However this is not supported by widentd; the service will not start.
 		*/
-		if (($post['sysname'] != "") && !preg_match("/^[a-zA-Z]+$/", $post['sysname'])) {
-			$input_errors[] .= 'System name may only contain uppercase and lowercase letters [a-zA-Z].';
+		if ($_POST['sysname'] != "") {
+			if (!preg_match("/^[a-zA-Z]+$/", $_POST['sysname'])) {
+				$input_errors[] = 'System name may only contain uppercase and lowercase letters [a-zA-Z].';
+			}
 		}
 
 		/* Check for IPv6-only interfaces */
-		$int = convert_friendly_interface_to_real_interface_name($post['interface']);
+		$int = convert_friendly_interface_to_real_interface_name($_POST['interface']);
 		$ip = find_interface_ip($int);
 		if (!is_ipaddrv4($ip)) {
-			$input_errors[] .= 'The selected interface has no IPv4 configured. Widentd does not support IPv6.';
+			$input_errors[] = 'The selected interface has no IPv4 configured. Widentd does not support IPv6.';
 		}
-	}
 	]]>
-	</custom_php_global_functions>
-	<custom_add_php_command>
-		sync_package_widentd();
-	</custom_add_php_command>
-	<custom_php_resync_config_command>
-		sync_package_widentd();
-	</custom_php_resync_config_command>
-	<custom_php_install_command>
-		unlink_if_exists("/usr/local/etc/rc.d/widentd.sh");
-	</custom_php_install_command>
-	<custom_php_validation_command>
-		validate_input_widentd($_POST, $input_errors);
 	</custom_php_validation_command>
 </packagegui>
