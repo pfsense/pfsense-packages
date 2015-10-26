@@ -815,7 +815,7 @@
 		<descr>Network UPS Tools.</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.1.0</version>
+		<version>2.1.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>

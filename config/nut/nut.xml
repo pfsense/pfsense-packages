@@ -41,7 +41,7 @@
 	]]>
 	</copyright>
 	<name>nut</name>
-	<version>2.0.5</version>
+	<version>2.1.1</version>
 	<title>Services: NUT</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/status_nut.php</aftersaveredirect>
@@ -76,6 +76,18 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<item>https://packages.pfsense.org/packages/config/nut/status_nut.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nut/ups_status.widget.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/javascript/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nut/ups_status.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/include/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nut/ups_status.inc</item>
 	</additional_files_needed>
 	<advanced_options>enabled</advanced_options>
 	<fields>
