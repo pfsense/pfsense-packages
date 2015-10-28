@@ -3802,11 +3802,7 @@ function snort_sync_on_changes() {
 					$protocol = $sh['varsyncprotocol'];
 					$error = '';
 					$success = TRUE;
-					if ($sh['varsyncusername']) {
-						$username = $sh['varsyncusername'];
-					} else {
-						$username = 'admin';
-					}
+					$username = $sh['varsyncusername'] ?: 'admin';
 					if ($password == "") {
 						$error = "Password parameter is empty. ";
 						$success = FALSE;
