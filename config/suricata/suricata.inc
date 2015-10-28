@@ -3328,7 +3328,7 @@ function suricata_sync_on_changes() {
 					$rs[0]['varsyncipaddress'] = $system_carp['synchronizetoip'];
 					$rs[0]['varsyncusername'] = $system_carp['username'];
 					$rs[0]['varsyncpassword'] = $system_carp['password'];
-					$rs[0]['varsyncsuricatastart'] = "no";
+					$rs[0]['varsyncsuricatastart'] = FALSE;
 					$rs[0]['varsyncdestinenable'] = FALSE;
 					// XMLRPC sync is currently only supported over connections using the same protocol and port as this system
 					if ($config['system']['webgui']['protocol'] == "http") {
