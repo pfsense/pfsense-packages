@@ -452,9 +452,6 @@ function squid_restart_services() {
 function squid_install_command() {
 	global $config, $g;
 
-	update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
-	update_output_window("Checking if there is configuration to migrate... One moment please...");
-
 	/* Set storage system for nanobsd */
 	if (!is_array($config['installedpackages']['squidcache'])) {
 		$config['installedpackages']['squidcache'] = array();
@@ -515,7 +512,6 @@ function squid_deinstall_command() {
 	squid_install_cron(false);
 
 	/* kill all running services */
-	update_output_window("Stopping and removing services...");
 	mwexec('/usr/local/etc/rc.d/sqp_monitor.sh stop');
 	mwexec("/bin/ps awux | /usr/bin/egrep -i '[s]quid -f|\([s]quid\)' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
 	mwexec("/bin/ps awux | /usr/bin/grep '[d]iskd' | /usr/bin/awk '{ print $2 }' | /usr/bin/xargs kill");
@@ -542,8 +538,6 @@ function squid_deinstall_command() {
 	$keep = ($squidsettings['keep_squid_data'] ? true : false);
 
 	if (!$keep) {
-		update_output_window("Removing cache and logs ... One moment please...");
-		update_output_window("This operation may take quite some time, please be patient. Do not press stop or attempt to navigate away from this page during this process.");
 		if (is_dir("{$cachedir}")) {
 			if (substr($cachedir, 0, 11) === "/var/squid/") {
 				mwexec_bg("/bin/rm -rf {$cachedir}");
@@ -558,7 +552,6 @@ function squid_deinstall_command() {
 				log_error("[squid] Will NOT delete Squid log dir '{$logdir}' since it is not located under /var/squid. Delete manually if required.");
 			}
 		}
-		update_output_window("Removing remaining Squid directories ... One moment please...");
 		$dirs = array("/var/run/squid", "/var/squid");
 		foreach ($dirs as $dir) {
 			if (is_dir("{$dir}")) {
@@ -570,7 +563,6 @@ function squid_deinstall_command() {
 	// remove antivirus integration features
 	squid_antivirus_deinstall_command();
 
-	update_output_window("Reloading filter...");
 	filter_configure();
 
 	/* Remove package settings from config if 'Keep Settings/Data' is disabled */
@@ -619,7 +611,6 @@ function squid_deinstall_command() {
 			unset($config['installedpackages']['squidusers']);
 		}
 	}
-	update_output_window("Squid3 has been uninstalled.");
 }
 
 /* Migrate configuration from god knows which Squid package versions */
@@ -704,7 +695,6 @@ function squid_upgrade_config() {
 	/* unset broken antivirus settings */
 	squid_antivirus_upgrade_config();
 
-	update_output_window("Writing configuration... One moment please...");
 	write_config();
 }
 
