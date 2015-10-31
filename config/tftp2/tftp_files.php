@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 require_once("guiconfig.inc");
+require_once("util.inc");
 require_once("/usr/local/pkg/tftp.inc");
 
 $pconfig['tftpdinterface'] = explode(",", $config['installedpackages']['tftpd']['config'][0]['tftpdinterface']);
@@ -43,7 +44,7 @@ if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
 	conf_mount_rw();
 	$filename = $backup_filename;
 	$download_dir = $backup_dir;
-	system("tar -czC / -f {$backup_path} tftpboot");
+	mwexec("/usr/bin/tar -czC / -f {$backup_path} tftpboot");
 	conf_mount_ro();
 }
 
@@ -73,8 +74,8 @@ if ($_GET['a'] == "other") {
 		if (file_exists($backup_path)) {
 			//echo "The file $filename exists";
 			conf_mount_rw();
-			system("tar -xpzC / -f {$backup_path}");
-			system("chmod -R 744 {$files_dir}/*");
+			mwexec("/usr/bin/tar -xpzC / -f {$backup_path}");
+			mwexec("/bin/chmod -R 744 {$files_dir}/*");
 			header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
 			conf_mount_ro();
 		} else {
@@ -100,7 +101,7 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 	conf_mount_rw();
 	move_uploaded_file($_FILES['ulfile']['tmp_name'], "{$files_dir}/{$_FILES['ulfile']['name']}");
 	$savemsg = "Uploaded file to {$files_dir}/" . htmlentities($_FILES['ulfile']['name']);
-	system('chmod -R 744 {$files_dir}/*');
+	mwexec('/bin/chmod -R 744 {$files_dir}/*');
 	unset($_POST['txtCommand']);
 	conf_mount_ro();
 }
@@ -122,7 +123,7 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">TFTP: Files</p>
+<p class="pgtitle">TFTP: Settings/Files</p>
 
 <?php
 $savemsg = $_GET["savemsg"];
@@ -137,7 +138,7 @@ if ($savemsg) {
 <?php
 
 	$tab_array = array();
-	$tab_array[] = array(gettext("Files"), false, "tftp_files.php");
+	$tab_array[] = array(gettext("TFTP"), false, "tftp_files.php");
 	display_top_tabs($tab_array);
 
 ?>
@@ -145,14 +146,16 @@ if ($savemsg) {
 </table>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td>
+<div id="mainarea">
+	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
-	<td class="tabcont">
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<td  colspan="2" class="listtopic">TFTP Daemon Interfaces</td>
+	</tr>
 	<tr>
+		<td width="22%" class="vncell">Select TFTP Daemon Interface(s).</td>
 		<td width="78%" class="vtable">
 			<form action="tftp_files.php" method="post" enctype="multipart/form-data" name="frmInterfaces" onsubmit="">
-			<p><span class="vexpl"><strong>TFTP Daemon Interfaces</strong></span></p>
-			<?=gettext("Choose the interfaces where you want the TFTP daemon to accept connections.");?><br/><br/>
 			<select name="tftpdinterface[]" multiple="multiple" class="formselect" size="3">
 			<?php
 				$ifdescs = get_configured_interface_with_descr();
@@ -164,70 +167,46 @@ if ($savemsg) {
 					echo "\t\t\t<option value=\"{$ifent}\"{$selected}>" . $ifdesc . "</option>\n";
 				}
 			?>
-			</select><br />
-			<input name="submit" type="submit" class="button" id="save" value="Save" />
+			</select><br /><br />
+			<span class="vexpl">
+			Choose the interfaces where you want the TFTP Daemon to accept connections.<br/>
+			<strong>Hint:</strong> If you simply need to (re)start tftpd/inetd, just use the Save button without making any changes here.<br /><br />
+			</span>
+			<input name="submit" type="submit" class="formbtns" id="save" value="Save" title="Save settings" />
 			</form>
 		</td>
 	</tr>
 
 	<tr>
-		<td>
-			<p><span class="vexpl"><span class="red"><strong>TFTP files</strong></span><br />
-				Trivial File Transport Protocol is a very simple file transfer protocol.<br />
-				Use the file upload to add files to the /tftpboot directory.<br />
-				Click on the file from the file list below to download it.<br />
-			</span></p>
-		</td>
+		<td colspan="2" class="listtopic">TFTP Files Upload</td>
 	</tr>
-	</table>
-	<br />
-	<div id="niftyOutter">
-	<form action="tftp_files.php" method="post" enctype="multipart/form-data" name="frmUpload" onsubmit="">
-		<table>
-		<tr>
-			<td align="right">File to upload:</td>
-			<td valign="top" class="label">
-				<input name="ulfile" type="file" class="button" id="ulfile" />
-			</td>
-		</tr>
-		<tr>
-			<td valign="top">&nbsp;&nbsp;&nbsp;</td>
-			<td valign="top" class="label">
-				<input name="submit" type="submit" class="button" id="upload" value="Upload" />
-			</td>
-		</tr>
-		</table>
-	</form>
-	</div>
-	<br /><br />
-	
-	<table width='690' cellpadding='0' cellspacing='0' border='0'>
 	<tr>
-		<td width='80%'>
-			<strong>Backup / Restore</strong><br />
-			The 'Backup' button compresses /tftpboot/ to /root/backup/tftp.bak.tgz; after that it presents the backup for download.<br />
-			If the backup file does not exist in /root/backup/tftp.bak.tgz then the 'Restore' button will be hidden.<br />
-			Use Diagnostics -> Command -> File to upload: to browse to the file and then click on upload.<br />
-			After that, backup will be ready to be restored.<br /><br />
-		</td>
-		<td width='20%' valign='middle' align='right'>
-			<input type="button" value="Backup" onclick="document.location.href='tftp_files.php?a=download&amp;t=backup'" />
-			<?php
-				if (file_exists('/root/backup/tftp.bak.tgz')) {
-					echo "<input type='button' value='Restore' onclick=\"document.location.href='tftp_files.php?a=other&amp;t=restore';\" />\n";
-				}
-			?>
+		<td width="22%" class="vncell">Use the file upload to add files to the /tftpboot directory.</td>
+		<td width="78%" class="vtable">
+			<form action="tftp_files.php" method="post" enctype="multipart/form-data" name="frmUpload" onsubmit="">
+			<span class="vexpl">1. Select file to upload:&nbsp;</span>
+			<input name="ulfile" type="file" class="formbtns" id="ulfile" title="Select file to upload" />
+			<br />
+			<span class="vexpl">2. Upload the selected file:&nbsp;</span>
+			<input name="submit" type="submit" class="formbtns" id="upload" value="Upload" title="Upload file" />
+			</form>
 		</td>
 	</tr>
-	</table>
-	<br /><br />
 
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-		<td width="25%" class="listhdrr">File Name (download)</td>
-		<td width="50%" class="listhdr">Last Modified</td>
-		<td width="50%" class="listhdr">Size</td>
+		<td colspan="3" class="listtopic">TFTP Files Download</td>
 	</tr>
+	<tr>
+		<td colspan="3" class="vexpl">Click on the file from the file list below to download it.</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tr>
+					<td width="25%" class="listhdrr">File Name (download)</td>
+					<td width="50%" class="listhdr">Last Modified</td>
+					<td width="50%" class="listhdr">Size</td>
+				</tr>
 
 <?php
 if ($handle = opendir('/tftpboot')) {
@@ -267,13 +246,37 @@ if ($handle = opendir('/tftpboot')) {
 }
 ?>
 
+				<tr>
+					<td class="list" colspan="3"></td>
+					<td class="list"></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
 	<tr>
-		<td class="list" colspan="3"></td>
-		<td class="list"></td>
+		<td colspan="2" class="listtopic">TFTP Backup / Restore</td>
+	</tr>
+	<tr>
+		<td width="22%" class="vncell">Use the file upload to add files to the /tftpboot directory.</td>
+		<td width="78%" class="vtable">
+			<span class="vexpl"><strong>Backup:</strong> 'Backup' button compresses /tftpboot/ to /root/backup/tftp.bak.tgz; after that it presents the backup for download.<br />
+			<strong>Restore:</strong> If the backup file does not exist in /root/backup/tftp.bak.tgz then the 'Restore' button will be hidden.
+			To 'Restore' a previously downloaded backup, use <a href="diag_backup.php" title="Upload file">Diagnostics -> Command Prompt -> File to upload</a> to browse to the file and then click on upload.<br />
+			After that, backup will be ready to be restored.<br /><br />
+			</span>
+			<input type="button" value="Backup" title="Create backup" onclick="document.location.href='tftp_files.php?a=download&amp;t=backup'" />
+			<?php
+				if (file_exists('/root/backup/tftp.bak.tgz')) {
+					echo "<input type='button' value='Restore' title='Restore backup' onclick=\"document.location.href='tftp_files.php?a=other&amp;t=restore';\" />\n";
+				}
+			?>
+		</td>
 	</tr>
 	</table>
-	</td>
-	</tr>
+
+</div>
+</td></tr>
 </table>
 </div>
 
