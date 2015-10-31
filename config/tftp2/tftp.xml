@@ -43,7 +43,7 @@
 	]]>
 	</copyright>
 	<name>tftp Settings</name>
-	<version>2.0</version>
+	<version>2.2.2</version>
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
@@ -56,23 +56,21 @@
 	<service>
 		<name>tftp</name>
 		<executable>inetd</executable>
-		<description>TFTP daemon</description>
+		<description>TFTP Daemon</description>
 	</service>
-	<tabs>
-		<tab>
-			<text>Files</text>
-			<url>tftp_files.php</url>
-		</tab>
-	</tabs>
 	<configpath>installedpackages->$packagename</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/tftp2/tftp.inc</item>
-	</additional_files_needed>	
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/tftp2/tftp.priv.inc</item>
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<item>https://packages.pfsense.org/packages/config/tftp2/tftp_files.php</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<custom_php_install_command>
 		tftp_install_command();
 	</custom_php_install_command>
