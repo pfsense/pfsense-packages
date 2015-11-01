@@ -1044,12 +1044,12 @@
 	<package>
 		<name>stunnel</name>
 		<website>http://www.stunnel.org/</website>
-		<descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
+		<descr>An SSL encryption wrapper between remote client and local or remote servers.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>stunnel-4.43.tbz</depends_on_package>
 		<depends_on_package_pbi>stunnel-4.54-i386.pbi</depends_on_package_pbi>
-		<version>4.43.0</version>
+		<version>4.54 pkg v5.20.3</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>1.2.1</required_version>
