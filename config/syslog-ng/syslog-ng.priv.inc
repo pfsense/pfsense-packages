@@ -36,7 +36,7 @@ $priv_list['page-services-syslogng']['match'] = array();
 $priv_list['page-services-syslogng']['match'][] = "pkg.php?xml=syslog-ng.xml*";
 $priv_list['page-services-syslogng']['match'][] = "pkg.php?xml=syslog-ng_advanced.xml*";
 
-$priv_list['page-services-syslogng']['match'][] = "pkg_edit.php?syslog-ng.xml*";
+$priv_list['page-services-syslogng']['match'][] = "pkg_edit.php?xml=syslog-ng.xml*";
 $priv_list['page-services-syslogng']['match'][] = "pkg_edit.php?xml=syslog-ng_advanced.xml*";
 
 $priv_list['page-services-syslogng']['match'][] = "syslog-ng_log_viewer.php*";
