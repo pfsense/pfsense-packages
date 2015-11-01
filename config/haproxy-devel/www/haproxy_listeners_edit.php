@@ -253,11 +253,11 @@ $htmllist_extaddr->editmode = true;
 
 $htmllist_acls = new HaproxyHtmlList("table_acls", $fields_aclSelectionList);
 $htmllist_acls->fields_details = $fields_acl_details;
-$htmllist_acls->editmode = true;
+//$htmllist_acls->editmode = true;
 
 $htmllist_actions = new HaproxyHtmlList("table_actions", $fields_actions);
 $htmllist_actions->fields_details = $fields_actions_details;
-$htmllist_actions->keyfield = "name";
+//$htmllist_actions->keyfield = "name";
 //$htmllist_actions->editmode = true;
 
 $htmllist_sslCertificates = new HaproxyHtmlList("tbl_sslCerts", $fields_sslCertificates);

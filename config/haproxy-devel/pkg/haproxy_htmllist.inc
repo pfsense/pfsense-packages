@@ -88,20 +88,21 @@ class HaproxyHtmlList
 			}
 			if ($add_item) {
 				if ($this->keyfield != "") {
-					if (isset($_POST[$this->tablename."_key".$x]))
+					if (isset($_POST[$this->tablename."_key".$x])) {
 						$key = $_POST[$this->tablename."_key".$x];
-					else {
+					} else {
 						$key = $_POST[$this->tablename.$this->keyfield.$x];
-					}	
+					}
 				} else {
 					$key = "";
 				}
 				$index = $_POST[$this->tablename."_rowindex".$x];
 				$value['_index'] = $index;
-				if (isset($values[$key]))
+				if (isset($values[$key])) {
 					$values[] = $value;
-				else
+				} else {
 					$values[$key] = $value;
+				}
 			}
 		}
 		usort($values, 'sort_index');
@@ -195,13 +196,12 @@ class HaproxyHtmlList
 					<img src='/themes/{$g['theme']}/images/icons/icon_e.gif' title='edit entry' width='17' height='17' border='0' onclick='editRow({$counter}); return false;' />
 					</td>
 					<td valign='middle'>
-					<input name='{$tablename}_rowindex{$counter}' id='{$tablename}_rowindex{$counter}' type='hidden' value='{$counter}' />
 					<img src='/themes/{$g['theme']}/images/icons/icon_x.gif' title='delete entry' width='17' height='17' border='0' onclick='deleteRow({$counter}, \"{$tablename}\"); return false;' />
 					</td>
 					<td valign='middle'>
 					<img src='/themes/{$g['theme']}/images/icons/icon_plus.gif' title='duplicate entry' width='17' height='17' border='0' onclick='dupRow({$counter}, \"{$tablename}\"); return false;' />
 					</td>";
-					if (empty($this->keyfield)) {
+					if (empty($this->noindex)) {
 						echo "<td valign='middle'>
 						<img src='/themes/{$g['theme']}/images/icons/icon_up.gif' title='move row up' width='17' height='17' border='0' onclick='moveRowUp({$counter}, \"{$tablename}\"); return false;' />
 						</td>
@@ -237,7 +237,7 @@ class HaproxyHtmlList
 			<td valign='middle'>
 			<img src='/themes/{$g['theme']}/images/icons/icon_plus.gif' title='duplicate entry' width='17' height='17' border='0' onclick='dupRow({$counter}, \"{$tablename}\"); return false;' />
 			</td>";
-			if (empty($this->keyfield)) {
+			if (empty($this->noindex)) {
 				echo "<td valign='middle'>
 				<img src='/themes/{$g['theme']}/images/icons/icon_up.gif' title='move row up' width='17' height='17' border='0' onclick='moveRowUp({$counter}, \"{$tablename}\"); return false;' />
 				</td>

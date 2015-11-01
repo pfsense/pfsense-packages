@@ -241,9 +241,13 @@ $a_filestype['writetodisk'] = array('name' => "Write to disk");
 global $a_action;
 $a_action = array();
 //
-$a_action["use_backend"] = array('name' => "Use Backend", 'mode' => '', 'syntax' => 'use_backend {backend}',
+$a_action["use_backend"] = array('name' => "Use Backend", 'mode' => '', 'syntax' => 'use_backend {backend}', 'usage' => 'frontend',
 	'fields' => array(
 		'backend' => array('name'=>"backend",'columnheader'=>"Backend",'type'=>"select",'size'=>"50",'mask'=>'backend')
+	));
+$a_action["use_server"] = array('name' => "Use Server", 'mode' => '', 'syntax' => 'use-server {server}', 'usage' => 'backend',
+	'fields' => array(
+		'server' => array('name'=>"server",'columnheader'=>"Server",'type'=>"select",'size'=>"50",'mask'=>'server')
 	));
 //
 $a_action["custom"] = array('name' => "Custom", 'mode' => '', 
@@ -356,7 +360,7 @@ $a_action["tcp-response_content_accept"] = array('name' => "tcp-response content
 $a_action["tcp-response_content_close"] = array('name' => "tcp-response content close", 'mode'=> '', 'syntax' => 'tcp-response content close');
 $a_action["tcp-response_content_reject"] = array('name' => "tcp-response content reject", 'mode'=> '', 'syntax' => 'tcp-response content reject');
 if (haproxy_version() >= '1.6') {
-	$a_action["tcp-response_content_lua"] = array('name' => "tcp-response content lua script", 'mode'=> '', 'syntax' => 'tcp-response content lua.{lua-function}',
+	$a_action["tcp-response_content_lua"] = array('name' => "tcp-response content lua script", 'mode'=> '', 'syntax' => 'tcp-response content lua.{lua-function}', 'usage' => 'backend',
 	'fields' => array(
 		'lua-function' => array('name'=>"lua-function",'columnheader'=>"lua function",'type'=>"textbox",'size'=>"50",'mask'=>'lua-function')
 	));

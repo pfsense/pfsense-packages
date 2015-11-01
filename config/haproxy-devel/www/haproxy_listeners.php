@@ -93,6 +93,28 @@ if ($_GET['act'] == "del") {
 	}
 }
 
+function haproxy_userlist_backend_servers($backendname) {
+	//used for hint title text when hovering mouse over a backend name
+	global $a_servermodes;
+	$backend_servers = "";
+	$backend = get_backend($backendname);
+	if ($backend && is_array($backend['ha_servers']) && is_array($backend['ha_servers']['item'])){
+		$servers = $backend['ha_servers']['item'];
+		$backend_servers = sprintf(gettext("Servers in \"%s\" pool:"), $backendname);
+		if (is_array($servers)){
+			foreach($servers as $server){
+				$srvstatus = $server['status'];
+				$status = $a_servermodes[$srvstatus]['sign'];
+				if (isset($server['forwardto']) && $server['forwardto'] != "")
+					$backend_servers .= "\n{$status}[{$server['forwardto']}]";
+				else								
+					$backend_servers .= "\n{$status}{$server['address']}:{$server['port']}";
+			}
+		}
+	}
+	return $backend_servers;
+}
+
 $pgtitle = "Services: HAProxy: Frontends";
 include("head.inc");
 haproxy_css();
@@ -238,24 +260,6 @@ function js_callback(req) {
 					if ($frontend['advanced']) $isadvset .= "Advanced pass thru setting used\r\n";
 					if ($isadvset)
 						echo "<img src=\"$img_adv\" title=\"" . gettext("Advanced settings set") . ": {$isadvset}\" border=\"0\" />";
-					
-					$backend_serverpool_hint = "";
-					$backend_serverpool = $frontend['backend_serverpool'];
-					$backend = get_backend($backend_serverpool);
-					if ($backend && is_array($backend['ha_servers']) && is_array($backend['ha_servers']['item'])){
-						$servers = $backend['ha_servers']['item'];
-						$backend_serverpool_hint = gettext("Servers in pool:");
-						if (is_array($servers)){
-							foreach($servers as $server){
-								$srvstatus = $server['status'];
-								$status = $a_servermodes[$srvstatus]['sign'];
-								if (isset($server['forwardto']) && $server['forwardto'] != "")
-									$backend_serverpool_hint .= "\n{$status}[{$server['forwardto']}]";
-								else								
-									$backend_serverpool_hint .= "\n{$status}{$server['address']}:{$server['port']}";
-							}
-						}
-					}
 					?>
 				  </td>
 				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
@@ -296,37 +300,29 @@ function js_callback(req) {
 				  ?>
 				  </td>
 				  <td class="listr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$frontendname;?>';">
-					<div title='<?=$backend_serverpool_hint;?>'>
 					<?
-					$first = true;
 					if (is_array($frontend['a_actionitems']['item'])) {
 						foreach ($frontend['a_actionitems']['item'] as $actionitem) {
 							if ($actionitem['action'] == "use_backend") {
-								if ($first) {
-									$first = false;
-								} else {
-									echo "<br/>";
-								}
 								$backend = $actionitem['use_backendbackend'];
+								$hint = haproxy_userlist_backend_servers($backend);
+								echo "<div title='{$hint}'>";
 								echo "<a href='haproxy_pool_edit.php?id={$backend}'>{$backend}</a>";
-								
 								if (!empty($actionitem['acl'])) {
 									echo "&nbsp;if({$actionitem['acl']})";
 								}
+								echo "<br/></div>";
 							}
 						}
 					}
+					$hint = haproxy_userlist_backend_servers($frontend['backend_serverpool']);
 					$backend = $frontend['backend_serverpool'];
 					if (!empty($backend)) {
-						if ($first) {
-							$first = false;
-						} else {
-							echo "<br/>";
-						}
+						echo "<div title='{$hint}'>";
 						echo "<a href='haproxy_pool_edit.php?id={$backend}'>{$backend}</a> (default)";
+						echo "<br/></div>";
 					}
 					?>
-					</div>
 				  </td>
 				  <td class="list" nowrap>
 					<table border="0" cellspacing="0" cellpadding="1">
