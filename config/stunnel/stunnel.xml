@@ -42,14 +42,10 @@
 	]]>
 	</copyright>
 	<name>stunnel</name>
-	<version>5.20.2</version>
+	<version>5.20.3</version>
 	<title>Services: Secure Tunnel</title>
 	<menu>
 		<name>STunnel</name>
-		<tooltiptext>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote server.
-		It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the programs' code.
-		It will negotiate an SSL connection using the OpenSSL or SSLeay libraries.
-		It calls the underlying crypto libraries, so stunnel supports whatever cryptographic algorithms you compiled into your crypto package.</tooltiptext>
 		<section>Services</section>
 		<configfile>stunnel.xml</configfile>
 	</menu>
@@ -57,6 +53,10 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
