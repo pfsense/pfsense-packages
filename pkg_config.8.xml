@@ -1657,8 +1657,8 @@
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
 		<category>Services</category>
-		<version>3.5.4.1 pkg.v.1.0.2</version>
-		<status>ALPHA</status>
+		<version>3.5.4.1 pkg v1.1.1</version>
+		<status>BETA</status>
 		<required_version>2.1</required_version>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>syslog-ng-3.5.4.1-i386.pbi</depends_on_package_pbi>
