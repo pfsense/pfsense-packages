@@ -63,7 +63,7 @@ class HaproxyHtmlList
 		phparray_to_javascriptarray($table_def, "tabledefinition_".$this->tablename,Array('/*','/*/*'));
 		phparray_to_javascriptarray($this->fields, "fields_".$this->tablename,Array('/*','/*/name','/*/type','/*/text','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name'));
 		if (count($this->fields_details) != 0) {
-			phparray_to_javascriptarray($this->fields_details,"fields_details_".$this->tablename,Array('/*','/*/name','/*/columnheader','/*/type','/*/text','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name','/*/items/*/*/name'));
+			phparray_to_javascriptarray($this->fields_details,"fields_details_".$this->tablename,Array('/*','/*/name','/*/columnheader','/*/description','/*/type','/*/text','/*/size','/*/items','/*/items/*','/*/items/*/*','/*/items/*/*/name','/*/items/*/*/name'));
 		}
 	}
 
@@ -476,13 +476,19 @@ function haproxy_htmllist_js(){
 			tr.appendChild(td);
 			td = d.createElement("td");
 			table = d.createElement("table");
+			table.setAttribute("cellspacing","0");
 			for (var i in items) {
 				field = items[i];
 				fieldhtml = createFieldHtml(tableId, field, totalrows);
 				subtr = d.createElement("tr");
 				subtr.setAttribute("id","tr_edititemdetails_" + totalrows + "_" + field['name']);
 				subtd = d.createElement("td");
-				subtd.innerHTML = field['columnheader'] + ": " + fieldhtml;
+				subtd.setAttribute("class","vncell");
+				subtd.innerHTML = field['columnheader'] + ": ";
+				subtr.appendChild(subtd);
+				subtd = d.createElement("td");
+				subtd.setAttribute("class","vncell");
+				subtd.innerHTML = field['description'] + "<br/>" + fieldhtml;
 				subtr.appendChild(subtd);
 				table.appendChild(subtr);
 			}
