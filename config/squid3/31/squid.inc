@@ -1854,8 +1854,8 @@ function squid_sync_on_changes() {
 		$synctimeout = $squid_sync['synctimeout'];
 		switch ($synconchanges){
 			case "manual":
-				if (is_array($squid_sync[row])){
-					$rs=$squid_sync[row];
+				if (is_array($squid_sync['row'])){
+					$rs=$squid_sync['row'];
 					}
 				else{
 					log_error("[squid] xmlrpc sync is enabled but there is no hosts to push on squid config.");
@@ -1863,8 +1863,8 @@ function squid_sync_on_changes() {
 					}
 				break;
 			case "auto":
-					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+					if (is_array($config['hasync'])) {
+						$system_carp = $config['hasync'];
 						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
 						$rs[0]['username']=$system_carp['username'];
 						$rs[0]['password']=$system_carp['password'];
