@@ -1,6 +1,6 @@
 <?php
 /*
-	checkmk.inc
+	tinydns.inc
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006, 2007, 2008, 2009 Scott Ullrich
 	Copyright (C) 2007 Goffredo Andreone
