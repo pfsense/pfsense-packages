@@ -205,7 +205,7 @@ function checkmk_sync_on_changes() {
 		switch ($synconchanges) {
 			case "manual":
 				if (is_array($checkmk_sync['row'])) {
-					$rs = $checkmksync['row'];
+					$rs = $checkmk_sync['row'];
 				} else {
 					log_error("[check_mk-agent] XMLRPC sync is enabled but there are no hosts configured as replication targets.");
 					return;
