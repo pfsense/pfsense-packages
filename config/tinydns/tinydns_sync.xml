@@ -96,7 +96,6 @@
 				<option><name>Sync to host(s) defined below</name><value>manual</value></option>
 				<option><name>Do not sync this package configuration</name><value>disabled</value></option>
 			</options>
-			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Sync Timeout</fielddescr>
