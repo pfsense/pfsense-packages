@@ -438,18 +438,20 @@ function sarg_validate_input($post, &$input_errors) {
 		}
 
 		# check squidguard
-		if (substr($key, 0, 10) == "proxy_server" && $value == "squidguard")
-			if (!is_array($config['installedpackages']['squidguardgeneral']))
+		if (substr($key, 0, 10) == "proxy_server" && $value == "squidguard") {
+			if (!is_array($config['installedpackages']['squidguardgeneral'])) {
 				$input_errors[]='squidguard package not detected';
+			}
+		}
 
 		# check squid
 		if (substr($key, 0, 5) == "proxy_server" && $value == "squid") {
 			if (is_array($config['installedpackages']['squid'])) {
 				if (!$config['installedpackages']['squid']['log_enabled']) {
-					$input_errors[]='squidlogs not enabled';
+					$input_errors[] = 'Squid logging not enabled';
 				}
 			} else {
-				$input_errors[]='squid package not installed';
+				$input_errors[] = 'Squid package not installed';
 			}
 		}
 
@@ -469,108 +471,113 @@ function sarg_validate_input($post, &$input_errors) {
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function sarg_sync_on_changes() {
 	global $config, $g;
+
 	if (is_array($config['installedpackages']['sargsync']['config'])) {
 		$sarg_sync = $config['installedpackages']['sargsync']['config'][0];
 		$synconchanges = $sarg_sync['synconchanges'];
-		$synctimeout = $sarg_sync['synctimeout'];
+		$synctimeout = $sarg_sync['synctimeout'] ?: '250';
 		switch ($synconchanges) {
 			case "manual":
-				if (is_array($sarg_sync[row])) {
-					$rs = $sarg_sync[row];
+				if (is_array($sarg_sync['row'])) {
+					$rs = $sarg_sync['row'];
 				} else {
-					log_error("[sarg] xmlrpc sync is enabled but there is no hosts to push on sarg config.");
+					log_error("[sarg] XMLRPC sync is enabled but there are no hosts configured as replication targets.");
 					return;
 				}
 				break;
 			case "auto":
-				if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])) {
-					$system_carp = $config['installedpackages']['carpsettings']['config'][0];
+				if (is_array($config['hasync'])) {
+					$system_carp = $config['hasync'];
 					$rs[0]['ipaddress'] = $system_carp['synchronizetoip'];
 					$rs[0]['username'] = $system_carp['username'];
 					$rs[0]['password'] = $system_carp['password'];
-					if ($system_carp['synchronizetoip'] == "" || $system_carp['username'] == "") {
-						log_error("[sarg] xmlrpc sync is enabled but there are no system backup hosts to push sarg config.");
-						return;
-					}
+					$rs[0]['syncdestinenable'] = FALSE;
 
+					// XMLRPC sync is currently only supported over connections using the same protocol and port as this system
+					if ($config['system']['webgui']['protocol'] == "http") {
+						$rs[0]['syncprotocol'] = "http";
+						$rs[0]['syncport'] = $config['system']['webgui']['port'] ?: '80';
+					} else {
+						$rs[0]['syncprotocol'] = "https";
+						$rs[0]['syncport'] = $config['system']['webgui']['port'] ?: '443';
+					}
+					if ($system_carp['synchronizetoip'] == "") {
+						log_error("[sarg] XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
+						return;
+					} else {
+						$rs[0]['syncdestinenable'] = TRUE;
+					}
 				} else {
-					log_error("[sarg] xmlrpc sync is enabled but there are no system backup hosts to push sarg config.");
+					log_error("[sarg] XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
 					return;
 				}
 				break;
 			default:
 				return;
-			break;
+				break;
 		}
 		if (is_array($rs)) {
-			log_error("[sarg] xmlrpc sync is starting.");
-			foreach($rs as $sh) {
-				$sync_to_ip = $sh['ipaddress'];
-				$password = $sh['password'];
-				if ($sh['username']) {
-					$username = $sh['username'];
-				} else {
-					$username = 'admin';
-				}
-				if ($password && $sync_to_ip) {
-					sarg_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout);
+			log_error("[sarg] XMLRPC sync is starting.");
+			foreach ($rs as $sh) {
+				// Only sync enabled replication targets
+				if ($sh['syncdestinenable']) {
+					$sync_to_ip = $sh['ipaddress'];
+					$port = $sh['syncport'];
+					$username = $sh['username'] ?: 'admin';
+					$password = $sh['password'];
+					$protocol = $sh['syncprotocol'];
+
+					$error = '';
+					$valid = TRUE;
+
+					if ($password == "") {
+						$error = "Password parameter is empty. ";
+						$valid = FALSE;
+					}
+					if (!is_ipaddr($sync_to_ip) && !is_hostname($sync_to_ip) && !is_domain($sync_to_ip)) {
+						$error .= "Misconfigured Replication Target IP Address or Hostname. ";
+						$valid = FALSE;
+					}
+					if (!is_port($port)) {
+						$error .= "Misconfigured Replication Target Port. ";
+						$valid = FALSE;
+					}
+					if ($valid) {
+						sarg_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $password, $synctimeout);
+					} else {
+						log_error("[sarg] XMLRPC sync with '{$sync_to_ip}' aborted due to the following error(s): {$error}");
+					}
 				}
 			}
-			log_error("[sarg] xmlrpc sync is ending.");
+			log_error("[sarg] XMLRPC sync completed.");
 		}
  	}
 }
 
 /* do the actual XMLRPC sync */
-function sarg_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) {
+function sarg_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $password, $synctimeout) {
 	global $config, $g;
 
-	if (!$username) {
+	if ($username == "" || $password == "" || $sync_to_ip == "" || $port == "" || $protocol == "") {
+		log_error("[sarg] A required XMLRPC sync parameter (username, password, replication target, port or protocol) is empty ... aborting pkg sync");
 		return;
 	}
 
-	if (!$password) {
-		return;
+	// Take care of IPv6 literal address
+	if (is_ipaddrv6($sync_to_ip)) {
+		$sync_to_ip = "[{$sync_to_ip}]";
 	}
 
-	if (!$sync_to_ip) {
-		return;
-	}
+	$url = "{$protocol}://{$sync_to_ip}";
 
-	if (!$synctimeout) {
-		$synctimeout="250";
-	}
-
-	$xmlrpc_sync_neighbor = $sync_to_ip;
-
-	if ($config['system']['webgui']['protocol'] != "") {
-		$synchronizetoip = $config['system']['webgui']['protocol'];
-		$synchronizetoip .= "://";
-	}
-	$port = $config['system']['webgui']['port'];
-	/* if port is empty, let's rely on the protocol selection */
-	if ($port == "") {
-		if ($config['system']['webgui']['protocol'] == "http") {
-			$port = "80";
-		} else {
-			$port = "443";
-		}
-	}
-	$synchronizetoip .= $sync_to_ip;
-
-	/* xml will hold the sections to sync */
+	/* XML will hold the sections to sync. */
 	$xml = array();
 	$xml['sarg'] = $config['installedpackages']['sarg'];
 	$xml['sarguser'] = $config['installedpackages']['sarguser'];
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($xml)
-	);
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($xml));
 
-	/* set a few variables needed for sync code */
-	$url = $synchronizetoip;
-	log_error("Beginning sarg XMLRPC sync to {$url}:{$port}.");
+	/* Set a few variables needed for sync code */
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -578,49 +585,45 @@ function sarg_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) {
 	if ($g['debug']) {
 		$cli->setDebug(1);
 	}
-	/* send our XMLRPC message and timeout after $synctimeout seconds */
+	/* Send our XMLRPC message and timeout after defined sync timeout value */
 	$resp = $cli->send($msg, $synctimeout);
 	if (!$resp) {
-		$error = "A communications error occurred while attempting sarg XMLRPC sync with {$url}:{$port}.";
-		log_error($error);
+		$error = "A communications error occurred while attempting XMLRPC sync with {$url}:{$port}.";
+		log_error("[sarg] {$error}");
 		file_notice("sync_settings", $error, "sarg Settings Sync", "");
 	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, $synctimeout);
-		$error = "An error code was received while attempting sarg XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
+		$error = "An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[sarg] {$error}");
 		file_notice("sync_settings", $error, "sarg Settings Sync", "");
 	} else {
-		log_error("sarg XMLRPC sync successfully completed with {$url}:{$port}.");
+		log_error("[sarg] XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 
-	/* tell sarg to reload our settings on the destionation sync host. */
+	/* Tell sarg to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd = "require_once('/usr/local/pkg/sarg.inc');\n";
 	$execcmd .= "sync_package_sarg();";
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($execcmd)
-	);
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($execcmd));
 
-	log_error("sarg XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials($username, $password);
 	$resp = $cli->send($msg, $synctimeout);
 	if (!$resp) {
-		$error = "A communications error occurred while attempting sarg XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
-		log_error($error);
+		$error = "A communications error occurred while attempting XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error("[sarg] {$error}");
 		file_notice("sync_settings", $error, "sarg Settings Sync", "");
 	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, $synctimeout);
-		$error = "An error code was received while attempting sarg XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
+		$error = "An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[sarg] {$error}");
 		file_notice("sync_settings", $error, "sarg Settings Sync", "");
 	} else {
-		log_error("sarg XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("[sarg] XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
 }
 
