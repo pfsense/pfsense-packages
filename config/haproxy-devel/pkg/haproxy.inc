@@ -2074,6 +2074,9 @@ function haproxy_get_transparent_backends(){
 	global $config;
 	$a_backends = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 	$transparent_backends = array();
+	if (!is_array($a_backends)) {
+		return $transparent_backends;
+	}
 	foreach ($a_backends as $backend) {
 		if ($backend["transparent_clientip"] != 'yes') {
 			continue;
