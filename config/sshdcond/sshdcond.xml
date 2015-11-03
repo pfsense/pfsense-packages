@@ -43,12 +43,10 @@
 	]]>
 	</copyright>
 	<name>sshdcond</name>
-	<version>1.0.2</version>
-	<title>SSH Conditional</title>
-	<description>SSH Conditional blocks</description>
+	<version>1.0.6</version>
+	<title>Services: SSH Conditional Options</title>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/sshdcond.inc</include_file>
-
 	<menu>
 		<name>SSH Conditions</name>
 		<tooltiptext>Configure SSH conditional exceptions</tooltiptext>
@@ -59,6 +57,10 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -93,7 +95,6 @@
 		<field>
 			<type>listtopic</type>
 			<name>Conditional SSH Options</name>
-			<fieldname>temp</fieldname>
 		</field>
 		<field>
 		<fielddescr>Enable</fielddescr>
@@ -187,7 +188,4 @@
 	<custom_php_resync_config_command>
 		sshdcond_custom_php_write_config();
 	</custom_php_resync_config_command>
-	<custom_php_command_before_form>
-		unset($_POST['temp']);
-	</custom_php_command_before_form>
 </packagegui>

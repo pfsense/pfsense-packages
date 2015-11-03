@@ -1490,10 +1490,10 @@
 	</package>
 	<package>
 		<name>SSHDCond</name>
-		<descr><![CDATA[Allows to define SSH overrides for users,groups,hosts and addresses using Match in a convenient way.<br />
-				This package acts as an access list frontend for ssh connections]]></descr>
+		<descr><![CDATA[Allows to define SSH overrides for users, groups, hosts and addresses using Match in a convenient way.<br />
+				This package acts as an access list frontend for ssh connections.]]></descr>
 		<category>Enhancements</category>
-		<version>1.0.5</version>
+		<version>1.0.6</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.xml</config_file>
