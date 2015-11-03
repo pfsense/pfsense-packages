@@ -299,49 +299,6 @@ function remove_spaces($string) {
 	return $string;
 }
 
-function sync_spamd_config_to_backup() {
-	global $config;
-	if (is_array($config['installedpackages']['carpsettings']['config'])) {
-		foreach ($config['installedpackages']['carpsettings']['config'] as $carp) {
-			if ($carp['synchronizetoip'] != "") {
-				$synctoip = $carp['synchronizetoip'];
-				$password = $carp['password'];
-				if ($config['system']['username']) {
-					$username = $config['system']['username'];
-				} else {
-					$username = "admin";
-				}
-			}
-		}
-	}
-	if ($synctoip and $password) {
-		if ($config['system']['webgui']['protocol'] != "") {
-			$synchronizetoip = $config['system']['webgui']['protocol'];
-			$synchronizetoip .= "://";
-		}
-		$port = $config['system']['webgui']['port'];
-		/* if port is empty lets rely on the protocol selection */
-		if ($port == "") {
-			if ($config['system']['webgui']['protocol'] == "http") {
-				$port = "80";
-			} else {
-				$port = "443";
-			}
-		}
-		$params = array(XML_RPC_encode($password),XML_RPC_encode($xml));
-		/* create files to sync array */
-		$filetosync = array("/var/db/spamd", "/var/db/whitelist.txt");
-		/* loop through files to sync list and sync them up */
-		foreach ($filetosync as $f2s) {
-			$f2c_contents = file_get_contents($f2s);
-			xmlrpc_sync_file($url, $password, $f2s, $f2c_contents, $port);
-		}
-		/* signal remote process config reload */
-		xmlrpc_exec_shell($url, $password, "/usr/bin/killall -HUP spamlogd", $port);
-		xmlrpc_exec_shell($url, $password, "/usr/bin/killall -HUP spamd", $port);
-	}
-}
-
 function custom_php_install_command() {
 	global $config;
 	system("touch /var/db/whitelist.txt");
