@@ -42,8 +42,8 @@
 	</copyright>
 	<description>A self-contained VPN solution designed to connect multiple sites together in a secure way.</description>
 	<name>tinc</name>
-	<version>1.2.2</version>
-	<title>VPN: tinc - Config</title>
+	<version>1.2.4</version>
+	<title>VPN: Tinc: Settings</title>
 	<include_file>/usr/local/pkg/tinc.inc</include_file>
 	<configpath>['installedpackages']['package']['$packagename']['config']</configpath>
 	<menu>
@@ -53,7 +53,7 @@
 		<url>/pkg_edit.php?xml=tinc.xml</url>
 	</menu>
 	<menu>
-		<name>tinc VPN</name>
+		<name>Tinc VPN</name>
 		<section>Status</section>
 		<url>/status_tinc.php</url>
 	</menu>
@@ -65,7 +65,7 @@
 	</service>
 	<tabs>
 		<tab>
-			<text>Config</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=tinc.xml</url>
 			<active/>
 		</tab>
@@ -77,6 +77,10 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/tinc/tinc.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/tinc/tinc.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -119,7 +123,7 @@
 			<fieldname>localip</fieldname>
 			<description>
 				<![CDATA[
-				IP Address of local tunnel interface.<br />
+				IP address of local tunnel interface.<br />
 				This is often the same IP as your routers LAN address. (Example: 192.168.2.1)
 				]]>
 			</description>
@@ -143,7 +147,7 @@
 			<fieldname>vpnnetmask</fieldname>
 			<description>
 				<![CDATA[
-				This is the Netmask that defines what traffic is routed to the VPNs tunnel interface.<br />
+				This is the netmask that defines what traffic is routed to the VPNs tunnel interface.<br />
 				It is usually broader then your local netmask. (Example: 255.255.0.0)
 				]]>
 			</description>

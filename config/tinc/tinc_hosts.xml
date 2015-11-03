@@ -41,13 +41,13 @@
 	]]>
 	</copyright>
 	<name>tinchosts</name>
-	<version>1.2.2</version>
-	<title>VPN: tinc - Hosts</title>
+	<version>1.2.4</version>
+	<title>VPN: Tinc: Hosts</title>
 	<include_file>/usr/local/pkg/tinc.inc</include_file>
 	<configpath>['installedpackages']['package']['$packagename']['config']</configpath>
 	<tabs>
 		<tab>
-			<text>Config</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=tinc.xml</url>
 		</tab>
 		<tab>
@@ -75,7 +75,6 @@
 			<fieldname>connect</fieldname>
 			<type>checkbox</type>
 		</columnitem>
-
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -107,7 +106,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>RSA public key</fielddescr>
+			<fielddescr>RSA Public Key</fielddescr>
 			<fieldname>cert_pub</fieldname>
 			<description>
 				<![CDATA[
