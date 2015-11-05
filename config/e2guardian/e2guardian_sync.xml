@@ -101,71 +101,84 @@
 		<field>
 			<fielddescr>Automatically Sync E2guardian Configuration Changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
-			<description>Select a sync method for e2guardian.</description>
+			<description>
+				<![CDATA[
+				Select a sync method for E2guardian.<br/><br/>
+				<strong>Important:</strong> While using "Sync to host(s) defined below", only sync from host A to B, A to C but <strong>do not</strong> enable XMLRPC sync <b>to</b> A.
+				This will result in a loop!
+				]]>
+			</description>
 			<type>select</type>
 			<required/>
 			<default_value>auto</default_value>
 			<options>
-				<option>
-					<name>Sync to configured system backup server</name>
-					<value>auto</value>
-				</option>
-				<option>
-					<name>Sync to host(s) defined below</name>
-					<value>manual</value>
-				</option>
-				<option>
-					<name>Do not sync this package configuration</name>
-					<value>disabled</value>
-				</option>
+				<option><name>Sync to configured system backup server</name><value>auto</value></option>
+				<option><name>Sync to host(s) defined below</name><value>manual</value></option>
+				<option><name>Do not sync this package configuration</name><value>disabled</value></option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Sync Timeout</fielddescr>
 			<fieldname>synctimeout</fieldname>
-			<description>Select sync max wait time.</description>
+			<description>XMLRPC timeout in seconds.</description>
 			<type>select</type>
 			<required/>
 			<default_value>250</default_value>
 			<options>
-				<option>
-					<name>250 seconds (default)</name>
-					<value>250</value>
-				</option>
-				<option>
-					<name>120 seconds</name>
-					<value>120</value>
-				</option>
-				<option>
-					<name>90 seconds</name>
-					<value>90</value>
-				</option>
-				<option>
-					<name>60 seconds</name>
-					<value>60</value>
-				</option>
-				<option>
-					<name>30 seconds</name>
-					<value>30</value>
-				</option>
+				<option><name>250 seconds (Default)</name><value>250</value></option>
+				<option><name>120 seconds</name><value>120</value></option>
+				<option><name>90 seconds</name><value>90</value></option>
+				<option><name>60 seconds</name><value>60</value></option>
+				<option><name>30 seconds</name><value>30</value></option>
 			</options>
 		</field>
 		<field>
-			<fielddescr>Remote Server</fielddescr>
+			<fielddescr>Replication Targets</fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<rowhelper>
 				<rowhelperfield>
-					<fielddescr>IP Address</fielddescr>
+					<fielddescr>Enable</fielddescr>
+					<fieldname>syncdestinenable</fieldname>
+					<description><![CDATA[Enable this host as a replication target]]></description>
+					<type>checkbox</type>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Protocol</fielddescr>
+					<fieldname>syncprotocol</fieldname>
+					<description><![CDATA[Choose the protocol used to sync with the destination host (HTTP or HTTPS).]]></description>
+					<type>select</type>
+					<default_value>HTTP</default_value>
+					<options>
+						<option><name>HTTP</name><value>http</value></option>
+						<option><name>HTTPS</name><value>https</value></option>
+					</options>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>IP Address/Hostname</fielddescr>
 					<fieldname>ipaddress</fieldname>
-					<description>IP Address of remote server.</description>
+					<description><![CDATA[IP address or hostname of the destination host.]]></description>
+					<type>input</type>
+					<size>40</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Port</fielddescr>
+					<fieldname>syncport</fieldname>
+					<description><![CDATA[Choose the sync port of the destination host.]]></description>
+					<type>input</type>
+					<size>3</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Username (admin)</fielddescr>
+					<fieldname>username</fieldname>
+					<description><![CDATA[Enter the username account for administration.]]></description>
 					<type>input</type>
 					<size>20</size>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>Password</fielddescr>
+					<fielddescr>Admin Password</fielddescr>
 					<fieldname>password</fieldname>
-					<description>Password for remote server.</description>
+					<description><![CDATA[Password of the user "admin" on the destination host.]]></description>
 					<type>password</type>
 					<size>20</size>
 				</rowhelperfield>
@@ -175,12 +188,6 @@
 	<custom_php_command_before_form>
 		e2guardian_check_config();
 	</custom_php_command_before_form>
-	<custom_php_install_command>
-		e2guardian_php_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		e2guardian_php_deinstall_command();
-	</custom_php_deinstall_command>
 	<custom_php_validation_command>
 		e2guardian_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
