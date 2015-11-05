@@ -688,8 +688,15 @@ MASTEREOF2;
 	//check postfix etc dir on 2.2
 	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 	$postfix_etc_lnk="/usr/local/etc/postfix";
-	if ($pfs_version == 2.2 && !is_dir($postfix_etc_lnk))
+	if ($pfs_version == 2.2 && !is_dir($postfix_etc_lnk)) {
 		@symlink(POSTFIX_LOCALBASE.'/etc/postfix',$postfix_etc_lnk);
+	}
+
+	// Fixup library path so postfix can find its libraries
+	// XXX: Bug #4420
+	if (POSTFIX_LOCALBASE != '/usr/local') {
+		mwexec("/sbin/ldconfig -m " . POSTFIX_LOCALBASE . "/local/lib/");
+	}
 
 	log_error("Writing out configuration");
 	file_put_contents(POSTFIX_LOCALBASE."/etc/postfix/main.cf", $postfix_main, LOCK_EX);
