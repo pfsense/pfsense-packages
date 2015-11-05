@@ -505,6 +505,8 @@
 		</build_pbi>
 		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET_FORCE=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
+		<conflicts>squid3</conflicts>
+		<conflicts>HAVP antivirus</conflicts>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
@@ -1067,6 +1069,8 @@
 		<build_options>c-icap_SET_FORCE=LARGE_FILES;squid_SET_FORCE=ARP_ACL AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF FS_AUFS FS_DISKD GSSAPI_MIT HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE LAX_HTTP SNMP SSL SSL_CRTD TP_PF WCCP WCCPV2;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DEBUG DNS_HELPER ECAP ESI FS_ROCK GSSAPI_NONE GSSAPI_BASE GSSAPI_HEIMDAL STACKTRACES TP_IPF TP_IPFW VIA_DB</build_options>
 		<conflicts>squid</conflicts>
 		<conflicts>squidGuard-devel</conflicts>
+		<conflicts>HAVP antivirus</conflicts>
+		<conflicts>Dansguardian</conflicts>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.10_2-##ARCH##.pbi</depends_on_package_pbi>
@@ -1208,6 +1212,7 @@
 		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
 		<conflicts>squid3</conflicts>
+		<conflicts>Dansguardian</conflicts>
 		<version>1.10.0</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
