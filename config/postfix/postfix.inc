@@ -736,6 +736,12 @@ MASTEREOF2;
 function postfix_start(){
 	global $config;
 	$pf_dir=POSTFIX_LOCALBASE;
+	if (POSTFIX_LOCALBASE != '/usr/local') {
+		$pf_libdir = POSTFIX_LOCALBASE . "/local/lib";
+		$pf_start_cmd = "LD_LIBRARY_PATH={$pf_libdir} {$pf_dir}/sbin/postfix start";
+	} else {
+		$pf_start_cmd = "{$pf_dir}/sbin/postfix start";
+	}
 	$start=<<<EOF
 
 	sysctl kern.ipc.nmbclusters=65536
@@ -743,7 +749,7 @@ function postfix_start(){
 	sysctl kern.maxfiles=131072
 	sysctl kern.maxfilesperproc=104856
 	sysctl kern.threads.max_threads_per_proc=4096
-	{$pf_dir}/sbin/postfix start
+	{$pf_start_cmd}
 
 EOF;
 	$stop = POSTFIX_LOCALBASE."/sbin/postfix stop\n";
