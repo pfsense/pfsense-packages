@@ -551,8 +551,6 @@
 		</build_pbi>
 		<build_options>dansguardian_UNSET_FORCE=APACHE;dansguardian_SET=TRICKLE CLAMD ICAP NTLM SSL</build_options>
 		<!-- NOTE: Distfile must be fetched manually from http://dansguardian.org/downloads/2/Alpha/dansguardian-2.12.0.0.tar.gz -->
-		<conflicts>HAVP antivirus</conflicts>
-		<conflicts>squid3-dev</conflicts>
 	</package>
 	<package>
 		<name>mailscanner</name>
@@ -1199,8 +1197,6 @@
 		<conflicts>squid3</conflicts>
 		<conflicts>squidGuard</conflicts>
 		<conflicts>squidGuard-devel</conflicts>
-		<conflicts>Dansguardian</conflicts>
-		<conflicts>HAVP antivirus</conflicts>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/33/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.3.10-i386.pbi</depends_on_package_pbi>
@@ -1365,7 +1361,6 @@
 		<build_port_path>/usr/ports/www/havp</build_port_path>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
 		<conflicts>squid3-dev</conflicts>
-		<conflicts>Dansguardian</conflicts>
 		<version>0.91_1 pkg v1.10.0</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
