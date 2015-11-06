@@ -149,7 +149,7 @@
 				(Legacy version)]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.4.24 pkg v 1.1.2</version>
+		<version>1.4.24 pkg v 1.1.3</version>
 		<status>Release</status>
 		<required_version>2.0</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-legacy/haproxy.xml</config_file>
