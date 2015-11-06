@@ -1067,7 +1067,6 @@
 		</build_pbi>
 		<build_options>c-icap_SET_FORCE=LARGE_FILES;squid_SET_FORCE=ARP_ACL AUTH_LDAP AUTH_NIS AUTH_SASL CACHE_DIGESTS DELAY_POOLS FOLLOW_XFF FS_AUFS FS_DISKD GSSAPI_MIT HTCP ICAP ICMP IDENT IPV6 KQUEUE LARGEFILE LAX_HTTP SNMP SSL SSL_CRTD TP_PF WCCP WCCPV2;squid_UNSET_FORCE=AUTH_SMB AUTH_SQL DEBUG DNS_HELPER ECAP ESI FS_ROCK GSSAPI_NONE GSSAPI_BASE GSSAPI_HEIMDAL STACKTRACES TP_IPF TP_IPFW VIA_DB</build_options>
 		<conflicts>squid</conflicts>
-		<conflicts>squidGuard-devel</conflicts>
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.10_2-##ARCH##.pbi</depends_on_package_pbi>
@@ -1175,7 +1174,6 @@
 			<custom_name>squidguard-devel</custom_name>
 		</build_pbi>
 		<build_options>squidGuard-devel_UNSET_FORCE=SQUID32 SQUID33;squidGuard-devel_SET_FORCE=LDAP STRIPNT SQUID27;squid_UNSET_FORCE=DNS_HELPER IPFILTER PINGER STACKTRACES STRICT_HTTP_DESC USERAGENT_LOG WCCPV2;squid_SET_FORCE=PF LDAP_AUTH NIS_AUTH SASL_AUTH ARP_ACL AUFS CACHE_DIGESTS CARP COSS DELAY_POOLS FOLLOW_XFF HTCP IDENT KERB_AUTH KQUEUE LARGEFILE REFERER_LOG SNMP SSL VIA_DB WCCP;SQUID_UID=proxy;SQUID_GID=proxy</build_options>
-		<conflicts>squid3</conflicts>
 		<conflicts>squidGuard</conflicts>
 		<config_file>https://packages.pfsense.org/packages/config/squidGuard-devel/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
