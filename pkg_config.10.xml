@@ -535,8 +535,8 @@
 		<website>http://www.mailscanner.info</website>
 		<descr><![CDATA[
 			MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
-			This is a level3 mail scanning tool with high CPU load.<br/>
-			<strong>WARNING! This package bundles ClamAV that conflicts with 'Squid3', 'Dansguardian' and 'HAVP antivirus packages!' Installing these will result in a broken state.</strong>
+			This is a level3 mail scanning tool with high CPU load.<br/><br/>
+			<strong>WARNING! This package bundles ClamAV that conflicts with 'Squid3', 'Dansguardian' and 'HAVP antivirus' packages! Installing these will result in a broken state.</strong>
 			]]>
 		</descr>
 		<category>Services</category>
@@ -1201,8 +1201,8 @@
 	<package>
 		<name>squidGuard-devel</name>
 		<descr><![CDATA[
-			High performance web proxy URL filter.
-			<strong>Requires proxy Squid (2.7 legacy branch) package.</strong>
+			High performance web proxy URL filter.<br/>
+			<strong>Requires Squid (2.7 legacy branch) package.</strong>
 			]]>
 		</descr>
 		<website>http://www.squidGuard.org/</website>
