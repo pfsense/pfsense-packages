@@ -460,14 +460,14 @@
 		<descr><![CDATA[
 			Postfix mail forwarder acts as a relay server for your domain.<br />
 			It can do first and second line antispam combat before sending incoming mail to local mail servers.<br />
-			Postfix can also detect zombies, check RBLS, SPF, search ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.
+			Postfix can also detect zombies, check RBLS, SPF, search LDAP for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.
 			]]>
 		</descr>
 		<category>Services</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,40622.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_pbi>postfix-2.11.3_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>2.4.4</version>
+		<version>2.4.5</version>
 		<status>Release</status>
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
