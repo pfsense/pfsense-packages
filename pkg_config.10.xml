@@ -40,7 +40,7 @@
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
 		<version>0.3.3</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
 		<run_depends>sbin/asterisk:net/asterisk</run_depends>
@@ -52,7 +52,7 @@
 		<build_options>asterisk_SET_FORCE=SRTP;asterisk_UNSET_FORCE=FREETDS PGSQL</build_options>
 		<maintainer>marcellocoutinho@gmail.com robreg@zsurob.hu</maintainer>
 		<configurationfile>asterisk.xml</configurationfile>
-		<after_install_info>Please visit the Asterisk tab on status menu.</after_install_info>
+		<after_install_info>Please visit Status - Asterisk menu.</after_install_info>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
@@ -79,11 +79,11 @@
 	<package>
 		<name>Filer</name>
 		<descr>Allows you to create and overwrite files from the GUI.</descr>
-		<category>File Management</category>
+		<category>Utility</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/Filer_package</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/filer/filer.xml</config_file>
 		<version>0.60.6</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>bscholer@cshl.edu</maintainer>
 		<configurationfile>filer.xml</configurationfile>
@@ -93,11 +93,11 @@
 		<name>File Manager</name>
 		<internal_name>File_Manager</internal_name>
 		<descr>PHP File Manager.</descr>
-		<category>Diagnostics</category>
+		<category>Utility</category>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,26974.0.html</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
 		<version>0.2.2</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>filemgr.xml</configurationfile>
@@ -114,11 +114,11 @@
 			Advanced Integration for Emerging Threats IQRisk IP Reputation Threat Sources.
 			]]>
 		</descr>
-		<category>Firewall</category>
+		<category>Security</category>
 		<pkginfolink>https://forum.pfsense.org/index.php?topic=86212.0</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
 		<version>1.10</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>
 		<configurationfile>pfblockerng.xml</configurationfile>
@@ -144,7 +144,7 @@
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
 		<version>0.32</version>
-		<status>Release</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy1_5/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
@@ -172,7 +172,7 @@
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
 		<version>0.33</version>
-		<status>Release</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
@@ -193,13 +193,13 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
 		<website>http://www.modsecurity.org/</website>
 		<descr><![CDATA[
-			ModSecurity is a web application firewall that can work either embedded or as a reverse proxy.<br />
+			ModSecurity (Apache 2.4 branch) is a web application firewall that can work either embedded or as a reverse proxy.<br />
 			It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis.<br />
 			In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.<br />
 			<strong>Backup your location config before updating from 0.2.x to 0.3 package version.</strong>
 			]]>
 		</descr>
-		<category>Network Management</category>
+		<category>Security</category>
 		<version>0.45</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
@@ -217,7 +217,7 @@
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
 		<build_options>apache24_UNSET_FORCE=MPM_PREFORK;apache24_SET_FORCE=MPM_EVENT SLOTMEM_SHM MOST_ENABLED_MODULES MPM_SHARED SESSION_ENABLED_MODULES PROXY_ENABLED_MODULES SESSION_ENABLED_MODULES;mod_security_SET_FORCE=MLOGC</build_options>
-		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
+		<after_install_info>Please visit Services - Mod_Security+Apache+Proxy menu and set the service up so that it may be started.</after_install_info>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
@@ -225,8 +225,13 @@
 		<internal_name>apache-mod_security</internal_name>
 		<pkginfolink>https://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
 		<website>http://www.modsecurity.org/</website>
-		<descr>ModSecurity is a web application firewall that can work either embedded or as a reverse proxy. It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis. In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.</descr>
-		<category>Network Management</category>
+		<descr><![CDATA[
+			ModSecurity (Apache 2.2 branch) is a web application firewall that can work either embedded or as a reverse proxy.<br/>
+			It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis.<br/>
+			In addition this package allows URL forwarding which can be convenient for hosting multiple websites behind pfSense using 1 IP address.
+			]]>
+		</descr>
+		<category>Security</category>
 		<version>0.1.8</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
@@ -245,13 +250,19 @@
 			<ports_after>www/mod_security www/mod_memcache</ports_after>
 		</build_pbi>
 		<build_options>apr_UNSET_FORCE=BDB MYSQL PGSQL NSS;apr_SET_FORCE=SQLITE THREADS IPV6 SSL;apache22-worker-mpm_UNSET_FORCE=AUTHNZ_LDAP AUTHN_DBD BUCKETEER CASE_FILTER CASE_FILTER_IN CGID DBD EXT_FILTER LDAP LOG_FORENSIC OPTIONAL_FN_EXPORT OPTIONAL_FN_IMPORT OPTIONAL_HOOK_EXPORT OPTIONAL_HOOK_IMPORT SUBSTITUTE SUEXEC SUEXEC_RSRCLIMIT;apache22-worker-mpm_SET_FORCE=ACTIONS ALIAS AUTHN_ALIAS VHOST_ALIAS ASIS AUTHN_ANON AUTHN_DBM AUTHN_DEFAULT AUTHN_FILE AUTHZ_DBM AUTHZ_DEFAULT AUTHZ_GROUPFILE AUTHZ_HOST AUTHZ_OWNER AUTHZ_USER AUTH_BASIC AUTH_DIGEST AUTOINDEX CACHE DISK_CACHE FILE_CACHE MEM_CACHE CERN_META CGI CHARSET_LITE DAV DAV_FS DEFLATE DIR DUMPIO ENV EXPIRES FILTER HEADERS IMAGEMAP INCLUDE INFO LOGIO LOG_CONFIG MIME MIME_MAGIC NEGOTIATION PROXY PROXY_AJP PROXY_BALANCER PROXY_CONNECT PROXY_FTP PROXY_HTTP PROXY_SCGI REQTIMEOUT REWRITE SETENVIF SPELING STATUS THREADS UNIQUE_ID USERDIR USERTRACK VERSION</build_options>
-		<after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
+		<after_install_info>Please visit Services - Mod_Security+Apache+Proxy menu and set the service up so that it may be started.</after_install_info>
 	</package>
 	<package>
 		<name>Avahi</name>
 		<pkginfolink>https://doc.pfsense.org/index.php/Avahi_package</pkginfolink>
 		<website>http://www.avahi.org/</website>
-		<descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple Mac OS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
+		<descr><![CDATA[
+			Avahi is a system which facilitates service discovery on a local network via the mDNS/DNS-SD protocol suite.<br/>
+			This enables you to plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared.<br/>
+			In addition it supports some nifty things that have never been seen elsewhere like correct mDNS reflection across LAN segments.<br/>
+			Compatible technology is found in Apple MacOS X (branded ​Bonjour and sometimes Zeroconf).
+			]]>
+		</descr>
 		<category>Network Management</category>
 		<lib_depends>libavahi-core.so:net/avahi-app</lib_depends>
 		<port_category>net</port_category>
@@ -266,7 +277,7 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
 		<configurationfile>avahi.xml</configurationfile>
-		<after_install_info>Please visit the Avahi settings tab and select which interfaces you do not wish Avahi to listen on and click save to start the service.</after_install_info>
+		<after_install_info>Please visit Services - Avahi menu, enable the service and select which interfaces you do NOT wish Avahi to listen on. Save settings to start the service.</after_install_info>
 	</package>
 	<package>
 		<name>ntop</name>
@@ -309,11 +320,11 @@
 	<package>
 		<name>Notes</name>
 		<descr>Track things you want to note for this system.</descr>
-		<category>Status</category>
+		<category>Utility</category>
 		<pkginfolink/>
 		<config_file>https://packages.pfsense.org/packages/config/notes/notes.xml</config_file>
 		<version>0.2.7</version>
-		<status>Alpha</status>
+		<status>RC</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>notes.xml</configurationfile>
@@ -326,7 +337,7 @@
 		<port_category>ftp</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/tftp2/tftp.xml</config_file>
 		<version>2.2.2</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<configurationfile>tftp.xml</configurationfile>
 		<maximum_version>2.2.999</maximum_version>
@@ -338,7 +349,7 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/PHPService</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/phpservice/phpservice.xml</config_file>
 		<version>0.5.1</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>phpservice.xml</configurationfile>
@@ -350,7 +361,7 @@
 		<category>System</category>
 		<config_file>https://packages.pfsense.org/packages/config/backup/backup.xml</config_file>
 		<version>0.2.1</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>backup.xml</configurationfile>
@@ -358,23 +369,27 @@
 	<package>
 		<name>Cron</name>
 		<descr>The cron utility is used to manage commands on a schedule.</descr>
-		<category>Services</category>
+		<category>System</category>
 		<config_file>https://packages.pfsense.org/packages/config/cron/cron.xml</config_file>
 		<version>0.3.2</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>cron.xml</configurationfile>
 	</package>
 	<package>
 		<name>vHosts</name>
-		<descr>A web server package that can host HTML, Javascript, CSS, and PHP. It uses the lighttpd web server that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite.</descr>
+		<descr><![CDATA[
+			A web server package that can host HTML, Javascript, CSS, and PHP. It uses the lighttpd web server that is already installed.<br/>
+			It uses PHP5 in FastCGI mode and has access to PHP Data Objects and PDO SQLite.
+			]]>
+		</descr>
 		<category>Services</category>
 		<port_category>www</port_category>
 		<pkginfolink>https://doc.pfsense.org/index.php/vhosts</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/vhosts/vhosts.xml</config_file>
 		<version>0.8.3</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>vhosts.xml</configurationfile>
@@ -397,15 +412,19 @@
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
 		<version>3.2.8.3</version>
 		<required_version>2.2</required_version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<configurationfile>/snort.xml</configurationfile>
-		<after_install_info>Please visit the Snort settings tab first and select your desired rules. Afterwards visit the update rules tab to download your configured rules.</after_install_info>
+		<after_install_info>Please visit Services - Snort - Interfaces tab first and select your desired rules. Afterwards visit the Updates tab to download your configured rulesets.</after_install_info>
 	</package>
 	<package>
 		<name>olsrd</name>
 		<website>http://www.olsr.org/</website>
-		<descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.</descr>
-		<category>Services</category>
+		<descr><![CDATA[
+			The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol.<br/>
+			OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding.
+			]]>
+		</descr>
+		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/olsrd/olsrd.xml</config_file>
 		<depends_on_package_pbi>olsrd-0.6.6.2_1-##ARCH##.pbi</depends_on_package_pbi>
 		<run_depends>sbin/olsrd:net/olsrd</run_depends>
@@ -414,7 +433,7 @@
 			<port>net/olsrd</port>
 		</build_pbi>
 		<version>1.0.3</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<configurationfile>olsrd.xml</configurationfile>
 		<maximum_version>2.2.999</maximum_version>
@@ -427,19 +446,23 @@
 		<port_category>net</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/routed/routed.xml</config_file>
 		<version>1.2.1</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<configurationfile>routed.xml</configurationfile>
 	</package>
 	<package>
 		<name>spamd</name>
 		<website>http://www.openbsd.org/spamd/</website>
-		<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
+		<descr><![CDATA[
+			Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly.<br/>
+			If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.
+			]]>
+		</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_pbi>spamd-4.9.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.1.6</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<port_category>mail</port_category>
 		<run_depends>sbin/spamdb:mail/spamd</run_depends>
@@ -460,7 +483,7 @@
 		<descr><![CDATA[
 			Postfix mail forwarder acts as a relay server for your domain.<br />
 			It can do first and second line antispam combat before sending incoming mail to local mail servers.<br />
-			Postfix can also detect zombies, check RBLS, SPF, search LDAP for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.
+			Postfix can also detect zombies, check RBLs, SPF, search LDAP for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.
 			]]>
 		</descr>
 		<category>Services</category>
@@ -468,7 +491,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_pbi>postfix-2.11.3_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.4.5</version>
-		<status>Release</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<port_category>mail</port_category>
@@ -486,8 +509,8 @@
 			DansGuardian is an award winning Open Source web content filter.<br />
 			It filters the actual content of pages based on many methods, including phrase matching, PICS filtering and URL filtering.<br />
 			It does not purely filter based on a banned list of sites like lesser totally commercial filters.<br />
-			For all non-commercial use it's free, without cost.<br />
-			For all commercial use visit DansGuardian website to get a licence.
+			For all non-commercial use it's free, without cost. For all commercial use visit DansGuardian website to get a licence.<br /><br />
+			<strong>WARNING! This package bundles ClamAV that conflicts with 'Squid3', 'Mailscanner' and 'HAVP antivirus' packages! Installing these will result in a broken state.</strong>
 			]]>
 		</descr>
 		<category>Services</category>
@@ -495,7 +518,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,43786.0.html</pkginfolink>
 		<depends_on_package_pbi>dansguardian-2.12.0.3_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.12.0.3_2 pkg v.0.1.12</version>
-		<status>beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>dansguardian.xml</configurationfile>
 		<build_pbi>
@@ -512,7 +535,8 @@
 		<website>http://www.mailscanner.info</website>
 		<descr><![CDATA[
 			MailScanner is an e-mail security and anti-spam package for e-mail gateway systems.<br />
-			This is a level3 mail scanning tool with high CPU load.
+			This is a level3 mail scanning tool with high CPU load.<br/>
+			<strong>WARNING! This package bundles ClamAV that conflicts with 'Squid3', 'Dansguardian' and 'HAVP antivirus packages!' Installing these will result in a broken state.</strong>
 			]]>
 		</descr>
 		<category>Services</category>
@@ -520,7 +544,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,43687.0.html</pkginfolink>
 		<depends_on_package_pbi>mailscanner-4.84.6-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.2.12</version>
-		<status>beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>mailscanner.xml</configurationfile>
 		<port_category>mail</port_category>
@@ -547,7 +571,7 @@
 			<port>net/siproxd</port>
 		</build_pbi>
 		<version>1.0.6</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>siproxd.xml</configurationfile>
 	</package>
@@ -558,7 +582,7 @@
 			<strong>WARNING! Installs files to the same place as Quagga OSPF. Installing both will result in a broken state, remove this package before installing Quagga OSPF.</strong>
 			]]>
 		</descr>
-		<category>NET</category>
+		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/openbgpd/openbgpd.xml</config_file>
 		<port_category>net</port_category>
 		<run_depends>sbin/bgpctl:net/openbgpd</run_depends>
@@ -567,7 +591,7 @@
 			<port>net/openbgpd</port>
 		</build_pbi>
 		<version>0.9.3.8</version>
-		<status>STABLE</status>
+		<status>RELEASE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>openbgpd.xml</configurationfile>
@@ -575,9 +599,13 @@
 	</package>
 	<package>
 		<name>Lightsquid</name>
-		<descr>LightSquid is a high performance web proxy reporting tool. Proxy realtime statistics (SQStat). Requires Squid HTTP proxy.</descr>
+		<descr><![CDATA[
+			LightSquid is a high performance web proxy reporting tool. Includes proxy realtime statistics (SQStat).
+			<strong>Requires Squid3 or Squid package.</strong>
+			]]>
+		</descr>
 		<website>http://lightsquid.sf.net/</website>
-		<category>Network Report</category>
+		<category>Network Management</category>
 		<version>2.42</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<port_category>www</port_category>
@@ -588,7 +616,7 @@
 			<port>www/lightsquid</port>
 		</build_pbi>
 		<build_options>lightsquid_SET_FORCE=GD;libgd_UNSET_FORCE=FONTCONFIG XPM;perl_UNSET_FORCE=MULTIPLICITY</build_options>
-		<status>RC1</status>
+		<status>RC</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/lightsquid/lightsquid.xml</config_file>
 		<configurationfile>lightsquid.xml</configurationfile>
@@ -600,15 +628,15 @@
 		<website>http://www.dansguardian.org/</website>
 		<descr><![CDATA[
 			Sarg - Squid Analysis Report Generator - is a tool that generates reports about where your users are going on the Internet.<br />
-			Sarg provides information about proxy users' activities: times, bytes, sites, etc. for those using Squid, SquidGuard or DansGuardian.
+			Sarg provides information about proxy users' activities: times, bytes, sites, etc. for those using Squid3/Squid, SquidGuard or DansGuardian packages.
 			]]>
 		</descr>
-		<category>Network Report</category>
+		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_pbi>sarg-2.3.9-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.6.7</version>
-		<status>Release</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<port_category>www</port_category>
 		<run_depends>bin/sarg:www/sarg</run_depends>
@@ -617,7 +645,7 @@
 			<port>www/sarg</port>
 		</build_pbi>
 		<build_options>sarg_UNSET_FORCE=PHP</build_options>
-		<after_install_info>Please visit sarg settings on Status Menu to configure sarg.</after_install_info>
+		<after_install_info>Please visit Status - Sarg Reports menu to configure Sarg package.</after_install_info>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
@@ -635,7 +663,7 @@
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,49917.msg263664.html#msg263664</pkginfolink>
 		<depends_on_package_pbi>ipguard-1.04_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.1.2</version>
-		<status>beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>ipguard.xml</configurationfile>
 		<port_category>security</port_category>
@@ -643,7 +671,7 @@
 		<build_pbi>
 			<port>security/ipguard</port>
 		</build_pbi>
-		<after_install_info>Please visit ipguard settings on the Firewall Menu to configure.</after_install_info>
+		<after_install_info>Please visit Firewall - IPguard menu to configure the package.</after_install_info>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
@@ -652,7 +680,7 @@
 		<descr><![CDATA[
 			Varnish is a state-of-the-art, high-performance HTTP accelerator.<br />
 			It uses the advanced features in FreeBSD to achieve its high performance.<br />
-			Version 3 includes streaming support
+			Version 3 includes streaming support.
 			]]>
 		</descr>
 		<website>http://varnish-cache.org</website>
@@ -678,7 +706,7 @@
 		<website>http://humdi.net/vnstat/</website>
 		<descr><![CDATA[
 			Vnstat is a console-based network traffic monitor.<br />
-			The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.
+			The vnstat PHP frontend and vnstati add a more user friendly way of displaying traffic usage.
 			]]>
 		</descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
@@ -690,7 +718,7 @@
 			<port>net/vnstat</port>
 		</build_pbi>
 		<version>1.12.8</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/vnstat2/vnstat2.xml</config_file>
@@ -703,7 +731,7 @@
 		<website>http://cr.yp.to/djbdns.html</website>
 		<category>Services</category>
 		<version>1.0.6.24</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/tinydns/tinydns.xml</config_file>
@@ -722,9 +750,9 @@
 		<name>Open-VM-Tools</name>
 		<descr>VMware Tools is a suite of utilities that enhances the performance of the virtual machine's guest operating system and improves management of the virtual machine.</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
-		<category>Services</category>
+		<category>System</category>
 		<version>1280544.12</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
@@ -747,7 +775,7 @@
 		<website>https://portal.pfsense.org</website>
 		<category>Services</category>
 		<version>1.29</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<pkginfolink>https://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/autoconfigbackup/autoconfigbackup.xml</config_file>
@@ -757,9 +785,9 @@
 		<name>arping</name>
 		<descr>Broadcasts a who-has ARP packet on the network and prints answers.</descr>
 		<website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
-		<category>Services</category>
+		<category>Network Management</category>
 		<version>1.2.1</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/arping/arping.xml</config_file>
 		<configurationfile>arping.xml</configurationfile>
@@ -774,12 +802,17 @@
 	<package>
 		<name>nmap</name>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is running on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more.</descr>
+		<descr><![CDATA[
+			NMap is a utility for network exploration or security auditing.<br/>
+			It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is running on a port), and TCP/IP fingerprinting (remote host OS or device identification).
+			It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more.
+			]]>
+		</descr>
 		<category>Security</category>
 		<depends_on_package_pbi>nmap-6.47-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
 		<version>1.4</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>nmap.xml</configurationfile>
@@ -814,7 +847,7 @@
 		<name>nut</name>
 		<descr>Network UPS Tools.</descr>
 		<website>http://www.networkupstools.org/</website>
-		<category>Network Management</category>
+		<category>Services</category>
 		<version>2.1.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
@@ -848,7 +881,7 @@
 		<category>Network Management</category>
 		<depends_on_package_pbi>darkstat-3.0.718-##ARCH##.pbi</depends_on_package_pbi>
 		<version>3.1.1</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<maintainer>coreteam@pfsense.org</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/darkstat/darkstat.xml</config_file>
@@ -867,7 +900,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8_1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.0.3</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>3.0</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
 		<port_category>net</port_category>
@@ -884,7 +917,7 @@
 		<category>Services</category>
 		<depends_on_package_pbi>widentd-1.03_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.0.5</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/widentd/widentd.xml</config_file>
@@ -907,15 +940,15 @@
 			]]>
 		</descr>
 		<pkginfolink>https://doc.pfsense.org/index.php/FreeRADIUS_2.x_package</pkginfolink>
-		<category>System</category>
+		<category>Services</category>
 		<version>1.6.17</version>
-		<status>RC1</status>
+		<status>RC</status>
 		<required_version>2.2</required_version>
 		<maintainer>nachtfalkeaw@web.de</maintainer>
 		<depends_on_package_pbi>freeradius-2.2.6_3-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/freeradius2/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
-		<after_install_info>Please visit Services: FreeRADIUS.</after_install_info>
+		<after_install_info>Please visit Services - FreeRADIUS menu to configure the package.</after_install_info>
 		<port_category>net</port_category>
 		<run_depends>sbin/radiusd:net/freeradius2 bin/bash:shells/bash</run_depends>
 		<build_pbi>
@@ -928,8 +961,13 @@
 	<package>
 		<name>bandwidthd</name>
 		<website>http://bandwidthd.sourceforge.net/</website>
-		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
-		<category>System</category>
+		<descr><![CDATA[
+			BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization.<br/>
+			Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each IP address's utilization can be logged out in CDF format, or to a backend database server.<br/>
+			HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.
+			]]>
+		</descr>
+		<category>Network Management</category>
 		<version>0.6.3</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
@@ -950,10 +988,10 @@
 		<name>stunnel</name>
 		<website>http://www.stunnel.org/</website>
 		<descr>SSL encryption wrapper between remote client and local or remote servers.</descr>
-		<category>Network Management</category>
+		<category>Security</category>
 		<depends_on_package_pbi>stunnel-5.20-##ARCH##.pbi</depends_on_package_pbi>
 		<version>5.20.3</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/stunnel/stunnel.xml</config_file>
@@ -974,7 +1012,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/iperf/iperf.xml</config_file>
 		<depends_on_package_pbi>iperf-2.0.5-##ARCH##.pbi</depends_on_package_pbi>
 		<version>2.0.5.2</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>2.2</required_version>
 		<configurationfile>iperf.xml</configurationfile>
@@ -1010,7 +1048,7 @@
 		<category>Network Management</category>
 		<depends_on_package_pbi>mtr-0.85_1-##ARCH##.pbi</depends_on_package_pbi>
 		<version>0.85_3</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mtr-nox11/mtr-nox11.xml</config_file>
 		<configurationfile>mtr-nox11.xml</configurationfile>
@@ -1023,11 +1061,11 @@
 	</package>
 	<package>
 		<name>squid</name>
-		<descr>High performance web proxy cache.</descr>
+		<descr>High performance web proxy cache (2.7 legacy branch).</descr>
 		<website>http://www.squid-cache.org/</website>
-		<category>Network</category>
+		<category>Services</category>
 		<version>4.3.10</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_pbi>squid-2.7.9_4-##ARCH##.pbi</depends_on_package_pbi>
@@ -1045,16 +1083,16 @@
 		<name>squid3</name>
 		<internal_name>squid</internal_name>
 		<descr><![CDATA[
-			High performance web proxy cache.<br />
-			It combines Squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
-			It includes an Exchange-Web-Access (OWA) Assistant, SSL filtering and antivirus integration via C-ICAP.
+			High performance web proxy cache (3.4 branch). It combines Squid as a proxy server with its capabilities of acting as a HTTP / HTTPS reverse proxy.<br />
+			It includes an Exchange-Web-Access (OWA) Assistant, SSL filtering and antivirus integration via C-ICAP.<br/><br/>
+			<strong>WARNING! This package bundles ClamAV that conflicts with 'Dansguardian', 'Mailscanner' and 'HAVP antivirus' packages! Installing these will result in a broken state.</strong>
 			]]>
 		</descr>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
-		<category>Network</category>
+		<category>Services</category>
 		<version>0.4.2</version>
-		<status>beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com fernando@netfilter.com.br seth.mos@dds.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<run_depends>sbin/squid:www/squid libexec/squid/squid_radius_auth:www/squid_radius_auth lib/c_icap/virus_scan.so:www/c-icap-modules lib/c_icap/squidclamav.so:www/squidclamav</run_depends>
@@ -1068,12 +1106,13 @@
 		<config_file>https://packages.pfsense.org/packages/config/squid3/34/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.10_2-##ARCH##.pbi</depends_on_package_pbi>
+		<after_install_info>Please visit Services - Squid Proxy Server menu to configure the package and enable the proxy.</after_install_info>
 	</package>
 	<package>
 		<name>LCDproc</name>
 		<descr>LCD display driver.</descr>
 		<website>http://www.lcdproc.org/</website>
-		<category>Utility</category>
+		<category>System</category>
 		<version>1.0.4</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
@@ -1088,7 +1127,7 @@
 			<port>sysutils/lcdproc</port>
 		</build_pbi>
 		<build_options>lcdproc_SET_FORCE=USB</build_options>
-		<after_install_info>Please set the service options in Services - LCDproc before running the service.</after_install_info>
+		<after_install_info>Please visit Services - LCDproc menu and configure the package before running the service.</after_install_info>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
@@ -1096,7 +1135,7 @@
 		<internal_name>lcdproc</internal_name>
 		<descr>LCD display driver - development version.</descr>
 		<website>http://www.lcdproc.org/</website>
-		<category>Utility</category>
+		<category>System</category>
 		<version>0.9.14</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
@@ -1112,14 +1151,14 @@
 			<port>sysutils/lcdproc</port>
 		</build_pbi>
 		<build_options>lcdproc_SET_FORCE=USB</build_options>
-		<after_install_info>Please set the service options in Services - LCDproc before running the service.</after_install_info>
+		<after_install_info>Please visit Services - LCDproc menu and configure the package before running the service.</after_install_info>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>arpwatch</name>
 		<descr>Arpwatch monitors Ethernet to IP address pairings. It logs certain changes to syslog.</descr>
 		<website>http://ee.lbl.gov/</website>
-		<category>Security</category>
+		<category>Network Management</category>
 		<depends_on_package_pbi>arpwatch-2.1.a15_8-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>net-mgmt/arpwatch</port>
@@ -1137,12 +1176,16 @@
 	</package>
 	<package>
 		<name>squidGuard</name>
-		<descr>High performance web proxy URL filter. Works with both Squid 2.x and Squid 3.x.</descr>
+		<descr><![CDATA[
+			High performance web proxy URL filter.<br/>
+			<strong>Works with both Squid (2.7 legacy branch) and Squid3 (3.4 branch) packages.</strong>
+			]]>
+		</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<category>Network Management</category>
 		<version>1.9.16</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-1.4_7-##ARCH##.pbi</depends_on_package_pbi>
 		<port_category>www</port_category>
@@ -1157,12 +1200,16 @@
 	</package>
 	<package>
 		<name>squidGuard-devel</name>
-		<descr>High performance web proxy URL filter. Requires proxy Squid 2.x package.</descr>
+		<descr><![CDATA[
+			High performance web proxy URL filter.
+			<strong>Requires proxy Squid (2.7 legacy branch) package.</strong>
+			]]>
+		</descr>
 		<website>http://www.squidGuard.org/</website>
 		<maintainer>gugabsd@mundounix.com.br</maintainer>
 		<category>Network Management</category>
 		<version>1.5.8</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<depends_on_package_pbi>squidguard-devel-1.5_1-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -1194,7 +1241,13 @@
 	<package>
 		<name>HAVP antivirus</name>
 		<website>http://www.server-side.de/</website>
-		<descr>Antivirus: HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. HAVP antivirus proxy has a parent and transparent proxy mode. It can be used with Squid or standalone.</descr>
+		<descr><![CDATA[
+			Antivirus: HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner.<br/>
+			The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic.<br/>
+			HAVP antivirus proxy has a parent and transparent proxy mode. It can be used with Squid or standalone.<br/><br/>
+			<strong>WARNING! This package bundles ClamAV that conflicts with 'Squid3', 'Mailscanner' and 'Dansguardian' packages! Installing these will result in a broken state.</strong>
+			]]>
+		</descr>
 		<category>Network Management</category>
 		<depends_on_package_pbi>havp-0.91_3-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
@@ -1202,14 +1255,13 @@
 			<ports_after>security/clamav</ports_after>
 		</build_pbi>
 		<build_options>CLAMAVUSER=havp;CLAMAVGROUP=havp</build_options>
-		<conflicts>squid3</conflicts>
 		<version>1.10.0</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/havp/havp.xml</config_file>
 		<configurationfile>havp.xml</configurationfile>
 		<maintainer>dv_serg@mail.ru</maintainer>
-		<after_install_info>Please check the HAVP settings.</after_install_info>
+		<after_install_info>Please visit Services - Antivirus menu to configure HAVP package.</after_install_info>
 		<noembedded>true</noembedded>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
@@ -1218,7 +1270,7 @@
 		<descr>Allows you to use LEDs for monitoring network activity on supported platforms (ALIX, WRAP, Soekris, etc.)</descr>
 		<category>System</category>
 		<version>0.4.6</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/blinkled8/blinkled.xml</config_file>
@@ -1237,7 +1289,7 @@
 		<descr>Allows you to use LEDs for monitoring gateway status on supported platforms (ALIX, WRAP, Soekris, etc.)</descr>
 		<category>System</category>
 		<version>0.2.3</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<port_category>sysutils</port_category>
 		<required_version>2.2</required_version>
@@ -1247,7 +1299,7 @@
 	<package>
 		<name>Dashboard Widget: HAVP</name>
 		<descr>Dashboard widget for HAVP alerts.</descr>
-		<category>System</category>
+		<category>Utility</category>
 		<config_file>https://packages.pfsense.org/packages/config/widget-havp/widget-havp.xml</config_file>
 		<version>0.1.1</version>
 		<status>BETA</status>
@@ -1258,7 +1310,7 @@
 	<package>
 		<name>Dashboard Widget: Antivirus Status</name>
 		<descr>Dashboard widget for HAVP status.</descr>
-		<category>System</category>
+		<category>Utility</category>
 		<config_file>https://packages.pfsense.org/packages/config/widget-antivirus/widget-antivirus.xml</config_file>
 		<version>0.1.1</version>
 		<status>BETA</status>
@@ -1270,9 +1322,9 @@
 		<name>RRD Summary</name>
 		<internal_name>RRD_Summary</internal_name>
 		<descr>RRD Summary Page, which will give a total amount of traffic passed In/Out during this and the previous month.</descr>
-		<category>System</category>
+		<category>Network Management</category>
 		<version>1.2</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<port_category>sysutils</port_category>
 		<required_version>2.2</required_version>
@@ -1282,10 +1334,10 @@
 	<package>
 		<name>Shellcmd</name>
 		<descr>The shellcmd utility is used to manage commands on system startup.</descr>
-		<category>Services</category>
+		<category>System</category>
 		<config_file>https://packages.pfsense.org/packages/config/shellcmd/shellcmd.xml</config_file>
 		<version>1.0</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>shellcmd.xml</configurationfile>
@@ -1294,7 +1346,7 @@
 		<name>NRPE v2</name>
 		<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
 		<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
-		<category>Services</category>
+		<category>Network Management</category>
 		<depends_on_package_pbi>nrpe-2.15_5-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>net-mgmt/nagios-plugins</ports_before>
@@ -1303,7 +1355,7 @@
 		<build_options>nrpe_SET_FORCE=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.2.5</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2.1</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
 		<configurationfile>nrpe2.xml</configurationfile>
@@ -1317,7 +1369,7 @@
 			For each host to be monitored check_mk is called by Nagios only once per time period.
 			]]>
 		</descr>
-		<category>Services</category>
+		<category>Network Management</category>
 		<depends_on_package_pbi>muse-0.2-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<ports_before>sysutils/ipmitool devel/libstatgrab</ports_before>
@@ -1325,7 +1377,7 @@
 		</build_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/checkmk-agent/checkmk.xml</config_file>
 		<version>0.1.5</version>
-		<status>RC1</status>
+		<status>RC</status>
 		<required_version>2.2</required_version>
 		<maintainer>marcellocoutinho@gmail.com</maintainer>
 		<configurationfile>checkmk.xml</configurationfile>
@@ -1338,9 +1390,9 @@
 			This package acts as an access list frontend for ssh connections
 			]]>
 		</descr>
-		<category>Enhancements</category>
+		<category>System</category>
 		<version>1.0.6</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sshdcond/sshdcond.xml</config_file>
 		<maintainer>namezero@afim.info</maintainer>
@@ -1350,9 +1402,9 @@
 	<package>
 		<name>mailreport</name>
 		<descr>Allows you to setup periodic e-mail reports containing command output, log file contents, and RRD graphs.</descr>
-		<category>Network Management</category>
+		<category>System</category>
 		<version>2.3_1</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<port_category>mail</port_category>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/mailreport/mailreport.xml</config_file>
@@ -1368,7 +1420,7 @@
 		</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>0.6.8</version>
-		<category>Routing</category>
+		<category>Network Management</category>
 		<status>BETA</status>
 		<depends_on_package_pbi>quagga-0.99.23.1_2-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/quagga_ospfd/quagga_ospfd.xml</config_file>
@@ -1401,7 +1453,7 @@
 		<website>http://www.bacula.org/</website>
 		<category>Services</category>
 		<version>1.0.12</version>
-		<status>Stable</status>
+		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/bacula-client/bacula-client.xml</config_file>
 		<depends_on_package_pbi>bacula-7.0.5-##ARCH##.pbi</depends_on_package_pbi>
@@ -1410,16 +1462,16 @@
 		</build_pbi>
 		<maintainer>marcioc.antao@gmail.com</maintainer>
 		<configurationfile>bacula-client.xml</configurationfile>
-		<after_install_info>Please visit the bacula client tab on services menu.</after_install_info>
+		<after_install_info>Please visit Services - Bacula Client menu to configure the package.</after_install_info>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>urlsnarf</name>
 		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
 		<descr>HTTP URL Sniffer (console/shell only).</descr>
-		<category>Services</category>
+		<category>Network Management</category>
 		<version>2.4b1</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/urlsnarf/urlsnarf.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
@@ -1436,9 +1488,9 @@
 		<pkginfolink>https://forum.pfsense.org/</pkginfolink>
 		<descr>Realtime interface monitor (console/shell only).</descr>
 		<website>http://www.ex-parrot.com/~pdw/iftop/</website>
-		<category>Services</category>
+		<category>Network Management</category>
 		<version>0.17</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/iftop/iftop.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
@@ -1457,7 +1509,7 @@
 		<website>http://git-scm.com/</website>
 		<category>Services</category>
 		<version>2.2.1</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/git/git.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
@@ -1475,7 +1527,7 @@
 		<name>tinc</name>
 		<website>http://www.tinc-vpn.org/</website>
 		<descr>tinc is a Virtual Private Network (VPN) daemon that uses tunnelling and encryption to create a secure private mesh network between hosts on the Internet.</descr>
-		<category>Network Management</category>
+		<category>Security</category>
 		<depends_on_package_pbi>tinc-1.0.24-##ARCH##.pbi</depends_on_package_pbi>
 		<build_pbi>
 			<port>security/tinc</port>
@@ -1497,7 +1549,7 @@
 		<name>syslog-ng</name>
 		<website>http://www.balabit.com/network-security/syslog-ng/</website>
 		<descr>Syslog-ng syslog server. This service is not intended to replace the default pfSense syslog server but rather acts as an independent syslog server.</descr>
-		<category>Services</category>
+		<category>System</category>
 		<version>1.1.1</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
@@ -1623,9 +1675,9 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/Sudo_Package</pkginfolink>
 		<descr>sudo allows delegation of privileges to users in the shell so commands can be run as other users, such as root.</descr>
 		<website>http://www.sudo.ws/</website>
-		<category>Security</category>
+		<category>System</category>
 		<version>0.2.8</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/sudo/sudo.xml</config_file>
 		<maintainer>jimp@pfsense.org</maintainer>
@@ -1644,7 +1696,7 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>1.7.1</version>
 		<category>Services</category>
-		<status>Release</status>
+		<status>RELEASE</status>
 		<config_file>https://packages.pfsense.org/packages/config/servicewatchdog/servicewatchdog.xml</config_file>
 		<required_version>2.2</required_version>
 		<configurationfile>servicewatchdog.xml</configurationfile>
@@ -1652,12 +1704,17 @@
 	<package>
 		<name>softflowd</name>
 		<website>http://code.google.com/p/softflowd/</website>
-		<descr>Softflowd is flow-based network traffic analyser capable of Cisco NetFlow data export. Softflowd semi-statefully tracks traffic flows recorded by listening on a network interface or by reading a packet capture file. These flows may be reported via NetFlow to a collecting host or summarised within softflowd itself. Softflowd supports Netflow versions 1, 5 and 9 and is fully IPv6-capable - it can track IPv6 flows and send export datagrams via IPv6. It also supports export to multicast groups, allowing for redundant flow collectors.</descr>
+		<descr><![CDATA[
+			Softflowd is flow-based network traffic analyser capable of Cisco NetFlow data export.<br/>
+			Softflowd semi-statefully tracks traffic flows recorded by listening on a network interface or by reading a packet capture file. These flows may be reported via NetFlow to a collecting host or summarised within softflowd itself.<br/>
+			Softflowd supports Netflow versions 1, 5 and 9 and is fully IPv6-capable - it can track IPv6 flows and send export datagrams via IPv6. It also supports export to multicast groups, allowing for redundant flow collectors.<br/>
+			]]>
+		</descr>
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/softflowd/softflowd.xml</config_file>
 		<depends_on_package_pbi>softflowd-0.9.8_2-##ARCH##.pbi</depends_on_package_pbi>
 		<version>1.2.1</version>
-		<status>Beta</status>
+		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>softflowd.xml</configurationfile>
 		<port_category>net-mgmt</port_category>
@@ -1729,7 +1786,7 @@
 		<maintainer>jimp@pfsense.org</maintainer>
 		<version>0.3</version>
 		<category>Services</category>
-		<status>Beta</status>
+		<status>BETA</status>
 		<port_category>ftp</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/ftpproxy/ftpproxy.xml</config_file>
 		<required_version>2.2</required_version>
