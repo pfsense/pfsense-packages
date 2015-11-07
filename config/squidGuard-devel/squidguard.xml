@@ -251,6 +251,7 @@
                         	]]>
                         </description>
                         <type>checkbox</type>
+                        <enablefields>blacklist_proxy,blacklist_url</enablefields>
                 </field>
                 <field>
                         <fielddescr>Blacklist proxy</fielddescr>
