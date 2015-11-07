@@ -112,6 +112,11 @@ function squidguard_validate(&$post, &$input_errors)
     	if (($g['platform'] == "pfSense") && isset($config['system']['use_mfs_tmpvar'])) {
     		$input_errors[] = "Please, disable 'Use RAM Disks' under System: Advanced: Miscellaneous to avoid SquidGuard configuration breakage on reboot.";
     	}
+	if ($g['platform'] != "pfSense") {
+		if ($post['blacklist'] != "" || $post['blacklist_proxy'] != "" || $post['blacklist_url'] != "") {
+			$input_errors[] = "Blacklists usage is NOT supported on NanoBSD. Disable 'Blacklist' option in 'General settings'.";
+		}
+	}
     	sg_check_config_data($input_errors);
     }
 }
