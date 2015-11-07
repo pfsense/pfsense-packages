@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidguardgeneral</name>
-	<version>1.5.8</version>
+	<version>1.5.9</version>
 	<title>Proxy filter SquidGuard: General settings</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<!-- Installation -->
@@ -244,7 +244,12 @@
                 <field>
                         <fielddescr>Blacklist</fielddescr>
                         <fieldname>blacklist</fieldname>
-                        <description><![CDATA[Check this option to enable blacklist]]></description>
+                        <description>
+                        	<![CDATA[
+                        	Check this option to enable blacklist.<br />
+                        	<strong><span class="errmsg">Do NOT enable this on NanoBSD installs!</span></strong>
+                        	]]>
+                        </description>
                         <type>checkbox</type>
                 </field>
                 <field>
