@@ -103,10 +103,17 @@ sg_init(convert_pfxml_to_sgxml());
 # ==============================================================================
 function squidguard_validate(&$post, &$input_errors)
 {
+    global $config, $g;
     $submit = isset($_GET['submit']) ? $_GET['submit'] : $_POST['submit'];
 
     # check config if 'Apply'
-    if ($submit === APPLY_BTN)  sg_check_config_data($input_errors);
+    if ($submit === APPLY_BTN) {
+    	// XXX:Bug #4608
+    	if (($g['platform'] == "pfSense") && isset($config['system']['use_mfs_tmpvar'])) {
+    		$input_errors[] = "Please, disable 'Use RAM Disks' under System: Advanced: Miscellaneous to avoid SquidGuard configuration breakage on reboot.";
+    	}
+    	sg_check_config_data($input_errors);
+    }
 }
 
 # ------------------------------------------------------------------------------
