@@ -244,8 +244,14 @@
                 <field>
                         <fielddescr>Blacklist</fielddescr>
                         <fieldname>blacklist</fieldname>
-                        <description><![CDATA[Check this option to enable blacklist]]></description>
+                        <description>
+                        	<![CDATA[
+                        	Check this option to enable blacklist.<br />
+                        	<strong><span class="errmsg">Do NOT enable this on NanoBSD installs!</span></strong>
+                        	]]>
+                        </description>
                         <type>checkbox</type>
+                        <enablefields>blacklist_proxy,blacklist_url</enablefields>
                 </field>
                 <field>
                         <fielddescr>Blacklist proxy</fielddescr>
