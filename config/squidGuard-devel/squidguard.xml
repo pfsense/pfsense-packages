@@ -148,7 +148,13 @@
                 <field>
                         <fielddescr>Enable</fielddescr>
                         <fieldname>squidguard_enable</fieldname>
-                        <description><![CDATA[Check this option to enable squidGuard]]></description>
+                        <description>
+                        	<![CDATA[
+                        	Check this option to enable squidGuard.<br />
+                        	<strong><span class="errmsg">Important: </span></strong>Please set up at least one category on the 'Target Categories' tab before enabling.
+                        	See <a href="https://forum.pfsense.org/index.php?topic=94312.0">this link for details</a>.
+                        	]]>
+                        </description>
                         <type>checkbox</type>
                 </field>
                 <field>
