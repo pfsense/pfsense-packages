@@ -494,7 +494,7 @@ else
 if (!empty($suricatacfg['stream_memcap']))
 	$stream_memcap = $suricatacfg['stream_memcap'];
 else
-	$stream_memcap = "33554432";
+	$stream_memcap = "67108864";
 
 if (!empty($suricatacfg['stream_prealloc_sessions']))
 	$stream_prealloc_sessions = $suricatacfg['stream_prealloc_sessions'];
