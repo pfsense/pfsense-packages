@@ -474,8 +474,8 @@ foreach ($rule as &$r) {
 	/**********************************************************/
 	/* Create interface Unified2 XFF log settings if not set  */
 	/**********************************************************/
-	if (!isset($pconfig['barnyard_log_xff'])) {
-		$pconfig['barnyard_log_xff'] = "off";
+	if (!isset($pconfig['barnyard_xff_logging'])) {
+		$pconfig['barnyard_xff_logging'] = "off";
 		$updated_cfg = true;
 	}
 	if (!isset($pconfig['barnyard_xff_mode'])) {
