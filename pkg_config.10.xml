@@ -408,7 +408,7 @@
 			<port>security/snort</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;snort_SET_FORCE=BARNYARD PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;snort_UNSET_FORCE=PULLEDPORK FILEINSPECT HA</build_options>
+		<build_options>security_barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;security_barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;security_snort_SET_FORCE=BARNYARD PERFPROFILE SOURCEFIRE GRE IPV6 NORMALIZER APPID;security_snort_UNSET_FORCE=PULLEDPORK FILEINSPECT HA</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/snort/snort.xml</config_file>
 		<version>3.2.8.3</version>
 		<required_version>2.2</required_version>
@@ -1775,7 +1775,7 @@
 			<port>security/suricata</port>
 			<ports_after>security/barnyard2</ports_after>
 		</build_pbi>
-		<build_options>barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;suricata_SET_FORCE=IPFW PORTS_PCAP GEOIP JSON NSS LUAJIT HTP_PORT;suricata_UNSET_FORCE=PRELUDE TESTS SC LUA</build_options>
+		<build_options>security_barnyard2_UNSET_FORCE=ODBC PGSQL PRELUDE;security_barnyard2_SET_FORCE=GRE IPV6 MPLS MYSQL PORT_PCAP BRO;security_suricata_SET_FORCE=IPFW PORTS_PCAP GEOIP JSON NSS LUAJIT HTP_PORT;security_suricata_UNSET_FORCE=PRELUDE TESTS SC LUA</build_options>
 		<depends_on_package_pbi>suricata-2.0.9-##ARCH##.pbi</depends_on_package_pbi>
 	</package>
 	<package>
