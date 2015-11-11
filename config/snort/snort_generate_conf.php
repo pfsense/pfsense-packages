@@ -1291,7 +1291,7 @@ $http_inspect_default_engine = array( "name" => "default", "bind_to" => "all", "
 				      "unlimited_decompress" => "on", "inspect_gzip" => "on", "normalize_cookies" =>"on", "normalize_headers" => "on", 
 				      "normalize_utf" => "on", "normalize_javascript" => "on", "allow_proxy_use" => "off", "inspect_uri_only" => "off", 
 				      "max_javascript_whitespaces" => 200, "post_depth" => -1, "max_headers" => 0, "max_spaces" => 0, 
-				      "max_header_length" => 0, "ports" => "default" );
+				      "max_header_length" => 0, "ports" => "default", "decompress_swf" => "off", "decompress_pdf" => "off" );
 $http_ports = str_replace(",", " ", snort_expand_port_range($snort_ports['http_ports']));
 $http_inspect_servers = "";
 
@@ -1385,6 +1385,10 @@ if ($snortcfg['http_inspect'] <> "off") {
 			$http_inspect_servers .= " \\\n\tlog_uri";
 		if ($v['log_hostname'] == "on")
 			$http_inspect_servers .= " \\\n\tlog_hostname";
+		if ($v['decompress_swf'] == "on")
+			$http_inspect_servers .= " \\\n\tdecompress_swf";
+		if ($v['decompress_pdf'] == "on")
+			$http_inspect_servers .= " \\\n\tdecompress_pdf";
 
 		// Add a pair of trailing newlines to terminate this server config
 		$http_inspect_servers .= "\n\n";
