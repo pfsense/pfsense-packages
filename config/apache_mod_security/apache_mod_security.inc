@@ -550,7 +550,7 @@ LoadModule status_module libexec/{$apache_version}/mod_status.so
 LoadModule autoindex_module libexec/{$apache_version}/mod_autoindex.so
 LoadModule asis_module libexec/{$apache_version}/mod_asis.so
 LoadModule info_module libexec/{$apache_version}/mod_info.so
-LoadModule cgi_module libexec/{$apache_version}/mod_cgi.so
+# LoadModule cgi_module libexec/{$apache_version}/mod_cgi.so
 LoadModule vhost_alias_module libexec/{$apache_version}/mod_vhost_alias.so
 LoadModule negotiation_module libexec/{$apache_version}/mod_negotiation.so
 LoadModule dir_module libexec/{$apache_version}/mod_dir.so
