@@ -42,16 +42,11 @@
 	]]>
         </copyright>
 	<name>netioserver</name>
-	<version>1.27</version>
-	<title>netio: Server</title>
+	<version>1.28</version>
+	<title>Diagnostics: netio: Server</title>
+	<savetext>Run netio server</savetext>
 	<preoutput>yes</preoutput>
 	<donotsave>true</donotsave>
-	<menu>
-		<name>netio</name>
-		<tooltiptext>Run netio in client or server mode.</tooltiptext>
-		<section>Diagnostics</section>
-		<configfile>netio.xml</configfile>
-	</menu>
 	<tabs>
 		<tab>
 			<text>Client</text>
@@ -74,9 +69,9 @@
 	<custom_add_php_command>
 		<![CDATA[
 		mwexec("/usr/bin/killall netio");
-		if($_POST['port'] != "") {
-			$netioserver_options = " -p {$_POST['port']}";
-			system("/usr/local/bin/netio -s" . $netioserver_options);
+		if ($_POST['port'] != "") {
+			$port = escapeshellarg($_POST['port']);
+			system("/usr/local/bin/netio -s -p {$port}");
 		}
 		]]>
 	</custom_add_php_command>
