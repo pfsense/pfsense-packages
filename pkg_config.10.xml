@@ -232,7 +232,7 @@
 			]]>
 		</descr>
 		<category>Security</category>
-		<version>0.1.8</version>
+		<version>0.1.9</version>
 		<status>ALPHA</status>
 		<required_version>2.2</required_version>
 		<maximum_version>2.2.999</maximum_version>
