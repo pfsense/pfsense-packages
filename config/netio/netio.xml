@@ -88,6 +88,7 @@
 			<fieldname>port</fieldname>
 			<description>Enter the port that netio will connect to. (Default: 18767)</description>
 			<type>input</type>
+			<default_value>18767</default_value>
 		</field>
 	</fields>
 	<custom_add_php_command>
