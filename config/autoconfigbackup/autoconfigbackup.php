@@ -82,6 +82,10 @@ if ($_REQUEST['download']) {
 	$pgtitle = "Diagnostics: Auto Configuration Backup";
 }
 
+/* Set up time zones for conversion. See #5250 */
+$acbtz = new DateTimeZone('America/Chicago');
+$mytz = new DateTimeZone(date_default_timezone_get());
+
 include("head.inc");
 
 function get_hostnames() {
@@ -193,7 +197,9 @@ function get_hostnames() {
 						$savemsg = "An error occurred while trying to remove the item from portal.pfsense.org.";
 					} else {
 						curl_close($curl_session);
-						$savemsg = "Backup revision {$_REQUEST['rmver']} has been removed.";
+						$budate = new DateTime($_REQUEST['rmver'], $acbtz);
+						$budate->setTimezone($mytz);
+						$savemsg = "Backup revision " . htmlspecialchars($budate->format(DATE_RFC2822)) . " has been removed.";
 					}
 					print_info_box($savemsg);
 				}
@@ -350,10 +356,6 @@ EOF;
 				// Loop through and create new confvers
 				$data_split = split("\n", $data);
 				$confvers = array();
-
-				/* Set up time zones for conversion. See #5250 */
-				$acbtz = new DateTimeZone('America/Chicago');
-				$mytz = new DateTimeZone(date_default_timezone_get());
 
 				foreach ($data_split as $ds) {
 					$ds_split = split($oper_sep, $ds);
