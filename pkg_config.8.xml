@@ -1083,8 +1083,8 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All</depends_on_package_base_url>
 		<depends_on_package>netio-1.26.tbz</depends_on_package>
 		<depends_on_package_pbi>netio-1.26-i386.pbi</depends_on_package_pbi>
-		<version>1.26</version>
-		<required_version>2.0</required_version>
+		<version>1.28</version>
+		<required_version>2.1</required_version>
 		<status>ALPHA</status>
 		<configurationfile>netio.xml</configurationfile>
 		<build_port_path>/usr/ports/benchmarks/netio</build_port_path>
