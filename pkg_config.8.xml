@@ -1067,8 +1067,8 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>iperf-2.0.5.tbz</depends_on_package>
 		<depends_on_package_pbi>iperf-2.0.5-i386.pbi</depends_on_package_pbi>
-		<version>2.0.5_1</version>
-		<status>Beta</status>
+		<version>2.0.5_3</version>
+		<status>RC</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
 		<required_version>1.2.1</required_version>
 		<configurationfile>iperf.xml</configurationfile>
