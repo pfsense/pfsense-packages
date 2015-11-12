@@ -49,7 +49,10 @@ function apache_mod_security_install() {
 	generate_apache_configuration();
 
 	$filename = "apache_mod_security.sh";
-	$start = APACHEDIR . "/sbin/httpd -k start";
+	if (APACHEDIR != "/usr/local") {
+		$start = "/sbin/ldconfig -m " . APACHEDIR . "/lib\n";
+	}
+	$start .= APACHEDIR . "/sbin/httpd -k start";
 	$stop = APACHEDIR . "/sbin/httpd -k stop";
 
 	write_rcfile(array(
@@ -73,6 +76,9 @@ function apache_mod_security_deinstall() {
 // Check Apache configuration syntax
 function apache_mod_security_checkconfig() {
 	global $config, $g;
+	if (APACHEDIR != "/usr/local") {
+		mwexec("/sbin/ldconfig -m " . APACHEDIR . "/lib");
+	}
 	$status = mwexec(APACHEDIR . "/sbin/httpd -t");
 	if ($status) {
 		$input_errors[] = "[apache_mod_security]: There was an error parsing the Apache configuration: {$status}";
