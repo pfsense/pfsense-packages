@@ -774,7 +774,7 @@
 		</descr>
 		<website>https://portal.pfsense.org</website>
 		<category>Services</category>
-		<version>1.30</version>
+		<version>1.31</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<pkginfolink>https://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
