@@ -350,12 +350,23 @@ EOF;
 				// Loop through and create new confvers
 				$data_split = split("\n", $data);
 				$confvers = array();
+
+				/* Set up time zones for conversion. See #5250 */
+				$acbtz = new DateTimeZone('America/Chicago');
+				$mytz = new DateTimeZone(date_default_timezone_get());
+
 				foreach ($data_split as $ds) {
 					$ds_split = split($oper_sep, $ds);
 					$tmp_array = array();
 					$tmp_array['username'] = $ds_split[0];
 					$tmp_array['reason'] = $ds_split[1];
 					$tmp_array['time'] = $ds_split[2];
+
+					/* Convert the time from server time to local. See #5250 */
+					$budate = new DateTime($tmp_array['time'], $acbtz);
+					$budate->setTimezone($mytz);
+					$tmp_array['time'] = $budate->format(DATE_RFC2822);
+
 					if ($ds_split[2] && $ds_split[0]) {
 						$confvers[] = $tmp_array;
 					}
