@@ -1088,7 +1088,7 @@
 			<strong>WARNING! This package bundles ClamAV that conflicts with 'Dansguardian', 'Mailscanner' and 'HAVP antivirus' packages! Installing these will result in a broken state.</strong>
 			]]>
 		</descr>
-		<pkginfolink>https://forum.pfsense.org/index.php/topic,48347.0.html</pkginfolink>
+		<pkginfolink>https://forum.pfsense.org/index.php?topic=100167.0</pkginfolink>
 		<website>http://www.squid-cache.org/</website>
 		<category>Services</category>
 		<version>0.4.3</version>
