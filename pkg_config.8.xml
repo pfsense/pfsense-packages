@@ -1780,9 +1780,9 @@
 		<descr>Set of programs for controlling APC UPS.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>apcupsd-3.14.10_1 pkg v0.3.6</version>
+		<version>apcupsd-3.14.10_1 pkg v0.3.9</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_port_path>/usr/ports/sysutils/apcupsd</build_port_path>
