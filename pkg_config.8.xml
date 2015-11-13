@@ -1451,10 +1451,9 @@
 		<category>Services</category>
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/shellcmd/shellcmd.xml</config_file>
-		<version>0.6</version>
-		<status>Beta</status>
-		<required_version>1.2</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
+		<version>1.0.1</version>
+		<status>RC</status>
+		<required_version>2.1</required_version>
 		<configurationfile>shellcmd.xml</configurationfile>
 	</package>
 	<package>
