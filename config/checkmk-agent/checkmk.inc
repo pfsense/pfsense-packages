@@ -73,6 +73,7 @@ function checkmk_decrapify() {
 	if ($i > 0) {
 		log_error("[check_mk-agent] Inconsistent configuration files; possibly caused by previous check_mk package versions.");
 		log_error("[check_mk-agent] Please, compare those against default distribution files at https://github.com/pfsense/pfsense and fix as required manually.");
+		file_notice("check_mk-agent", "Inconsistent configuration files found, possibly caused by previous check_mk package versions. See Status - System Logs - General for details.", "Packages", "");
 	}
 }
 
