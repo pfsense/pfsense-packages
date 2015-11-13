@@ -41,15 +41,18 @@
 	</copyright>
 	<name>Apcupsd</name>
 	<title>Services: Apcupsd (General)</title>
-	<category>Monitoring</category>
-	<version>0.3.7</version>
+	<version>0.3.9</version>
 	<include_file>/usr/local/pkg/apcupsd.inc</include_file>
-	<addedit_string>Apcupsd has been created/modified.</addedit_string>
-	<delete_string>Apcupsd has been deleted.</delete_string>
+	<addedit_string>Apcupsd configuration has been created/modified.</addedit_string>
+	<delete_string>Apcupsd configuration has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/apcupsd.sh restart</restart_command>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.priv.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/apcupsd/apcupsd_status.php</item>
@@ -67,18 +70,18 @@
 		<name>Apcupsd</name>
 		<tooltiptext>Setup Apcupsd specific settings</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=apcupsd.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=apcupsd.xml</url>
 	</menu>
 	<service>
 		<name>apcupsd</name>
 		<rcfile>apcupsd.sh</rcfile>
 		<executable>apcupsd</executable>
-		<description>Apcupsd a daemon for controlling APC UPSes</description>
+		<description>APC UPS Daemon</description>
 	</service>
 	<tabs>
 		<tab>
 			<text>General</text>
-			<url>/pkg_edit.php?xml=apcupsd.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=apcupsd.xml</url>
 			<active/>
 		</tab>
 		<tab>
@@ -88,19 +91,19 @@
 	</tabs>
 	<fields>
 		<field>
-			<name>General configuration parameters</name>
+			<name>General Configuration Parameters</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Enable</fielddescr>
 			<fieldname>apcupsdenabled</fieldname>
-			<description>Enable APC UPS Daemon service</description>
+			<description>Enable APC UPS Daemon service.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>UPS Name</fielddescr>
 			<fieldname>upsname</fieldname>
-			<description>Use this to give your UPS a name in log files and such</description>
+			<description>Use this to give your UPS a name in log files and such.</description>
 			<type>input</type>
 			<size>60</size>
 			<required>true</required>
@@ -199,7 +202,7 @@
 		<field>
 			<fielddescr>Kill on Power Fail</fielddescr>
 			<fieldname>killonpowerfail</fieldname>
-			<description>Hibernate UPS on powerfail</description>
+			<description>Hibernate UPS on powerfail.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -322,7 +325,7 @@
 			<default_value>3551</default_value>
 		</field>
 		<field>
-			<name>Configuration statements used if sharing</name>
+			<name>UPS Sharing Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
