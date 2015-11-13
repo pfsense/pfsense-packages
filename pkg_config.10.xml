@@ -1729,7 +1729,7 @@
 		<website>http://www.apcupsd.com/</website>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/apcupsd/apcupsd.xml</config_file>
-		<version>0.3.8</version>
+		<version>0.3.9</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>apcupsd.xml</configurationfile>
