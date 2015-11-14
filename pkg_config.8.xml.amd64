@@ -1200,9 +1200,9 @@
 		<descr>LCD display driver - Development version</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.6 pkg v. 0.9.14</version>
+		<version>0.5.6 pkg v0.9.15</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<maintainer>michele@nt2.it</maintainer>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,44034.0.html</pkginfolink>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
