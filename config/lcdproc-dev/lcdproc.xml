@@ -45,29 +45,33 @@
 	</copyright>
 	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
-	<version>0.9.13</version>
+	<version>0.9.15</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
 		<tab>
 			<text>Server</text>
-			<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=lcdproc.xml</url>
 			<active/>
 		</tab>
 		<tab>
 			<text>Screens</text>
-			<url>/pkg_edit.php?xml=lcdproc_screens.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=lcdproc_screens.xml</url>
 		</tab>
 	</tabs>
 	<menu>
 		<name>LCDproc</name>
 		<tooltiptext>Set LCDproc settings such as display driver and COM port.</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=lcdproc.xml</url>
 	</menu>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc.priv.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/lcdproc-dev/lcdproc_screens.xml</item>
