@@ -87,7 +87,7 @@ function sync_package_ntop() {
 	/* Set up ntop interfaces */
 	$ifaces_final = "";
 	$first = 0;
-	$mergeifs = ($ntop_config['disallowmerge'] == "on") ? "" : "-M";
+	$mergeifs = $ntop_config['disallowmerge'] == "on" ? "-M" : "";
 
 	foreach ($ntop_config['interface_array'] as $iface) {
 		$if = convert_friendly_interface_to_real_interface_name($iface);
