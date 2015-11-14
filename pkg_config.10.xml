@@ -1136,7 +1136,7 @@
 		<descr>LCD display driver - development version.</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>System</category>
-		<version>0.9.14</version>
+		<version>0.9.15</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>michele@nt2.it</maintainer>
