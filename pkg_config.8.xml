@@ -748,22 +748,6 @@
 		<after_install_info></after_install_info>
 	</package>
 	<package>
-		<name>phpSysInfo</name>
-		<website>http://phpsysinfo.sourceforge.net/</website>
-		<descr>PHPSysInfo is a customizable PHP Script that parses /proc, and formats information nicely. It will display information about system facts like Uptime, CPU, Memory, PCI devices, SCSI devices, IDE devices, Network adapters, Disk usage, and more.</descr>
-		<category>System</category>
-		<version>2.5.4</version>
-		<status>Beta</status>
-		<required_version>1.0</required_version>
-		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>mbmon-205_5.tbz</depends_on_package>
-		<depends_on_package_pbi>mbmon-205_6-i386.pbi</depends_on_package_pbi>
-		<build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
-		<config_file>https://packages.pfsense.org/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
-		<configurationfile>phpsysinfo.xml</configurationfile>
-		<noembedded>true</noembedded>
-	</package>
-	<package>
 		<name>dns-server</name>
 		<descr>pfSense version of TinyDNS which features failover host support</descr>
 		<website>http://cr.yp.to/djbdns.html</website>
