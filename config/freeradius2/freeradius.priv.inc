@@ -32,6 +32,7 @@ $priv_list['page-services-freeradius'] = array();
 $priv_list['page-services-freeradius']['name'] = "WebCfg - Services: FreeRADIUS";
 $priv_list['page-services-freeradius']['descr'] = "Allow access to FreeRADIUS package GUI";
 
+$priv_list['page-services-freeradius']['match'] = array();
 $priv_list['page-services-freeradius']['match'][] = "pkg.php?xml=freeradius.xml*";
 $priv_list['page-services-freeradius']['match'][] = "pkg.php?xml=freeradiusauthorizedmacs.xml*";
 $priv_list['page-services-freeradius']['match'][] = "pkg.php?xml=freeradiusclients.xml*";
@@ -43,7 +44,6 @@ $priv_list['page-services-freeradius']['match'][] = "pkg.php?xml=freeradiuscerts
 $priv_list['page-services-freeradius']['match'][] = "pkg.php?xml=freeradiusmodulesldap.xml*";
 $priv_list['page-services-freeradius']['match'][] = "pkg.php?xml=freeradiussync.xml*";
 
-$priv_list['page-services-freeradius']['match'] = array();
 $priv_list['page-services-freeradius']['match'][] = "pkg_edit.php?xml=freeradius.xml*";
 $priv_list['page-services-freeradius']['match'][] = "pkg_edit.php?xml=freeradiusauthorizedmacs.xml*";
 $priv_list['page-services-freeradius']['match'][] = "pkg_edit.php?xml=freeradiusclients.xml*";
