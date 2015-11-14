@@ -1113,7 +1113,7 @@
 		<descr>LCD display driver.</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>System</category>
-		<version>1.0.4</version>
+		<version>1.0.5</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
