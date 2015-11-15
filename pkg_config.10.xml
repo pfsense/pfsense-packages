@@ -898,7 +898,7 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8_1-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.0.3</version>
+		<version>1.0.4</version>
 		<status>RELEASE</status>
 		<required_version>3.0</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
