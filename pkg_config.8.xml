@@ -1525,12 +1525,12 @@
 		<name>System Patches</name>
 		<descr>A package to apply and maintain custom system patches.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>1.0.3</version>
+		<version>1.0.7</version>
 		<category>System</category>
 		<status>RELEASE</status>
 		<config_file>https://packages.pfsense.org/packages/config/systempatches/systempatches.xml</config_file>
 		<pkginfolink></pkginfolink>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<configurationfile>systempatches.xml</configurationfile>
 	</package>
 	<package>
