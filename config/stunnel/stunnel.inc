@@ -177,7 +177,7 @@ function stunnel_save($config) {
 		if ($pkgconfig['sourceip']) {
 			fwrite($fout, "local = " . $pkgconfig['sourceip'] . "\n");
 		}
-		fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
+		fwrite($fout, "accept = " . ($pkgconfig['localip'] ? $pkgconfig['localip'] . ":" : "")  . $pkgconfig['localport'] . "\n");
 		fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
 		fwrite($fout, "TIMEOUTclose = 0\n\n");
 	}
@@ -257,7 +257,7 @@ function stunnel_install() {
 			if ($pkgconfig['sourceip']) {
 				fwrite($fout, "local = " . $pkgconfig['sourceip'] . "\n");
 			}
-			fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
+			fwrite($fout, "accept = " . ($pkgconfig['localip'] ? $pkgconfig['localip'] . ":" : "") . $pkgconfig['localport'] . "\n");
 			fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
 			fwrite($fout, "TIMEOUTclose = 0\n\n");
 		}
