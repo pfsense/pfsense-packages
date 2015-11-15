@@ -370,10 +370,9 @@
 		<pkginfolink/>
 		<config_file>https://packages.pfsense.org/packages/config/notes/notes.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<version>0.2.4</version>
-		<status>Alpha</status>
-		<required_version>1.2.1</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
+		<version>0.2.8</version>
+		<status>Release</status>
+		<required_version>2.1</required_version>
 		<configurationfile>notes.xml</configurationfile>
 	</package>
 	<package>
