@@ -49,7 +49,10 @@ function apache_mod_security_install() {
 	generate_apache_configuration();
 
 	$filename = "apache_mod_security.sh";
-	$start = APACHEDIR . "/sbin/httpd -k start";
+	if (APACHEDIR != "/usr/local") {
+		$start = "/sbin/ldconfig -m " . APACHEDIR . "/lib\n";
+	}
+	$start .= APACHEDIR . "/sbin/httpd -k start";
 	$stop = APACHEDIR . "/sbin/httpd -k stop";
 
 	write_rcfile(array(
@@ -73,6 +76,9 @@ function apache_mod_security_deinstall() {
 // Check Apache configuration syntax
 function apache_mod_security_checkconfig() {
 	global $config, $g;
+	if (APACHEDIR != "/usr/local") {
+		mwexec("/sbin/ldconfig -m " . APACHEDIR . "/lib");
+	}
 	$status = mwexec(APACHEDIR . "/sbin/httpd -t");
 	if ($status) {
 		$input_errors[] = "[apache_mod_security]: There was an error parsing the Apache configuration: {$status}";
@@ -550,7 +556,7 @@ LoadModule status_module libexec/{$apache_version}/mod_status.so
 LoadModule autoindex_module libexec/{$apache_version}/mod_autoindex.so
 LoadModule asis_module libexec/{$apache_version}/mod_asis.so
 LoadModule info_module libexec/{$apache_version}/mod_info.so
-LoadModule cgi_module libexec/{$apache_version}/mod_cgi.so
+# LoadModule cgi_module libexec/{$apache_version}/mod_cgi.so
 LoadModule vhost_alias_module libexec/{$apache_version}/mod_vhost_alias.so
 LoadModule negotiation_module libexec/{$apache_version}/mod_negotiation.so
 LoadModule dir_module libexec/{$apache_version}/mod_dir.so
