@@ -848,8 +848,8 @@
 		<descr>Network UPS Tools.</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Services</category>
-		<version>2.1.1</version>
-		<status>BETA</status>
+		<version>2.1.2</version>
+		<status>RC</status>
 		<required_version>2.2</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/nut/nut.xml</config_file>

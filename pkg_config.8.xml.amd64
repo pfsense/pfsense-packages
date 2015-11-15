@@ -868,9 +868,9 @@
 		<descr>Network UPS Tools</descr>
 		<website>http://www.networkupstools.org/</website>
 		<category>Network Management</category>
-		<version>2.6.5_1 pkg 2.1.1</version>
-		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<version>2.6.5_1 pkg v2.1.2</version>
+		<status>RC</status>
+		<required_version>2.1</required_version>
 		<maintainer>rswagoner@gmail.com</maintainer>
 		<config_file>https://packages.pfsense.org/packages/config/nut/nut.xml</config_file>
 		<configurationfile>nut.xml</configurationfile>
