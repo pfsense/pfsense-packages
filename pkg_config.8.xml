@@ -350,9 +350,9 @@
 			<port>net/ntop</port>
 		</build_pbi>
 		<build_options>WITH_PCAP_PORT=true;WITH_XMLDUMP=true;WITHOUT_JUMBO_FRAMES=true;WITH_MAKO=true;WITHOUT_DEJAVU=true;WITH_JSON=true;WITH_MMAP=true;WITHOUT_PERL_MODULE=true;WITHOUT_PYTHON_MODULE=true;WITHOUT_RUBY_MODULE=true;WITHOUT_EXAMPLES=true;WITHOUT_FPECTL=true;WITH_IPV6=true;WITH_NLS=true;WITHOUT_PTH=true;WITH_PYMALLOC=true;WITHOUT_SEM=true;WITH_THREADS=true;WITHOUT_UCS2=true;WITH_UCS4=true;WITH_FONTCONFIG=true;WITH_ICONV=true;WITHOUT_XPM=true;WITHOUT_DAG=true;WITHOUT_DIGCOLA=true;WITHOUT_IPSEPCOLA=true;WITHOUT_PANGOCAIRO=true;WITHOUT_GTK=true;WITHOUT_XCB=true</build_options>
-		<version>5.0.1 v2.5</version>
+		<version>5.0.1 pkg v2.3.2</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntop2/ntop.xml</config_file>
 		<configurationfile>ntop.xml</configurationfile>
 		<noembedded>true</noembedded>

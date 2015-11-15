@@ -290,7 +290,7 @@
 			<port>net/ntop</port>
 		</build_pbi>
 		<build_options>ntop_SET_FORCE=PCAP_PORT XMLDUMP MAKO;ntop_UNSET_FORCE=JUMBO_FRAMES;rrdtool_UNSET_FORCE=DEJAVU PERL_MODULE PYTHON_MODULE RUBY_MODULE;rrdtool_SET_FORCE=JSON MMAP NLS;graphviz_UNSET_FORCE=XPM DIGCOLA IPSEPCOLA PANGOCAIRO;graphviz_SET_FORCE=ICONV NLS;cairo_UNSET_FORCE=X11 XCB;libgd_UNSET_FORCE=FONTCONFIG XPM;libgd_SET_FORCE=ICONV;libpcap_UNSET_FORCE=DAG;libpcap_SET_FORCE=IPV6</build_options>
-		<version>2.3.1</version>
+		<version>2.3.2</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/ntop2/ntop.xml</config_file>
