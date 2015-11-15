@@ -1179,9 +1179,9 @@
 		<descr>LCD display driver</descr>
 		<website>http://www.lcdproc.org/</website>
 		<category>Utility</category>
-		<version>lcdproc-0.5.5 pkg.v.1.0.2</version>
+		<version>0.5.5 pkg v1.0.5</version>
 		<status>BETA</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.1</required_version>
 		<maintainer>seth.mos@dds.nl</maintainer>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lcdproc-0.5.5.tbz</depends_on_package>
