@@ -1769,7 +1769,7 @@
 			<descr>Send and decode link layer advertisements. Support for LLDP (Link Layer Discovery Protocol), CDP (Cisco Discovery Protocol), EDP (Extreme Discovery Protocol) and NDP (Nortel Discovery Protocol).</descr>
 		<website>https://code.google.com/p/ladvd/</website>
 		<category>Network Management</category>
-		<version>1.0.4</version>
+		<version>1.0.4.3</version>
 		<status>BETA</status>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package_pbi>ladvd-1.0.4-amd64.pbi</depends_on_package_pbi>
