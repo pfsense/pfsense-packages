@@ -460,7 +460,7 @@
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_pbi>spamd-4.9.1_2-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.1.6</version>
+		<version>1.1.7</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<port_category>mail</port_category>
