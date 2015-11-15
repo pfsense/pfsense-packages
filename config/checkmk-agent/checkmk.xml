@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>checkmk</name>
-	<version>0.1.5</version>
+	<version>0.1.6</version>
 	<title>check_mk Agent</title>
 	<include_file>/usr/local/pkg/checkmk.inc</include_file>
 	<additional_files_needed>
@@ -63,22 +63,26 @@
 		<section>Diagnostics</section>
 		<url>/pkg_edit.php?xml=checkmk.xml</url>
 	</menu>
+	<service>
+		<name>check_mk</name>
+		<executable>inetd</executable>
+		<description>check_mk Agent</description>
+	</service>
 	<tabs>
 		<tab>
-			<text>Config</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=checkmk.xml</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>XMLRPC Sync</text>
+			<text>Sync</text>
 			<url>/pkg_edit.php?xml=checkmk_sync.xml</url>
 		</tab>
 	</tabs>
 	<fields>
 		<field>
 			<type>listtopic</type>
-			<fieldname>temp</fieldname>
-			<name>check_mk Agent Configuration</name>
+			<name>General Settings</name>
 		</field>
 		<field>
 			<fielddescr>Enable check_mk Agent</fielddescr>
@@ -91,19 +95,29 @@
 				For reference, see <a href="https://github.com/sileht/check_mk/tree/master/doc">project documentation at GitHub</a>.
 				]]>
 			</description>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Listen Port</fielddescr>
 			<fieldname>checkmkport</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description>Enter port to listen on. Leave empty to use Default port 6556.</description>
+			<default_value>6556</default_value>
+			<description>Enter port to listen on. (Default: 6556)</description>
+			<required/>
 		</field>
 		<field>
-			<fielddescr>Hosts.allow</fielddescr>
+			<fielddescr>Listen Interface(s)</fielddescr>
+			<fieldname>checkmkifaces</fieldname>
+			<type>interfaces_selection</type>
+			<size>5</size>
+			<description>Select interface(s) to listen on.</description>
+			<hideinterfaceregex>loopback</hideinterfaceregex>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Hosts Allowed</fielddescr>
 			<fieldname>checkmkhosts</fieldname>
-			<description>Enter hosts (comma separated) that can communicate with this agent.</description>
+			<description>Enter an IP address, subnet or alias for host(s) that can communicate with this agent. (Leave empty to allow any host.)</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
@@ -111,13 +125,16 @@
 	<custom_php_install_command>
 		checkmk_install();
 	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		checkmk_deinstall();
+	</custom_php_deinstall_command>
 	<custom_php_validation_command>
 		checkmk_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
-	<custom_delete_php_command>
-		sync_package_checkmk();
-	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		sync_package_checkmk();
 	</custom_php_resync_config_command>
+	<filter_rules_needed>
+		checkmk_generate_rules
+	</filter_rules_needed>
 </packagegui>
