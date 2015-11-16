@@ -928,7 +928,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>pfflowd-0.8.tbz</depends_on_package>
 		<depends_on_package_pbi>pfflowd-0.8-i386.pbi</depends_on_package_pbi>
-		<version>0.8.3 pkg v1.0.1</version>
+		<version>0.8.3 pkg v1.0.4</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
