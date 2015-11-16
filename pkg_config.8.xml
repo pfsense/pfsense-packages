@@ -409,10 +409,9 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/PHPService</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/phpservice/phpservice.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.4.2</version>
+		<version>0.5.2</version>
 		<status>Beta</status>
-		<required_version>1.2.1</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
+		<required_version>2.1</required_version>
 		<configurationfile>phpservice.xml</configurationfile>
 	</package>
 	<package>
