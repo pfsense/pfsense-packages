@@ -1657,9 +1657,9 @@
 		<descr>Monitoring agent.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>zabbix2-agent-2.2.5 pkg v0.8.4</version>
+		<version>zabbix2-agent-2.2.5 pkg v0.8.5</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
@@ -1675,9 +1675,9 @@
 		<descr>Monitoring agent proxy.</descr>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>zabbix2-proxy-2.2.5 pkg v0.8.4</version>
+		<version>zabbix2-proxy-2.2.5 pkg v0.8.5</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
 		<maintainer>dbaio@bsd.com.br</maintainer>
 		<build_pbi>
