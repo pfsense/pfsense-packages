@@ -1631,7 +1631,7 @@
 		<website>http://www.zabbix.com/product.php</website>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.xml</config_file>
-		<version>0.8.4</version>
+		<version>0.8.5</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-agent.xml</configurationfile>
@@ -1656,7 +1656,7 @@
 		<website>http://www.zabbix.com/product.php</website>
 		<category>Services</category>
 		<config_file>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-proxy.xml</config_file>
-		<version>0.8.4</version>
+		<version>0.8.5</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<configurationfile>zabbix2-proxy.xml</configurationfile>
