@@ -41,14 +41,12 @@
 /* ====================================================================================== */
 	]]>
 	</copyright>
-	<description>PHP Service</description>
-	<name>PHP Service Settings</name>
-	<version>0.5.0</version>
-	<title>Settings</title>
+	<name>phpservice</name>
+	<version>0.5.2</version>
+	<title>PHPService</title>
 	<include_file>/usr/local/pkg/phpservice.inc</include_file>
 	<menu>
 		<name>PHPService</name>
-		<tooltiptext>PHP Service settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>phpservice.xml</configfile>
 		<url>/packages/phpservice/phpservice_php.php</url>
@@ -59,13 +57,17 @@
 		<executable>phpservice</executable>
 		<description>PHP script as a service</description>
 		<custom_php_service_status_command>
-			exec("/bin/pgrep -fq phpservice");
+			phpservice_custom_php_service_status_command();
 		</custom_php_service_status_command>
 	</service>
 	<configpath>installedpackages->package->$packagename->configuration->phpservice</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/phpservice/phpservice.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/phpservice/phpservice.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/packages/phpservice/</prefix>
@@ -78,7 +80,7 @@
 	<custom_php_resync_config_command>
 		phpservice_sync_package();
 	</custom_php_resync_config_command>
-	<custom_php_install_command>
-		phpservice_install_command();
-	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		phpservice_deinstall_command();
+	</custom_php_deinstall_command>
 </packagegui>
