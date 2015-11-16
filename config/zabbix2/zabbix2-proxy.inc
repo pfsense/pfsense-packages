@@ -73,10 +73,9 @@ function php_deinstall_zabbix2_proxy() {
 		if (is_dir("/var/run/zabbix2")) {
 			exec("/bin/rm -r /var/run/zabbix2/");
 		}
-	}
-
-	if (is_dir("/var/db/zabbix2")) {
-		exec("/bin/rm -r /var/db/zabbix2/");
+		if (is_dir("/var/db/zabbix2")) {
+			exec("/bin/rm -r /var/db/zabbix2/");
+		}
 	}
 }
 
