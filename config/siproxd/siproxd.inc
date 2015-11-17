@@ -77,7 +77,12 @@ function sync_package_siproxd_users() {
 function siproxd_generate_rules($type) {
 	global $config;
 
-	$siproxd_conf = &$config['installedpackages']['siproxdsettings']['config'][0];
+	if (is_array($config['installedpackages']['siproxdsettings'])) {
+		$siproxd_conf = &$config['installedpackages']['siproxdsettings']['config'][0];
+	} else {
+		$siproxd_conf = array();
+	}
+
 	if (!is_service_running('siproxd')) {
 		log_error("[siproxd] Package is installed but not started. Not installing firewall rules.");
 		return;
@@ -156,7 +161,7 @@ function sync_package_siproxd() {
 	fwrite($fout, "# package management system.\n\n");
 
 	/* if proxy is turned off in package settings, stop service, remove rc script and do nothing else */
-	if ($siproxd_conf['sipenable'] == "0") {
+	if ($siproxd_conf['sipenable'] != "on") {
 		fclose($fout);
 		if (is_service_running('siproxd')) {
 			stop_service("siproxd");
