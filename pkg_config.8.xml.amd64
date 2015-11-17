@@ -453,7 +453,7 @@
 		<depends_on_package>olsrd-0.6.2.tbz</depends_on_package>
 		<depends_on_package_pbi>olsrd-0.6.3-amd64.pbi</depends_on_package_pbi>
 		<build_port_path>/usr/ports/net/olsrd</build_port_path>
-		<version>1.0.1</version>
+		<version>1.0.4</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
 		<configurationfile>olsrd.xml</configurationfile>
