@@ -580,6 +580,11 @@ if ($openappid_detectors == 'on') {
 			update_status(gettext("Copying md5 signature to snort directory..."));
 			@copy("{$tmpfname}/{$snort_openappid_filename_md5}", "{$snortdir}/{$snort_openappid_filename_md5}");
 		}
+		if (!is_dir("{$snort_openappid_path}custom")) {
+			safe_mkdir("{$snort_openappid_path}custom");
+			safe_mkdir("{$snort_openappid_path}custom/lua");
+			touch("{$snort_openappid_path}custom/userappid.conf");
+		}
 		update_status(gettext("Extraction of Snort OpenAppID detectors completed..."));
 		$static_output .= gettext(" done.\n");
 		update_output_window($static_output);

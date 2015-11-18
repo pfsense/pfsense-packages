@@ -896,6 +896,9 @@ EOD;
 $appid_memcap = $snortcfg['sf_appid_mem_cap'] * 1024 * 1024;
 $appid_params = "app_detector_dir " . rtrim(SNORT_APPID_ODP_PATH, '/') . ", \\\n\tmemcap {$appid_memcap}";
 if ($snortcfg['sf_appid_statslog'] == "on") {
+	if (!file_exists("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/app-stats.log")) {
+		touch("{$snortlogdir}/snort_{$if_real}{$snort_uuid}/app-stats.log");
+	}
 	$appid_params .= ", \\\n\tapp_stats_filename app-stats.log";
 	$appid_params .= ", \\\n\tapp_stats_period {$snortcfg['sf_appid_stats_period']}";
 	$appid_params .= ", \\\n\tapp_stats_rollover_size " . strval($config['installedpackages']['snortglobal']['appid_stats_log_limit_size'] * 1024);
@@ -1271,7 +1274,7 @@ if ($snortcfg['host_attribute_table'] == "on" && !empty($snortcfg['host_attribut
 $http_inspect_global = "preprocessor http_inspect: global ";
 if ($snortcfg['http_inspect'] == "off")
 	$http_inspect_global .= "disabled ";
-$http_inspect_global .= "\\\n\tiis_unicode_map unicode.map 1252 \\\n";
+$http_inspect_global .= "\\\n\tiis_unicode_map {$snortdir}/unicode.map 1252 \\\n";
 $http_inspect_global .= "\tcompress_depth 65535 \\\n";
 $http_inspect_global .= "\tdecompress_depth 65535 \\\n";
 if (!empty($snortcfg['http_inspect_memcap']))
