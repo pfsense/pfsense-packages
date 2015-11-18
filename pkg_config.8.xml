@@ -622,7 +622,7 @@
 		<descr>High performance web proxy report (LightSquid). Proxy realtime stat (SQStat). Requires squid HTTP proxy.</descr>
 		<website>http://lightsquid.sf.net/</website>
 		<category>Network Report</category>
-		<version>2.42</version>
+		<version>2.43</version>
 		<maintainer>dv_serg@mail.ru</maintainer>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
