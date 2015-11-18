@@ -264,6 +264,74 @@ function squid_resync_reverse() {
 		$conf .= "deny_info TCP_RESET allsrc\n";
 	}
 
+	if (is_array($config['installedpackages']['squidports']['config'])) {
+		foreach ($config['installedpackages']['squidports']['config'] as $portsettings){
+			$port_defsite=(empty($portsettings['reverse_defsite'])?$settings['reverse_external_fqdn']:$portsettings['reverse_defsite']);
+			if ($portsettings['enable'] == 'on') {
+				if ($portsettings['enablessl']  == 'on') {
+					if(isset($portsettings["reverse_ssl_cert"]) && $portsettings["reverse_ssl_cert"] != "none") {
+						$svr_cert = lookup_cert($portsettings["reverse_ssl_cert"]);
+						if ($svr_cert != false) {
+							if(base64_decode($svr_cert['crt'])) {
+								file_put_contents(SQUID_CONFBASE . "/{$portsettings["reverse_ssl_cert"]}.crt",sq_text_area_decode($svr_cert['crt']));
+								$portsettings_reverse_crt = SQUID_CONFBASE . "/{$portsettings["reverse_ssl_cert"]}.crt";
+							}
+							if(base64_decode($svr_cert['prv'])) {
+								file_put_contents(SQUID_CONFBASE . "/{$portsettings["reverse_ssl_cert"]}.key",sq_text_area_decode($svr_cert['prv']));
+								$portsettings_reverse_key = SQUID_CONFBASE . "/{$portsettings["reverse_ssl_cert"]}.key";
+							}
+
+						}					
+					}
+
+					if($portsettings['enable_client_ca']  == 'on' && isset($portsettings["client_ca"]) && $portsettings["client_ca"] != "none") {
+						$client_ca = lookup_ca($portsettings["client_ca"]);
+						if ($client_ca != false) {
+							if(base64_decode($client_ca['crt']) && base64_decode($client_ca['prv'])) {
+								file_put_contents(SQUID_CONFBASE . "/{$portsettings["client_ca"]}.pem",sq_text_area_decode($client_ca['prv']) . "\n");
+								file_put_contents(SQUID_CONFBASE . "/{$portsettings["client_ca"]}.pem",sq_text_area_decode($client_ca['crt']), FILE_APPEND);
+								$portsettings_client_ca = SQUID_CONFBASE . "/{$portsettings["client_ca"]}.pem";
+							}
+						}	
+					}
+				}
+
+				foreach (explode(",", $ifaces) as $i => $iface) {
+					$real_ifaces[] = squid_get_real_interface_address($iface);
+					if($real_ifaces[$i][0]) {
+						if ($portsettings['enablessl']  == 'on') {
+							//HTTPS clientca={$portsettings_client_ca}
+							$conf .= "https_port {$real_ifaces[$i][0]}:{$portsettings['port']} accel cert={$portsettings_reverse_crt} key={$portsettings_reverse_key} defaultsite={$port_defsite} vhost";
+							if($portsettings['enable_client_ca']  == 'on' && isset($portsettings["client_ca"]) && $portsettings["client_ca"] != "none") {
+								$conf .= " clientca={$portsettings_client_ca}";
+							}
+							if(!empty($portsettings['ssl_context'])) {
+								$conf .= " sslcontext={$portsettings['ssl_context']}";
+							}
+							$conf .= "\n";
+						} else {
+							//HTTP
+							$conf .= "http_port {$real_ifaces[$i][0]}:{$portsettings['port']} accel defaultsite={$portsettings['reverse_defsite']} vhost\n";
+						}
+					}
+				}
+
+				if(!empty($portsettings['reverse_ip'])) {
+					$reverse_ip = explode(";", ($portsettings['reverse_ip']));
+					foreach ($reverse_ip as $reip) {
+						if ($portsettings['enablessl']  == 'on') {
+							//HTTPS
+							$conf .= "https_port {$reip}:{$portsettings['port']} accel cert={$portsettings_reverse_crt} key={$portsettings_reverse_key} defaultsite={$port_defsite} vhost\n";
+						} else {
+							//HTTP
+							$conf .= "http_port {$reip}:{$portsettings['port']} accel defaultsite={$portsettings['reverse_defsite']} vhost\n";
+						}
+					}
+				}
+			}
+		}
+	}
+
 	return $conf;
 }
 

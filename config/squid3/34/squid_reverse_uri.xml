@@ -51,6 +51,10 @@
 			<url>/pkg_edit.php?xml=squid_reverse_general.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Additional ports</text>
+			<url>/pkg.php?xml=squid_reverse_ports.xml&amp;id=0</url>
+		</tab>
+		<tab>
 			<text>Web Servers</text>
 			<url>/pkg.php?xml=squid_reverse_peer.xml</url>
 		</tab>
