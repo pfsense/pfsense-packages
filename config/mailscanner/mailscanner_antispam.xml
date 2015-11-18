@@ -9,7 +9,7 @@
 /*
     mailscanner_antispam.xml
     part of the mailscanner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -169,7 +169,7 @@
 				<option><name>Spam Score (yes)</name><value>spam_score</value></option>
 				<option><name>Cache SpamAssassin Results (yes)</name><value>cache_spamassassin_results</value></option>
 				<option><name>Wait During Bayes Rebuild (no)</name><value>wait_during_bayes_rebuild</value></option>
-				<option><name>Use Pyzor plugin (yes)</name><value>use_pyzor</value></option>
+				<option><name>Use Pyzor plugin (no)</name><value>use_pyzor</value></option>
 				<option><name>Use Razor plugin (yes)</name><value>use_razor</value></option>
 				<option><name>Use DCC plugin (yes)</name><value>use_dcc</value></option>
 				<option><name>Use Bayes (yes)</name><value>use_bayes</value></option>
@@ -346,62 +346,93 @@
 			<size>5</size>
 		</field>
 		<field>
-			<name>Antispam Files</name>
+			<name>spam.assassin.prefs.conf</name>
 			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>spam.assassin.prefs.conf</fielddescr>
 			<fieldname>sa_pref_file</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>spam.lists.conf</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>spam.lists.conf</fielddescr>
 			<fieldname>rbl_file</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.lists.conf. Leave Blank to load sample file.<br>
 								<strong>Use this list only when not using postscreen RBL checks(postfix-forwareder package).</strong>]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>bounce.rules</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>bounce.rules</fielddescr>
 			<fieldname>bounce</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>max.message.size.rules</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>max.message.size.rules</fielddescr>
 			<fieldname>max_message_size</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
+		</field>
+		<field>
+			<name>spam.whitelist.rules</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>spam.whitelist.rules</fielddescr>
 			<fieldname>spam_whitelist</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
-
+		<field>
+			<name>mcp.spam.assassin.prefs.conf</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>mcp.spam.assassin.prefs.conf</fielddescr>
 			<fieldname>mcp_pref_file</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
 			<description><![CDATA[Edit mcp.spam.assassin.prefs.conf. Leave Blank to load sample file.]]></description>
 			<type>textarea</type>
-			<cols>80</cols>
+			<cols>90</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -414,7 +445,7 @@
 		mailscanner_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
+		mailscanner_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_mailscanner();

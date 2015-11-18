@@ -1,8 +1,8 @@
 <?php
-	// Mod_security enabled?
-	if($modsec_settings['enablemodsecurity'])  {
-		$enable_mod_security = true;
-		$mod_security = <<< EOF
+// Mod_security enabled?
+if($mods_settings['enablemodsecurity']=="on") {
+	$enable_mod_security = true;
+	$mod_security = <<< EOF
 # -- Rule engine initialization ----------------------------------------------
 
 # Enable ModSecurity, attaching it to every transaction. Use detection
@@ -208,3 +208,5 @@ SecArgumentSeparator &
 #
 SecCookieFormat 0
 
+EOF;
+}

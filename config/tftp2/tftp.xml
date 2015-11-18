@@ -2,46 +2,48 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    tftp.xml
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-                                                                                  */
-/* ========================================================================== */
+	tftp.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2011 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description></description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>tftp Settings</name>
-	<version>2.0</version>
+	<version>2.2.2</version>
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
@@ -54,30 +56,28 @@
 	<service>
 		<name>tftp</name>
 		<executable>inetd</executable>
-		<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>    
+		<description>TFTP Daemon</description>
 	</service>
-	<tabs>
-		<tab>
-			<text>Files</text>
-			<url>tftp_files.php</url>
-		</tab>
-	</tabs>
 	<configpath>installedpackages->$packagename</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/tftp2/tftp.inc</item>
-	</additional_files_needed>	
+		<item>https://packages.pfsense.org/packages/config/tftp2/tftp.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/tftp2/tftp.priv.inc</item>
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/tftp2/tftp_files.php</item>
-	</additional_files_needed>	
+		<item>https://packages.pfsense.org/packages/config/tftp2/tftp_files.php</item>
+	</additional_files_needed>
 	<custom_php_install_command>
 		tftp_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		tftp_deinstall_command();
 	</custom_php_deinstall_command>
-	<filter_rules_needed>tftp_generate_rules</filter_rules_needed>
+	<filter_rules_needed>
+		tftp_generate_rules
+	</filter_rules_needed>
 </packagegui>

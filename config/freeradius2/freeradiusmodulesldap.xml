@@ -115,7 +115,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<name>GENERAL CONFIGURATION - SERVER 1</name>
+			<name>General Configuration - SERVER 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -125,6 +125,14 @@
 			<type>input</type>
 			<size>80</size>
 			<default_value>ldap.your.domain</default_value>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>varmodulesldapserverport</fieldname>
+			<description><![CDATA[No description. (Default: 389 )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>389</default_value>
 		</field>
 		<field>
 			<fielddescr>Identity</fielddescr>
@@ -199,7 +207,7 @@
 			<default_value>1</default_value>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION - SERVER 1</name>
+			<name>Miscellaneous Configuration - SERVER 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -377,7 +385,7 @@
 			<description><![CDATA[Choose how the certs should be checked:<br><br>
 			
 									<b>never: </b>don't even bother trying<br>
-									<b>allow: </b>try but don't fail if the cerificate can't be verified<br>
+									<b>allow: </b>try but don't fail if the certificate can't be verified<br>
 									<b>demand: </b>fail if the certificate doesn't verify]]></description>
 			<type>select</type>
 			<default_value>never</default_value>
@@ -426,7 +434,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<name>GENERAL CONFIGURATION - SERVER 2</name>
+			<name>General Configuration - SERVER 2</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -436,6 +444,14 @@
 			<type>input</type>
 			<size>80</size>
 			<default_value>ldap.your.domain</default_value>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>varmodulesldap2serverport</fieldname>
+			<description><![CDATA[No description. (Default: 389 )]]></description>
+			<type>input</type>
+			<size>80</size>
+			<default_value>389</default_value>
 		</field>
 		<field>
 			<fielddescr>Identity</fielddescr>
@@ -510,7 +526,7 @@
 			<default_value>1</default_value>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION - SERVER 2</name>
+			<name>Miscellaneous Configuration - SERVER 2</name>
 			<type>listtopic</type>
 		</field>
 		<field>

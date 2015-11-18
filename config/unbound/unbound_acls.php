@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	unbound_acls.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 
 	Copyright (C) 2011 Warren Baker <warren@decoy.co.za>
 	All rights reserved.
@@ -139,7 +139,8 @@ include("head.inc");
 <script type="text/javascript">
 	function mask_field(fieldname, fieldsize, n) {
 		return '<select name="' + fieldname + n + '" class="formselect" id="' + fieldname + n + '"><?php
-			for ($i = 128; $i >= 0; $i--) {
+			$start = 24; if (function_exists("is_ipaddrv6")) $start = "128";
+			for ($i = $start; $i >= 0; $i--) {
 					echo "<option value=\"$i\">$i</option>";
 			}
 		?></select>';

@@ -1,9 +1,9 @@
 <?php
-/* $Id$ */
 /*
 	apache_mod_security_view_logs.php
-	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2009, 2010 Scott Ullrich <sullrich@gmail.com>
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009, 2010 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -27,31 +27,33 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-require("guiconfig.inc");
+require_once("guiconfig.inc");
+require_once("util.inc");
+require_once("/usr/local/pkg/apache_mod_security.inc");
 
 if($_REQUEST['getactivity']) {
-	if($_REQUEST['logtype'] == "error")
-		$apachelogs = `cat /var/log/httpd-error.log`;
-	else
-		$apachelogs = `cat /var/log/httpd-access.log`;
-	echo "</pre><h1>Apache+Mod_Security_Proxy Server logs as of " . date("D M j G:i:s T Y")  . "</h1><pre>\n\n";
+	if ($_REQUEST['logtype'] == "error") {
+		$apachelogs = shell_exec("/bin/cat /var/log/httpd-error.log");
+		$logtype = "Error";
+	} else {
+		$apachelogs = shell_exec("/bin/cat /var/log/httpd-access.log");
+		$logtype = "Access";
+	}
+	echo "</pre><h2>Apache+Mod_Security_Proxy Server {$logtype} Logs as of " . date("D M j G:i:s T Y") . "</h2><pre>\n\n";
 	echo $apachelogs;
 	exit;
 }
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
-	$one_two = true;
+if ($_POST['clear']) {
+	unlink_if_exists("/var/log/httpd-error.log");
+	unlink_if_exists("/var/log/httpd-access.log");
+	apache_mod_security_restart();
+}
 
+$closehead = false;
 $pgtitle = "Services: Mod_Security+Apache+Proxy: Logs";
 include("head.inc");
-
-/* XXX */
-if ($_POST['clear']) { }
-
 ?>
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <style type='text/css'>
 pre {
  overflow-x: auto; /* Use horizontal scroller if needed; for Firefox 2, not needed in Firefox 3 */
@@ -64,65 +66,76 @@ pre {
 }
 </style>
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
-	<script type="text/javascript">
-		function getlogactivity() {
-			var url = "/apache_mod_security_view_logs.php";
-			var pars = 'getactivity=yes';
-			var myAjax = new Ajax.Request(
-				url,
-				{
-					method: 'post',
-					parameters: pars,
-					onComplete: activitycallback
-				});
-		}
-		function activitycallback(transport) {
-			$('apachelogs').innerHTML = '<font face="Courier"><pre>' + transport.responseText  + '</pre></font>';
-			setTimeout('getlogactivity()', 2500);		
-		}
-		setTimeout('getlogactivity()', 1000);	
-	</script>
+<script type="text/javascript">
+//<![CDATA[
+	function getlogactivity() {
+<?php
+	if ($_REQUEST['logtype'] != "error") {
+		$viewurl = "/apache_mod_security_view_logs.php";
+	} else {
+		$viewurl = "/apache_mod_security_view_logs.php?logtype=error";
+	}
+?>
+		var url = "<? echo $viewurl ?>";
+		var pars = 'getactivity=yes';
+		var myAjax = new Ajax.Request(
+			url,
+			{
+				method: 'post',
+				parameters: pars,
+				onComplete: activitycallback
+			});
+	}
+	function activitycallback(transport) {
+		$('apachelogs').innerHTML = '<font face="Courier"><pre>' + transport.responseText + '</pre></font>';
+		setTimeout('getlogactivity()', 2500);
+	}
+	setTimeout('getlogactivity()', 1000);
+//]]>
+</script>
+</head>
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-
-<?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
-<?php endif; ?>
-
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr><td>
 <?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Proxy Server Settings"), false, "/pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0");
-	$tab_array[] = array(gettext("Site Proxies"), false, "/pkg.php?xml=apache_mod_security.xml");	
+	$tab_array[] = array(gettext("Site Proxies"), false, "/pkg.php?xml=apache_mod_security.xml");
 	$tab_array[] = array(gettext("Logs"), true, "/apache_mod_security_view_logs.php");
 	display_top_tabs($tab_array);
 ?>
-</table>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-   <tr>
-     <td class="tabcont" >
-      <form action="apache_mod_security_view_logs.php" method="post">
-		<br>
-			<div id="apachelogs">
-				<pre>One moment please, loading Apache logs...</pre>
+		</td></tr>
+		<tr><td>
+			<div id="mainarea">
+				<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+				<tr><td class="tabcont" >
+					<form action="apache_mod_security_view_logs.php" method="post">
+						<br />
+						<div id="apachelogs">
+						<pre>One moment please, loading Apache logs...</pre>
+						</div>
+					</form>
+				</td></tr>
+				</table>
 			</div>
-     </td>
-    </tr>
-</table>
-<td align="left" valign="top">
-	<form id="filterform" name="filterform" action="apache_mod_security_view_logs.php" method="post" style="margin-top: 14px;">
-	<p/>
-	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
-	</form>
-</td>
+		</td></tr>
+		<tr><td align="left" valign="top">
+			<form id="filterform" name="filterform" action="apache_mod_security_view_logs.php" method="post" style="margin-top: 14px;">
+			<p />
+			<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
+			</form>
+		</td></tr>
+	</table>
 </div>
 <?php
-	if($_REQUEST['logtype'] = "error") {
-		echo "<br/>View <a href='apache_mod_security_view_logs.php?logtype=error'>error</a> logs";
+	if ($_REQUEST['logtype'] != "error") {
+		echo "<br /><a href='apache_mod_security_view_logs.php?logtype=error'>View Error Logs</a>";
 	} else {
-		echo "<br/>View <a href='apache_mod_security_view_logs.php'>access</a> logs";
+		echo "<br /><a href='apache_mod_security_view_logs.php'>View Access Logs</a>";
 	}
 ?>
 <?php include("fend.inc"); ?>

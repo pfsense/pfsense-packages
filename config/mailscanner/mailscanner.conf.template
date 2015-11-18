@@ -3,17 +3,17 @@
 $mc=<<<EOF
 {$info}
 # Configuration directory containing this file
-%etc-dir% = /usr/local/etc/MailScanner
+%etc-dir% = {$mlb}/etc/MailScanner
 
 # Set the directory containing all the reports in the required language
-%report-dir% = /usr/local/share/MailScanner/reports/{$report_language}
+%report-dir% = {$mlb}/share/MailScanner/reports/{$report_language}
 
 # Rulesets directory containing your ".rules" files
-%rules-dir% = /usr/local/etc/MailScanner/rules
+%rules-dir% = {$mlb}/etc/MailScanner/rules
 
 # Configuration directory containing files related to MCP
 # (Message Content Protection)
-%mcp-dir% = /usr/local/etc/MailScanner/mcp
+%mcp-dir% = {$mlb}/etc/MailScanner/mcp
 
 #
 # System settings
@@ -417,7 +417,7 @@ Log SpamAssassin Rule Actions = {$log_sa_rule_action}
 SpamAssassin Temporary Dir = /var/spool/MailScanner/incoming/SpamAssassin-Temp
 SpamAssassin User State Dir =
 SpamAssassin Install Prefix =
-SpamAssassin Site Rules Dir = /usr/local/etc/mail/spamassassin
+SpamAssassin Site Rules Dir = {$mlb}/etc/mail/spamassassin
 SpamAssassin Local Rules Dir =
 SpamAssassin Local State Dir = # /var/lib/spamassassin
 SpamAssassin Default Rules Dir =
@@ -469,7 +469,7 @@ Sender MCP Report = %report-dir%/sender.mcp.report.txt
 Use Default Rules With Multiple Recipients = {$default_rule_multiple}
 Read IP Address From Received Header = {$read_ipaddress}
 Spam Score Number Format = {$spam_score_format}
-MailScanner Version Number = 4.83.5
+MailScanner Version Number = {$mailscanner_version}
 SpamAssassin Cache Timings = {$cache_timings}
 Debug = {$debug}
 Debug SpamAssassin = {$debug_spam}
@@ -480,12 +480,12 @@ Deliver In Background = {$deliver_background}
 Delivery Method = {$mailscanner['deliver_method']}
 Split Exim Spool = {$split_exim_spool}
 Lockfile Dir = /var/spool/MailScanner/incoming/Locks
-Custom Functions Dir = /usr/local/lib/MailScanner/MailScanner/CustomFunctions
+Custom Functions Dir = {$mlb}/lib/MailScanner/MailScanner/CustomFunctions
 Lock Type =
 Syslog Socket Type =
 Automatic Syntax Check = {$syntax_check}
 Minimum Code Status = {$mailscanner['minimum_code']}
-include /usr/local/etc/MailScanner/conf.d/*
+include {$mlb}/etc/MailScanner/conf.d/*
 
 
 

@@ -37,52 +37,56 @@
 		]]>
 	</copyright>
 	<name>mailreport</name>
-	<version>2.0.4</version>
-	<title>Status: Mail Reports</title>
+	<version>2.3</version>
+	<title>Status: Email Reports</title>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/mailreport/mail_reports_generate.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/mail_reports_generate.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/etc/inc/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/mail_reports.inc</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/mail_reports.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/etc/inc/phpmailer/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/class.phpmailer.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/PHPMailerAutoload.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/etc/inc/phpmailer/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/class.pop3.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/class.phpmailer.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/etc/inc/phpmailer/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/class.smtp.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/class.pop3.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/phpmailer/</prefix>
+		<item>https://packages.pfsense.org/packages/config/mailreport/class.smtp.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/status_mail_report.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/status_mail_report.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/status_mail_report_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/status_mail_report_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/status_mail_report_add_cmd.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/status_mail_report_add_cmd.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/status_mail_report_add_log.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/status_mail_report_add_log.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<item>http://www.pfsense.com/packages/config/mailreport/status_mail_report_add_graph.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailreport/status_mail_report_add_graph.php</item>
 	</additional_files_needed>
 	<menu>
-		<name>E-Mail Reports</name>
-		<tooltiptext>Setup periodic e-mail reports.</tooltiptext>
+		<name>Email Reports</name>
+		<tooltiptext>Setup periodic email reports.</tooltiptext>
 		<section>Status</section>
 		<url>/status_mail_report.php</url>
 	</menu>
@@ -90,12 +94,15 @@
 	<![CDATA[
 		exec("rm /usr/local/bin/mail_reports_generate.php");
 		exec("rm /usr/local/etc/mail_reports.inc");
+		exec("rm /usr/local/etc/phpmailer/PHPMailerAutoload.php");
 		exec("rm /usr/local/etc/phpmailer/class.phpmailer.php");
 		exec("rm /usr/local/etc/phpmailer/class.pop3.php");
 		exec("rm /usr/local/etc/phpmailer/class.smtp.php");
 		exec("rmdir /usr/local/etc/phpmailer");
 		exec("rm /usr/local/www/status_mail_report.php");
 		exec("rm /usr/local/www/status_mail_report_edit.php");
+		exec("rm /usr/local/www/status_mail_report_add_cmd.php");
+		exec("rm /usr/local/www/status_mail_report_add_log.php");
 		exec("rm /usr/local/www/status_mail_report_add_graph.php");
 	]]>
 	</custom_php_deinstall_command>

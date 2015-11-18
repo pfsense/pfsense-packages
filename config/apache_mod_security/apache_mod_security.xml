@@ -1,76 +1,115 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
-			/* $Id$ */
-			/* ========================================================================== */
-			/*
-    			apache_mod_security.xml
-    			part of apache_mod_security package (http://www.pfSense.com)
-    			Copyright (C)2009, 2010 Scott Ullrich
-    			All rights reserved.
-			*/
-			/* ========================================================================== */
-			/*
-			    Redistribution and use in source and binary forms, with or without
-			    modification, are permitted provided that the following conditions are met:
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	apache_mod_security.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009, 2010 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-			     1. Redistributions of source code must retain the above copyright notice,
-			        this list of conditions and the following disclaimer.
 
-			     2. Redistributions in binary form must reproduce the above copyright
-			        notice, this list of conditions and the following disclaimer in the
-			        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-			    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-			    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-			    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-			    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-			    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-			    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-			    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-			    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-			    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-			    POSSIBILITY OF SUCH DAMAGE.
-			*/
-			/* ========================================================================== */
-        ]]>
-        </copyright>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>apache_mod_security</name>
-	<version>1.0</version>
+	<version>0.1.9</version>
 	<title>Services: Mod_Security+Apache+Proxy: Site Proxies</title>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>
 	<menu>
 		<name>Mod_Security+Apache+Proxy</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<configfile>apache_mod_security.xml</configfile>
 	</menu>
+	<service>
+		<name>apache_mod_security</name>
+		<rcfile>apache_mod_security.sh</rcfile>
+		<executable>httpd</executable>
+		<description>HTTP Daemon with mod_security</description>
+	</service>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.inc</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/priv/inc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security_settings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security_settings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security_view_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/apache_mod_security_view_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/rules/10_asl_rules.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/rules/a_exclude.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/rules/blacklist.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/rules/default.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/rules/recons.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/rules/rootkits.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules</prefix>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security/rules/useragents.conf</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Proxy Server Settings</text>
-			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml</url>
 		</tab>
 		<tab>
 			<text>Site Proxies</text>
 			<url>/pkg.php?xml=apache_mod_security.xml</url>
-			<active/>			
+			<active/>
 		</tab>
 		<tab>
 			<text>Logs</text>
@@ -79,7 +118,7 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Site name</fielddescr>
+			<fielddescr>Site Name</fielddescr>
 			<fieldname>sitename</fieldname>
 		</columnitem>
 		<columnitem>
@@ -89,21 +128,21 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fielddescr>Site name</fielddescr>
+			<fielddescr>Site Name</fielddescr>
 			<fieldname>sitename</fieldname>
 			<description>
 				<![CDATA[
-					Enter a short descriptive name for the site. (e.g. intranet)
+				Enter a short descriptive name for the site. (e.g. intranet)
 				]]>
 			</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Site Webmaster E-Mail address</fielddescr>
+			<fielddescr>Site Webmaster E-Mail Address</fielddescr>
 			<fieldname>siteemail</fieldname>
 			<description>
 				<![CDATA[
-					Enter the Webmaster E-Mail address for this site.
+				Enter the Webmaster E-Mail address for this site.
 				]]>
 			</description>
 			<type>input</type>
@@ -113,10 +152,10 @@
 			<fieldname>siteurl</fieldname>
 			<description></description>
 			<size>1</size>
-			<type>select</type>			
+			<type>select</type>
 			<options>
-			    <option><name>HTTP</name><value>HTTP</value></option>
-			    <option><name>HTTPS</name><value>HTTPS</value></option>
+				<option><name>HTTP</name><value>HTTP</value></option>
+				<option><name>HTTPS</name><value>HTTPS</value></option>
 			</options>
 		</field>
 		<field>
@@ -138,8 +177,8 @@
 			<fieldname>certificatefile</fieldname>
 			<description>
 				<![CDATA[
-					Name of certificate file under /usr/local/apache22/etc/<br/>
-					(required if Protocol is https)
+				Name of certificate file under /usr/local/apache22/etc/<br />
+				(Required if 'Protocol' is HTTPS.)
 				]]>
 			</description>
 			<size>40</size>
@@ -150,8 +189,8 @@
 			<fieldname>certificatekeyfile</fieldname>
 			<description>
 				<![CDATA[
-					Name of certificate key file under /usr/local/apache22/etc/<br/>
-					(required if Protocol is https)
+				Name of certificate key file under /usr/local/apache22/etc/<br />
+				(Required if 'Protocol' is HTTPS.)
 				]]>
 			</description>
 			<size>40</size>
@@ -162,30 +201,30 @@
 			<fieldname>certificatechainfile</fieldname>
 			<description>
 				<![CDATA[
-					Name of certificate chain file under /usr/local/apache22/etc/<br/>
-					(not required)
-				]]> 
+				Name of certificate chain file under /usr/local/apache22/etc/<br />
+				(Not required.)
+				]]>
 			</description>
 			<size>40</size>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Preserve Proxy hostname</fielddescr>
+			<fielddescr>Preserve Proxy Hostname</fielddescr>
 			<fieldname>preserveproxyhostname</fieldname>
 			<description>
 				<![CDATA[
-					When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.
+				When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.
 				]]>
 			</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Primary site hostname</fielddescr>
+			<fielddescr>Primary Site Hostname</fielddescr>
 			<fieldname>primarysitehostname</fieldname>
 			<description>
 				<![CDATA[
-					Enter the primary hostname (FQDN) for this website (e.g. www.example.com)<br/>
-					Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)
+				Enter the primary hostname (FQDN) for this website (e.g. www.example.com).<br />
+				Leave blank and define the IP Address / Port above for IP site proxy (i.e. not named site proxy).
 				]]>
 			</description>
 			<size>40</size>
@@ -194,36 +233,40 @@
 		<field>
 			<fielddescr>
 				<![CDATA[
-					Backend Web Servers and Additional Site Hostnames
+				Backend Web Servers and Additional Site Hostnames
 				]]>
 			</fielddescr>
 			<fieldname>additionalparameters</fieldname>
-		    <type>rowhelper</type>
-		    <rowhelper>
+			<type>rowhelper</type>
+			<rowhelper>
 				<rowhelperfield>
-                                    <fielddescr>Web server backend URLs</fielddescr>
-                                    <fieldname>webserveripaddr</fieldname>
-                                    <description>Add each web server IP address here.</description>
-				    <type>input</type>
-                                    <size>40</size>
+					<fielddescr>Web Server Backend URLs</fielddescr>
+					<fieldname>webserveripaddr</fieldname>
+					<description>Add each web server IP address here.</description>
+					<type>input</type>
+					<size>40</size>
 				</rowhelperfield>
 				<rowhelperfield>
-				    <fielddescr>Additional Site Hostnames (not required)</fielddescr>
-				    <fieldname>additionalsitehostnames</fieldname>
-				    <description>Add each webserver hostname address here.</description>
-				    <type>input</type>
-				    <size>40</size>
+					<fielddescr>Additional Site Hostnames (Optional)</fielddescr>
+					<fieldname>additionalsitehostnames</fieldname>
+					<description>Add each webserver hostname address here.</description>
+					<type>input</type>
+					<size>40</size>
 				</rowhelperfield>
-		    </rowhelper>
+			</rowhelper>
 		</field>
 	</fields>
-	<service>
-		<name>apache_mod_security</name>
-		<rcfile>/usr/local/etc/rc.d/apache_mod_security.sh</rcfile>
-		<executable>httpd</executable>
-	</service>
+	<custom_php_install_command>
+		apache_mod_security_install();
+		apache_mod_security_upgrade_config();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		apache_mod_security_deinstall();
+	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();
 	</custom_php_resync_config_command>
-	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
+	<custom_php_validation_command>
+		apache_mod_security_validate_input($_POST, $input_errors);
+	</custom_php_validation_command>
 </packagegui>

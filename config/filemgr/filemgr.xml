@@ -1,18 +1,32 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
 	filemgr.xml
-	
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2010 Tom Schaefer <tom@tomschaefer.org>
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
-                                                                              */
-/* ========================================================================== */
+*/
+/* ====================================================================================== */
 /*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -23,27 +37,24 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-		]]>
-		</copyright>
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<description>PHP File Manager</description>
-	<requirements>none</requirements>
-	<faq>http://forum.pfsense.org/index.php/topic,26974.0.html</faq>
+	<faq>https://forum.pfsense.org/index.php/topic,26974.0.html</faq>
 	<name>File Manager</name>
-	<version>0.1.2</version>
-	<title>Settings</title>
-	<include_file>/usr/local/pkg/filemgr.inc</include_file>
+	<version>0.2.1</version>
+	<title>Diagnostics: File Manager</title>
 	<menu>
 		<name>File Manager</name>
-		<tooltiptext>File Manager settings</tooltiptext>
 		<section>Diagnostics</section>
 		<configfile>filemgr.xml</configfile>
 		<url>/packages/filemgr/file_manager.php</url>
 	</menu>
 	<tabs>
 		<tab>
-			<text>Settings</text>
+			<text>File Manager</text>
 			<url>/packages/filemgr/file_manager.php</url>
 			<active/>
 		</tab>
@@ -51,190 +62,137 @@
 	<configpath>installedpackages->package->$packagename->configuration->filemgr</configpath>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/filemgr.xml</item>
+		<item>https://packages.pfsense.org/packages/config/filemgr/filemgr.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/filemgr.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/filemgr.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/file_manager.tmp</item>
+		<prefix>/usr/local/www/packages/filemgr/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/file_manager.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/index.tmp</item>
+		<prefix>/usr/local/www/packages/filemgr/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/index.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/bg_footer.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/bg_footer.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/bg_header.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/bg_header.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/bg_page.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/bg_page.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/file_editor_bg.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/file_editor_bg.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/folder.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/folder.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/folder_go.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/folder_go.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/folder_up.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/folder_up.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/go.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/go.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_delete.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_delete.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_download.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_download.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_file.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_file.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_html.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_html.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_open_as_web.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_open_as_web.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_php.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_php.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_picture.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_picture.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_rename.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_rename.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_script_edit.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_script_edit.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_use_file.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_use_file.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_use_file_inactive.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/ico_use_file_inactive.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/index.html</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/index.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/new.png</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfmimg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfmimg/new.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/config.tmp</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/config.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/download.tmp</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/download.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/file_editor_style.css</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/file_editor_style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/functions.tmp</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/functions.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/index.html</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/index.html</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/rename.tmp</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/rename.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/session.tmp</item>
+		<prefix>/usr/local/www/packages/filemgr/rbfminc/</prefix>
+		<item>https://packages.pfsense.org/packages/config/filemgr/rbfminc/session.php</item>
 	</additional_files_needed>
-	<fields>
-		<field>
-			<fielddescr>Variable One</fielddescr>
-			<fieldname>var1</fieldname>
-			<description>Enter the variable one here.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Variable Two</fielddescr>
-			<fieldname>var1</fieldname>
-			<description>Enter the variable one here.</description>
-			<type>input</type>
-		</field>
-	</fields>
-	<custom_add_php_command>
-	</custom_add_php_command>
-	<custom_php_resync_config_command>
-		php_sync_package_fm();
-	</custom_php_resync_config_command>
-	<custom_delete_php_command>    
-		php_sync_package_fm();
-	</custom_delete_php_command>
-	<custom_php_install_command>
-		php_install_command_fm();
-	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		deinstall_command_fm();
+		<![CDATA[
+		if (is_dir("/usr/local/www/packages/filemgr")) {
+			mwexec("/bin/rm -rf /usr/local/www/packages/filemgr/");
+		}
+		]]>
 	</custom_php_deinstall_command>
 </packagegui>

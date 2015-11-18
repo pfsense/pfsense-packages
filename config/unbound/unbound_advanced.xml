@@ -219,11 +219,12 @@
 			<fieldname>num_queries_per_thread</fieldname>
 			<description>The number of queries that every thread will service simultaneously. If more queries arrive that need to be serviced, and no queries can be jostled, then these queries are dropped.</description>
 			<type>select</type>
-			<default_value>1024</default_value>
+			<default_value>4096</default_value>
 			<options>
 				<option><name>512</name><value>512</value></option>
 				<option><name>1024</name><value>1024</value></option>
 				<option><name>2048</name><value>2048</value></option>
+				<option><name>4096</name><value>4096</value></option>
 			</options>
 			<advancedfield/>
 		</field>
@@ -261,16 +262,7 @@
 		<field>
 			<fielddescr>TTL for Host cache entries</fielddescr>
 			<fieldname>infra_host_ttl</fieldname>
-			<description>Time to live for entries in the host cache. The host cache contains roundtrip timing and EDNS support information. The default is 900 seconds.</description>
-			<type>input</type>
-			<size>5</size>
-			<default_value>900</default_value>
-			<advancedfield/>
-		</field>
-		<field>
-			<fielddescr>TTL for lame delegation</fielddescr>
-			<fieldname>infra_lame_ttl</fieldname>
-			<description>Time to live for when a delegation is considered to be lame. The default is 900 seconds.</description>
+			<description>Time to live for entries in the host cache. The host cache contains roundtrip timing, lameness and EDNS support information. The default is 900 seconds.</description>
 			<type>input</type>
 			<size>5</size>
 			<default_value>900</default_value>

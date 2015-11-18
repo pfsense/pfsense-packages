@@ -2,7 +2,7 @@ pfSense OpenVPN Client Export Package
 -------------------------------------
 
 This package includes a webConfigurator interface that allows for easy
-expory of user based OpenVPN configurations and pre-configured windows
+export of user based OpenVPN configurations and pre-configured windows
 installer packages.
 
 Contents
@@ -34,7 +34,7 @@ root package directory using the following command ...
 
 tar zcvf openvpn-client-export.tgz client-export
 
-With the archive created, you will have three relevent files in the
+With the archive created, you will have three relevant files in the
 root package directory ...
 
 openvpn-client-export.inc

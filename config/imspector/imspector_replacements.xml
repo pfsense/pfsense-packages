@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* ========================================================================== */
+/*
+    imspector.xml
+    part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2011 Scott Ullrich <sullrich@gmail.com>
+	Copyright (C) 2011 Bill Marquette <billm@gmail.com>
+    Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>imspectorreplacements</name>
+	<version>20111108</version>
+	<title>Services: IMSpector</title>
+	<savetext>Save</savetext>
+	<include_file>/usr/local/pkg/imspector.inc</include_file>
+	<menu>
+		<name>IMSpector</name>
+		<tooltiptext>Set IMSpector settings such as protocols to listen on.</tooltiptext>
+		<section>Services</section>
+		<url>/services_imspector_logs.php</url>
+	</menu>
+	<service>
+		<name>imspector</name>
+		<rcfile>imspector.sh</rcfile>
+		<executable>imspector</executable>
+	</service>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=imspector.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Replacements</text>
+			<url>/pkg_edit.php?xml=imspector_replacements.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Access Lists</text>
+			<url>/pkg.php?xml=imspector_acls.xml</url>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/imspector_logs.php</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=imspector_sync.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>Response messages</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable response messages</fielddescr>
+			<fieldname>responder</fieldname>
+			<description> 
+				Inform the users (both local and remote) that the conversation they are having is being recorded. This might be needed for legal reasons.  
+				Inform the sender that a file (or message) was blocked. This is useful because the sender will know a block occured, instead of the transfer simply failing.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Notification frequency</fielddescr>
+			<fieldname>notice_days</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description>Frequency in number of days for notifying users they are being logged.  Default 1 day if responses are enabled, set to 0 to disable</description>
+		</field>		
+		<field>
+			<fielddescr>Filtered frequency</fielddescr>
+			<fieldname>filtered_minutes</fieldname>
+			<type>input</type>
+			<size>10</size>
+			<description>The time between sending "filtered" in minutes. Default 15 minutes if responses are enabled, set to 0 to disable</description>
+		</field>
+		<field>
+			<fielddescr>Custom message prefix</fielddescr>
+			<fieldname>prefix_message</fieldname>
+			<description>
+				Message to prepend to all IMSpector generated messages.  The default is "Message from IMSpector"
+			</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Custom recorded message response</fielddescr>
+			<fieldname>recorded_message</fieldname>
+			<description>
+				Message to send to users to let them know they are being recorded.  The default is "Your activities are being logged"
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>60</cols>
+		</field>
+		<field>
+			<fielddescr>Custom filtered message response</fielddescr>
+			<fieldname>filtered_message</fieldname>
+			<description>
+				Message to send to users to let them know about filtered messages.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>60</cols>
+		</field>
+		<field>
+			<name>Restrictions</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Block file transfers</fielddescr>
+			<fieldname>block_files</fieldname>
+			<description>Block file transfers on supported protocols.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Block web cameras</fielddescr>
+			<fieldname>block_webcams</fieldname>
+			<description>This option will block all webcam sessions. Currently IMSpector can only spot webcam sessions on Yahoo.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable bad word filtering</fielddescr>
+			<fieldname>filter_badwords</fieldname>
+			<description>Replace characters of matched bad word with *.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Bad words list</fielddescr>
+			<fieldname>badwords_list</fieldname>
+			<description>
+				Place one word or phrase to match per line.&lt;br /&gt;
+				Leave blank to load default list.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>10</rows>
+			<cols>60</cols>
+		</field>
+	</fields>
+	<custom_php_validation_command>
+		validate_form_imspector($_POST, $input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_imspector();
+	</custom_php_resync_config_command>    
+	<custom_php_deinstall_command>
+		deinstall_package_imspector();
+	</custom_php_deinstall_command>
+	<filter_rules_needed>imspector_generate_rules</filter_rules_needed>
+
+</packagegui>

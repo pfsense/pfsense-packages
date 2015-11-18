@@ -1,10 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<description>Nagios NRPEv2</description>
-	<requirements>Describe your package requirements here</requirements>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	nrpe2.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 Erik Kristensen
+	Copyright (C) 2011-2013 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>nrpe2</name>
-	<version>2.11</version>
-	<title>NRPEv2</title>
+	<version>2.2.2</version>
+	<title>Services: NRPEv2</title>
 	<aftersaveredirect>/pkg_edit.php?xml=nrpe2.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/nrpe2.inc</include_file>
 	<menu>
@@ -17,56 +57,65 @@
 		<name>nrpe2</name>
 		<rcfile>nrpe2.sh</rcfile>
 		<executable>nrpe2</executable>
-		<description>Nagios NRPE Daemon</description>
+		<description>Nagios NRPEv2 Daemon</description>
 	</service>
 	<configpath>installedpackages->package->nrpe2</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/nrpe2/nrpe2.inc</item>
+		<item>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.priv.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>
 			<type>listtopic</type>
-			<name>NRPE Options</name>
-			<fieldname>temp</fieldname>
+			<name>Service Options</name>
 		</field>
 		<field>
-			<fielddescr>Enabled</fielddescr>
+			<fielddescr>Enable NRPE</fielddescr>
 			<fieldname>enabled</fieldname>
-			<description>Check this to enable NRPE daemon</description>
+			<description>Check this to enable NRPE daemon.</description>
 			<type>checkbox</type>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<type>listtopic</type>
 			<name>Configuration Options</name>
-			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>Port Number</fielddescr>
 			<fieldname>server_port</fieldname>
 			<description>Port number we should wait for connections on. (Default: 5666)</description>
 			<type>input</type>
+			<default_value>5666</default_value>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>Bind IP Address</fielddescr>
 			<fieldname>server_address</fieldname>
-			<description>Set this to the IP address of the interface you want the daemon to listen on.</description>
+			<description>Set this to the IP address of the interface you want the daemon to listen on. (Optional)</description>
 			<type>input</type>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Nagios Server(s)</fielddescr>
 			<fieldname>allowed_hosts</fieldname>
-			<description>IP Address of Nagios server, usualy a single IP, but if multiple delimit by comma</description>
+			<description>IP Address of Nagios server. Usually a single IP; multiple IPs must be delimited by comma.</description>
 			<type>input</type>
 			<required/>
 		</field>
 		<field>
+			<fielddescr>Allow Arguments (dont_blame_nrpe)</fielddescr>
+			<fieldname>dont_blame_nrpe</fieldname>
+			<description>Check this to enable accept NRPE arguments. (Default: 0)</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+
+		<field>
 			<type>listtopic</type>
 			<name>Commands</name>
-			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>Command Definitions that the Nagios server can call via the NRPE daemon.</fielddescr>
@@ -110,7 +159,7 @@
 					<required/>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>Extra Options</fielddescr>
+					<fielddescr>Extra Options (Example: -s Z \$ARG1\$ \$ARG2\$)</fielddescr>
 					<fieldname>extra</fieldname>
 					<description>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</description>
 					<type>input</type>
@@ -119,28 +168,22 @@
 			</rowhelper>
 		</field>
 	</fields>
-	<custom_delete_php_command>
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
-	</custom_delete_php_command>
-	<custom_add_php_command>
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
-	</custom_add_php_command>
 	<custom_php_install_command>
 		nrpe2_custom_php_install_command();
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		nrpe2_custom_php_deinstall_command();
-		nrpe2_custom_php_write_config();
 	</custom_php_deinstall_command>
+	<custom_add_php_command>
+		nrpe2_resync_package();
+	</custom_add_php_command>
+	<custom_delete_php_command>
+		nrpe2_resync_package();
+	</custom_delete_php_command>
 	<custom_php_resync_config_command>
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
+		nrpe2_resync_package();
 	</custom_php_resync_config_command>
-	<custom_php_command_before_form>
-		unset($_POST['temp']);
-	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		nrpe2_custom_php_validation_command($_POST, $input_errors);
+	</custom_php_validation_command>
 </packagegui>

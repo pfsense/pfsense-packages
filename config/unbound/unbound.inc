@@ -1,6 +1,6 @@
 <?php
 /*	unbound.inc
-	(C)2010 Warren Baker (warren@decoy.co.za)
+	(C)2013 Warren Baker (warren@decoy.co.za)
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -118,17 +118,14 @@ function unbound_keys_setup() {
 function unbound_rc_setup() {
 	global $config;
 
-
 	// Startup process and idea taken from TinyDNS package (author sullrich@gmail.com)
 	$filename = "unbound.sh";
 	$start = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 <?php
 	require_once(\"/usr/local/pkg/unbound.inc\");
 	echo \"Starting and configuring Unbound...\";
-	fetch_root_hints();
 	unbound_control(\"anchor_update\");
 	unbound_control(\"start\");
-	unbound_control(\"forward\");
 	unbound_control(\"restore_cache\");
 	echo \"done.\\n\";
 ?>
@@ -165,40 +162,9 @@ function unbound_control($action) {
 	$cache_dumpfile = "/var/tmp/unbound_cache";
 
 	switch ($action) {
-		case "forward":
-				/* Dont utilize forward cmd if Unbound is doing DNS queries directly
-				 * XXX: We could make this an option to then make pfSense use Unbound
-				 * as the recursive nameserver instead of upstream ones(?)
-				 */
-				if ($unbound_config['forwarding_mode'] == "on") {
-					// Get configured DNS servers and add them as forwarders
-					if (!isset($config['system']['dnsallowoverride'])) {
-						$ns = array_unique(get_nameservers());
-						foreach($ns as $nameserver) {
-							if($nameserver)
-								$dns_servers .= " $nameserver";
-						}
-					} else {
-						$ns = array_unique(get_dns_servers());
-						foreach($ns as $nameserver) {
-							if($nameserver)
-								$dns_servers .= " $nameserver";
-						}
-					}
-
-					if(is_service_running("unbound")) {
-						unbound_ctl_exec("forward $dns_servers");
-					} else {
-						unbound_control("start");
-						sleep(1);
-						unbound_control("forward");
-					}
-				}
-				break;
-
 		case "start":
 				//Start unbound
-				if($unbound_config['unbound_status'] == "on") {
+				if($unbound_config['enable'] == "on") {
 					if(!is_service_running("unbound"))
 						unbound_ctl_exec("start");
 						/* Link dnsmasq.pid to prevent dhcpleases logging error */
@@ -207,13 +173,12 @@ function unbound_control($action) {
 							mwexec("/bin/ln -s /var/run/unbound.pid /var/run/dnsmasq.pid");
 						}
 					mwexec_bg("/usr/local/bin/unbound_monitor.sh");
-					fetch_root_hints();
 				}
 				break;
 
 		case "stop":
 				//Stop unbound and unmount the file system
-				if($unbound_config['unbound_status'] == "on") {
+				if($unbound_config['enable'] == "on") {
 					mwexec_bg("/usr/local/bin/unbound_monitor.sh stop");
 					unbound_ctl_exec("stop");
 				}
@@ -240,7 +205,9 @@ function unbound_control($action) {
 				break;
 		case "anchor_update":
 				//Update the Root Trust Anchor
+				conf_mount_rw();
 				mwexec(UNBOUND_BASE . "/sbin/unbound-anchor -a " . UNBOUND_BASE . "/etc/unbound/root-trust-anchor", true);
+				conf_mount_ro();
 				break;
 		default:
 				break;
@@ -275,12 +242,14 @@ function unbound_get_network_interface_addresses() {
 								log_error("Unbound DNS: There was a problem setting up the Virtual IP for the interface ".link_ip_to_carp_interface($vip['subnet']));
 							} else {
 								$unbound_interfaces[$i]['virtual']['ipaddr'] = $virtual_ip;
+								$unbound_interfaces[$i]['virtual']['subnet'] = $vip['subnet_bits'];
+								$unbound_interfaces[$i]['virtual']['network'] = $virtual_ip;
 							}
 						}
 					}
 				}
 			}
-		} else if(isset($interfaces[$unboundif]['ipaddr'])) {
+		} else if (isset($interfaces[$unboundif]['ipaddr'])) {
 			/* Find the interface IP address for
 			 * XXX - this only works for IPv4 currently - the pfSense module needs IPv6 love
 			 */
@@ -378,7 +347,7 @@ function unbound_acls_config() {
 	global $config;
 
 	/* Configure the ACLs */
-	if(is_array($config['installedpackages']['unboundacls']['config'])) {
+	if (is_array($config['installedpackages']['unboundacls']['config'])) {
 		$unbound_acls = $config['installedpackages']['unboundacls']['config'];
 		$unboundcfg = "";
 		foreach($unbound_acls as $unbound_acl){
@@ -409,9 +378,9 @@ function unbound_resync_config() {
 	$unbound_allowed_networks = "";
 	$unboundnetcfg = unbound_get_network_interface_addresses();
 	foreach($unboundnetcfg as $netent) {
-		foreach($netent as $entry) {
+		foreach($netent as $nettype => $entry) {
 			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
-			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1")
+			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1" && $nettype != "virtual")
 				$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
 		}
 	}
@@ -453,46 +422,45 @@ function unbound_resync_config() {
 	}
 
 	// Private-address support for DNS Rebinding
-	if($unbound_config['private_address'] == "on") {
+	if ($unbound_config['private_address'] == "on") {
 		$pvt_addr = <<<EOF
 # For DNS Rebinding prevention
 private-address: 10.0.0.0/8
 private-address: 172.16.0.0/12
 private-address: 192.168.0.0/16
-private-address: 192.254.0.0/16
+private-address: 169.254.0.0/16
 private-address: fd00::/8
 private-address: fe80::/10
 # Set private domains in case authorative name server returns a RFC1918 IP address
 EOF;
 
-	// Add private-domain options
-	$private_domains = unbound_add_domain_overrides(true);
-
+		// Add private-domain options
+		$private_domains = unbound_add_domain_overrides(true);
 	}
 
 	//Setup optimization
 	$optimization = unbound_optimization();
 
-	$unbound_config = &$config['installedpackages']['unboundadvanced']['config'][0];
+	$adv_config = &$config['installedpackages']['unboundadvanced']['config'][0];
 	// Setup Advanced options
-	$log_verbosity = (isset($unbound_config['unbound_verbosity'])) ? $unbound_config['unbound_verbosity'] : "1";
-	$hide_id = ($unbound_config['hide_id'] == "on") ? "yes" : "no";
-	$hide_version = ($unbound_config['hide_version'] == "on") ? "yes" : "no";
-	$harden_glue = ($unbound_config['harden_glue'] == "on") ? "yes" : "no";
-	$harden_dnssec_stripped = ($unbound_config['harden_dnssec_stripped'] == "on") ? "yes" : "no";
-	$prefetch = ($unbound_config['prefetch'] == "on") ? "yes" : "no";
-	$prefetch_key = ($unbound_config['prefetch_key'] == "on") ? "yes" : "no";
-	$outgoing_num_tcp = (!empty($unbound_config['outgoing_num_tcp'])) ? $unbound_config['outgoing_num_tcp'] : "10";
-	$incoming_num_tcp = (!empty($unbound_config['incoming_num_tcp'])) ? $unbound_config['incoming_num_tcp'] : "10";
-	$edns_buffer_size = (!empty($unbound_config['edns_buffer_size'])) ? $unbound_config['edns_buffer_size'] : "4096";
-	$num_queries_per_thread = (!empty($unbound_config['num_queries_per_thread'])) ? $unbound_config['num_queries_per_thread'] : "1024";
-	$jostle_timeout = (!empty($unbound_config['jostle_timeout'])) ? $unbound_config['jostle_timeout'] : "200";
-	$cache_max_ttl = (!empty($unbound_config['cache_max_ttl'])) ? $unbound_config['cache_max_ttl'] : "86400";
-	$cache_min_ttl = (!empty($unbound_config['cache_min_ttl'])) ? $unbound_config['cache_min_ttl'] : "0";
-	$infra_host_ttl = (!empty($unbound_config['infra_host_ttl'])) ? $unbound_config['infra_host_ttl'] : "900";
-	$infra_lame_ttl = (!empty($unbound_config['infra_lame_ttl'])) ? $unbound_config['infra_lame_ttl'] : "900";
-	$infra_cache_numhosts = (!empty($unbound_config['infra_cache_numhosts'])) ? $unbound_config['infra_cache_numhosts'] : "10000";
-	$unwanted_reply_threshold = (!empty($unbound_config['unwanted_reply_threshold'])) ? $unbound_config['unwanted_reply_threshold'] : "0";
+	$log_verbosity = (isset($adv_config['unbound_verbosity'])) ? $adv_config['unbound_verbosity'] : "1";
+	$hide_id = ($adv_config['hide_id'] == "on") ? "yes" : "no";
+	$hide_version = ($adv_config['hide_version'] == "on") ? "yes" : "no";
+	$harden_glue = ($adv_config['harden_glue'] == "on") ? "yes" : "no";
+	$harden_dnssec_stripped = ($adv_config['harden_dnssec_stripped'] == "on") ? "yes" : "no";
+	$prefetch = ($adv_config['prefetch'] == "on") ? "yes" : "no";
+	$prefetch_key = ($adv_config['prefetch_key'] == "on") ? "yes" : "no";
+	$outgoing_num_tcp = isset($adv_config['outgoing_num_tcp']) ? $adv_config['outgoing_num_tcp'] : "10";
+	$incoming_num_tcp = isset($adv_config['incoming_num_tcp']) ? $adv_config['incoming_num_tcp'] : "10";
+	$edns_buffer_size = (!empty($adv_config['edns_buffer_size'])) ? $adv_config['edns_buffer_size'] : "4096";
+	$num_queries_per_thread = (!empty($adv_config['num_queries_per_thread'])) ? $adv_config['num_queries_per_thread'] : "4096";
+	$jostle_timeout = (!empty($adv_config['jostle_timeout'])) ? $adv_config['jostle_timeout'] : "200";
+	$cache_max_ttl = (!empty($adv_config['cache_max_ttl'])) ? $adv_config['cache_max_ttl'] : "86400";
+	$cache_min_ttl = (!empty($adv_config['cache_min_ttl'])) ? $adv_config['cache_min_ttl'] : "0";
+	$infra_host_ttl = (!empty($adv_config['infra_host_ttl'])) ? $adv_config['infra_host_ttl'] : "900";
+	$infra_lame_ttl = (!empty($adv_config['infra_lame_ttl'])) ? $adv_config['infra_lame_ttl'] : "900";
+	$infra_cache_numhosts = (!empty($adv_config['infra_cache_numhosts'])) ? $adv_config['infra_cache_numhosts'] : "10000";
+	$unwanted_reply_threshold = (!empty($adv_config['unwanted_reply_threshold'])) ? $adv_config['unwanted_reply_threshold'] : "0";
 
 
 	$unbound_conf = <<<EOD
@@ -508,7 +476,6 @@ chroot: ""
 username: "unbound"
 directory: "{$unbound_base}/etc/unbound"
 pidfile: "{$g['varrun_path']}/unbound.pid"
-root-hints: "root.hints"
 harden-referral-path: no
 prefetch: {$prefetch}
 prefetch-key: {$prefetch_key}
@@ -525,7 +492,8 @@ unwanted-reply-threshold: {$unwanted_reply_threshold}
 num-queries-per-thread: {$num_queries_per_thread}
 jostle-timeout: {$jostle_timeout}
 infra-host-ttl: {$infra_host_ttl}
-infra-lame-ttl: {$infra_lame_ttl}
+prefetch: {$prefetch}
+prefetch-key: {$prefetch_key}
 infra-cache-numhosts: {$infra_cache_numhosts}
 outgoing-num-tcp: {$outgoing_num_tcp}
 incoming-num-tcp: {$incoming_num_tcp}
@@ -536,6 +504,9 @@ statistics-cumulative: {$cumulative_stats}
 cache-max-ttl: {$cache_max_ttl}
 cache-min-ttl: {$cache_min_ttl}
 harden-dnssec-stripped: {$harden_dnssec_stripped}
+hide-identity: {$hide_id}
+hide-version: {$hide_version}
+harden-glue: {$harden_glue}
 {$optimization['number_threads']}
 {$optimization['msg_cache_slabs']}
 {$optimization['rrset_cache_slabs']}
@@ -543,8 +514,10 @@ harden-dnssec-stripped: {$harden_dnssec_stripped}
 {$optimization['key_cache_slabs']}
 {$optimization['msg_cache_size']}
 {$optimization['rrset_cache_size']}
-{$optimization['outgoing_range']}
+outgoing-range: 8192
 {$optimization['so_rcvbuf']}
+{$optimization['so_sndbuf']}
+
 
 # Interface IP(s) to bind to
 {$unbound_bind_interfaces}
@@ -569,11 +542,38 @@ access-control: ::1 allow
 EOD;
 
 	# Handle custom options
-	if(!empty($unbound_config['custom_options'])) {
-		$custom_options = explode(";", ($unbound_config['custom_options']));
-		$unbound_conf .= "# Unbound Custom options\n";
-		foreach ($custom_options as $ent) {
+	if (!empty($adv_config['custom_options'])) {
+		$custom_options = explode(";", ($adv_config['custom_options']));
+		$unbound_conf .= "\n# Unbound Custom options\n";
+		foreach ($custom_options as $ent)
 			$unbound_conf .= $ent."\n";
+	}
+
+	// Set up forward-zones if configured
+	if ($unbound_config['forwarding_mode'] == "on") {
+		$dnsservers = array();
+		if (isset($config['system']['dnsallowoverride'])) {
+			$ns = array_unique(get_nameservers());
+			foreach($ns as $nameserver) {
+				if ($nameserver)
+					$dnsservers[] = $nameserver;
+				}
+		} else {
+			$ns = array_unique(get_dns_servers());
+			foreach($ns as $nameserver) {
+				if ($nameserver)
+					$dnsservers[] = $nameserver;
+			}
+		}
+
+		if (!empty($dnsservers)) {
+			$unbound_conf .=<<<EOD
+forward-zone:
+	name: "."
+
+EOD;
+			foreach($dnsservers as $dnsserver)
+				$unbound_conf .= "\tforward-addr: $dnsserver\n";
 		}
 	}
 
@@ -619,23 +619,19 @@ function unbound_optimization() {
 	// Set the number of threads equal to number of CPUs.
 	// Use 1 (disable threading) if for some reason this sysctl fails.
 	$numprocs = intval(trim(`/sbin/sysctl kern.smp.cpus | /usr/bin/cut -d" " -f2`));
-	if($numprocs > 0)
+	if ($numprocs > 1) {
 		$optimization['number_threads'] = "num-threads: {$numprocs}";
-	else
+		$optimize_num = pow(2,floor(log($numprocs,2)));
+	} else {
 		$optimization['number_threads'] = "num-threads: 1";
+		$optimize_num = 4;
+	}
 
 	// Slabs to help reduce lock contention.
-	if ($numprocs > 4) {
-		$optimization['msg_cache_slabs'] = "msg-cache-slabs: {$numprocs}";
-		$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: {$numprocs}";
-		$optimization['infra_cache_slabs'] = "infra-cache-slabs: {$numprocs}";
-		$optimization['key_cache_slabs'] = "key-cache-slabs: {$numprocs}";
-	} else {
-		$optimization['msg_cache_slabs'] = "msg-cache-slabs: 4";
-		$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: 4";
-		$optimization['infra_cache_slabs'] = "infra-cache-slabs: 4";
-		$optimization['key_cache_slabs'] = "key-cache-slabs: 4";
-	}
+	$optimization['msg_cache_slabs'] = "msg-cache-slabs: {$optimize_num}";
+	$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: {$optimize_num}";
+	$optimization['infra_cache_slabs'] = "infra-cache-slabs: {$optimize_num}";
+	$optimization['key_cache_slabs'] = "key-cache-slabs: {$optimize_num}";
 
 	// Memory usage - default is 4Mb if nothing has been selected
 	if(isset($unbound_config['msg_cache_size'])) {
@@ -647,64 +643,33 @@ function unbound_optimization() {
 		$optimization['rrset_cache_size'] = "rrset-cache-size: 8m";
 	}
 
-	// More outgoing connections per thread otherwise assign a default of 4096 for a single thread
-	if($numprocs > 0) {
-		$or = (1024/$numprocs) - 50;
-		$optimization['outgoing_range'] = "outgoing-range: {$or}";
-	} else {
-		$optimization['outgoing_range'] = "outgoing-range: {4096}";
-	}
-
 	// Larger socket buffer for busy servers
 	// Check that it is set to 4MB (by default the OS has it configured to 4MB)
 	foreach ($config['sysctl']['item'] as $tunable) {
 		if ($tunable['tunable'] == 'kern.ipc.maxsockbuf') {
-			$so = floor(($tunable['value']/1024/1024)-1);
-			// Check to ensure that the number is not a negative
-			if ($so > 0)
-				$optimization['so_rcvbuf'] = "so-rcvbuf: {$so}m";
+			if ($tunable['value'] == 'default')
+				$maxsockbuf = '4262144';
 			else
-				unset($optimization['so_rcvbuf']);
-
+				$maxsockbuf = $tunable['value'];
+			$so = floor(($maxsockbuf/1024/1024)-1);
+			// Check to ensure that the number is not a negative
+			if ($so > 0) {
+				$optimization['so_rcvbuf'] = "so-rcvbuf: {$so}m";
+				$optimization['so_sndbuf'] = "so-sndbuf: {$so}m";
+			} else {
+				$optimization['so_rcvbuf'] = "#so-rcvbuf: 4m";
+				$optimization['so_sndbuf'] = "#so-sndbuf: 4m";
+			}
 		}
 	}
-	// Safety check in case kern.ipc.maxsockbuf is deleted.
-	if(!isset($optimization['so_rcvbuf']))
-		$optimization['so_rcvbuf'] = "#so-rcvbuf: 4m";
 
 	return $optimization;
-}
-
-function fetch_root_hints() {
-
-	$destination_file = UNBOUND_BASE . "/etc/unbound/root.hints";
-	if (filesize($destination_file) == 0 ) {
-		conf_mount_rw();
-		$fout = fopen($destination_file, "w");
-		$url = "ftp://ftp.internic.net/domain/named.cache";
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, '25');
-		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		$data = curl_exec($ch);
-		curl_close($ch);
-
-		fwrite($fout, $data);
-		fclose($fout);
-		conf_mount_ro();
-
-		return ($http_code == 200) ? true : $http_code;
-	} else {
-		return false;
-	}
 }
 
 function unbound_validate($post, $type=null) {
 	global $config, $input_errors;
 
-	if($post['unbound_status'] == "on" && isset($config['dnsmasq']['enable']))
+	if($post['enable'] == "on" && isset($config['dnsmasq']['enable']))
 		$input_errors[] = "The system dns-forwarder is still active. Disable it before enabling the Unbound service.";
 
 	/* Validate the access lists */
@@ -734,8 +699,6 @@ function unbound_validate($post, $type=null) {
 			$input_errors[] = "You must enter a valid number in 'Minimum TTL for RRsets and messages'.";
 		if(!is_numeric($post['infra_host_ttl']))
 				$input_errors[] = "You must enter a valid number in 'TTL for Host cache entries'.";
-		if(!is_numeric($post['infra_lame_ttl']))
-				$input_errors[] = "You must enter a valid number in 'TTL for lame delegation'.";
 		if(!is_numeric($post['infra_cache_numhosts']))
 				$input_errors[] = "You must enter a valid number in 'Number of Hosts to cache'.";
 
@@ -751,20 +714,18 @@ function unbound_reconfigure() {
 
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
 
-	if ($unbound_config['unbound_status'] != "on") {
-		if(is_service_running("unbound"))
+	if ($unbound_config['enable'] != "on") {
+		if (is_service_running("unbound"))
 			unbound_control("termstop");
 	} else {
-		if(is_service_running("unbound")) {
+		if (is_service_running("unbound")) {
 			unbound_control("dump_cache");
 			unbound_control("termstop");
 		}
 		unbound_resync_config();
 		unbound_control("start");
-		if(is_service_running("unbound")) {
-			unbound_control("forward");
+		if (is_service_running("unbound"))
 			unbound_control("restore_cache");
-		}
 	}
 }
 
@@ -830,24 +791,45 @@ function unbound_add_host_entries() {
 		$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} AAAA ::1\"\n";
 	}
 
+	$added_item_v4 = array();
+	$added_item_v6 = array();
 	if ($config['interfaces']['lan']) {
+		$current_host = $syscfg['hostname'].".".$syscfg['domain'];
 		$cfgip = get_interface_ip("lan");
 		if (is_ipaddr($cfgip)) {
-			$unbound_entries .= "local-data-ptr: \"{$cfgip} {$syscfg['hostname']}.{$syscfg['domain']}\"\n";
-			$unbound_entries .= "local-data: \"{$syscfg['hostname']}.{$syscfg['domain']} A {$cfgip}\"\n";
+			$unbound_entries .= "local-data-ptr: \"{$cfgip} {$current_host}\"\n";
+			$unbound_entries .= "local-data: \"{$current_host} A {$cfgip}\"\n";
 			$unbound_entries .= "local-data: \"{$syscfg['hostname']} A {$cfgip}\"\n";
+			$added_item_v4[$current_host] = true;
+		}
+		$cfgip6 = get_interface_ipv6("lan");
+		if (is_ipaddrv6($cfgip6)) {
+			$unbound_entries .= "local-data-ptr: \"{$cfgip6} {$current_host}\"\n";
+			$unbound_entries .= "local-data: \"{$current_host} AAAA {$cfgip6}\"\n";
+			$unbound_entries .= "local-data: \"{$syscfg['hostname']} AAAA {$cfgip6}\"\n";
+			$added_item_v6[$current_host] = true;
 		}
 	} else {
 		$sysiflist = get_configured_interface_list();
 		foreach ($sysiflist as $sysif) {
 			if (!interface_has_gateway($sysif)) {
+				$current_host = $syscfg['hostname'].".".$syscfg['domain'];
 				$cfgip = get_interface_ip($sysif);
 				if (is_ipaddr($cfgip)) {
-					$unbound_entries .= "local-data-ptr: \"{$cfgip} {$syscfg['hostname']}.{$syscfg['domain']}\"\n";
-					$unbound_entries .= "local-data: \"{$syscfg['hostname']}.{$syscfg['domain']} A {$cfgip}\"\n";
+					$unbound_entries .= "local-data-ptr: \"{$cfgip} {$current_host}\"\n";
+					$unbound_entries .= "local-data: \"{$current_host} A {$cfgip}\"\n";
 					$unbound_entries .= "local-data: \"{$syscfg['hostname']} A {$cfgip}\"\n";
-					break;
+					$added_item_v4[$current_host] = true;
 				}
+				$cfgip6 = get_interface_ipv6($sysif);
+				if (is_ipaddr($cfgip6)) {
+					$unbound_entries .= "local-data-ptr: \"{$cfgip6} {$current_host}\"\n";
+					$unbound_entries .= "local-data: \"{$current_host} AAAA {$cfgip6}\"\n";
+					$unbound_entries .= "local-data: \"{$syscfg['hostname']} AAAA {$cfgip6}\"\n";
+					$added_item_v6[$current_host] = true;
+				}
+				if (is_ipaddr($cfgip) || is_ipaddr($cfgip6))
+					break;
 			}
 		}
 	}
@@ -855,59 +837,130 @@ function unbound_add_host_entries() {
 	// DNSMasq entries static host entries
 	if (isset($dnsmasqcfg['hosts'])) {
 		$hosts = $dnsmasqcfg['hosts'];
-		$host_entries = "";
+		$host_entries = "# DNSMasq Host overrides\n";
 		$added_item = array();
 		foreach ($hosts as $host) {
-			$current_host = $host['host'];
-			if ($host['host'] != "")
-				$host['host'] = $host['host'].".";
-			if(!$added_item[$current_host]) {
-				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}{$host['domain']}\"\n";
-				if(function_exists("is_ipaddrv6")) {
-					if (is_ipaddrv6($host['ip']))
-						$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN AAAA {$host['ip']}\"\n";
-					else
-						$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN A {$host['ip']}\"\n";
-				} else
-					$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN A {$host['ip']}\"\n";
-				if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
-					$host_entries .= "local-data: '{$host['host']}{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
-
-				// Do not add duplicate entries
+			$current_host = ($host['host'] != "") ? $host['host'].".".$host['domain'] : $host['domain'];
+			if (function_exists("is_ipaddrv6") && is_ipaddrv6($host['ip'])) {
+				if (!$added_item_v6[$current_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ip']} {$current_host}\"\n";
+					$host_entries .= "local-data: \"{$current_host} IN AAAA {$host['ip']}\"\n";
+					$added_item_v6[$current_host] = true;
+				}
+				if ($host['aliases']['item'] && is_array($host['aliases']['item']))
+					foreach ($host['aliases']['item'] as $alias) {
+						$current_alias = ($alias['host'] != "") ? $alias['host'].".".$alias['domain'] : $alias['domain'];
+						if (!$added_item_v6[$current_alias]) {
+							$host_entries .= "local-data: \"{$current_alias} IN AAAA {$host['ip']}\"\n";
+							$added_item_v6[$current_alias] = true;
+							if ((!$added_item[$current_alias]) && (!empty($alias['description'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$current_alias} TXT \"".addslashes($alias['description'])."\"'\n";
+								$added_item[$current_alias] = true;
+							}
+						}
+					}
+			} else {
+				if (!$added_item_v4[$current_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ip']} {$current_host}\"\n";
+					$host_entries .= "local-data: \"{$current_host} IN A {$host['ip']}\"\n";
+					$added_item_v4[$current_host] = true;
+				}
+				if ($host['aliases']['item'] && is_array($host['aliases']['item']))
+					foreach ($host['aliases']['item'] as $alias) {
+						$current_alias = ($alias['host'] != "") ? $alias['host'].".".$alias['domain'] : $alias['domain'];
+						if (!$added_item_v4[$current_alias]) {
+							$host_entries .= "local-data: \"{$current_alias} IN A {$host['ip']}\"\n";
+							$added_item_v4[$current_alias] = true;
+							if ((!$added_item[$current_alias]) && (!empty($alias['description'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$current_alias} TXT \"".addslashes($alias['description'])."\"'\n";
+								$added_item[$current_alias] = true;
+							}
+						}
+					}
+			}
+			if ((!$added_item[$current_host]) && (!empty($host['descr'])) && ($unboundcfg['txtsupport'] == 'on')) {
+				$host_entries .= "local-data: '{$current_host} TXT \"".addslashes($host['descr'])."\"'\n";
 				$added_item[$current_host] = true;
 			}
 		}
 		$unbound_entries .= $host_entries;
 	}
+	
 	// Static DHCP entries
-	$host_entries = "";
+	$host_entries = "# DHCP Reservations\n";
 	if (isset($unboundcfg['regdhcpstatic']) && is_array($config['dhcpd'])) {
 		foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
 			if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
 				foreach ($dhcpifconf['staticmap'] as $host)
 					if ($host['ipaddr'] && $host['hostname']) {
-						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['hostname']}.{$syscfg['domain']}\"\n";
-						$host_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} IN A {$host['ipaddr']}\"\n";
-						if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
-							$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+						$current_host = $host['hostname'].".".$syscfg['domain'];
+						if (!$added_item_v4[$current_host]) {
+							$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$current_host}\"\n";
+							$host_entries .= "local-data: \"{$current_host} IN A {$host['ipaddr']}\"\n";
+							$added_item_v4[$current_host] = true;
+							if ((!$added_item[$current_host]) && (!empty($host['descr'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+								$added_item[$current_host] = true;
+							}
+						}
+					}
+		$unbound_entries .= $host_entries;
+	}
+	
+	// Static DHCPv6 entries
+	$host_entries = "# DHCPv6 reservations\n";
+	if (isset($unboundcfg['regdhcpstatic']) && is_array($config['dhcpdv6'])) {
+		foreach ($config['dhcpdv6'] as $dhcpif => $dhcpifconf)
+			if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
+				foreach ($dhcpifconf['staticmap'] as $host)
+					if ($host['ipaddrv6'] && $host['hostname']) {
+						$current_host = $host['hostname'].".".$syscfg['domain'];
+						if (!$added_item_v6[$current_host]) {
+							$host_entries .= "local-data-ptr: \"{$host['ipaddrv6']} {$current_host}\"\n";
+							$host_entries .= "local-data: \"{$current_host} IN AAAA {$host['ipaddrv6']}\"\n";
+							$added_item_v6[$current_host] = true;
+							if ((!$added_item[$current_host]) && (!empty($host['descr'])) && ($unboundcfg['txtsupport'] == 'on')) {
+								$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+								$added_item[$current_host] = true;
+							}
+						}
 					}
 		$unbound_entries .= $host_entries;
 	}
 
 	// Handle DHCPLeases added host entries
 	$dhcplcfg = read_hosts();
-	$host_entries = "";
+	$host_entries = "# /etc/hosts entries\n";
 	if(is_array($dhcplcfg)) {
 		foreach($dhcplcfg as $key=>$host) {
-			$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
-			$host_entries .= "local-data: \"{$host['fqdn']} IN A {$host['ipaddr']}\"\n";
-			if (!empty($host['name'])) {
-				$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
-				$host_entries .= "local-data: \"{$host['name']} IN A {$host['ipaddr']}\"\n";
+			$current_host = $host['fqdn'];
+			if (function_exists("is_ipaddrv6") && is_ipaddrv6($host['ipaddr'])) {
+				if (!$added_item_v6[$current_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
+					$host_entries .= "local-data: \"{$host['fqdn']} IN AAAA {$host['ipaddr']}\"\n";
+					$added_item_v6[$current_host] = true;
+					if ((!empty($host['name'])) && (!$added_item_v6[$host['name']])) {
+						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
+						$host_entries .= "local-data: \"{$host['name']} IN AAAA {$host['ipaddr']}\"\n";
+						$added_item_v6[$host['name']] = true;
+					}
+				}
+			} else {
+				if (!$added_item_v4[$current_host]) {
+					$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
+					$host_entries .= "local-data: \"{$host['fqdn']} IN A {$host['ipaddr']}\"\n";
+					$added_item_v4[$current_host] = true;
+					if ((!empty($host['name'])) && (!$added_item_v4[$host['name']])) {
+						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
+						$host_entries .= "local-data: \"{$host['name']} IN A {$host['ipaddr']}\"\n";
+						$added_item_v4[$host['name']] = true;
+					}
+				}
 			}
 		}
 		$unbound_entries .= $host_entries;
 	}
+	
 	return $unbound_entries;
 }
 
@@ -924,23 +977,25 @@ function unbound_add_domain_overrides($pvt=false) {
 		$result = array();
 		foreach($sorted_domains as $domain) {
 			$domain_key = current($domain);
-			if(!isset($result[$domain_key])) {
+			if (!isset($result[$domain_key]))
 				$result[$domain_key] = array();
-			}
 			$result[$domain_key][] = $domain['ip'];
 		}
 
 		$domain_entries = "";
 		foreach($result as $domain=>$ips) {
-			if($pvt == true) {
-				$domain_entries .= "private-domain: \"$domain\"\n";
-				$domain_entries .= "domain-insecure: \"$domain\"\n";
+			if ($pvt == true) {
+				if (strpos($domain, "in-addr.arpa") !== false)
+					$domain_entries .= "local-zone: \"$domain\" transparent\n";
+				else
+					$domain_entries .= "private-domain: \"$domain\"\n";
+				if (isset($config['installedpackages']['unbound']['config'][0]['dnssec_status']))
+					$domain_entries .= "domain-insecure: \"$domain\"\n";
 			} else {
 				$domain_entries .= "stub-zone:\n";
 				$domain_entries .= "\tname: \"$domain\"\n";
-				foreach($ips as $ip) {
+				foreach($ips as $ip)
 					$domain_entries .= "\tstub-addr: $ip\n";
-				}
 				$domain_entries .= "\tstub-prime: no\n";
 			}
 		}

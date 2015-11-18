@@ -37,6 +37,8 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
+	$config['installedpackages']['snortglobal']['rule'] = array();
 if (!is_array($config['installedpackages']['snortglobal']['suppress']))
 	$config['installedpackages']['snortglobal']['suppress'] = array();
 if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
@@ -44,18 +46,44 @@ if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
 $a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
 $id_gen = count($config['installedpackages']['snortglobal']['suppress']['item']);
 
-if ($_GET['act'] == "del") {
-	if ($a_suppress[$_GET['id']]) {
-		/* make sure rule is not being referenced by any nat or filter rules */
+function snort_suppresslist_used($supplist) {
 
-		unset($a_suppress[$_GET['id']]);
-		write_config();
-		header("Location: /snort/snort_interfaces_suppress.php");
-		exit;
+	/****************************************************************/
+	/* This function tests if the passed Suppress List is currently */
+	/* assigned to an interface.  It returns TRUE if the list is    */
+	/* in use.                                                      */
+	/*                                                              */
+	/* Returns:  TRUE if list is in use, else FALSE                 */
+	/****************************************************************/
+
+	global $config;
+
+	$snortconf = $config['installedpackages']['snortglobal']['rule'];
+	if (empty($snortconf))
+		return false;
+	foreach ($snortconf as $value) {
+		if ($value['suppresslistname'] == $supplist)
+			return true;
+	}
+	return false;
+}
+
+if ($_POST['del']) {
+	if ($a_suppress[$_POST['list_id']] && is_numericint($_POST['list_id'])) {
+		/* make sure list is not being referenced by any Snort interfaces */
+		if (snort_suppresslist_used($a_suppress[$_POST['list_id']]['name'])) {
+			$input_errors[] = gettext("ERROR -- Suppress List is currently assigned to a Snort interface and cannot be removed!  Unassign it from all Snort interfaces first.");
+		}
+		else {
+			unset($a_suppress[$_POST['list_id']]);
+			write_config("Snort pkg: deleted a Suppress List.");
+			header("Location: /snort/snort_interfaces_suppress.php");
+			exit;
+		}
 	}
 }
 
-$pgtitle = "Services: Snort: Suppression";
+$pgtitle = gettext("Snort: Suppression Lists");
 include_once("head.inc");
 
 ?>
@@ -64,10 +92,16 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+if ($input_errors) {
+	print_input_errors($input_errors);
+}
+
+if ($savemsg)
+	print_info_box($savemsg);
 ?>
 
-<form action="/snort/snort_interfaces_suppress.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
+<form action="/snort/snort_interfaces_suppress.php" method="post">
+<input type="hidden" name="list_id" id="list_id" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -77,10 +111,13 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
         $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
         $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
         $tab_array[6] = array(gettext("Suppress"), true, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-        display_top_tabs($tab_array);
+	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+        display_top_tabs($tab_array, true);
 ?>
 </td>
 </tr>
@@ -98,21 +135,19 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 		<?=htmlspecialchars($list['name']);?></td>
 	<td class="listbg"
 		ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
-	<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;
+	<font color="#FFFFFF"> <?=htmlspecialchars($list['descr']);?>&nbsp;</font>
 	</td>
 
 	<td valign="middle" nowrap class="list">
 	<table border="0" cellspacing="0" cellpadding="1">
 		<tr>
-			<td valign="middle"><a
-				href="snort_interfaces_suppress_edit.php?id=<?=$i;?>"><img
-				src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("edit whitelist"); ?>"></a></td>
-			<td><a
-				href="/snort/snort_interfaces_suppress.php?act=del&id=<?=$i;?>"
-				onclick="return confirm('<?php echo gettext("Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!"); ?>')"><img
-				src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("delete whitelist"); ?>"></a></td>
+			<td valign="middle"><a href="snort_interfaces_suppress_edit.php?id=<?=$i;?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" 
+				width="17" height="17" border="0" title="<?php echo gettext("Edit Suppress List"); ?>"></a></td>
+			<td><input type="image" name="del[]" 
+				onclick="document.getElementById('list_id').value='<?=$i;?>';return confirm('<?=gettext("Do you really want to delete this Suppress List?");?>');" 
+				src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" 
+				title="<?=gettext("Delete Suppress List");?>"/></td>
 		</tr>
 	</table>
 	</td>
@@ -127,20 +162,20 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 			<td valign="middle"><a
 				href="snort_interfaces_suppress_edit.php?id=<?php echo $id_gen;?> "><img
 				src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-				width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
+				width="17" height="17" border="0" title="<?php echo gettext("Add a new list"); ?>"></a></td>
 		</tr>
 	</table>
-	</div>
 	</td>
 </tr>
 </table>
+</div>
 </td></tr>
 <tr>
 	<td colspan="3" width="100%"><br/><span class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span>
-	<p><span class="vexpl"><?php echo gettext("Here you can create event filtering and " .
+	<p><?php echo gettext("Here you can create event filtering and " .
 	"suppression for your snort package rules."); ?><br/><br/>
 	<?php echo gettext("Please note that you must restart a running Interface so that changes can " .
-	"take effect."); ?></span></p></td>
+	"take effect."); ?></p></span></td>
 </tr>
 </table>
 </form>

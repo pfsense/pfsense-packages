@@ -1,9 +1,9 @@
 <?php
 /*
 	sarg_frame.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Marcello Coutinho <marcellocoutinho@gmail.com>
-	based on varnish_view_config.
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,53 +29,55 @@
 */
 require_once("authgui.inc");
 
-$uname=posix_uname();
-if ($uname['machine']=='amd64')
-        ini_set('memory_limit', '250M');
-        
-if(preg_match("/(\S+)\W(\w+.html)/",$_REQUEST['file'],$matches)){
-	#https://192.168.1.1/sarg_reports.php?file=2012Mar30-2012Mar30/index.html
-	$url=$matches[2];
-	$prefix=$matches[1];
-	}
-else{
-	$url="index.html";
-	$prefix="";
-	}
-$url=($_REQUEST['file'] == ""?"index.html":$_REQUEST['file']);
-$dir="/usr/local/sarg-reports";
-$rand=rand(100000000000,999999999999);
-$report="";
-if (file_exists("{$dir}/{$url}"))
-	$report=file_get_contents("{$dir}/{$url}");
-else if (file_exists("{$dir}/{$url}.gz")) {
-		$data = gzfile("{$dir}/{$url}.gz");
-		$report = implode($data);
-		unset ($data);
-		}
-if ($report != "" )
-	{
-	$pattern[0]="/href=\W(\S+html)\W/";
-	$replace[0]="href=/sarg_frame.php?prevent=".$rand."&file=$prefix/$1";
-	$pattern[1]='/img src="\S+\W([a-zA-Z0-9.-]+.png)/';
-	$replace[1]='img src="/sarg-images/$1';
-	$pattern[2]='@img src="([.a-z/]+)/(\w+\.\w+)@';
-	$replace[2]='img src="/sarg-images'.$prefix.'/$1/$2';
-	$pattern[3]='/img src="([a-zA-Z0-9.-_]+).png/';
-	$replace[3]='img src="/sarg-images/temp/$1.'.$rand.'.png';
-	$pattern[4]='/<head>/';
-	$replace[4]='<head><META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"><META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">';
+$uname = posix_uname();
+if ($uname['machine'] == 'amd64') {
+	ini_set('memory_limit', '250M');
+}
 
-	#look for graph files inside reports. 
-	if (preg_match_all('/img src="([a-zA-Z0-9._-]+).png/',$report,$images)){
-		for ($x=0;$x<count($images[1]);$x++){
-			copy("{$dir}/{$prefix}/{$images[1][$x]}.png","/usr/local/www/sarg-images/temp/{$images[1][$x]}.{$rand}.png");
-			}
+if (preg_match("/(\S+)\W(\w+.html)/", $_REQUEST['file'], $matches)) {
+	// URL format
+	// https://192.168.1.1/sarg_reports.php?file=2012Mar30-2012Mar30/index.html
+	$url = $matches[2];
+	$prefix = $matches[1];
+} else {
+	$url = "index.html";
+	$prefix = "";
+}
+
+$url = ($_REQUEST['file'] == "" ? "index.html" : $_REQUEST['file']);
+$dir = "/usr/local/sarg-reports";
+$rand = rand(100000000000, 999999999999);
+$report = "";
+if (file_exists("{$dir}/{$url}")) {
+	$report = file_get_contents("{$dir}/{$url}");
+} elseif (file_exists("{$dir}/{$url}.gz")) {
+	$data = gzfile("{$dir}/{$url}.gz");
+	$report = implode($data);
+	unset ($data);
+}
+if ($report != "" ) {
+	$pattern[0] = "/href=\W(\S+html)\W/";
+	$replace[0] = "href=/sarg_frame.php?prevent=" . $rand . "&file=$prefix/$1";
+	$pattern[1] = '/img src="\S+\W([a-zA-Z0-9.-]+.png)/';
+	$replace[1] = 'img src="/sarg-images/$1';
+	$pattern[2] = '@img src="([.a-z/]+)/(\w+\.\w+)@';
+	$replace[2] = 'img src="/sarg-images' . $prefix . '/$1/$2';
+	$pattern[3] = '/img src="([a-zA-Z0-9.-_]+).png/';
+	$replace[3] = 'img src="/sarg-images/temp/$1.' . $rand . '.png';
+	$pattern[4] = '/<head>/';
+	$replace[4] = '<head><META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE"><META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">';
+
+	// look for graph files inside reports. 
+	if (preg_match_all('/img src="([a-zA-Z0-9._-]+).png/', $report, $images)) {
+		conf_mount_rw();
+		for ($x = 0; $x < count($images[1]); $x++) {
+			copy("{$dir}/{$prefix}/{$images[1][$x]}.png", "/usr/local/www/sarg-images/temp/{$images[1][$x]}.{$rand}.png");
 		}
-	print preg_replace($pattern,$replace,$report);
+		conf_mount_ro();
 	}
-else{
-	print "<pre>Error: Could not find report index file.<br>Check and save sarg settings and try to force sarg schedule.";
-	}		
+	print preg_replace($pattern, $replace, $report);
+} else {
+	print "Error: Could not find report index file.<br />Check and save Sarg settings and try to force Sarg schedule.";
+}
 
 ?>

@@ -2,7 +2,7 @@
 /* $Id: load_balancer_virtual_server.php,v 1.6.2.1 2006/01/02 23:46:24 sullrich Exp $ */
 /*
 	haproxy_baclkends.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -45,9 +45,7 @@ if ($_POST) {
 
 	if ($_POST['apply']) {
 		$retval = 0;
-		config_lock();
 		$retval = haproxy_configure();
-		config_unlock();
 		$savemsg = get_std_save_message($retval);
 		unlink_if_exists($d_haproxyconfdirty_path);
 	}
@@ -65,8 +63,8 @@ if ($_GET['act'] == "del") {
 	}
 }
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 	
 $pgtitle = "Services: HAProxy: Listener";

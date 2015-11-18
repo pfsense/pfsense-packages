@@ -38,11 +38,11 @@ require_once("/etc/inc/functions.inc");
 require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("guiconfig.inc");
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
         $one_two = true;
 
-$pgtitle = "Status: Apache Vhosts Logs";
+$pgtitle = "Status: Apache VirtualHost Logs";
 include("head.inc");
 ?>
 
@@ -96,7 +96,7 @@ function showLog(content,url,logtype)
 			<?php
 				$tab_array = array();
 				$tab_array[] = array(gettext("Apache"), true, "/pkg_edit.php?xml=apache_settings.xml&amp;id=0");
-				$tab_array[] = array(gettext("ModSecurity"), false, "/pkg_edit.php?xml=apache_mod_security_setttings.xml");
+				$tab_array[] = array(gettext("ModSecurity"), false, "/pkg_edit.php?xml=apache_mod_security_settings.xml");
 				$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=apache_mod_security_sync.xml");
 				display_top_tabs($tab_array);
 			?>
@@ -106,6 +106,7 @@ function showLog(content,url,logtype)
 				unset ($tab_array);
 				$tab_array[] = array(gettext("Daemon Options"), false, "pkg_edit.php?xml=apache_settings.xml");
 				$tab_array[] = array(gettext("Backends / Balancers"), false, "/pkg.php?xml=apache_balancer.xml");
+				$tab_array[] = array(gettext("Location(s)"), false, "/pkg.php?xml=apache_location.xml");
 				$tab_array[] = array(gettext("Virtual Hosts"), false, "/pkg.php?xml=apache_virtualhost.xml");
 				$tab_array[] = array(gettext("Logs"), true, "/apache_view_logs.php");
 				display_top_tabs($tab_array);
@@ -171,8 +172,8 @@ function showLog(content,url,logtype)
 			</tbody>
 		</table>
 	</form>
-	<div id="bowserinfo" style='padding: 5px; border: 1px dashed #990000; font-weight:bold; font-size: 0.9em; text-align: center; margin: 1px; display:block; height: 12px;'> 
-		<span><span>
+	<div id="browserinfo" style='padding: 5px; border: 1px dashed #990000; font-weight:bold; font-size: 0.9em; text-align: center; margin: 1px; display:block; height: 12px;'> 
+		<span></span>
 	</div>
 	<!-- Squid Table --> 
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">

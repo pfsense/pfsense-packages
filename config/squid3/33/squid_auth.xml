@@ -110,6 +110,7 @@
 				<option><name>Local</name><value>local</value></option>
 				<option><name>LDAP</name><value>ldap</value></option>
 				<option><name>RADIUS</name><value>radius</value></option>
+				<option><name>Captive Portal</name><value>cp</value></option>
 				<option><name>NT domain</name><value>msnt</value></option>
 			</options>
 			<onchange>on_auth_method_changed()</onchange>
@@ -140,16 +141,16 @@
 			<fieldname>auth_processes</fieldname>
 			<description>The number of authenticator processes to spawn. If many authentications are expected within a short timeframe, increase this number accordingly.</description>
 			<type>input</type>
-			<size>60</size>
+			<size>5</size>
 			<default_value>5</default_value>
 		</field>
 		<field>
 			<fielddescr>Authentication TTL</fielddescr>
 			<fieldname>auth_ttl</fieldname>
-			<description>This specifies for how long (in minutes) the proxy server assumes an externally validated username and password combination is valid (Time To Live).  When the TTL expires, the user will be prompted for credentials again.</description>
+			<description>This specifies for how long (in seconds) the proxy server assumes an externally validated username and password combination is valid (Time To Live).  When the TTL expires, the user will be prompted for credentials again.Default value is 5.</description>
 			<type>input</type>
-			<size>60</size>
-			<default_value>60</default_value>
+			<size>5</size>
+			<default_value>5</default_value>
 		</field>
 		<field>
 			<fielddescr>Requiere authentication for unrestricted hosts</fielddescr>
@@ -193,7 +194,7 @@
 			<fieldname>ldap_pass</fieldname>
 			<description>Enter here the password to use to connect to the LDAP server.</description>
 			<type>password</type>
-			<size>60</size>
+			<size>20</size>
 		</field>
 		<field>
 			<fielddescr>LDAP base domain</fielddescr>
@@ -207,7 +208,7 @@
 			<fieldname>ldap_userattribute</fieldname>
 			<description>Enter LDAP username DN attibute.</description>
 			<type>input</type>
-			<size>60</size>
+			<size>20</size>
 			<default_value>uid</default_value>
 		</field>
 		<field>
@@ -215,7 +216,7 @@
 			<fieldname>ldap_filter</fieldname>
 			<description>Enter LDAP search filter.</description>
 			<type>input</type>
-			<size>60</size>
+			<size>40</size>
 			<default_value>(&amp;(objectClass=person)(uid=%s))</default_value>
 		</field>
 		<field>
@@ -245,11 +246,11 @@
 			<fieldname>radius_secret</fieldname>
 			<description>The RADIUS secret for RADIUS authentication.</description>
 			<type>password</type>
-			<size>60</size>
+			<size>20</size>
 		</field>
 	</fields>
 	<custom_php_validation_command>
-		squid_validate_auth($_POST, &amp;$input_errors);
+		squid_validate_auth($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_after_form_command>
 		squid_print_javascript_auth2();
@@ -262,7 +263,7 @@
 	</custom_php_before_form_command>
 	<custom_php_after_head_command>
 		$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
-		if($transparent_proxy)
+		if($transparent_proxy and preg_match("/(local|ldap|radius|msnt|ntlm)/",$config['installedpackages']['squidauth']['config'][0]['auth_method']))
 			$input_errors[] = "Authentication cannot be enabled while transparent proxy mode is enabled";
 		squid_print_javascript_auth();
 	</custom_php_after_head_command>

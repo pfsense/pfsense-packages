@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	widentd.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 Bill Marquette
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<name>widentd</name>
+	<version>1.0.5</version>
+	<title>Services: widentd</title>
+	<menu>
+		<name>widentd</name>
+		<tooltiptext>Modify widentd settings.</tooltiptext>
+		<section>Services</section>
+		<url>pkg_edit.php?xml=widentd.xml</url>
+	</menu>
+	<service>
+		<name>widentd</name>
+		<rcfile>widentd.sh</rcfile>
+		<executable>widentd</executable>
+	</service>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/widentd/widentd.priv.inc</item>
+		<prefix>/etc/inc/priv/</prefix>
+	</additional_files_needed>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<fields>
+		<field>
+			<fielddescr>Enable widentd Daemon</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Listening Interface</fielddescr>
+			<fieldname>interface</fieldname>
+			<description>
+				<![CDATA[
+				Enter the desired listening interface here.<br />
+				(Default: WAN)
+				]]>
+			</description>
+			<type>interfaces_selection</type>
+			<default_value>wan</default_value>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
+			<description>
+				<![CDATA[
+				Enter the username you'd like displayed via widentd. Allowed characters: [a-zA-Z] and "." only.<br />
+				(Defaults to 'user' if left empty.)
+				]]>
+			</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>System Name</fielddescr>
+			<fieldname>sysname</fieldname>
+			<description>
+				<![CDATA[
+				Enter the system name you'd like displayed via widentd. Allowed characters: [a-zA-Z] only.<br />
+				(Defaults to 'UNIX' if left empty.)
+				]]>
+			</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+	<![CDATA[
+		conf_mount_rw();
+		global $config;
+
+		/* If the service is (being) disabled, stop it (if running) and do nothing else */
+		if ($config['installedpackages']['widentd']['config'][0][enable] != "on") {
+			if (is_service_running("widentd")) {
+				stop_service("widentd");
+			}
+			unlink_if_exists("/usr/local/etc/rc.d/widentd.sh");
+		} else {
+			$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['widentd']['config'][0]['interface']);
+			$ip = find_interface_ip($int);
+			$user = $config['installedpackages']['widentd']['config'][0]['username'] ?: 'user';
+			$system = $config['installedpackages']['widentd']['config'][0]['sysname'] ?: 'UNIX';
+			$start = "/usr/local/sbin/widentd -u {$user} -o {$system} -i {$ip}";
+			$stop = "/usr/bin/killall widentd";
+			write_rcfile(array(
+				"file" => "widentd.sh",
+				"start" => $start,
+				"stop" => $stop
+				)
+			);
+			/* (Re)start service */
+			if (is_service_running("widentd")) {
+				restart_service("widentd");
+			} else {
+				start_service("widentd");
+			}
+		}
+		conf_mount_ro();
+	]]>
+	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+	<![CDATA[
+		/* Only allow ^[a-zA-Z\.]+$ otherwise the daemon will not start; see widentd manpage */
+		if ($_POST['username'] != "") {
+			if (!preg_match("/^[a-zA-Z\.]+$/", $_POST['username'])) {
+				$input_errors[] = 'Username may only contain uppercase and lowercase letters [a-zA-Z] and "." character.';
+			}
+		}
+
+		/* Technically, ^[A-Z][A-Z0-9\-.\/]+[A-Z0-9]$ should be valid characters here
+		https://www.iana.org/assignments/operating-system-names/operating-system-names.xhtml
+		However this is not supported by widentd; the service will not start.
+		*/
+		if ($_POST['sysname'] != "") {
+			if (!preg_match("/^[a-zA-Z]+$/", $_POST['sysname'])) {
+				$input_errors[] = 'System name may only contain uppercase and lowercase letters [a-zA-Z].';
+			}
+		}
+
+		/* Check for IPv6-only interfaces */
+		$int = convert_friendly_interface_to_real_interface_name($_POST['interface']);
+		$ip = find_interface_ip($int);
+		if (!is_ipaddrv4($ip)) {
+			$input_errors[] = 'The selected interface has no IPv4 configured. Widentd does not support IPv6.';
+		}
+	]]>
+	</custom_php_validation_command>
+</packagegui>

@@ -1,9 +1,9 @@
 <?php
 /* $Id$ */
 /*
-	status_rrd_graph.php
+	status_mail_report_edit.php
 	Part of pfSense
-	Copyright (C) 2011 Jim Pingle <jimp@pfsense.org>
+	Copyright (C) 2011-2014 Jim Pingle <jimp@pfsense.org>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -32,20 +32,14 @@
 */
 
 ##|+PRIV
-##|*IDENT=page-status-rrdgraphs
-##|*NAME=Status: RRD Graphs page
-##|*DESCR=Allow access to the 'Status: RRD Graphs' page.
-##|*MATCH=status_rrd_graph.php*
+##|*IDENT=page-status-mailreportsedit
+##|*NAME=Status: Email Reports: Edit Report page
+##|*DESCR=Allow access to the 'Status: Email Reports: Edit Report' page.
+##|*MATCH=status_mail_report_edit.php*
 ##|-PRIV
 
 require("guiconfig.inc");
 require_once("mail_reports.inc");
-
-/* if the rrd graphs are not enabled redirect to settings page */
-if(! isset($config['rrd']['enable'])) {
-	header("Location: status_rrd_graph_settings.php");
-	return;
-}
 
 $cmdid = $_REQUEST['cmdid'];
 $logid = $_REQUEST['logid'];
@@ -97,17 +91,35 @@ if ($_GET['act'] == "del") {
 	}
 }
 
-$frequencies = array("daily", "weekly", "monthly");
+$frequencies = array("daily", "weekly", "monthly", "quarterly", "yearly");
 $daysofweek = array(
 		"" => "",
-		"0" => "sunday",
-		"1" => "monday",
-		"2" => "tuesday",
-		"3" => "wednesday",
-		"4" => "thursday",
-		"5" => "friday",
-		"6" => "saturday");
+		"0" => "Sunday",
+		"1" => "Monday",
+		"2" => "Tuesday",
+		"3" => "Wednesday",
+		"4" => "Thursday",
+		"5" => "Friday",
+		"6" => "Saturday");
 $dayofmonth = array("", "1", "15");
+$monthofquarter = array(
+		"" => "",
+		"1" => "beginning",
+		"2" => "middle");
+$monthofyear = array(
+		"" => "",
+		"1" => "January",
+		"2" => "February",
+		"3" => "March",
+		"4" => "April",
+		"5" => "May",
+		"6" => "June",
+		"7" => "July",
+		"8" => "August",
+		"9" => "September",
+		"10" => "October",
+		"11" => "November",
+		"12" => "December");
 
 if ($_POST) {
 	unset($_POST['__csrf_magic']);
@@ -137,9 +149,38 @@ if ($_POST) {
 	if ($pconfig['frequency'] == "monthly") {
 		$pconfig['dayofmonth'] = isset($pconfig['dayofmonth']) ? $pconfig['dayofmonth'] : 1;
 		$friendly = "Monthly, on day {$pconfig['dayofmonth']} at {$friendlytime}";
-	} else {
+	} elseif ($pconfig['frequency'] != "yearly") {
 		if (isset($pconfig['dayofmonth']))
 			unset($pconfig['dayofmonth']);
+	}
+
+	// If quarterly, check for day of the month
+	if ($pconfig['frequency'] == "quarterly") {
+		$pconfig['monthofquarter'] = isset($pconfig['monthofquarter']) ? $pconfig['monthofquarter'] : 1;
+		$friendly = "Quarterly, at the {$monthofquarter[$pconfig['monthofquarter']]}, at {$friendlytime}";
+		switch ($pconfig['monthofquarter']) {
+			case 2:
+				$pconfig['dayofmonth'] = 15;
+				$pconfig['monthofyear'] = "2,5,8,11";
+				break;
+			case 1:
+			default:
+				$pconfig['dayofmonth'] = 1;
+				$pconfig['monthofyear'] = "1,4,7,10";
+				break;
+		}
+	} else {
+		if (isset($pconfig['monthofquarter']))
+			unset($pconfig['monthofquarter']);
+	}
+
+	// If yearly, check for day of the month
+	if ($pconfig['frequency'] == "yearly") {
+		$pconfig['monthofyear'] = isset($pconfig['monthofyear']) ? $pconfig['monthofyear'] : 1;
+		$friendly = "Yearly, on day {$pconfig['dayofmonth']} of {$monthofyear[$pconfig['monthofyear']]} at {$friendlytime}";
+	} elseif ($pconfig['frequency'] != "quarterly") {
+		if (isset($pconfig['monthofyear']))
+			unset($pconfig['monthofyear']);
 	}
 
 	// Copy back into the schedule.
@@ -162,7 +203,7 @@ if ($_POST) {
 	return;
 }
 
-$pgtitle = array(gettext("Status"),gettext("Edit Mail Reports"));
+$pgtitle = array(gettext("Status"),gettext("Edit Email Reports"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -194,7 +235,7 @@ include("head.inc");
 				<option value="<?php echo $freq; ?>" <?php if($pconfig["frequency"] === $freq) echo "selected"; ?>><?php echo ucwords($freq); ?></option>
 			<?php endforeach; ?>
 			</select>
-			<br/>Select the frequency for the report to be sent via e-mail.
+			<br/>Select the frequency for the report to be sent via email.
 			<br/>
 			</td>
 			<td></td>
@@ -217,10 +258,36 @@ include("head.inc");
 			<td class="vtable" colspan="3">
 			<select name="dayofmonth">
 			<?php foreach($dayofmonth as $dom): ?>
-				<option value="<?php echo $dom; ?>" <?php if($pconfig["dayofmonth"] === $dom) echo "selected"; ?>><?php echo $dom; ?></option>
+				<option value="<?php echo $dom; ?>" <?php if($pconfig["dayofmonth"] == $dom) echo "selected"; ?>><?php echo $dom; ?></option>
 			<?php endforeach; ?>
 			</select>
-			<br/>Select the day of the month to send the report. Only valid for monthly reports.
+			<br/>Select the day of the month to send the report. Only valid for monthly and yearly reports.
+			<br/>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td class="vncell" valign="top" colspan="1">Time of Quarter</td>
+			<td class="vtable" colspan="3">
+			<select name="monthofquarter">
+			<?php foreach($monthofquarter as $moqi => $moq): ?>
+				<option value="<?php echo $moqi; ?>" <?php if($pconfig["monthofquarter"] == $moqi) echo "selected"; ?>><?php echo $moq; ?></option>
+			<?php endforeach; ?>
+			</select>
+			<br/>Select the time of the quarter to send the report. Only valid for quarter reports.
+			<br/>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td class="vncell" valign="top" colspan="1">Month of the Year</td>
+			<td class="vtable" colspan="3">
+			<select name="monthofyear">
+			<?php foreach($monthofyear as $moyi => $moy): ?>
+				<option value="<?php echo $moyi; ?>" <?php if($pconfig["monthofyear"] == $moyi) echo "selected"; ?>><?php echo $moy; ?></option>
+			<?php endforeach; ?>
+			</select>
+			<br/>Select the month of the year to send the report. Only valid for yearly reports.
 			<br/>
 			</td>
 			<td></td>

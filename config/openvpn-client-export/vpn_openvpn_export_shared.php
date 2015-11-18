@@ -1,21 +1,22 @@
-<?php 
+<?php
 /*
-	vpn_openvpn_export.php
-
+	vpn_openvpn_export_shared.php
+	part of pfSense (http://www.pfSense.org)
 	Copyright (C) 2008 Shrew Soft Inc.
 	Copyright (C) 2010 Ermal Luçi
-	All rights reserved. 
+	Copyright (C) 2011-2015 ESF, LLC
+	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-	
+
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
-	
+
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -36,26 +37,29 @@ require("openvpn-client-export.inc");
 
 $pgtitle = array("OpenVPN", "Client Export Utility");
 
-if (!is_array($config['openvpn']['openvpn-server']))
+if (!is_array($config['openvpn']['openvpn-server'])) {
 	$config['openvpn']['openvpn-server'] = array();
+}
 
 $a_server = $config['openvpn']['openvpn-server'];
 
 $ras_server = array();
-foreach($a_server as $sindex => $server) {
-	if (isset($server['disable']))
+foreach ($a_server as $sindex => $server) {
+	if (isset($server['disable'])) {
 		continue;
+	}
 	$ras_user = array();
-	if ($server['mode'] != "p2p_shared_key")
+	if ($server['mode'] != "p2p_shared_key") {
 		continue;
-
+	}
 	$ras_serverent = array();
 	$prot = $server['protocol'];
 	$port = $server['local_port'];
-	if ($server['description'])
+	if ($server['description']) {
 		$name = "{$server['description']} {$prot}:{$port}";
-	else
+	} else {
 		$name = "Shared Key Server {$prot}:{$port}";
+	}
 	$ras_serverent['index'] = $sindex;
 	$ras_serverent['name'] = $name;
 	$ras_serverent['mode'] = $server['mode'];
@@ -63,16 +67,18 @@ foreach($a_server as $sindex => $server) {
 }
 
 $id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id'])) {
 	$id = $_POST['id'];
+}
 
 $act = $_GET['act'];
-if (isset($_POST['act']))
+if (isset($_POST['act'])) {
 	$act = $_POST['act'];
+}
 
 $error = false;
 
-if(($act == "skconf") || ($act == "skzipconf")) {
+if (($act == "skconf") || ($act == "skzipconf")) {
 	$srvid = $_GET['srvid'];
 	if (($srvid === false) || ($config['openvpn']['openvpn-server'][$srvid]['mode'] != "p2p_shared_key")) {
 		pfSenseHeader("vpn_openvpn_export.php");
@@ -82,8 +88,9 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 	if (empty($_GET['useaddr'])) {
 		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
-	} else
+	} else {
 		$useaddr = $_GET['useaddr'];
+	}
 
 	$proxy = "";
 	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
@@ -91,32 +98,37 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 		if (empty($_GET['proxy_addr'])) {
 			$error = true;
 			$input_errors[] = "You need to specify an address for the proxy port.";
-		} else
+		} else {
 			$proxy['ip'] = $_GET['proxy_addr'];
+		}
 		if (empty($_GET['proxy_port'])) {
 			$error = true;
 			$input_errors[] = "You need to specify a port for the proxy ip.";
-		} else
+		} else {
 			$proxy['port'] = $_GET['proxy_port'];
+		}
 		$proxy['proxy_type'] = $_GET['proxy_type'];
 		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
 		if ($_GET['proxy_authtype'] != "none") {
 			if (empty($_GET['proxy_user'])) {
 				$error = true;
 				$input_errors[] = "You need to specify a username with the proxy config.";
-			} else
+			} else {
 				$proxy['user'] = $_GET['proxy_user'];
+			}
 			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
 				$error = true;
 				$input_errors[] = "You need to specify a password with the proxy user.";
-			} else
+			} else {
 				$proxy['password'] = $_GET['proxy_password'];
+			}
 		}
 	}
 
 	$exp_name = openvpn_client_export_prefix($srvid);
-	if ($act == "skzipconf")
+	if ($act == "skzipconf") {
 		$zipconf = true;
+	}
 	$exp_data = openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipconf);
 	if (!$exp_data) {
 		$input_errors[] = "Failed to export config files!";
@@ -136,10 +148,11 @@ if(($act == "skconf") || ($act == "skzipconf")) {
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
-		if ($zipconf)
+		if ($zipconf) {
 			readfile("{$g['tmp_path']}/{$exp_data}");
-		else
+		} else {
 			echo $exp_data;
+		}
 
 		@unlink("{$g['tmp_path']}/{$exp_data}");
 		exit;
@@ -175,13 +188,15 @@ function download_begin(act) {
 			return;
 		}
 		useaddr = document.getElementById("useaddr_hostname").value;
-	} else
+	} else {
 		useaddr = document.getElementById("useaddr").value;
+	}
 
 	var useproxy = 0;
 	var useproxypass = 0;
-	if (document.getElementById("useproxy").checked)
+	if (document.getElementById("useproxy").checked) {
 		useproxy = 1;
+	}
 
 	var proxyaddr = document.getElementById("proxyaddr").value;
 	var proxyport = document.getElementById("proxyport").value;
@@ -191,8 +206,9 @@ function download_begin(act) {
 			return;
 		}
 
-		if (document.getElementById("useproxypass").value != 'none')
+		if (document.getElementById("useproxypass").value != 'none') {
 			useproxypass = 1;
+		}
 
 		var proxytype = document.getElementById("useproxytype").value;
 
@@ -202,7 +218,7 @@ function download_begin(act) {
 		var proxyconf = document.getElementById("proxyconf").value;
 		if (useproxypass) {
 			if (!proxyuser) {
-				alert("Please fill the proxy username and passowrd.");
+				alert("Please fill the proxy username and password.");
 				return;
 			}
 			if (!proxypass || !proxyconf) {
@@ -231,14 +247,15 @@ function download_begin(act) {
 		}
 	}
 
-	window.open(dlurl,"_self");
+	window.open(dlurl, "_self");
 }
 
 function server_changed() {
 
 	var table = document.getElementById("clients");
-	while (table.rows.length > 1 )
+	while (table.rows.length > 1 ) {
 		table.deleteRow(1);
+	}
 
 	var index = document.getElementById("server").selectedIndex;
 
@@ -257,17 +274,18 @@ function server_changed() {
 
 function useaddr_changed(obj) {
 
-	if (obj.value == "other")
+	if (obj.value == "other") {
 		$('HostName').show();
-	else
+	} else {
 		$('HostName').hide();
-	
+	}
+
 }
 
 function useproxy_changed(obj) {
 
 	if ((obj.id == "useproxy" && obj.checked) ||
-		(obj.id == "useproxypass" && (obj.value != 'none'))) {
+	    (obj.id == "useproxypass" && (obj.value != 'none'))) {
 		$(obj.id + '_opts').show();
 	} else {
 		$(obj.id + '_opts').hide();
@@ -276,15 +294,17 @@ function useproxy_changed(obj) {
 //]]>
 </script>
 <?php
-	if ($input_errors)
+	if ($input_errors) {
 		print_input_errors($input_errors);
-	if ($savemsg)
+	}
+	if ($savemsg) {
 		print_info_box($savemsg);
+	}
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0" summary="openvpn export shared">
- 	<tr>
+	<tr>
 		<td>
-			<?php 
+			<?php
 				$tab_array = array();
 				$tab_array[] = array(gettext("Server"), false, "vpn_openvpn_server.php");
 				$tab_array[] = array(gettext("Client"), false, "vpn_openvpn_client.php");
@@ -304,7 +324,7 @@ function useproxy_changed(obj) {
 						<td width="22%" valign="top" class="vncellreq">Shared Key Server</td>
 						<td width="78%" class="vtable">
 							<select name="server" id="server" class="formselect" onchange="server_changed()">
-								<?php foreach($ras_server as & $server): ?>
+								<?php foreach ($ras_server as & $server): ?>
 								<option value="<?=$server['sindex'];?>"><?=$server['name'];?></option>
 								<?php endforeach; ?>
 							</select>
@@ -390,7 +410,7 @@ function useproxy_changed(obj) {
 								</tr>
 								<tr>
 									<td width="25%">
-							<br />
+										<br />
 									</td>
 									<td>
 										<select name="useproxypass" id="useproxypass" class="formselect" onchange="useproxy_changed(this)">
@@ -401,39 +421,39 @@ function useproxy_changed(obj) {
 										<span class="vexpl">
 											Choose proxy authentication if any.
 										</span>
-							<br />
-							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none" summary="name and password">
-								<tr>
-									<td align="right" width="25%">
-										<span class="vexpl">
-											 &nbsp;Username :&nbsp;
-										</span>
-									</td>
-									<td>
-										<input name="proxyuser" id="proxyuser" class="formfld unknown" size="20" value="" />
-									</td>
-								</tr>
-								<tr>
-									<td align="right" width="25%">
-										<span class="vexpl">
-											 &nbsp;Password :&nbsp;
-										</span>
-									</td>
-									<td>
-										<input name="proxypass" id="proxypass" type="password" class="formfld pwd" size="20" value="" />
-									</td>
-								</tr>
-								<tr>
-									<td align="right" width="25%">
-										<span class="vexpl">
-											 &nbsp;Confirm :&nbsp;
-										</span>
-									</td>
-														<td>
-										<input name="proxyconf" id="proxyconf" type="password" class="formfld pwd" size="20" value="" />
-									</td>
-								</tr>
-							</table>
+										<br />
+										<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none" summary="name and password">
+											<tr>
+												<td align="right" width="25%">
+													<span class="vexpl">
+														 &nbsp;Username :&nbsp;
+													</span>
+												</td>
+												<td>
+													<input name="proxyuser" id="proxyuser" class="formfld unknown" size="20" value="" />
+												</td>
+											</tr>
+											<tr>
+												<td align="right" width="25%">
+													<span class="vexpl">
+														 &nbsp;Password :&nbsp;
+													</span>
+												</td>
+												<td>
+													<input name="proxypass" id="proxypass" type="password" class="formfld pwd" size="20" value="" />
+												</td>
+											</tr>
+											<tr>
+												<td align="right" width="25%">
+													<span class="vexpl">
+														 &nbsp;Confirm :&nbsp;
+													</span>
+												</td>
+												<td>
+													<input name="proxyconf" id="proxyconf" type="password" class="formfld pwd" size="20" value="" />
+												</td>
+											</tr>
+										</table>
 									</td>
 								</tr>
 							</table>

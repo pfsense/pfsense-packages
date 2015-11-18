@@ -45,7 +45,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiusauthorizedmacs</name>
-	<version>2.1.12</version>
+	<version>2.2.0</version>
 	<title>FreeRADIUS: MACs</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<menu>
@@ -54,13 +54,6 @@
 		<section>Services</section>
 		<url>/pkg.php?xml=freeradiusauthorizedmacs.xml</url>
 	</menu>
-	<service>
-		<name>radiusd</name>
-		<rcfile>radiusd.sh</rcfile>
-		<executable>radiusd</executable>
-		<description><![CDATA[FreeRADIUS Server]]></description>
-	</service>
-
 	<tabs>
 		<tab>
 			<text>Users</text>
@@ -108,61 +101,6 @@
 			<url>/pkg_edit.php?xml=freeradiussync.xml&amp;id=0</url>
 		</tab>
 	</tabs>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradius_view_config.php</item>
-	</additional_files_needed>	
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusclients.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussettings.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuseapconf.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussqlconf.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusinterfaces.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiuscerts.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiussync.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusmodulesldap.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/freeradius2/freeradiusauthorizedmacs.xml</item>
-	</additional_files_needed>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>MAC Address</fielddescr>
@@ -200,7 +138,7 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>GENERAL CONFIGURATION</name>
+			<name>General Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -227,13 +165,13 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION</name>
+			<name>Miscellaneous Configuration</name>
 			<type>listtopic</type>
 		</field>		
 		<field>
 			<fielddescr>Redirection URL</fielddescr>
 			<fieldname>varmacsswisprredirectionurl</fieldname>			
-			<description><![CDATA[Enter the URL the MAC should be redirected to after successfull login. (e.g.: http://www.google.com)]]></description>
+			<description><![CDATA[Enter the URL the MAC should be redirected to after successful login. (e.g.: http://www.google.com)]]></description>
 			<type>input</type>
 		</field>
 		<field>
@@ -250,7 +188,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>NETWORK CONFIGURATION</name>
+			<name>Network Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -287,7 +225,7 @@
 			<type>input</type>
 		</field>		
 		<field>
-			<name>TIME CONFIGURATION</name>
+			<name>Time Configuration</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -331,7 +269,7 @@
 				</options>
 		</field>
 		<field>
-			<name>TRAFFIC AND BANDWIDTH</name>
+			<name>Traffic and Bandwidth</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -372,7 +310,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<name>ADVANCED CONFIGURATION</name>
+			<name>Advanced Configuration</name>
 			<type>listtopic</type>
 		</field>		
 		<field>

@@ -43,7 +43,6 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <form action="/snort/snort_download_updates.php" method="GET">
 

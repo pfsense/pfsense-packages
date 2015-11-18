@@ -18,12 +18,15 @@
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
+
      1. Redistributions of source code must retain the above copyright notice,
         this list of conditions and the following disclaimer.
+
 
      2. Redistributions in binary form must reproduce the above copyright
         notice, this list of conditions and the following disclaimer in the
         documentation and/or other materials provided with the distribution.
+
 
     THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
     INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -63,20 +66,24 @@
 			<active/>
 		</tab>
 
+
 		<tab>
 			<text>Top Spammers</text>
 			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
 		</tab>
-	
+
+
 		<tab>
 			<text>Africa</text>
 			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>
-			
+
+
 		</tab>
 		<tab>
 			<text>Asia</text>
 			<url>/pkg_edit.php?xml=pfblocker_Asia.xml&amp;id=0</url>
-			
+
+
 		</tab>
 		<tab>
 			<text>Europe</text>
@@ -108,6 +115,7 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>	
+
 
 		<columnitem>
 			<fielddescr>Action</fielddescr>
@@ -176,15 +184,19 @@
 			<fielddescr>List Action</fielddescr>
 		<description><![CDATA[Default:<strong>Deny Inbound</strong><br>
 						Select action for network on lists you have selected.<br><br>
-						<strong>Note: </strong><br>'Deny Both' - Will deny access on Both directions.<br>
-								'Deny Inbound' - Will deny access from selected lists to your network.<br>
-								'Deny Outbound' - Will deny access from your users to ip lists you selected to block.<br>
-								'Permit Inbound' - Will allow access from selected lists to your network.<br>
-								'Permit Outbound' - Will allow access from your users to ip lists you selected to block.<br>
-								'Disabled' - Will just keep selection and do nothing to selected Lists.<br>
-								'Alias Only' - Will create an alias with selected Lists to help custom rule assignments.<br><br>
-								<strong>While creating rules with this list, keep aliasname in the beggining of rule description and do not end description with 'rule'.<br></strong>
-								custom rules with 'Aliasname something rule' description will be removed by package.]]></description>
+						<strong>'Deny' Rules:</strong><br>
+						'Deny' rules create high priority 'block' or 'reject' rules on the stated interfaces. They don't change the 'pass' rules on other interfaces. Typical uses of 'Deny' rules are:<br>
+						<ul><li><strong>Deny Both</strong> - blocks all traffic in both directions, if the source or destination IP is in the block list</li>
+						<li><strong>Deny Inbound/Deny Outbound</strong> - blocks all traffic in one direction <u>unless</u> it is part of a session started by traffic sent in the other direction. Does not affect traffic in the other direction. </li>
+						<li>One way 'Deny' rules can be used to selectively block <u>unsolicited</u> incoming (new session) packets in one direction, while still allowing <u>deliberate</u> outgoing sessions to be created in the other direction.</li></ul>
+						<strong>'Permit' Rules:</strong><br>
+						'Permit' rules create high priority 'pass' rules on the stated interfaces. They are not the opposite of Deny rules, and don't create any 'blocking' effect anywhere. They have priority over all Deny rules. Typical uses of 'Permit' rules are:<br>
+						<ul><li><strong>To ensure</strong> that traffic to/from the listed IPs will <u>always</u> be allowed in the stated directions. They override <u>almost all other</u> Firewall rules on the stated interfaces.</li>
+						<li><strong>To act as a whitelist</strong> for Deny rule exceptions, for example if a large IP range or pre-created blocklist blocks a few IPs that should be accessible.</li></ul>
+						<strong>'Alias' and 'Disabled' Rules:</strong><br>
+						<ul><li><strong>'Alias'</strong> rules create an <a href="/firewall_aliases.php">alias</a> for the list (and do nothing else). This enables a Pfblocker list to be used by name, in any firewall rule or Pfsense function, as desired.</li>
+						<li><strong>'Disabled'</strong> rules are kept for future use, but nothing is done with them.</li></ul><br>
+						<strong>While creating rules with this list, keep aliasname in the beginning of rule description and do not end description with 'rule'.</strong> Custom rules with 'Aliasname something rule' description will be removed by package.]]></description>
 			<fieldname>action</fieldname>
 	    	<type>select</type>
  				<options>
@@ -193,6 +205,7 @@
 				<option><name>Deny Both</name><value>Deny_Both</value></option>
 				<option><name>Permit Inbound</name><value>Permit_Inbound</value></option>
 				<option><name>Permit Outbound</name><value>Permit_Outbound</value></option>
+				<option><name>Permit Both</name><value>Permit_Both</value></option>
 				<option><name>Alias only</name><value>Alias_only</value></option>			
 				<option><name>Disabled</name><value>Disabled</value></option>
 				</options>
@@ -233,9 +246,10 @@
 		pfblocker_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		pfblocker_validate_input($_POST, &amp;$input_errors);
+		pfblocker_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_pfblocker();
 	</custom_php_resync_config_command>	
 </packagegui>
+

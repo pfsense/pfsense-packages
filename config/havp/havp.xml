@@ -1,305 +1,387 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <name>havp</name>
-        <title>Antivirus: HTTP proxy (havp + clamav)</title>
-        <category>Status</category>
-        <version>0.88_03</version>
-        <include_file>/usr/local/pkg/havp.inc</include_file>
-        <menu>
-                <name>Antivirus</name>
-                <tooltiptext>Antivirus service</tooltiptext>
-                <section>Services</section>
-                <url>/antivirus.php</url>
-        </menu>
-        <service>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	havp.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009-2010 Sergey Dvoriancev <dv_serg@mail.ru>
+	Copyright (C) 2014 Andrew Nikitin <andrey.b.nikitin@gmail.com>.
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<name>havp</name>
+	<title>Antivirus: HTTP proxy (HAVP + ClamAV)</title>
+	<category>Status</category>
+	<version>1.10.0</version>
+	<include_file>/usr/local/pkg/havp.inc</include_file>
+	<menu>
+		<name>Antivirus</name>
+		<tooltiptext>Antivirus service</tooltiptext>
+		<section>Services</section>
+		<url>/antivirus.php</url>
+	</menu>
+	<service>
 		<name>havp</name>
 		<rcfile>havp.sh</rcfile>
 		<executable>havp</executable>
-		<description>Antivirus HTTP proxy Service</description>
-        </service>
-        <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp.inc</item>
-               <prefix>/usr/local/pkg/</prefix>
-               <chmod>0755</chmod>
-        </additional_files_needed>
-        <!--additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp_fscan.xml</item>
-               <prefix>/usr/local/pkg/</prefix>
-               <chmod>0755</chmod>
-        </additional_files_needed-->
-        <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/havp_avset.xml</item>
-               <prefix>/usr/local/pkg/</prefix>
-               <chmod>0755</chmod>
-        </additional_files_needed>
-        <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/havp/antivirus.php</item>
-               <prefix>/usr/local/www/</prefix>
-               <chmod>0755</chmod>
-        </additional_files_needed>
-        <tabs>
-                <tab>
-                        <text>General page</text>
-                        <url>/antivirus.php</url>
-                </tab>
-                <tab>
-                        <text>HTTP proxy</text>
-                        <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
-                        <active/>
-                </tab>
-                <!--tab>
-                        <text>Files Scanner</text>
-                        <url>/pkg_edit.php?xml=havp_fscan.xml&amp;id=0</url>
-                </tab-->
-                <tab>
-                        <text>Settings</text>
-                        <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
-                </tab>
-        </tabs>
-        <fields>
-                <field>
-                        <fielddescr>Enable</fielddescr>
-                        <fieldname>enable</fieldname>
-                        <description>Check this for enable proxy.</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Proxy mode</fielddescr>
-                        <fieldname>proxymode</fieldname>
-                        <description>
-				Select interface mode: &lt;br&gt;
-				&lt;b&gt; standard &lt;/b&gt; - client(s) bind to the 'proxy port' on selected interface(s); &lt;br&gt;
-				&lt;b&gt; parent for squid &lt;/b&gt; - configure HAVP as parent for Squid proxy;&lt;br&gt;
-				&lt;b&gt; transparent &lt;/b&gt; - all HTTP requests on interface(s) will be directed to the HAVP proxy server without any client configuration necessary (works as parent for squid with transparent Squid proxy); &lt;br&gt;
-				&lt;b&gt; internal &lt;/b&gt; - HAVP will listen on the loopback (127.0.0.1) on configured 'proxy port.' Use you own traffic forwarding rules.&lt;br&gt;
+		<description>Antivirus HTTP Proxy Service</description>
+	</service>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/havp/havp.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+	</additional_files_needed>
+	<!--
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/havp/havp_fscan.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+	</additional_files_needed>
+	-->
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/havp/havp_avset.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/havp/antivirus.php</item>
+		<prefix>/usr/local/www/</prefix>
+	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>General Page</text>
+			<url>/antivirus.php</url>
+		</tab>
+		<tab>
+			<text>HTTP Proxy</text>
+			<url>/pkg_edit.php?xml=havp.xml</url>
+			<active/>
+		</tab>
+		<!--
+		<tab>
+			<text>Files Scanner</text>
+			<url>/pkg_edit.php?xml=havp_fscan.xml</url>
+		</tab>
+		-->
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=havp_avset.xml</url>
+		</tab>
+		<tab>
+			<text>HAVP Log</text>
+			<url>/havp_log.php?logtab=havp</url>
+		</tab>
+		<tab>
+			<text>Clamd Log</text>
+			<url>/havp_log.php?logtab=clamd</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Enable</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Check this to enable AV proxy.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>ClamAV Mode</fielddescr>
+			<fieldname>useclamd</fieldname>
+			<description>
+				<![CDATA[
+				Select ClamAV running mode:<br />
+				<strong>Daemon</strong> - HAVP will use ClamAV as socket scanner daemon. (Default option.)<br />
+				<strong>Library</strong> - HAVP will use ClamAV as loaded library scanner. Note: this mode needs <strong>much more</strong> memory.<br />
+				]]>
 			</description>
-                        <type>select</type>
-                        <default_value>standard</default_value>
-                        <options>
-                                 <option><value>standard</value><name>Standard</name></option>
-                                 <option><value>squid</value><name>Parent for Squid</name></option>
-                                 <option><value>transparent</value><name>Transparent</name></option>
-                                 <option><value>internal</value><name>Internal</name></option>
-                        </options>
-                </field>
-                <field>
-                        <fielddescr>Proxy interface(s)</fielddescr>
-                        <fieldname>proxyinterface</fieldname>
-                        <description>The interface(s) for client connections to the proxy. Use 'Ctrl' + L. Click for multiple selection.</description>
-                        <type>interfaces_selection</type>
-                        <required/>
-                        <multiple/>
-                        <default_value>lan</default_value>
-                </field>
-                <field>
-                        <fielddescr>Proxy port</fielddescr>
-                        <fieldname>proxyport</fieldname>
-                        <description>
-				This is the port the proxy server will listen on (for example: 8080). This port must be different from Squid proxy.
-                        </description>
-                        <type>input</type>
-                        <size>10</size>
-                        <required/>
-                        <default_value>3125</default_value>
-                </field>
-                <field>
-                        <fielddescr>Parent proxy</fielddescr>
-                        <fieldname>parentproxy</fieldname>
-                        <description>
-                                Enter the parent (upstream) proxy settings as PROXY:PORT format or leave empty.
-                        </description>
-                        <type>input</type>
-                        <size>90</size>
-                </field>
-                <field>
-                        <fielddescr>Enable X-Forwarded-For</fielddescr>
-                        <fieldname>enablexforwardedfor</fieldname>
-                        <description>
- 				If client sent this header, FORWARDED_IP setting defines the value, then it is passed on. You might want to keep this disabled for security reasons.
-				&lt;br&gt;Enable this if you use your own parent proxy after HAVP, so it will see the original client IP.
-				&lt;br&gt;Disabling this also disables Via: header generation.
-                        </description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Enable Forwarded IP</fielddescr>
-                        <fieldname>enableforwardedip</fieldname>
-                        <description>
-				If HAVP is used as a parent proxy for some other proxy, this allows writing the real user's IP to log, instead of the proxy IP.
-                        </description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Language</fielddescr>
-                        <fieldname>lang</fieldname>
-                        <description>Select the language in which the proxy server will display error messages to users.</description>
-                        <type>select</type>
-                        <value>en</value>
-                        <options>
-                                 <option><value>br</value><name>Brazil</name></option>
-                                 <option><value>de</value><name>Germany</name></option>
-                                 <option><value>en</value><name>English</name></option>
-                                 <option><value>es</value><name>Spain</name></option>
-                                 <option><value>fr</value><name>French</name></option>
-                                 <option><value>it</value><name>Italian</name></option>
-                                 <option><value>nf</value><name>Norfolk Island</name></option>
-                                 <option><value>pl</value><name>Poland</name></option>
-                                 <option><value>ru</value><name>Russian</name></option>
-                        </options>
-                </field>
-                <field>
-                        <fielddescr>Max download size, Bytes</fielddescr>
-                        <fieldname>maxdownloadsize</fieldname>
-                        <description>Enter value (in Bytes) or leave empty. Downloads larger than 'Max download size' will be blocked if not whitelisted.</description>
-                        <type>input</type>
-                        <size>10</size>
-                        <default_value></default_value>
-                </field>
-                <field>
-                        <fielddescr>HTTP Range requests</fielddescr>
-                        <fieldname>range</fieldname>
-                        <description>
-                        	Set this for allow HTTP Range requests, and broken downloads can be resumed.
-                        	Allowing HTTP Range is a security risk, because partial HTTP requests may not be properly scanned.
-                        	Whitelisted sites are allowed to use Range in any case.
-                        </description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Whitelist</fielddescr>
-                        <fieldname>whitelist</fieldname>
-                        <description>
-                            Enter each destination URL on a new line that will be accessable to the users without scanning.
-                            Use '*' symbol for mask. Example: *.github.com/*, *sourceforge.net/*clamav-*, */*.xml, */*.inc
-                        </description>
-                        <type>textarea</type>
-                        <cols>60</cols>
-                        <rows>5</rows>
-                        <encoding>base64</encoding>
-                </field>
-                <field>
-                        <fielddescr>Blacklist</fielddescr>
-                        <fieldname>blacklist</fieldname>
-                        <description>Enter each destination domain on a new line that will be accessable to the users that are allowed to use the proxy.</description>
-                        <type>textarea</type>
-                        <cols>60</cols>
-                        <rows>5</rows>
-                        <encoding>base64</encoding>
-                </field>
-                <field>
-                        <fielddescr>Block file if error scanning</fielddescr>
-                        <fieldname>failscanerror</fieldname>
-                        <description>If set, the proxy will block the files on which an error scanning.</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Enable RAM Disk</fielddescr>
-                        <fieldname>enableramdisk</fieldname>
-                        <description>
-				This option allow use RAM disk for HAVP temp files for more quick traffic scan.
-				RAM disk size depends on 'ScanMax' file size and available memory.
-				This option can be ignored on systems with low memory.
-				( RAM disk size calculated as [1/4 available system memory] > [Scan max file size] * 100 )
-                        </description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Scan max file size</fielddescr>
-                        <fieldname>scanmaxsize</fieldname>
-                        <description>
-                                Select this value for limit maximum file size or leave '---(5M)'.
-                                Files larger than this limit won't be scanned.
-                                Small values increace scan speed and maximum new connections per second and allow RAM disk use.
-                                &lt;br&gt;
-                                NOTE: Setting limit is a security risk, because some archives like
-                                ZIP need all the data to be scanned properly! Use this only if you
-                                can't afford temporary space for big files.
-                        </description>
-                        <type>select</type>
-                        <value>0</value>
-                        <options>
-                                 <option><value> 5000</value><name>--- (5M)</name></option>
-                                 <option><value>    1</value><name>     1 K</name></option>
-                                 <option><value>    2</value><name>     2 K</name></option>
-                                 <option><value>    3</value><name>     3 K</name></option>
-                                 <option><value>    5</value><name>     5 K</name></option>
-                                 <option><value>    7</value><name>     7 K</name></option>
-                                 <option><value>   10</value><name>    10 K</name></option>
-                                 <option><value>   20</value><name>    20 K</name></option>
-                                 <option><value>   30</value><name>    30 K</name></option>
-                                 <option><value>   50</value><name>    50 K</name></option>
-                                 <option><value>   70</value><name>    70 K</name></option>
-                                 <option><value>  100</value><name>   100 K</name></option>
-                                 <option><value>  200</value><name>   200 K</name></option>
-                                 <option><value>  300</value><name>   300 K</name></option>
-                                 <option><value>  500</value><name>   500 K</name></option>
-                                 <option><value>  700</value><name>   700 K</name></option>
-                                 <option><value> 1000</value><name>  1000 K</name></option>
-                                 <option><value> 1500</value><name>  1500 K</name></option>
-                                 <option><value> 2000</value><name>  2000 K</name></option>
-                                 <option><value> 2500</value><name>  2500 K</name></option>
-                                 <option><value> 3000</value><name>  3000 K</name></option>
-                                 <option><value> 3500</value><name>  3500 K</name></option>
-                                 <option><value> 4000</value><name>  4000 K</name></option>
-                                 <option><value> 4500</value><name>  4500 K</name></option>
-                                 <option><value> 5000</value><name>  5000 K</name></option>
-                                 <option><value> 5500</value><name>  5500 K</name></option>
-                                 <option><value> 6000</value><name>  6000 K</name></option>
-                                 <option><value> 7000</value><name>  7000 K</name></option>
-                                 <option><value> 8000</value><name>  8000 K</name></option>
-                                 <option><value> 9000</value><name>  9000 K</name></option>
-                                 <option><value>10000</value><name>10 000 K</name></option>
-                        </options>
-                </field>
-                <field>
-                        <fielddescr>Scan images</fielddescr>
-                        <fieldname>scanimg</fieldname>
-                        <description>
-                            Check this for scan image files. 
-                            This option allows you to increase reliability, but also slows down the scanning process.
-                        </description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Scan media stream</fielddescr>
-                        <fieldname>scanstream</fieldname>
-                        <description>Check this for scan media (audio/video) stream. Use this for additional scan exploits for players.</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Scan Broken Executables</fielddescr>
-                        <fieldname>scanbrokenexe</fieldname>
-                        <description>Check this to enable the Heuristic Broken Executable scan.</description>
-                        <type>checkbox</type>
-						<default_value>on</default_value>
-                </field>				
-                <field>
-                        <fielddescr>Log</fielddescr>
-                        <fieldname>log</fieldname>
-                        <description>Check this for enable log.</description>
-                        <type>checkbox</type>
-                        <enablefields>syslog</enablefields>
-                </field>
-                <field>
-                        <fielddescr>Syslog</fielddescr>
-                        <fieldname>syslog</fieldname>
-                        <description>Check this for enable Syslog.</description>
-                        <type>checkbox</type>
-                </field>
-        </fields>
-        <custom_php_command_before_form>
-            havp_before_form(&amp;$pkg);
-        </custom_php_command_before_form>
-        <custom_php_validation_command>
-            havp_validate_settings($_POST, &amp;$input_errors);
-        </custom_php_validation_command>
-        <custom_php_resync_config_command>
-            havp_resync();
-        </custom_php_resync_config_command>
-        <custom_php_install_command>
+			<type>select</type>
+			<default_value>true</default_value>
+			<options>
+				 <option><value>true</value><name>Daemon</name></option>
+				 <option><value>false</value><name>Library</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Proxy Mode</fielddescr>
+			<fieldname>proxymode</fieldname>
+			<description>
+				<![CDATA[
+				Select proxy interface mode:<br />
+				<strong>Standard</strong> - clients bind to the 'proxy port' on selected interface(s)<br />
+				<strong>Parent for Squid</strong> - configure HAVP as parent for Squid proxy<br />
+				<strong>Transparent</strong> - all HTTP requests on interface(s) will be directed to the HAVP proxy server without any client configuration necessary. (Works as parent for Squid with transparent Squid proxy.)<br />
+				<strong>Internal</strong> - HAVP will listen on the loopback (127.0.0.1) on configured 'Proxy Port.' Use your own firewall forwarding rules.<br />
+				]]>
+			</description>
+			<type>select</type>
+			<default_value>standard</default_value>
+			<options>
+				 <option><value>standard</value><name>Standard</name></option>
+				 <option><value>squid</value><name>Parent for Squid</name></option>
+				 <option><value>transparent</value><name>Transparent</name></option>
+				 <option><value>internal</value><name>Internal</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Proxy Interface(s)</fielddescr>
+			<fieldname>proxyinterface</fieldname>
+			<description>The interface(s) for client connections to the proxy. Use 'Ctrl' + left click for multiple selection.</description>
+			<type>interfaces_selection</type>
+			<required/>
+			<multiple/>
+			<default_value>lan</default_value>
+		</field>
+		<field>
+			<fielddescr>Proxy Port</fielddescr>
+			<fieldname>proxyport</fieldname>
+			<description>
+				<![CDATA[
+				This is the port that HAVP proxy server will listen on. (Example: 8080)<br />
+				<strong>Note: This port must be different from Squid proxy.</strong>
+				]]>
+			</description>
+			<type>input</type>
+			<size>10</size>
+			<required/>
+			<default_value>3125</default_value>
+		</field>
+		<field>
+			<fielddescr>Parent Proxy</fielddescr>
+			<fieldname>parentproxy</fieldname>
+			<description>Enter the parent (upstream) proxy settings in PROXY:PORT format or leave empty.</description>
+			<type>input</type>
+			<size>90</size>
+		</field>
+		<field>
+			<fielddescr>Enable X-Forwarded-For</fielddescr>
+			<fieldname>enablexforwardedfor</fieldname>
+			<description>
+				<![CDATA[
+ 				If client sends this header, FORWARDED_IP setting defines the value, then it is passed on. You might want to keep this disabled for security reasons.<br />
+				Enable this if you use your own parent proxy after HAVP, so it will see the original client's IP.<br />
+				Note: Disabling this also disables <em>Via:</em> header generation.<br />
+				]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Forwarded IP</fielddescr>
+			<fieldname>enableforwardedip</fieldname>
+			<description>If HAVP is used as a parent proxy for some other proxy, this allows writing the real user's IP to log, instead of the proxy IP.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Language</fielddescr>
+			<fieldname>lang</fieldname>
+			<description>Select the language in which the HAVP proxy server will display error messages to users.</description>
+			<type>select</type>
+			<value>en</value>
+			<options>
+				 <option><value>br</value><name>Brazilian Portuguese</name></option>
+				 <option><value>de</value><name>German</name></option>
+				 <option><value>en</value><name>English</name></option>
+				 <option><value>es</value><name>Spanish</name></option>
+				 <option><value>fr</value><name>French</name></option>
+				 <option><value>it</value><name>Italian</name></option>
+				 <option><value>nl</value><name>Dutch</name></option>
+				 <option><value>pf</value><name>Norf'k</name></option>
+				 <option><value>pl</value><name>Polish</name></option>
+				 <option><value>ru</value><name>Russian</name></option>
+				 <option><value>sv</value><name>Swedish</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Max Download Size</fielddescr>
+			<fieldname>maxdownloadsize</fieldname>
+			<description>
+				<![CDATA[
+				Enter value <strong>(in bytes)</strong> or leave empty. Downloads larger than 'Max Download Size' will be blocked if not whitelisted.
+				]]>
+			</description>
+			<type>input</type>
+			<size>10</size>
+			<default_value></default_value>
+		</field>
+		<field>
+			<fielddescr>HTTP Range Requests</fielddescr>
+			<fieldname>range</fieldname>
+			<description>
+				<![CDATA[
+				Set this to allow HTTP Range requests, so that broken downloads can be resumed.<br />
+				Allowing HTTP Range is a security risk, because partial HTTP requests may not be properly scanned.<br />
+				Note: Whitelisted sites are allowed to use HTTP Range in any case, regardless of this setting.
+				]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Whitelist</fielddescr>
+			<fieldname>whitelist</fieldname>
+			<description>
+				<![CDATA[
+				Enter each destination URL on a <strong>separate line</strong>. The URLs will be accessible to users without AV scanning.<br />
+				Use '*' symbol as wildcard mask. URL examples: *.github.com/*, *sourceforge.net/*clamav-*, */*.xml, */*.inc
+				]]>
+			</description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Blacklist</fielddescr>
+			<fieldname>blacklist</fieldname>
+			<description>
+				<![CDATA[
+				Enter each destination URL on a <strong>separate line</strong>, using the same syntax as 'Whitelist'.<br />
+				<strong>Access to these URLs will be blocked for HAVP proxy users.</strong>
+				]]>
+			</description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Block File on Scanning Error</fielddescr>
+			<fieldname>failscanerror</fieldname>
+			<description>If enabled, the proxy will block the files if an error occurs while scanning.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable RAM Disk</fielddescr>
+			<fieldname>enableramdisk</fieldname>
+			<description>
+				<![CDATA[
+				This option allows to use RAM disk for HAVP temporary files for faster traffic scan.<br />
+				RAM disk size depends on 'Scan Max File Size' and available memory. <strong>This option should be ignored on systems with low memory.</strong><br />
+				Note: RAM disk size is calculated as [1/4 available system memory] > [Scan max file size] * 100 ).
+				]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Scan Max File Size</fielddescr>
+			<fieldname>scanmaxsize</fieldname>
+			<description>
+				<![CDATA[
+				Select the value to limit maximum scanned file size or leave at default (5 MB). Files larger than this limit will not be scanned.<br />
+				Small values increase scan speed and maximum new connections per second and allow RAM disk use.<br />
+				NOTE: Setting a low limit is a security risk, because some archives like ZIP need all the data to be scanned properly! Use this only if you
+				can't afford temporary space for large files.
+				]]>
+			</description>
+			<type>select</type>
+			<value>0</value>
+			<options>
+				 <option><value> 5000</value><name>--- (5M)</name></option>
+				 <option><value>    1</value><name>     1 K</name></option>
+				 <option><value>    2</value><name>     2 K</name></option>
+				 <option><value>    3</value><name>     3 K</name></option>
+				 <option><value>    5</value><name>     5 K</name></option>
+				 <option><value>    7</value><name>     7 K</name></option>
+				 <option><value>   10</value><name>    10 K</name></option>
+				 <option><value>   20</value><name>    20 K</name></option>
+				 <option><value>   30</value><name>    30 K</name></option>
+				 <option><value>   50</value><name>    50 K</name></option>
+				 <option><value>   70</value><name>    70 K</name></option>
+				 <option><value>  100</value><name>   100 K</name></option>
+				 <option><value>  200</value><name>   200 K</name></option>
+				 <option><value>  300</value><name>   300 K</name></option>
+				 <option><value>  500</value><name>   500 K</name></option>
+				 <option><value>  700</value><name>   700 K</name></option>
+				 <option><value> 1000</value><name>  1000 K</name></option>
+				 <option><value> 1500</value><name>  1500 K</name></option>
+				 <option><value> 2000</value><name>  2000 K</name></option>
+				 <option><value> 2500</value><name>  2500 K</name></option>
+				 <option><value> 3000</value><name>  3000 K</name></option>
+				 <option><value> 3500</value><name>  3500 K</name></option>
+				 <option><value> 4000</value><name>  4000 K</name></option>
+				 <option><value> 4500</value><name>  4500 K</name></option>
+				 <option><value> 5000</value><name>  5000 K</name></option>
+				 <option><value> 5500</value><name>  5500 K</name></option>
+				 <option><value> 6000</value><name>  6000 K</name></option>
+				 <option><value> 7000</value><name>  7000 K</name></option>
+				 <option><value> 8000</value><name>  8000 K</name></option>
+				 <option><value> 9000</value><name>  9000 K</name></option>
+				 <option><value>10000</value><name>10 000 K</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Scan Images</fielddescr>
+			<fieldname>scanimg</fieldname>
+			<description>Check this option to scan image files. This option allows you to increase reliability, but also slows down the scanning process.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Scan Media Streams</fielddescr>
+			<fieldname>scanstream</fieldname>
+			<description>Check this option to scan media (audio/video) streams.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Scan Broken Executables</fielddescr>
+			<fieldname>scanbrokenexe</fieldname>
+			<description>Check this to enable the Heuristic Broken Executable Scan.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+		<field>
+			<fielddescr>HAVP Log</fielddescr>
+			<fieldname>log</fieldname>
+			<description>Check this to enable HAVP logging.</description>
+			<type>checkbox</type>
+			<enablefields>syslog</enablefields>
+		</field>
+		<field>
+			<fielddescr>HAVP Syslog</fielddescr>
+			<fieldname>syslog</fieldname>
+			<description>Check this to enable HAVP logging to syslog.</description>
+			<type>checkbox</type>
+		</field>
+	</fields>
+	<custom_php_validation_command>
+		havp_validate_settings($_POST, $input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		havp_resync();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
 		havp_install();
-        </custom_php_install_command>
-        <custom_php_deinstall_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
 		havp_deinstall();
-        </custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+	<filter_rules_needed>
+		havp_generate_rules
+	</filter_rules_needed>
 </packagegui>

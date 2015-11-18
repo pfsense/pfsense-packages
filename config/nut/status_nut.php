@@ -1,9 +1,9 @@
 <?php
 /*
 	status_nut.php
-	part of pfSense (http://www.pfsense.com/)
-
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,13 +29,15 @@
 */
 
 require("guiconfig.inc");
-
+global $nut_config;
 $nut_config = $config['installedpackages']['nut']['config'][0];
 
 /* functions */
 
 function secs2hms($secs) {
-	if ($secs<0) return false;
+	if ($secs < 0 ) {
+		return false;
+	}
 	$m = (int)($secs / 60); $s = $secs % 60;
 	$h = (int)($m / 60); $m = $m % 60;
 	return "{$h}h {$m}m {$s}s";
@@ -50,25 +52,29 @@ function tblclose () {
 }
 
 function tblrow ($name, $value, $symbol = null) {
-	if(!$value) return;
-
-	if($symbol == '&deg;')
+	if (!$value) {
+		return;
+	}
+	if ($symbol == '&deg;') {
 		$value = sprintf("%.1f", $value);
-
-	if($symbol == 'Hz')
+	}
+	if ($symbol == 'Hz') {
 		$value = sprintf("%d", $value);
+	}
 
 	print(<<<EOD
 <tr>
-  <td class="vncellreq" width="100px">{$name}</td>
-  <td class="vtable">{$value}{$symbol}</td>
+	<td class="vncellreq" width="100px">{$name}</td>
+	<td class="vtable">{$value}{$symbol}</td>
 <tr>
 EOD
 	."\n");
 }
 
 function tblrowbar ($name, $value, $symbol, $red, $yellow, $green) {
-	if(!$value) return;
+	if (!$value) {
+		return;
+	}
 
 	$value = sprintf("%.1f", $value);
 
@@ -80,57 +86,54 @@ function tblrowbar ($name, $value, $symbol, $red, $yellow, $green) {
 	sort($yellow);
 	sort($green);
 
-	if($value >= $red[0] && $value <= ($red[0]+9)) {
+	if ($value >= $red[0] && $value <= ($red[0]+9)) {
 		$color = 'black';
 		$bgcolor = 'red';
 	}
-	if($value >= ($red[0]+10) && $value <= $red[1]) {
+	if ($value >= ($red[0]+10) && $value <= $red[1]) {
 		$color = 'white';
 		$bgcolor = 'red';
 	}
-	if($value >= $yellow[0] && $value <= $yellow[1]) {
+	if ($value >= $yellow[0] && $value <= $yellow[1]) {
 		$color = 'black';
 		$bgcolor = 'yellow';
 	}
-	if($value >= $green[0] && $value <= ($green[0]+9)) {
+	if ($value >= $green[0] && $value <= ($green[0]+9)) {
 		$color = 'black';
 		$bgcolor = 'green';
 	}	
-	if($value >= ($green[0]+10) && $value <= $green[1]) {
+	if ($value >= ($green[0]+10) && $value <= $green[1]) {
 		$color = 'white';
 		$bgcolor = 'green';
 	}
 
 	print(<<<EOD
 <tr>
-  <td class="vncellreq" width="100px">{$name}</td>
-  <td class="vtable">
-    <div style="width: 125px; height: 12px; border-top: thin solid gray; border-bottom: thin solid gray;">
-      <div style="width: {$value}{$symbol}; height: 12px; background-color: {$bgcolor};">
-        <div style="text-align: center; color: {$color}">{$value}{$symbol}</div>
-      </div>
-    </div>
-  </td>
+	<td class="vncellreq" width="100px">{$name}</td>
+	<td class="vtable">
+	<div style="width: 125px; height: 12px; border-top: thin solid gray; border-bottom: thin solid gray;">
+		<div style="width: {$value}{$symbol}; height: 12px; background-color: {$bgcolor};">
+			<div style="text-align: center; color: {$color}">{$value}{$symbol}</div>
+		</div>
+	</div>
+	</td>
 <tr>
 EOD
 	."\n");
 }
 
 /* defaults to this page but if no settings are present, redirect to setup page */
-if(!$nut_config['monitor'])
+if (!$nut_config['monitor']) {
 	Header("Location: /pkg_edit.php?xml=nut.xml&id=0");
+}
 
 $pgtitle = "Status: NUT Status";
 include("head.inc");
-/* put your custom HTML head content here        */
-/* using some of the $pfSenseHead function calls */
-//$pfSenseHead->addMeta("<meta http-equiv=\"refresh\" content=\"120;url={$_SERVER['SCRIPT_NAME']}\" />");
-//echo $pfSenseHead->getHTML();
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+<p class="pgtitle"><?=$pgtitle?></p>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
@@ -143,32 +146,33 @@ include("head.inc");
 ?>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr>
+<tr>
 	<td>
 <?php
 	tblopen();
 
-	$running = ((int)exec('pgrep upsmon | wc -l') > 0) ? true : false;
+	$running = ((int)exec('/bin/pgrep upsmon | /usr/bin/wc -l') > 0) ? true : false;
 
-	if($nut_config['monitor'] == 'local') {
+	if ($nut_config['monitor'] == 'local') {
 		tblrow('Monitoring:','Local UPS'); 
-		$cmd = "upsc {$nut_config['name']}@localhost";
-	} elseif($nut_config['monitor'] == 'remote') {
+		$cmd = "/usr/local/bin/upsc {$nut_config['name']}@localhost";
+	} elseif ($nut_config['monitor'] == 'remote') {
 		tblrow('Monitoring:','Remote UPS');
-		$cmd = "upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}";
-	} elseif($nut_config['monitor'] == 'snmp') {
+		$cmd = "/usr/local/bin/upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}";
+	} elseif ($nut_config['monitor'] == 'snmp') {
 		tblrow('Monitoring:','SNMP UPS');
-		$cmd = "upsc {$nut_config['snmpname']}@localhost";
+		$cmd = "/usr/local/bin/upsc {$nut_config['snmpname']}@localhost";
 	}
 
-	if($running)
+	if ($running) {
 		$handle = popen($cmd, 'r');
-	elseif($nut_config['monitor'] == 'snmp')
+	} elseif ($nut_config['monitor'] == 'snmp') {
 		tblrow('ERROR:','NUT is enabled, however the service is not running! The SNMP UPS may be unreachable.');
-	else
+	} else {
 		tblrow('ERROR:','NUT is enabled, however the service is not running!');
+	}
 	
-	if($handle) {
+	if ($handle) {
 		$read = fread($handle, 4096);
 		pclose($handle);
 
@@ -179,14 +183,17 @@ include("head.inc");
 			$ups[$line[0]] = trim($line[1]);
 		}
 
-		if(count($lines) == 1)
+		if (count($lines) == 1) {
 			tblrow('ERROR:', 'Data stale!');
+		}
 
 		tblrow('Model:', $ups['ups.model']);
 
 		$status = explode(' ', $ups['ups.status']);
 		foreach($status as $condition) {
-			if($disp_status) $disp_status .= ', ';
+			if ($disp_status) {
+				$disp_status .= ', ';
+			}
 			switch ($condition) {
 				case 'WAIT':
 					$disp_status .= 'Waiting';
@@ -241,14 +248,11 @@ include("head.inc");
 
 	tblclose();
 ?>
-    </td>
-  </tr>
+	</td>
+</tr>
 </table>
-<?php 
-	/* display upsc array */
-	/*print('<pre>'); print_r($ups); print('</pre>');*/
-?>
 </div>
+
 <?php include("fend.inc"); ?>
 </body>
 </html>

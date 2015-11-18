@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	tinydns_view_logs.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 
 	Copyright (C) 2006 Scott Ullrich <sullrich@gmail.com>
 	All rights reserved.
@@ -32,7 +32,7 @@
 require("guiconfig.inc");
 
 if($_REQUEST['getactivity']) {
-	$tinydnslogs = `cat /var/run/service/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0"`;
+	$tinydnslogs = `cat /var/run/service/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0 "`;
 	echo "TinyDNS Server logs as of " . date("D M j G:i:s T Y")  . "\n\n";
 	echo $tinydnslogs;
 	exit;
@@ -42,8 +42,8 @@ if($_REQUEST['getactivity']) {
 if(!$config['installedpackages']['tinydns']['config'][0])
 	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "TinyDNS: View Logs";
@@ -53,8 +53,9 @@ include("head.inc");
 
 /* NEED TO FIX */
 if ($_POST['clear']) {
-//	exec("rm /etc/tinydns/log/main/current");
-//	exec("touch /etc/tinydns/log/main/current");
+	exec("rm /var/etc/tinydns/log/main/current");
+	exec("touch /var/etc/tinydns/log/main/current");
+	exec("chown Gdnslog /var/etc/tinydns/log/main/current");
 }
 
 ?>

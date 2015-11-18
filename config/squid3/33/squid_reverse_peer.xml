@@ -160,10 +160,10 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-		squid_before_form_general(&amp;$pkg);
+		squid_before_form_general($pkg);
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		squid_validate_reverse($_POST, &amp;$input_errors);
+		squid_validate_reverse($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();

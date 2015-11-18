@@ -2,7 +2,8 @@
 /* $Id: load_balancer_pool.php,v 1.5.2.6 2007/03/02 23:48:32 smos Exp $ */
 /*
 	haproxy_global.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
+	Copyright (C) 2013 Marcello Coutinho
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -28,7 +29,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "haproxy";
 require("globals.inc");
 require("guiconfig.inc");
 require_once("haproxy.inc");
@@ -45,9 +46,7 @@ if ($_POST) {
 	
 	if ($_POST['apply']) {
 		$retval = 0;
-		config_lock();
 		$retval = haproxy_configure();
-		config_unlock();
 		$savemsg = get_std_save_message($retval);
 		unlink_if_exists($d_haproxyconfdirty_path);
 	} else {
@@ -56,27 +55,19 @@ if ($_POST) {
 			$reqdfieldsn = explode(",", "Maximum connections");		
 		}
 
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version < 2.1)
+			$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+		else
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";
 
-		if($_POST['synchost1'] && !is_ipaddr($_POST['synchost1']))
-			$input_errors[] = "Synchost1 needs to be an IPAddress.";
-		if($_POST['synchost2'] && !is_ipaddr($_POST['synchost2']))
-			$input_errors[] = "Synchost2 needs to be an IPAddress.";
-		if($_POST['synchost3'] && !is_ipaddr($_POST['synchost3']))
-			$input_errors[] = "Synchost3 needs to be an IPAddress.";
-
 		if (!$input_errors) {
 			$config['installedpackages']['haproxy']['enable'] = $_POST['enable'] ? true : false;
 			$config['installedpackages']['haproxy']['maxconn'] = $_POST['maxconn'] ? $_POST['maxconn'] : false;
-			$config['installedpackages']['haproxy']['enablesync'] = $_POST['enablesync'] ? true : false;
-			$config['installedpackages']['haproxy']['synchost1'] = $_POST['synchost1'] ? $_POST['synchost1'] : false;
-			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost2'] ? $_POST['synchost2'] : false;
-			$config['installedpackages']['haproxy']['synchost3'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
 			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
-			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
 			touch($d_haproxyconfdirty_path);
@@ -88,17 +79,12 @@ if ($_POST) {
 
 $pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
 $pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
-$pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
-$pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
-$pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
-$pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
-$pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
 $pconfig['advanced'] = base64_decode($config['installedpackages']['haproxy']['advanced']);
 $pconfig['nbproc'] = $config['installedpackages']['haproxy']['nbproc'];
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "Services: HAProxy: Settings";
@@ -134,7 +120,8 @@ function enable_change(enable_change) {
 	$tab_array = array();
 	$tab_array[] = array("Settings", true, "haproxy_global.php");
 	$tab_array[] = array("Frontends", false, "haproxy_frontends.php");	
-	$tab_array[] = array("Servers", false, "haproxy_servers.php");	
+	$tab_array[] = array("Servers", false, "haproxy_servers.php");
+	$tab_array[] = array("Sync", false, "pkg_edit.php?xml=haproxy_sync.xml");
 	display_top_tabs($tab_array);
 	?>
 	</td></tr>
@@ -207,7 +194,7 @@ function enable_change(enable_change) {
 					Number of processes to start
 				</td>
 				<td class="vtable">
-					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>">
+					<input name="nbproc" type="text" class="formfld" id="nbproc" size="4" value="<?=htmlspecialchars($pconfig['nbproc']);?>">
 					<br/>
 					Defaults to number of cores/processors installed if left blank (<?php echo trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`); ?> detected).
 				</td>
@@ -229,58 +216,15 @@ function enable_change(enable_change) {
 				<td colspan="2" valign="top" class="listtopic">Global Advanced pass thru</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vncell">&nbsp;</td>
-				<td width="78%" class="vtable">
-					<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+				<td width="100%" class="vtable" colspan="2">
+					<textarea name='advanced' rows="6" cols="90" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
 					<br/>
 					NOTE: paste text into this box that you would like to pass thru in the global settings area.
 				</td>
 			</tr>
 			<tr>
 				<td>
-					&nbsp;
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="listtopic">Configuration synchronization</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell">&nbsp;</td>
-				<td width="78%" class="vtable">
-					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
-					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong>
-				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell">Synchronization password</td>
-				<td width="78%" class="vtable">
-					<input name="syncpassword" type="password" value="<?=$pconfig['syncpassword'];?>">
-					<br/>
-					<strong>Enter the password that will be used during configuration synchronization.  This is generally the remote webConfigurator password.</strong>
-				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell">Sync host #1</td>
-				<td width="78%" class="vtable">
-					<input name="synchost1" value="<?=$pconfig['synchost1'];?>">
-					<br/>
-					<strong>Synchronize settings to this hosts IP address.</strong>
-				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell">Sync host #2</td>
-				<td width="78%" class="vtable">
-					<input name="synchost2" value="<?=$pconfig['synchost2'];?>">
-					<br/>
-					<strong>Synchronize settings to this hosts IP address.</strong>
-				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell">Sync host #3</td>
-				<td width="78%" class="vtable">
-					<input name="synchost3" value="<?=$pconfig['synchost3'];?>">
-					<br/>
-					<strong>Synchronize settings to this hosts IP address.</strong>
+				&nbsp;
 				</td>
 			</tr>
 			<tr>

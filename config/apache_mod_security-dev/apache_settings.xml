@@ -10,7 +10,7 @@
     apache_mod_security_settings.xml
 	part of apache_mod_security package (http://www.pfSense.com)
     Copyright (C) 2008, 2009, 2010 Scott Ullrich
-    Copyright (C) 2012 Marcello Coutinho
+    Copyright (C) 2012-2013 Marcello Coutinho
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -68,7 +68,12 @@
 			<tab_level>2</tab_level>
 		</tab>
 		<tab>
-			<text>Virutal Hosts</text>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Virtual Hosts</text>
 			<url>/pkg.php?xml=apache_virtualhost.xml</url>
 			<tab_level>2</tab_level>
 		</tab>
@@ -88,36 +93,35 @@
 			<fieldname>globalsiteadminemail</fieldname>
 			<description>Enter the site administrators e-mail address</description>
 			<type>input</type>
+			<size>25</size>
 		</field>
 		<field>
 			<fielddescr>Server hostname</fielddescr>
 			<fieldname>hostname</fieldname>
 			<description>
-				<![CDATA[Enter the servers hostname<br/
+				<![CDATA[Enter the servers hostname<br>
 					NOTE: Leave blank to use this devices hostname.]]>
 			</description>
 			<type>input</type>
+			<size>25</size>
 		</field>
 		<field>
 			<fielddescr>Default Bind to IP Address</fielddescr>
 			<fieldname>globalbindtoipaddr</fieldname>
 			<description>
-				<![CDATA[
-					This is the IP address the Proxy Server will listen on. 
-					<br/>
-					NOTE: Leave blank to bind to *
-				]]>
+				<![CDATA[This is the IP address the Proxy Server will listen on.]]>
 			</description>
-			<type>input</type>
+			<type>interfaces_selection</type>
+			<showlistenall/>
+			<showvirtualips/>
+			<showips/>
 		</field>
 		<field>
 			<fielddescr>Default Bind to port</fielddescr>
 			<fieldname>globalbindtoport</fieldname>
 			<description>
-				<![CDATA[
-					This is the port the Proxy Server will listen on.<br>
-					NOTE: Leave blank to bind to 80
-				]]>					
+				<![CDATA[This is the port the Proxy Server will listen on.<br>
+					NOTE: Leave blank to bind to 80]]>
 			</description>
 			<type>input</type>
 			<size>5</size>
@@ -277,6 +281,39 @@
 			</description>
 			<type>input</type>
 			<size>10</size>
+		</field>
+		<field>
+			<name>Status Page</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Status Page</fielddescr>
+			<fieldname>statuspage</fieldname>
+			<description>
+				<![CDATA[Enable a status page for Apache and Mod_proxy. Access http://DefaultBindIP:DefaultBindPort/status-server]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option><name>Disabled (Default)</name><value>off</value></option>
+				<option><name>Enabled</name><value>on</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Extended Status</fielddescr>
+			<fieldname>extendedstatuspage</fieldname>
+			<description>
+				<![CDATA[Keep track of extended status information for each request]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Status Page ACL</fielddescr>
+			<fieldname>netaccessstatus</fieldname>
+			<description>
+				<![CDATA[Networks that can access apache status page. Ex: 172.16.1.0/24<br>
+					NOTE: Leave blank to allow access from any ip.(Not recommended for security reasons)]]>
+			</description>
+			<type>input</type>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>

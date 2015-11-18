@@ -1,7 +1,8 @@
-<?php 
+<?php
 /*
-        Copyright 2011 Marcello Coutinho
-        Part of pfSense widgets (www.pfsense.com)
+  		postfix.widget.php
+	    Copyright 2011-2014 Marcello Coutinho
+        Part of pfSense widgets (www.pfsense.org)
 
         Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions are met:
@@ -31,7 +32,7 @@
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
-        
+
 function open_table(){
 	echo "<table style=\"padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">";
 	echo"  <tr>";
@@ -39,7 +40,7 @@ function open_table(){
 function close_table(){
 	echo"  </tr>";
 	echo"</table>";
-	
+
 }
 
 $pfb_table=array();
@@ -49,20 +50,20 @@ $img['Healthy']="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up
 
 #var_dump($pfb_table);
 #exit;
-?><div id='postfix'><?php 
+?><div id='postfix'><?php
 global $config;
 
 
 $size=$config['installedpackages']['postfix']['config'][0]['widget_size'];
 if (preg_match('/\d+/',$config['installedpackages']['postfix']['config'][0]['widget_days']))
-	$days=$config['installedpackages']['postfix']['config'][0]['widget_days'] * -1;	
+	$days=$config['installedpackages']['postfix']['config'][0]['widget_days'] * -1;
 else
 	$days=-3;
 if (preg_match('/\d+/',$config['installedpackages']['postfix']['config'][0]['widget_size']))
-	$size=$config['installedpackages']['postfix']['config'][0]['widget_size'];	
+	$size=$config['installedpackages']['postfix']['config'][0]['widget_size'];
 else
 	$size='100000000';#100mb
-	
+
 $postfix_dir="/var/db/postfix/";
 $curr_time = time();
 for ($z = 0; $z > $days; $z--){
@@ -71,7 +72,7 @@ if ($z==0)
 	$postfix_db=date("Y-m-d");
 else
 	$postfix_db=date("Y-m-d",strtotime("$z day",$curr_time));
-	
+
 if (file_exists($postfix_dir.'/'.$postfix_db.".db")){
 	#noqueue
 	open_table();
@@ -83,7 +84,7 @@ if (file_exists($postfix_dir.'/'.$postfix_db.".db")){
 		$stm="select count(*) as total from mail_noqueue";
 		$result = sqlite_query($dbhandle, $stm);
 		$row_noqueue = sqlite_fetch_array($result, SQLITE_ASSOC);
-	
+
 		#queue
 		$result = sqlite_query($dbhandle, $stm);
 		$stm="select mail_status.info as status,count(*) as total from mail_to,mail_status where mail_to.status=mail_status.id group by status order by mail_status.info";
@@ -96,7 +97,7 @@ if (file_exists($postfix_dir.'/'.$postfix_db.".db")){
 					 	if (preg_match("/\w+/",$row['status'])){
 					 	$reader.="<td class=\"listlr\"width=50%><strong>".ucfirst($row['status'])."</strong></td>\n";
 					 	if ($row['status']=="reject")
-					 		$row['total']=+$row_noqueue['total']; 
+					 		$row['total']=+$row_noqueue['total'];
 						$count.="<td class=\"listlr\">".$row['total']."</td>\n";
 					 	}
 					 }
@@ -111,7 +112,7 @@ if (file_exists($postfix_dir.'/'.$postfix_db.".db")){
 		}
 	close_table();
 	echo "<br>";
-	
+
 }
 }
 echo"  </tr>";

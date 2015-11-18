@@ -39,7 +39,7 @@
 		</copyright>
 	<description>Strikeback</description>
 	<requirements>Active Internet</requirements>
-	<faq>http://forum.pfsense.org/index.php/topic,37225.0.html</faq>
+	<faq>https://forum.pfsense.org/index.php/topic,37225.0.html</faq>
 	<name>Strikeback Settings</name>
 	<version>0.1</version>
 	<title>Settings</title>
@@ -62,52 +62,52 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/strikeback.xml</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/strikeback.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/strikeback.inc</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/strikeback.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/strikeback.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/strikeback.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/index.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/index.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/firewall_shaper.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/firewall_shaper.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/help.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/help.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/settings.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/settings.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/parse.tmp</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/parse.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/strikeback.db</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/strikeback.db</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/jscolor.js</item>
+		<item>https://packages.pfsense.org/packages/config/strikeback/jscolor.js</item>
 	</additional_files_needed>
 	<fields>
 		<field>

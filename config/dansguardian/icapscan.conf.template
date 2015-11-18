@@ -1,0 +1,16 @@
+<?php
+	$icapconf=<<<EOF
+plugname = 'icapscan'
+
+# ICAP URL
+# Use hostname rather than IP address
+# Always specify the port
+#
+icapurl = '{$icapurl}'
+
+exceptionvirusmimetypelist = '/usr/pbi/dansguardian-amd64/etc/dansguardian/lists/contentscanners/exceptionvirusmimetypelist'
+exceptionvirusextensionlist = '/usr/pbi/dansguardian-amd64/etc/dansguardian/lists/contentscanners/exceptionvirusextensionlist'
+exceptionvirussitelist = '/usr/pbi/dansguardian-amd64/etc/dansguardian/lists/contentscanners/exceptionvirussitelist'
+exceptionvirusurllist = '/usr/pbi/dansguardian-amd64/etc/dansguardian/lists/contentscanners/exceptionvirusurllist'
+EOF;
+?>

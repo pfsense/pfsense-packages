@@ -1,8 +1,8 @@
 <?php
 /*
 	postfix_about.php
-	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011 Marcello Coutinho <marcellocoutinho@gmail.com>
+	part of pfSense (https://www.pfsense.org/)
+	Copyright (C) 2011-2014 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
 
@@ -27,11 +27,11 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "postfix";
 require("guiconfig.inc");
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "Diagnostics: Search Mail";
@@ -48,7 +48,7 @@ include("head.inc");
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <!-- <form action="postfix_view_config.php" method="post"> -->
-	
+
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
@@ -68,7 +68,7 @@ include("head.inc");
 ?>
 		</td></tr>
  		<tr>
- 		
+
     		<td>
 				<div id="mainarea">
 					<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
@@ -78,19 +78,19 @@ include("head.inc");
 						</tr>
 						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Credits ");?></td>
-                        <td width="78%" class="vtable"><?=gettext("Package v2 Created by <a target=_new href='http://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a><br><br>");?></td>
+                        <td width="78%" class="vtable"><?=gettext("Package v2 Created by <a target=_new href='https://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a><br><br>");?></td>
                         </tr>
 						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Donatios ");?></td>
-                        <td width="78%" class="vtable"><?=gettext("If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br><br>
+                        <td width="78%" class="vtable"><?=gettext("If you like this package, please <a target=_new href='https://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br><br>
 								 If you want that your donation goes to this package developer, make a note on donation forwarding it to me.<br><br>");?></td>
                         </tr>
 						</table>
-						
+
 				</div>
 			</td>
 		</tr>
-	
+
 
 	</table>
 	<br>

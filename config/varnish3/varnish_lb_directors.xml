@@ -9,7 +9,7 @@
     varnish_lb_directors.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2014 Marcello Coutinho
     
     All rights reserved.                                                      
 */
@@ -49,17 +49,17 @@
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish64/varnish_settings.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish64/varnish_settings.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish64/varnish_custom_vcl.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish64/varnish_custom_vcl.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish64/varnish.inc</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish64/varnish.inc</item>
 	</additional_files_needed>
 	<menu>
 		<name>Varnish </name>
@@ -99,6 +99,7 @@
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
+			<movable>on</movable>
 		<columnitem>
 			<fielddescr>Director name</fielddescr>
 			<fieldname>directorname</fieldname>
@@ -129,6 +130,10 @@
 			<fieldname>grace</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>SSL</fielddescr>
+			<fieldname>forcessl</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Failover</fielddescr>
 			<fieldname>failover</fieldname>
 		</columnitem>		
@@ -136,7 +141,6 @@
 	<fields>
 		<field>
 			<fielddescr>DirectorSettings</fielddescr>
-			<fieldname>Director Settings</fieldname>
 			<type>listtopic</type>
 			<name>Director settings</name>
 		</field>
@@ -197,6 +201,13 @@
 	    	<type>input</type>
 	    	<size>5</size>
  		</field>
+		<field>
+			<fielddescr>Force SSL</fielddescr>
+			<fieldname>forcessl</fieldname>
+			<description><![CDATA[Redirect to ssl if request does not came from ssl offload servers.]]></description>
+	    	<type>checkbox</type>
+	    	<size>5</size>
+ 		</field>
  		<field>
 			<fielddescr>Additions options</fielddescr>
 			<fieldname>customapping</fieldname>
@@ -208,7 +219,6 @@
 		</field>
 		<field>
 			<fielddescr>Backendlist</fielddescr>
-			<fieldname>Backendlist</fieldname>
 			<type>listtopic</type>
 			<name>Backend Settings</name>
 		</field>
@@ -248,7 +258,6 @@
 		</field>
 		<field>
 			<fielddescr>FailoverSettings</fielddescr>
-			<fieldname>FailoverSettings</fieldname>
 			<type>listtopic</type>
 			<name>Failover Settings</name>
 		</field>
@@ -263,18 +272,15 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
+	varnish_check_config();
 	</custom_php_command_before_form>
 	<custom_delete_php_command>
 		sync_package_varnish();
-		create_varnish_rcd_file();
-		varnish_start();
 	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
-		create_varnish_rcd_file();
-		varnish_start();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		varnish_lb_directors_post_validate($_POST, &amp;$input_errors);
+		varnish_lb_directors_post_validate($_POST, $input_errors);
 	</custom_php_validation_command>	
 </packagegui>

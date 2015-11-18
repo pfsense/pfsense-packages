@@ -9,7 +9,7 @@
     varnish_backends.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2014 Marcello Coutinho
     All rights reserved.                                                      
 /*/
 /* ========================================================================== */
@@ -48,42 +48,47 @@
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnish_lb_directors.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnish_lb_directors.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnish_settings.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnish_settings.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnish_custom_vcl.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnish_custom_vcl.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/www/widgets/widgets/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnish.widget.php</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnish.widget.php</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnish.inc</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnish.inc</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnish_sync.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnish_sync.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnish_view_config.php</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnish_view_config.php</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish3/varnishstat.php</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish3/varnishstat.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/varnish3/pkg_varnish.inc</item>
 	</additional_files_needed>
 	<menu>
 		<name>Varnish</name>
@@ -129,19 +134,27 @@
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
+		<movable>on</movable>
 		<columnitem>
 			<fielddescr>IPAddress</fielddescr>
 			<fieldname>ipaddress</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+		</columnitem>	
+		<columnitem>
 			<fielddescr>Name</fielddescr>
 			<fieldname>backendname</fieldname>
-		</columnitem>	
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<fielddescr>BackendSettings</fielddescr>
-			<fieldname>BackendSettings</fieldname>
 			<type>listtopic</type>
 			<name>Backend settings</name>
 		</field>
@@ -163,11 +176,18 @@
 			<fieldname>port</fieldname>
 			<description>Enter the TCP/IP port of the webserver.</description>
 			<type>input</type>
+			<size>6</size>
 			<validate>^[0-9]+$</validate>
 		</field>
 		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description for this Backend.</description>
+			<type>input</type>
+			<size>40</size>
+		</field>
+		<field>
 			<fielddescr>PerformanceMetrics</fielddescr>
-			<fieldname>PerformanceMetrics</fieldname>
 			<type>listtopic</type>
 			<name>Performance metrics</name>
 		</field>		
@@ -185,7 +205,6 @@
 		</field>
 		<field>
 			<fielddescr>ProbeInfo</fielddescr>
-			<fieldname>ProbeInfo</fieldname>
 			<type>listtopic</type>
 			<name>Probe settings</name>
 		</field>		
@@ -228,7 +247,6 @@
 		</field>
 		<field>
 			<fielddescr>Mappings</fielddescr>
-			<fieldname>Mappings</fieldname>
 			<type>listtopic</type>
 			<name>Backend Mappings</name>
 		</field>
@@ -275,18 +293,15 @@
 		varnish_install();
 	</custom_php_install_command>
 	<custom_php_command_before_form>
+		varnish_check_config();
 	</custom_php_command_before_form>
 	<custom_delete_php_command>
 		sync_package_varnish();
-		create_varnish_rcd_file();
-		varnish_start();
 	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
-		create_varnish_rcd_file();
-		varnish_start();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		varnish_backends_post_validate($_POST, &amp;$input_errors);
+		varnish_backends_post_validate($_POST, $input_errors);
 	</custom_php_validation_command>
 </packagegui>

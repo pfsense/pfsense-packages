@@ -1,7 +1,7 @@
 <?php
 /*
 	varnishstat_view_logs.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2006 Scott Ullrich <sullrich@gmail.com>
 	All rights reserved.
 
@@ -36,8 +36,8 @@ if($_REQUEST['getactivity']) {
 	exit;
 }
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "Varnish: VarnishSTAT";

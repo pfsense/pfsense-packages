@@ -1,8 +1,8 @@
 <?php
 /*
 	postfix_search.php
-	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
+	part of pfSense (https://www.pfsense.org/)
+	Copyright (C) 2011-2014 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
 
@@ -27,15 +27,15 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "postfix";
 require("guiconfig.inc");
 
 $uname=posix_uname();
 if ($uname['machine']=='amd64')
         ini_set('memory_limit', '250M');
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "Diagnostics: Search Mail";
@@ -52,7 +52,7 @@ include("head.inc");
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <!-- <form action="postfix_view_config.php" method="post"> -->
-	
+
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
@@ -72,7 +72,7 @@ include("head.inc");
 ?>
 		</td></tr>
  		<tr>
- 		
+
     		<td>
 				<div id="mainarea">
 					<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
@@ -151,7 +151,7 @@ include("head.inc");
 						<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Sqlite files: ");?></td>
                         <td width="78%" class="vtable">
-                        	
+
                         	<?php if ($handle = opendir('/var/db/postfix')) {
                         		$total_files=0;
                         		$array_files=array();
@@ -159,14 +159,14 @@ include("head.inc");
                         			if (preg_match("/(\d+-\d+-\d+).db$/",$file,$matches))
                         				$array_files[]=array($file,$matches[1]);
                         		closedir($handle);
-                        		asort($array_files); 		
+                        		asort($array_files);
 								foreach ($array_files as $file)
                         		$select_output= '<option value="'.$file[0].'">'.$file[1]."</option>\n" . $select_output;
-                        			
+
                         			echo '<select name="drop1" id="Select1" size="'.(count($array_files)>10?10:count($array_files)+2).'" multiple="multiple">';
                         			echo $select_output;
                         			echo '</select><br>'.gettext("Select what database files you want to use in your search.").'</td></td>';
-                        	                        			}?>	
+                        	                        			}?>
 							</tr>
 					<tr>
                         <td width="22%" valign="top" class="vncell"><?=gettext("Message Fields: ");?></td>
@@ -188,17 +188,17 @@ include("head.inc");
 							<option value="helo">Helo</option>
 						</select><br><?=gettext("Max log messages to fetch per Sqlite file.");?></td>
 					</tr>
-					
+
 							<tr>
 							<td width="22%" valign="top"></td>
                         <td width="78%"><input name="Submit" type="submit" class="formbtn" id="search" value="<?=gettext("Search");?>" onclick="getsearch_results('search')">
                          &nbsp;<input name="Submit" type="submit" class="formbtn" id="export" value="<?=gettext("Export");?>" onclick="getsearch_results('export')"></td>
 						</table>
-						
+
 				</div>
 			</td>
 		</tr>
-	
+
 
 	</table>
 	<br>

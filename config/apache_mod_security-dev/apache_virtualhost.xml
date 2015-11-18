@@ -4,40 +4,41 @@
 <packagegui>
         <copyright>
         <![CDATA[
-			/* $Id$ */
-			/* ========================================================================== */
-			/*
-    			apache_virtualhost.xml
-    			part of apache_mod_security package (http://www.pfSense.com)
-    			Copyright (C)2009, 2010 Scott Ullrich
-    			Copyright (C)2012 Marcello Coutinho
-    			All rights reserved.
-			*/
-			/* ========================================================================== */
-			/*
-			    Redistribution and use in source and binary forms, with or without
-			    modification, are permitted provided that the following conditions are met:
+/* $Id$ */
+/* ========================================================================== */
+/*
+    apache_virtualhost.xml
+    part of apache_mod_security package (http://www.pfSense.com)
+    Copyright (C)2009, 2010 Scott Ullrich
+    Copyright (C)2012 Marcello Coutinho
+    Copyright (C)2013 Stephane Lapie <stephane.lapie@asahinet.com>
+    All rights reserved.
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
 
-			     1. Redistributions of source code MUST retain the above copyright notice,
-			        this list of conditions and the following disclaimer.
+     1. Redistributions of source code MUST retain the above copyright notice,
+        this list of conditions and the following disclaimer.
 
-			     2. Redistributions in binary form MUST reproduce the above copyright
-			        notice, this list of conditions and the following disclaimer in the
-			        documentation and/or other materials provided with the distribution.
+     2. Redistributions in binary form MUST reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
 
-			    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-			    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-			    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-			    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-			    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-			    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-			    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-			    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-			    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-			    POSSIBILITY OF SUCH DAMAGE.
-			*/
-			/* ========================================================================== */
-			]]>
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+]]>
         </copyright>
 	<name>apachevirtualhost</name>
 	<version>1.0</version>
@@ -51,67 +52,77 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security.inc</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security.template</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_groups.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_groups.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_settings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_settings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_view_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_view_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache.template</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache24.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_balancer.template</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_balancer.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_balancer.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_balancer.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_logs_data.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_logs_data.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_manipulation.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_manipulation.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_mod_security_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_mod_security_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_settings.xml</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_settings.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/apache_mod_security-dev/apache_view_logs.php</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_view_logs.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/pkg_apache.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache_location.xml</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>
@@ -138,7 +149,12 @@
 			<tab_level>2</tab_level>
 		</tab>
 		<tab>
-			<text>Virutal Hosts</text>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Virtual Hosts</text>
 			<url>/pkg.php?xml=apache_virtualhost.xml</url>
 			<tab_level>2</tab_level>
 			<active/>
@@ -150,9 +166,12 @@
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
+		<movable>on</movable>
 		<columnitem>
 			<fielddescr>Status</fielddescr>
 			<fieldname>enable</fieldname>
+			<listmodeon>Enabled</listmodeon>
+			<listmodeoff>Disabled</listmodeoff>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Iface</fielddescr>
@@ -193,17 +212,14 @@
 			<description>Select protocols that this virtual host will accept connections</description>
 			<type>select</type>			
 			<options>
-			    <option><name>HTTP</name><value>http</value></option>
-			    <option><name>HTTPS</name><value>https</value></option>
+				<option><name>HTTP</name><value>http</value></option>
+				<option><name>HTTPS</name><value>https</value></option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Server Name(s)</fielddescr>
 			<fieldname>primarysitehostname</fieldname>
-			<description>
-				<![CDATA[Enter hostnames one per line in FQDN format for this website (e.g. www.example.com)<br/>
-					Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)]]>
-			</description>
+			<description><![CDATA[Enter hostnames one per line in FQDN format for this website (e.g. www.example.com)<br/>Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)]]></description>
 			<cols>40</cols>
 			<rows>2</rows>
 			<type>textarea</type>
@@ -230,36 +246,96 @@
 			<fielddescr>Site Webmaster E-Mail address</fielddescr>
 			<fieldname>siteemail</fieldname>
 			<size>50</size>
-			<description>
-				<![CDATA[
-					Enter the Webmaster E-Mail address for this site.
-				]]>
-			</description>
+			<description><![CDATA[Enter the Webmaster E-Mail address for this site.]]></description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Site description</fielddescr>
 			<fieldname>description</fieldname>
 			<size>50</size>
-			<description>
-				<![CDATA[Enter a site description]]>
-			</description>
+			<description><![CDATA[Enter a site description]]></description>
 			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>
+				<![CDATA[Location(s)]]>
+			</fielddescr>
+			<fieldname>locations</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr><![CDATA[Location]]></fielddescr>
+					<fieldname>location</fieldname>
+					<description>Server Location</description>
+					<source><![CDATA[$config['installedpackages']['apachelocation']['config']]]></source>
+					<source_name>name</source_name>
+					<source_value>name</source_value>
+					<show_disable_value>none</show_disable_value>
+					<type>select_source</type>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+		<field>
+			<name>SSL Environment</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>SSL Protocol</fielddescr>
+			<fieldname>ssl_protocol</fieldname>
+			<size>50</size>
+			<description><![CDATA[Enter the SSL protocol versions allowed (default: all -SSLv2)]]></description>
+			<type>input</type>
+			<default_value>all -SSLv2</default_value>
+		</field>
+		<field>
+			<fielddescr>SSL Cipher Suite</fielddescr>
+			<fieldname>ssl_cipher_suite</fieldname>
+			<size>50</size>
+			<description><![CDATA[Configure the Cipher Suite the client is permitted to negotiate in the SSL handshake phase. (default: ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL)]]></description>
+			<type>input</type>
+			<default_value>ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL</default_value>
+		</field>
+		<field>
+			<fielddescr>SSL Honor Cipher Order</fielddescr>
+			<fieldname>ssl_honor_cipher_order</fieldname>
+			<description><![CDATA[Forces the server's preferences to be used in a SSLv3/TLSv1 handshake (default: off)]]></description>
+			<default_value>off</default_value>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>SSL Proxy Engine</fielddescr>
+			<fieldname>ssl_proxy_engine</fieldname>
+			<description><![CDATA[Enables the SSL proxy engine for the current virtualhost (default: on)]]></description>
+			<default_value>on</default_value>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>SSL Proxy Verify</fielddescr>
+			<fieldname>ssl_proxy_verify</fieldname>
+			<description><![CDATA[When a proxy is configured to forward requests to a remote SSL server, this directive can be used to configure certificate verification of the remote server. ]]></description>
+			<type>select</type>
+			<options>
+				<option><name>None</name><value>none</value></option>
+				<option><name>Optional (remote server MAY present a valid certificate)</name><value>optional</value></option>
+				<option><name>Require (remote server HAS to present a valid certificate)</name><value>require</value></option>
+				<option><name>Optional, without CA (remote server may present a valid certificate, but it need not be (successfully) verifiable)</name><value>optional_no_ca</value></option>
+			</options>
+			<default_value>none</default_value>
 		</field>
 		<field>
 			<fielddescr>HTTPS SSL certificate</fielddescr>
 			<fieldname>ssl_cert</fieldname>
 			<description>Choose the SSL Server Certificate here.</description>
-	    	<type>select_source</type>
+			<type>select_source</type>
 			<source><![CDATA[$config['cert']]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
 			<show_disable_value>none</show_disable_value>
 		</field>
 		<field>
-			<fielddescr>intermediate CA certificate(optional)</fielddescr>
-			<fieldname>reverse_int_ca</fieldname>
-			<description>Select intermediate CA assigned to certificate. Not all certificates require this.</description>
+			<fielddescr>HTTPS SSL certificate chain</fielddescr>
+			<fieldname>ssl_cert_chain</fieldname>
+			<description>Select intermediate CA assigned to server certificate. Not all certificates require this.</description>
 			<type>select_source</type>
 			<source><![CDATA[$config['ca']]]></source>
 			<source_name>descr</source_name>
@@ -267,86 +343,14 @@
 			<show_disable_value>none</show_disable_value>
 		</field>
 		<field>
-			<fielddescr>
-				<![CDATA[Location(s)]]>
-			</fielddescr>
-			<fieldname>locations</fieldname>
-		    <type>rowhelper</type>
-		    <rowhelper>
-				<rowhelperfield>
-				    <fielddescr><![CDATA[gzip?]]></fielddescr>
-				    <fieldname>compress</fieldname>
-				    <description>Compress data to save bandwidth?</description>
-				   	<type>select</type>			
-					<options>
-			    	<option><name>yes</name><value>yes</value></option>
-			    	<option><name>no</name><value>no</value></option>
-					</options>
-				</rowhelperfield>
-				<rowhelperfield>
-				    <fielddescr><![CDATA[site path]]></fielddescr>
-				    <fieldname>sitepath</fieldname>
-				    <description><![CDATA[Site path to publish.<br>leave blank to use /]]></description>
-				    <type>input</type>
-				    <size>5</size>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr><![CDATA[Balancer]]></fielddescr>
-				    <fieldname>balancer</fieldname>
-				    <description>Server balancer / pool</description>
-					<source><![CDATA[$config['installedpackages']['apachebalancer']['config']]]></source>
-					<source_name>name</source_name>
-					<source_value>name</source_value>
-					<show_disable_value>none</show_disable_value>
-					<type>select_source</type>
-                    <size>5</size>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr><![CDATA[<a href='https://httpd.apache.org/docs/2.2/mod/mod_proxy.html#proxypass'>LbMethod</a>]]></fielddescr>
-				    <fieldname>lbmethod</fieldname>
-				    <description>Server balance method</description>
-				    <type>select</type>
-				    <options>
-			    	<option><name>byrequests</name><value>byrequests</value></option>
-			    	<option><name>bytraffic</name><value>bytraffic</value></option>
-			    	<option><name>bybusyness</name><value>bybusyness</value></option>
-					</options>
-				</rowhelperfield>
-				<rowhelperfield>
-				    <fielddescr>Backend path</fielddescr>
-				    <fieldname>backendpath</fieldname>
-				    <description><![CDATA[Backend redirect path.<br>Leave blank to use /]]></description>
-				    <type>input</type>
-				    <size>5</size>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr><![CDATA[ModSecurity]]></fielddescr>
-					<fieldname>modsecgroup</fieldname>
-					<description>Choose Modsecurity group to use on this virtual host.</description>
-			    	<type>select_source</type>
-					<source><![CDATA[$config['installedpackages']['apachemodsecuritygroups']['config']]]></source>
-					<source_name>name</source_name>
-					<source_value>name</source_value>
-					<show_disable_value>none</show_disable_value>
-				</rowhelperfield>
-				<rowhelperfield>
-					<fielddescr><![CDATA[Manipulations]]></fielddescr>
-					<fieldname>modsecmanipulation</fieldname>
-					<description>Choose Modsecurity group to use on this virtual host.</description>
-			    	<type>select_source</type>
-					<source><![CDATA[$config['installedpackages']['apachemodsecuritymanipulation']['config']]]></source>
-					<source_name>name</source_name>
-					<source_value>name</source_value>
-					<show_disable_value>none</show_disable_value>
-				</rowhelperfield>
-				<rowhelperfield>
-				    <fielddescr><![CDATA[<a href='https://httpd.apache.org/docs/2.2/mod/mod_proxy.html#proxypass'>&nbsp;&nbsp;Balancer options</a>]]></fielddescr>
-				    <fieldname>options</fieldname>
-				    <description><![CDATA[Additional proxypass options for this path.<br>ex: ttl=60 stickysession='JSESSIONID']]></description>
-				    <type>input</type>
-				    <size>5</size>
-				</rowhelperfield>
-		    </rowhelper>
+			<fielddescr>Client certificates CA (optional)</fielddescr>
+			<fieldname>reverse_int_ca</fieldname>
+			<description>Select CA assigned to client certificates.</description>
+			<type>select_source</type>
+			<source><![CDATA[$config['ca']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+			<show_disable_value>none</show_disable_value>
 		</field>
 		<field>
 			<name>Logging</name>
@@ -355,25 +359,19 @@
 		<field>
 			<fielddescr>Preserve Proxy hostname</fielddescr>
 			<fieldname>preserveproxyhostname</fieldname>
-			<description>
-				<![CDATA[
-					When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.
-				]]>
-			</description>
+			<description><![CDATA[When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.]]></description>
 			<type>checkbox</type>
 		</field>
-			<field>
+		<field>
 			<fielddescr>Log file</fielddescr>
 			<fieldname>logfile</fieldname>
-			<description>
-				<![CDATA[Enable access and error log for this virtual host.]]>
-			</description>
+			<description><![CDATA[Enable access and error log for this virtual host.]]></description>
 			<type>select</type>			
-					<options>
-			    	<option><name>Log to default apache log file</name><value>default</value></option>
-			    	<option><name>Create a log file for this site</name><value>create</value></option>
-			    	<option><name>Do not not this website</name><value>disabled</value></option>
-					</options>
+			<options>
+				<option><name>Log to default apache log file</name><value>default</value></option>
+				<option><name>Create a log file for this site</name><value>create</value></option>
+				<option><name>Do not log this website</name><value>disabled</value></option>
+			</options>
 		</field>
 		<field>
 			<name>Custom Options</name>
@@ -382,17 +380,18 @@
 		<field>
 			<fielddescr>Custom Options</fielddescr>
 			<fieldname>custom</fieldname>
-			<description>Paste extra apache config for this virtualhost. This is usefull for rewrite rules for example.</description>
+			<description>Pass extra Apache config for this VirtualHost. This is useful for Rewrite rules for example.</description>
 			<type>textarea</type>
-			<cols>65</cols>
+			<cols>90</cols>
 			<rows>10</rows>
 			<encoding>base64</encoding>
+			<dontdisplayname/>
+			<usecolspan2/>
 		</field>
-		
 	</fields>
 	<service>
 		<name>apache_mod_security</name>
-		<rcfile>/usr/local/etc/rc.d/apache_mod_security.sh</rcfile>
+		<rcfile>apache_mod_security.sh</rcfile>
 		<executable>httpd</executable>
 	</service>
 	<custom_php_resync_config_command>

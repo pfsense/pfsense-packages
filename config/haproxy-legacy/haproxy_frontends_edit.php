@@ -2,7 +2,8 @@
 /* $Id: load_balancer_pool_edit.php,v 1.24.2.23 2007/03/03 00:07:09 smos Exp $ */
 /*
 	haproxy_frontends_edit.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
+	Copyright (C) 2013 Marcello Coutinho
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -28,7 +29,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "haproxy";
 require("guiconfig.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
@@ -95,12 +96,19 @@ if ($_POST) {
 		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout");		
 	}
 	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	$reqdfields = explode(" ", "name type port max_connections client_timeout");
 	$reqdfieldsn = explode(",", "Name,Type,Port,Max connections,Client timeout");
 	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
@@ -113,12 +121,14 @@ if ($_POST) {
 
 	if (!$_POST['retries'] && is_numeric($_POST['retries']))
 		$input_errors[] = "The field 'Retries' value is not a number.";
+		
+	if ($_POST['stats_enabled'] == "yes"){
+		if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_username']))
+			$input_errors[] = "The field 'Stats Username' contains invalid characters.";
 
-	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_username']))
-		$input_errors[] = "The field 'Stats Username' contains invalid characters.";
-
-	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_password']))
-		$input_errors[] = "The field 'Stats Password' contains invalid characters.";
+		if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_password']))
+			$input_errors[] = "The field 'Stats Password' contains invalid characters.";
+		}
 
 	if (!is_numeric($_POST['max_connections']))
 		$input_errors[] = "The field 'Max connections' value is not a number.";
@@ -260,8 +270,8 @@ if ($_POST) {
 	}
 }
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "HAProxy: Frontend: Edit";
@@ -391,7 +401,21 @@ include("head.inc");
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 <form action="haproxy_frontends_edit.php" method="post" name="iform" id="iform">
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td class="tabnavtbl">
+  <?php
+        /* active tabs */
+        $tab_array = array();
+		$tab_array[] = array("Settings", false, "haproxy_global.php");
+        $tab_array[] = array("Frontends", true, "haproxy_frontends.php");		
+		$tab_array[] = array("Servers", false, "haproxy_servers.php");
+		$tab_array[] = array("Sync", false, "pkg_edit.php?xml=haproxy_sync.xml");
+		display_top_tabs($tab_array);
+  ?>
+  </td></tr>
+  <tr><td>
+	<div id="mainarea">
+	<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Edit haproxy backend</td>
 		</tr>		
@@ -408,30 +432,6 @@ include("head.inc");
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Connection timeout</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="64">
-				<div>the time (in milliseconds) we give up if the connection does not complete within (30000).</div>
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Server timeout</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="64">
-				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (30000).</div>
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Retries</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="retries" type="text" <?if(isset($pconfig['retries'])) echo "value=\"{$pconfig['retries']}\"";?> size="64">
-				<div>After a connection failure to a server, it is possible to retry, potentially
-on another server. This is useful if health-checks are too rare and you don't
-want the clients to see the failures. The number of attempts to reconnect is
-set by the 'retries' parameter (2).</div>
-			</td>
-		</tr>
-		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Type</td>
 			<td width="78%" class="vtable" colspan="2">
 				<select name="type" id="type" onchange="type_change();">
@@ -441,7 +441,43 @@ set by the 'retries' parameter (2).</div>
 					<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
 				</select>
 			</td>
-		</tr>		
+		</tr>
+		</tr>
+				<tr align="left">
+					<td width="22%" valign="top" class="vncellreq">Port</td>
+					<td width="78%" class="vtable" colspan="2">
+						<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="6" maxlength="500">
+						<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
+					</td>
+				</tr>
+				<tr>
+				  <td width="22%" valign="top" class="vncellreq">Listen address</td>
+				  <td width="78%" class="vtable">
+					<select name="extaddr" class="formfld">
+						<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
+						<option value="127.0.0.1" <?php if($pconfig['extaddr'] == "127.0.0.1") echo "selected"; ?>>127.0.0.1 (Localhost)</option>
+					<?php
+						if (is_array($config['virtualip']['vip'])):
+							foreach ($config['virtualip']['vip'] as $sn):
+					?>
+						<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>>
+							<?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?>
+						</option>
+					<?php
+							endforeach;
+						endif; 	
+					?>
+						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
+					</select>
+					<br/>
+					<span class="vexpl">
+						If you want this rule to apply to another IP address than the IP address of the interface chosen above,
+						select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
+						Also note that if you are trying to redirect connections on the LAN select the "any" option.<br>
+						While using carp, select localhost and forward via NAT.
+					</span>
+				  </td>
+				</tr>	
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Balance</td>
 			<td width="78%" class="vtable" colspan="2">
@@ -507,6 +543,69 @@ set by the 'retries' parameter (2).</div>
 				</table>
 			</td>
 		</tr>
+			<tr align="left">
+				<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>
+				<td width="78%" class="vtable" colspan="2">
+					<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?>>
+					<br/>
+					The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
+					contains the client's IP address. This is useful to let the final web server
+					know what the client address was (eg for statistics on domains)
+				</td>
+			</tr>
+			<tr align="left">
+				<td width="22%" valign="top" class="vncell">Use 'httpclose' option</td>
+				<td width="78%" class="vtable" colspan="2">
+					<input id="httpclose" name="httpclose" type="checkbox" value="yes" <?php if ($pconfig['httpclose']=='yes') echo "checked"; ?>>
+					<br/>
+					The 'httpclose' option removes any 'Connection' header both ways, and
+					adds a 'Connection: close' header in each direction. This makes it easier to
+					disable HTTP keep-alive than the previous 4-rules block.
+				</td>
+			</tr>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Connection limits</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Connection timeout</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="connection_timeout" type="text" <?if(isset($pconfig['connection_timeout'])) echo "value=\"{$pconfig['connection_timeout']}\"";?> size="64">
+				<div>the time (in milliseconds) we give up if the connection does not complete within (30000).</div>
+			</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Server timeout</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="server_timeout" type="text" <?if(isset($pconfig['server_timeout'])) echo "value=\"{$pconfig['server_timeout']}\"";?> size="64">
+				<div>the time (in milliseconds) we accept to wait for data from the server, or for the server to accept data (30000).</div>
+			</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Retries</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="retries" type="text" <?if(isset($pconfig['retries'])) echo "value=\"{$pconfig['retries']}\"";?> size="6">
+				<div>After a connection failure to a server, it is possible to retry, potentially
+on another server. This is useful if health-checks are too rare and you don't
+want the clients to see the failures. The number of attempts to reconnect is
+set by the 'retries' parameter (2).</div>
+			</td>
+		</tr>
+		<tr align="left">
+					<td width="22%" valign="top" class="vncell">Max connections</td>
+					<td width="78%" class="vtable" colspan="2">
+						<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
+					</td>
+				</tr>
+				<tr align="left">
+					<td width="22%" valign="top" class="vncell">Client timeout</td>
+					<td width="78%" class="vtable" colspan="2">
+						<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10">
+						<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (30000).</div>
+					</td>
+				</tr>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Backend stats</td>
+		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Stats Enabled</td>
 			<td width="78%" class="vtable" colspan="2">
@@ -530,14 +629,14 @@ set by the 'retries' parameter (2).</div>
 		<tr align="left" id='stats_username_row' name='stats_username_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
 			<td width="22%" valign="top" class="vncellreq">Stats Username</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"{$pconfig['stats_username']}\"";?> size="64">
+				<input id="stats_username" name="stats_username" type="text" <?if(isset($pconfig['stats_username'])) echo "value=\"{$pconfig['stats_username']}\"";?> size="25">
 			</td>
 		</tr>
 		
 		<tr align="left" id='stats_password_row' name='stats_password_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
 			<td width="22%" valign="top" class="vncellreq">Stats Password</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_password" name="stats_password" type="password" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="64">
+				<input id="stats_password" name="stats_password" type="password" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="25">
 				<br/>
 			</td>
 		</tr>
@@ -565,7 +664,7 @@ set by the 'retries' parameter (2).</div>
 		<tr align="left" id='stats_refresh_row' name='stats_refresh_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
 			<td width="22%" valign="top" class="vncell">Stats Refresh</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_refresh" name="stats_refresh" type="text" <?if(isset($pconfig['stats_refresh'])) echo "value=\"{$pconfig['stats_refresh']}\"";?> size="10" maxlength="30"><br/>
+				<input id="stats_refresh" name="stats_refresh" type="text" <?if(isset($pconfig['stats_refresh'])) echo "value=\"{$pconfig['stats_refresh']}\"";?> size="6" maxlength="30"><br/>
 				Specify the refresh rate of the stats page in seconds, or specified time unit (us, ms, s, m, h, d).
 			</td>
 		</tr>
@@ -577,53 +676,7 @@ set by the 'retries' parameter (2).</div>
 				Example: / or /index.php or /index.html or /testmypage.cgi
 			</td>
 		</tr>
-				</tr>
-				<tr align="left">
-					<td width="22%" valign="top" class="vncellreq">Port</td>
-					<td width="78%" class="vtable" colspan="2">
-						<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="30" maxlength="500">
-						<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
-					</td>
-				</tr>
-				<tr>
-				  <td width="22%" valign="top" class="vncellreq">External address</td>
-				  <td width="78%" class="vtable">
-					<select name="extaddr" class="formfld">
-						<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
-					<?php
-						if (is_array($config['virtualip']['vip'])):
-							foreach ($config['virtualip']['vip'] as $sn): 
-					?>
-						<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>>
-							<?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?>
-						</option>
-					<?php
-							endforeach;
-						endif; 	
-					?>
-						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
-					</select>
-					<br />
-					<span class="vexpl">
-						If you want this rule to apply to another IP address than the IP address of the interface chosen above,
-						select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
-						Also note that if you are trying to redirect connections on the LAN select the "any" option.
-					</span>
-				  </td>
-				</tr>
-				<tr align="left">
-					<td width="22%" valign="top" class="vncell">Max connections</td>
-					<td width="78%" class="vtable" colspan="2">
-						<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
-					</td>
-				</tr>
-				<tr align="left">
-					<td width="22%" valign="top" class="vncell">Client timeout</td>
-					<td width="78%" class="vtable" colspan="2">
-						<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10">
-						<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (30000).</div>
-					</td>
-				</tr>
+				
 <?php
 /*
 				<tr>
@@ -676,30 +729,12 @@ set by the 'retries' parameter (2).</div>
 			</tr>
 */
 ?>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>
-				<td width="78%" class="vtable" colspan="2">
-					<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?>>
-					<br/>
-					The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
-					contains the client's IP address. This is useful to let the final web server
-					know what the client address was (eg for statistics on domains)
-				</td>
-			</tr>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">Use 'httpclose' option</td>
-				<td width="78%" class="vtable" colspan="2">
-					<input id="httpclose" name="httpclose" type="checkbox" value="yes" <?php if ($pconfig['httpclose']=='yes') echo "checked"; ?>>
-					<br/>
-					The 'httpclose' option removes any 'Connection' header both ways, and
-					adds a 'Connection: close' header in each direction. This makes it easier to
-					disable HTTP keep-alive than the previous 4-rules block.
-				</td>
-			</tr>
-			<tr align="left">
-				<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
-				<td width="78%" class="vtable" colspan="2">
-					<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Advanced pass thru</td>
+		</tr>
+			<tr align="left" colspan="2" >
+				<td width="100%" class="vtable" colspan="2">
+					<textarea name='advanced' rows="6" cols="90" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
 					<br/>
 					NOTE: paste text into this box that you would like to pass thru.
 				</td>
@@ -715,12 +750,14 @@ set by the 'retries' parameter (2).</div>
 			</td>
 		</tr>
 		<tr>
-			<br/>&nbsp;<br/>
+			
 			<td colspan='3'>
 					<span class="vexpl"><b>NOTE:</b> You must add a firewall rule permitting access to this frontend!</span>
 			</td>
 		</tr>
 	</table>
+	</div>
+	</td></tr></table>
 	</form>
 <br>
 <script type="text/javascript">

@@ -1,87 +1,108 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-  <copyright>
-<![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-snortsync.xml
-part of pfSense (http://www.pfSense.com)
-Copyright (C) 2013 Marcello Coutinho
-based on pfblocker_sync.xml
-All rights reserved.
-
-Based on m0n0wall (http://m0n0.ch/wall)
-Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-All rights reserved.
+	snort.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2013 Marcello Coutinho
+	Copyright (C) 2014-2015 Bill Meeks
+	Copyright (C) 2015 Electric Sheep Fencing LP
+	All rights reserved.
 */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code MUST retain the above copyright notice,
-this list of conditions and the following disclaimer.
 
-2. Redistributions in binary form MUST reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
 */
-/* ========================================================================== */
-]]></copyright>
-	<description><![CDATA[Describe your package here]]></description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<description>Snort: XMLRPC Sync</description>
 	<name>snortsync</name>
-	<version>1.0</version>
-	<title>Snort: XMLRPC Sync (EXPERIMENTAL)</title>
+	<version>3.2.6</version>
+	<title>Snort: XMLRPC Sync</title>
 	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<tabs>
 		<tab>
 			<text>Snort Interfaces</text>
 			<url>/snort/snort_interfaces.php</url>
+			<no_drop_down/>
 		</tab>
 		<tab>
 			<text>Global Settings</text>
 			<url>/snort/snort_interfaces_global.php</url>
+			<no_drop_down/>
 		</tab>
 		<tab>
 			<text>Updates</text>
 			<url>/snort/snort_download_updates.php</url>
+			<no_drop_down/>
 		</tab>
 		<tab>
 			<text>Alerts</text>
 			<url>/snort/snort_alerts.php</url>
+			<no_drop_down/>
 		</tab>
 		<tab>
 			<text>Blocked</text>
 			<url>/snort/snort_blocked.php</url>
+			<no_drop_down/>
 		</tab>
 		<tab>
-			<text>Whitelists</text>
-			<url>/snort/snort_interfaces_whitelist.php</url>
+			<text>Pass Lists</text>
+			<url>/snort/snort_passlist.php</url>
+			<no_drop_down/>
 		</tab>
 		<tab>
 			<text>Suppress</text>
 			<url>/snort/snort_interfaces_suppress.php</url>
+			<no_drop_down/>
+		</tab>
+		<tab>
+			<text>IP Lists</text>
+			<url>/snort/snort_ip_list_mgmt.php</url>
+			<no_drop_down/>
+		</tab>
+		<tab>
+			<text>SID Mgmt</text>
+			<url>/snort/snort_sid_mgmt.php</url>
+			<no_drop_down/>
+		</tab>
+		<tab>
+			<text>Log Mgmt</text>
+			<url>/snort/snort_log_mgmt.php</url>
+			<no_drop_down/>
 		</tab>
 		<tab>
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=snort/snort_sync.xml</url>
 			<active/>
+			<no_drop_down/>
 		</tab>
 	</tabs>
 	<fields>
@@ -151,11 +172,11 @@ POSSIBILITY OF SUCH DAMAGE.
 					</options>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>IP-Address</fielddescr>
+					<fielddescr>IP Address/Hostname</fielddescr>
 					<fieldname>varsyncipaddress</fieldname>
-					<description><![CDATA[IP Address of the destination host.]]></description>
+					<description><![CDATA[IP address or hostname of the destination host.]]></description>
 					<type>input</type>
-					<size>15</size>
+					<size>40</size>
 				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr>Port</fielddescr>
@@ -180,14 +201,8 @@ POSSIBILITY OF SUCH DAMAGE.
 				</rowhelperfield>
 			</rowhelper>
 		</field>
-		<field>
-			<name>WARNING:  This feature is considered experimental and not recommended for production use</name>
-			<type>listtopic</type>
-		</field>
 	</fields>
-	<custom_delete_php_command>
-	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
-		write_config();snort_sync_on_changes();
+		write_config("Snort pkg: saved changes to XMLRPC sync configuration.");snort_sync_on_changes();
 	</custom_php_resync_config_command>
 </packagegui>

@@ -9,7 +9,7 @@
 /*
     mailscanner.xml
     part of the mailscaner package for pfSense
-    Copyright (C) 2011 Marcello Coutinho
+    Copyright (C) 2011-2013 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -54,63 +54,68 @@
 	<service>
 		<name>mailscanner</name>
 		<rcfile>mailscanner</rcfile>
-		<executable>perl5.12.4</executable>
+		<executable>perl_mailscanner</executable>
 		<description>MailScanner</description>
 	</service>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner.inc</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_report.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_report.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_antispam.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_antispam.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_alerts.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_alerts.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_antivirus.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_antivirus.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_attachments.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_attachments.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_content.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_content.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner_about.php</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner_about.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/mailscanner/mailscanner.conf.template</item>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/mailscanner.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/shortcuts/</prefix>
+		<chmod>0755</chmod>
+		<item>https://packages.pfsense.org/packages/config/mailscanner/pkg_mailscanner.inc</item>
 	</additional_files_needed>
 <tabs>
 		<tab>
@@ -228,7 +233,7 @@
 			<fielddescr>Logging</fielddescr>
 			<fieldname>syslog</fieldname>
 			<description>
-			<![CDATA[Select virus scanner tests to enable. Mailscanner default options are in (&nbsp;).]]>
+			<![CDATA[Select logging options to enable. Mailscanner default options are in (&nbsp;).]]>
 			</description>
 	    	<type>select</type>
  				<options>
@@ -342,7 +347,7 @@
 		mailscanner_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		mailscanner_validate_input($_POST, &amp;$input_errors);
+		mailscanner_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_mailscanner();

@@ -75,7 +75,12 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>Virutal Hosts</text>
+			<text>Location(s)</text>
+			<url>/pkg.php?xml=apache_location.xml</url>
+			<tab_level>2</tab_level>
+		</tab>
+		<tab>
+			<text>Virtual Hosts</text>
 			<url>/pkg.php?xml=apache_virtualhost.xml</url>
 			<tab_level>2</tab_level>
 		</tab>
@@ -103,23 +108,24 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>	
+		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>apache Reverse Peer Mappings</name>
+			<name>Apache Reverse Peer Mappings</name>
 			<type>listtopic</type>
 		</field>
 			<field>
 			<fielddescr>Enable</fielddescr>
 			<fieldname>enable</fieldname>
-			<description>If this field is checked, then this server poll will be available for virtual hosts config.</description>
+			<description>If this field is checked, then this server pool will be available for Virtual Hosts configuration.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Balancer name</fielddescr>
 			<fieldname>name</fieldname>
-			<description><![CDATA[Name to identify this peer on apache conf<br>
-						example: www_site1]]></description>
+			<description><![CDATA[Name to identify this peer in Apache configuration<br>
+						Example: www_site1]]></description>
 			<type>input</type>
 			<size>20</size>
 		</field>
@@ -133,61 +139,66 @@
 		<field>
 			<fielddescr>Protocol</fielddescr>
 			<fieldname>proto</fieldname>
-			<description><![CDATA[Protocol listening on this internal server(s) port.]]></description>
+			<description><![CDATA[Protocol used on the internal server(s).]]></description>
 			<type>select</type>
-            <options>
-              <option> <name>HTTP</name> <value>http</value> </option>
-              <option> <name>HTTPS</name> <value>https</value> </option>
-            </options>
+			<options>
+				<option> <name>HTTP</name> <value>http</value> </option>
+				<option> <name>HTTPS</name> <value>https</value> </option>
+			</options>
 		</field>
-<field>
-			<fielddescr>
-				<![CDATA[Internal Servers]]>
-			</fielddescr>
+		<field>
+			<name><![CDATA[Internal Server(s)]]></name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr><![CDATA[Internal Servers]]></fielddescr>
 			<fieldname>additionalparameters</fieldname>
-		    <type>rowhelper</type>
-		    <rowhelper>
+			<type>rowhelper</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<movable>on</movable>
+			<rowhelper>
 				<rowhelperfield>
-				    <fielddescr>fqdn or ip</fielddescr>
-				    <fieldname>host</fieldname>
-				    <description>Internal site IP or Hostnamesite</description>
-				    <type>input</type>
-				    <size>20</size>
+					<fielddescr>FQDN or IP Address</fielddescr>
+					<fieldname>host</fieldname>
+					<description>Internal site IP or site hostname</description>
+					<type>input</type>
+					<size>27</size>
 				</rowhelperfield>
 				<rowhelperfield>
-				    <fielddescr>port</fielddescr>
-				    <fieldname>port</fieldname>
-				    <description>Internal site port</description>
-				    <type>input</type>
-				    <size>4</size>
+					<fielddescr>Port</fielddescr>
+					<fieldname>port</fieldname>
+					<description>Internal site port</description>
+					<type>input</type>
+					<size>5</size>
 				</rowhelperfield>
 				<rowhelperfield>
-				    <fielddescr>routeid</fielddescr>
-				    <fieldname>routeid</fieldname>
-				    <description>id to define stick connections</description>
-				    <type>input</type>
-				    <size>4</size>
+					<fielddescr>Route ID</fielddescr>
+					<fieldname>routeid</fieldname>
+					<description>ID to define sticky connections</description>
+					<type>input</type>
+					<size>6</size>
 				</rowhelperfield>
 				<rowhelperfield>
-				    <fielddescr>weight</fielddescr>
-				    <fieldname>loadfactor</fieldname>
-				    <description>Server weight</description>
-				    <type>input</type>
-				    <size>4</size>
+					<fielddescr>Weight</fielddescr>
+					<fieldname>loadfactor</fieldname>
+					<description>Server weight</description>
+					<type>input</type>
+					<size>4</size>
 				</rowhelperfield>
 				<rowhelperfield>
-				    <fielddescr>ping</fielddescr>
-				    <fieldname>ping</fieldname>
-				    <description>Server ping test interval</description>
-				    <type>input</type>
-				    <size>4</size>
+					<fielddescr>Ping</fielddescr>
+					<fieldname>ping</fieldname>
+					<description>Server ping test interval</description>
+					<type>input</type>
+					<size>6</size>
 				</rowhelperfield>
 				<rowhelperfield>
-				    <fielddescr>ttl</fielddescr>
-				    <fieldname>ttl</fieldname>
-				    <description>Server pint ttl</description>
-				    <type>input</type>
-				    <size>4</size>
+					<fielddescr>TTL</fielddescr>
+					<fieldname>ttl</fieldname>
+					<description>Server ping TTL</description>
+					<type>input</type>
+					<size>6</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>

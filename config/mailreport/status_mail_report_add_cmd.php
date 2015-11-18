@@ -1,9 +1,9 @@
 <?php
 /* $Id$ */
 /*
-	status_rrd_graph.php
+	status_mail_report_add_cmd.php
 	Part of pfSense
-	Copyright (C) 2011 Jim Pingle <jimp@pfsense.org>
+	Copyright (C) 2011-2014 Jim Pingle <jimp@pfsense.org>
 	Portions Copyright (C) 2007-2011 Seth Mos <seth.mos@dds.nl>
 	All rights reserved.
 
@@ -33,10 +33,10 @@
 */
 
 ##|+PRIV
-##|*IDENT=page-status-rrdgraphs
-##|*NAME=Status: RRD Graphs page
-##|*DESCR=Allow access to the 'Status: RRD Graphs' page.
-##|*MATCH=status_rrd_graph.php*
+##|*IDENT=page-status-mailreportsaddcmd
+##|*NAME=Status: Email Reports: Add Command page
+##|*DESCR=Allow access to the 'Status: Email Reports: Add Command' page.
+##|*MATCH=status_mail_report_add_cmd.php*
 ##|-PRIV
 
 require("guiconfig.inc");
@@ -89,7 +89,7 @@ if ($_POST) {
 }
 
 
-$pgtitle = array(gettext("Status"),gettext("Add Mail Report Command"));
+$pgtitle = array(gettext("Status"),gettext("Add Email Report Command"));
 include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -130,7 +130,7 @@ include("head.inc");
 			<input name="Submit" type="submit" class="formbtn" value="<?=gettext("Save");?>">
 			<a href="status_mail_report_edit.php?id=<?php echo $reportid;?>"><input name="cancel" type="button" class="formbtn" value="<?=gettext("Cancel");?>"></a>
 			<input name="reportid" type="hidden" value="<?=htmlspecialchars($reportid);?>">
-			<?php if (isset($id) && $a_graphs[$id]): ?>
+			<?php if (isset($id) && $a_cmds[$id]): ?>
 			<input name="id" type="hidden" value="<?=htmlspecialchars($id);?>">
 			<?php endif; ?>
 			</td>

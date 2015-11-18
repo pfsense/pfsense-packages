@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-	authng.xml
-	part of pfSense (http://www.pfSense.com)
-	Copyright (C) 2008 Scott Ullrich
+	ntop.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2011-2013 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	 1. Redistributions of source code must retain the above copyright notice,
-		this list of conditions and the following disclaimer.
 
-	 2. Redistributions in binary form must reproduce the above copyright
-		notice, this list of conditions and the following disclaimer in the
-		documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
 
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -35,19 +38,26 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-/* ========================================================================== */
+/* ====================================================================================== */
 	]]>
 	</copyright>
 	<name>ntop</name>
-	<version>3.0</version>
+	<version>2.3.2</version>
 	<title>Diagnostics: ntop Settings</title>
-	<savetext>Change</savetext>
-	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/ntop.inc</include_file>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/ntop2/ntop.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/ntop2/ntop.priv.inc</item>
+	</additional_files_needed>
+	<aftersaveredirect>pkg_edit.php?xml=ntop.xml</aftersaveredirect>
 	<menu>
 		<name>ntop Settings</name>
-		<tooltiptext>Set ntop settings such as password and port.</tooltiptext>
 		<section>Diagnostics</section>
-		<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=ntop.xml</url>
 	</menu>
 	<menu>
 		<name>ntop</name>
@@ -60,11 +70,12 @@
 		<name>ntop</name>
 		<rcfile>ntop.sh</rcfile>
 		<executable>ntop</executable>
+		<description>NTOP Network Traffic Monitor</description>
 	</service>
 	<tabs>
 		<tab>
-			<text>ntop Settings</text>
-			<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=ntop.xml</url>
 			<active/>
 		</tab>
 		<tab>
@@ -74,15 +85,37 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>ntop Admin Password</fielddescr>
-			<fieldname>password</fieldname>
-			<description>Enter the password for the NTOP Web GUI.  Minimum 5 characters.</description>
-			<type>password</type>
+			<fielddescr>Enable ntop</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Check this to enable ntop.</description>
+			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>ntop Admin Password AGAIN</fielddescr>
+			<fielddescr>Keep Data/Settings</fielddescr>
+			<fieldname>keepdata</fieldname>
+			<description>
+				<![CDATA[
+				Check this to keep ntop settings, graphs and traffic data. (Default: on)<br />
+				<strong><span class="errmsg">Note:</span> If 'Keep Data/Settings' is disabled, all settings and data will be wiped on package uninstall/reinstall/upgrade!</strong>
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+		<field>
+			<fielddescr>ntop Admin Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password for the NTOP Web GUI. Minimum 5 characters.</description>
+			<type>password</type>
+			<required>true</required>
+			<size>20</size>
+		</field>
+		<field>
+			<fielddescr>Confirm ntop Admin Password</fielddescr>
 			<fieldname>passwordagain</fieldname>
 			<type>password</type>
+			<required>true</required>
+			<size>20</size>
 		</field>
 		<field>
 			<fielddescr>Interface</fielddescr>
@@ -91,87 +124,30 @@
 			<size>3</size>
 			<value>lan</value>
 			<multiple>true</multiple>
+			<hideinterfaceregex>loopback</hideinterfaceregex>
 		</field>
 		<field>
-			<fielddescr>Allow merging interfaces&lt;br&gt;(Def: Do not merge)</fielddescr>
-			<fieldname>allowmerge</fieldname>
+			<fielddescr>Disallow merging interfaces</fielddescr>
+			<fieldname>disallowmerge</fieldname>
+			<description>
+				<![CDATA[
+				By default, traffic information obtained by all the interfaces is merged together as if the traffic was seen by only one interface.<br />
+				Use this option to keep traffic separate by interface. (Default: Disabled)
+				]]>
+			</description>
 			<type>checkbox</type>
 		</field>
 	</fields>
-	<custom_php_global_functions>
-	<![CDATA[
-	function sync_package_ntop() {
-		conf_mount_rw();
-		config_lock();
-		global $config;
-		global $input_errors;
-		if ($_POST) {
-			$config['installedpackages']['ntop']['config'] = array();
-			$config['installedpackages']['ntop']['config'][0] = $_POST;
-		}
-		$ntop_config =& $config['installedpackages']['ntop']['config'][0];
-		$if_final = "";
-		$ifaces_final = "";
-		system("/bin/mkdir -p /var/db/ntop");
-		system("/bin/mkdir -p /var/db/ntop/rrd");
-		system("/bin/mkdir -p /var/db/ntop/rrd/graphics");
-		system("/bin/chmod -R 755 /var/db/ntop");
-		system("/usr/sbin/chown -R nobody:nobody /var/db/ntop");
-		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
-		$first = 0;
-		$mergeifs = ($ntop_config['allowmerge'] == "on") ? "" : "-M";
-		foreach($ntop_config['interface_array'] as $iface) {
-		$if = convert_friendly_interface_to_real_interface_name($iface);
-		if($if) {
-			if($first == 1)
-			$ifaces_final .= ",";
-			$ifaces_final .= $if;
-			$first = 1;
-		}
-		}
-		$start = "/usr/local/bin/ntop -i {$ifaces_final} -u root -d -4 {$mergeifs} -x 8102 -X 8192 &";
-		write_rcfile(array(
-					"file" => "ntop.sh",
-					"start" => $start,
-					"stop" => "/usr/bin/killall ntop"
-				)
-		);
-		if (is_service_running("ntop")) {
-			stop_service("ntop");
-			// Wait for ntop to shut down cleanly.
-			sleep(20);
-		}
-		if (empty($ntop_config['password']))
-			$ntop_config['password'] = "admin";
-		unlink_if_exists("/var/db/ntop/ntop_pw.db");
-		exec("/usr/local/bin/ntop --set-admin-password={$ntop_config['password']}");
-		sleep(2);
-		start_service("ntop");
-		conf_mount_ro();
-		config_unlock();
-	}
-	]]>
-	</custom_php_global_functions>
-	<custom_add_php_command>
-		sync_package_ntop();
-	</custom_add_php_command>
+	<custom_php_install_command>
+		ntop_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		ntop_php_deinstall_command();
+	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 		sync_package_ntop();
 	</custom_php_resync_config_command>
-	<custom_php_install_command>
-		sync_package_ntop();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		exec("rm /usr/local/etc/rc.d/ntop*");
-	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-	<![CDATA[
-	if ($_POST) {
-		if (empty($_POST['password']) || empty($_POST['passwordagain']))
-			$input_errors[] = "You must provide (and confirm) ntop's password.";
-		if ($_POST['password'] != $_POST['passwordagain'])
-			$input_errors[] = "The provided passwords did not match.";
-	}
-	]]>
+		ntop_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
 </packagegui>

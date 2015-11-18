@@ -1,16 +1,7 @@
 <?php
 /*
  * snort_rules_flowbits.php
- * Copyright (C) 2004 Scott Ullrich
- * Copyright (C) 2011-2012 Ermal Luci
- * All rights reserved.
- *
- * originially part of m0n0wall (http://m0n0.ch/wall)
- * Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
- * All rights reserved.
- *
- * modified for the pfsense snort package
- * Copyright (C) 2009-2010 Robert Zelaya.
+ * Copyright (C) 2013, 2014 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,9 +29,10 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $flowbit_rules_file, $rebuild_rules;
+global $g, $rebuild_rules;
 
 $snortdir = SNORTDIR;
+$flowbit_rules_file = FLOWBITS_FILENAME;
 $rules_map = array();
 $supplist = array();
 
@@ -49,15 +41,34 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 }
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
-$id = $_GET['id'];
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
+elseif (isset($_GET['id']) && is_numericint($_GET['id']))
+	$id = htmlspecialchars($_GET['id']);
+
 if (is_null($id)) {
 	header("Location: /snort/snort_interfaces.php");
 	exit;
 }
 
-$if_real = snort_get_real_interface($a_nat[$id]['interface']);
+// Set who called us so we can return to the correct page with
+// the RETURN ('cancel') button.
+if (isset($_POST['referrer']) && strpos($_POST['referrer'], '://'.$_SERVER['SERVER_NAME'].'/') !== FALSE)
+	$referrer = $_POST['referrer'];
+else
+	$referrer = $_SERVER['HTTP_REFERER'];
+
+// Make sure a rule index ID is appended to the return URL
+if (strpos($referrer, "?id={$id}") === FALSE)
+	$referrer .= "?id={$id}";
+
+// If RETURN button clicked, exit to original calling page
+if ($_POST['cancel']) {
+	header("Location: {$referrer}");
+	exit;
+}
+
+$if_real = get_real_interface($a_nat[$id]['interface']);
 $snort_uuid = $a_nat[$id]['uuid'];
 
 /* We should normally never get to this page if Auto-Flowbits are disabled, but just in case... */
@@ -67,67 +78,72 @@ if ($a_nat[$id]['autoflowbitrules'] == 'on') {
 		$rules_map = snort_load_rules_map("{$snortdir}/snort_{$snort_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 	else
-		$savemsg = "There are no flowbit-required rules necessary for the current enforcing rule set.";
+		$savemsg = gettext("There are no flowbit-required rules necessary for the current enforcing rule set.");
 }
 else
-	$input_errors[] = "Auto-Flowbit rule generation is disabled for this interface!";
+	$input_errors[] = gettext("Auto-Flowbit rule generation is disabled for this interface!");
 
-if ($_GET['act'] == "addsuppress" && is_numeric($_GET['sidid']) && is_numeric($_GET['gen_id'])) {
-	$descr = snort_get_msg($rules_map[$_GET['gen_id']][$_GET['sidid']]['rule']);
+if ($_POST['addsuppress'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid'])) {
+	$descr = snort_get_msg($rules_map[$_POST['gid']][$_POST['sid']]['rule']);
+	$suppress = gettext("## -- This rule manually suppressed from the Auto-Flowbits list. -- ##\n");
 	if (empty($descr))
-		$suppress = "suppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}\n";
+		$suppress .= "suppress gen_id {$_POST['gid']}, sig_id {$_POST['sid']}\n";
 	else
-		$suppress = "# {$descr}\nsuppress gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']}";
+		$suppress .= "# {$descr}\nsuppress gen_id {$_POST['gid']}, sig_id {$_POST['sid']}\n";
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
 		$config['installedpackages']['snortglobal']['suppress'] = array();
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
 		$config['installedpackages']['snortglobal']['suppress']['item'] = array();
 	$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
+	$found_list = false;
 
 	if (empty($a_nat[$id]['suppresslistname']) || $a_nat[$id]['suppresslistname'] == 'default') {
 		$s_list = array();
-		$s_list['name'] = $a_nat[$id]['interface'] . "suppress";
 		$s_list['uuid'] = uniqid();
-		$s_list['descr']  =  "Auto-generated list for alert suppression";
+		$s_list['name'] = $a_nat[$id]['interface'] . "suppress" . "_" . $s_list['uuid'];
+		$s_list['descr']  =  "Auto-generated list for Alert suppression";
 		$s_list['suppresspassthru'] = base64_encode($suppress);
 		$a_suppress[] = $s_list;
 		$a_nat[$id]['suppresslistname'] = $s_list['name'];
+		$found_list = true;
 	} else {
+		/* If we get here, a Suppress List is defined for the interface so see if we can find it */
 		foreach ($a_suppress as $a_id => $alist) {
 			if ($alist['name'] == $a_nat[$id]['suppresslistname']) {
+				$found_list = true;
 				if (!empty($alist['suppresspassthru'])) {
 					$tmplist = base64_decode($alist['suppresspassthru']);
 					$tmplist .= "\n{$suppress}";
 					$alist['suppresspassthru'] = base64_encode($tmplist);
 					$a_suppress[$a_id] = $alist;
 				}
+				else {
+					$alist['suppresspassthru'] = base64_encode($suppress);
+					$a_suppress[$a_id] = $alist;
+				}
 			}
 		}
 	}
-	write_config();
-	$rebuild_rules = "off";
-	sync_snort_package_config();
-	$savemsg = "Wrote suppress rule for gen_id {$_GET['gen_id']}, sig_id {$_GET['sidid']} to the {$a_nat[$id]['suppresslistname']} Suppression List.";
-}
-
-function truncate($string, $length) {
-
-	/********************************
-	 * This function truncates the  *
-	 * passed string to the length  *
-	 * specified adding ellipsis if *
-	 * truncation was necessary.    *
-	 ********************************/
-	if (strlen($string) > $length)
-		$string = substr($string, 0, ($length - 3)) . "...";
-	return $string; 
+	if ($found_list) {
+		write_config("Snort pkg: modified Suppress List for {$a_nat[$id]['interface']}.");
+		$rebuild_rules = false;
+		conf_mount_rw();
+		sync_snort_package_config();
+		conf_mount_ro();
+		snort_reload_config($a_nat[$id]);
+		$savemsg = gettext("An entry to suppress the Alert for 'gen_id {$_POST['gid']}, sig_id {$_POST['sid']}' has been added to Suppress List '{$a_nat[$id]['suppresslistname']}'.");
+	}
+	else {
+		/* We did not find the defined list, so notify the user with an error */
+		$input_errors[] = gettext("Suppress List '{$a_nat[$id]['suppresslistname']}' is defined for this interface, but it could not be found!");
+	}
 }
 
 /* Load up an array with the current Suppression List GID,SID values */
 $supplist = snort_load_suppress_sigs($a_nat[$id]);
 
-$if_friendly = snort_get_friendly_interface($a_nat[$id]['interface']);
-$pgtitle = "Services: Snort: {$if_friendly} Flowbit Rules";
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
+$pgtitle = gettext("Snort: Interface {$if_friendly} - Flowbit Rules");
 include_once("head.inc");
 
 ?>
@@ -136,12 +152,16 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-if ($input_errors) print_input_errors($input_errors);
+if ($input_errors)
+	print_input_errors($input_errors);
 if ($savemsg)
 	print_info_box($savemsg);
 ?>
 <form action="snort_rules_flowbits.php" method="post" name="iform" id="iform">
+<input type="hidden" name="id" value="<?=$id;?>"/>
+<input type="hidden" name="referrer" value="<?=$referrer;?>"/>
+<input type="hidden" name="sid" id="sid" value=""/>
+<input type="hidden" name="gid" id="gid" value=""/>
 <div id="boxarea">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
@@ -165,12 +185,13 @@ if ($savemsg)
 	</tr>
 	<tr>
 		<td width="78%" class="vncell">
-			<table width="100%" border="0 cellspacing="2" cellpadding="0">
+			<table width="100%" border="0" cellspacing="2" cellpadding="0">
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus.gif" width='12' height='12' border='0'/></td>
 					<td><span class="vexpl"><?php echo gettext("Alert is Not Suppressed"); ?></span></td>
-					<td rowspan="3" align="right"><input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="history.back()" <?php 
-					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/></td>
+					<td rowspan="3" align="right"><input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
+					echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
+					</td>
 				</tr>
 				<tr>
 					<td width="17px"><img src="../themes/<?=$g['theme']?>/images/icons/icon_plus_d.gif" width='12' height='12' border='0'/></td>
@@ -187,22 +208,24 @@ if ($savemsg)
 	</tr>
 	<tr>
 		<td>
-		<table id="myTable" width="100%" class="sortable" border="1" cellpadding="0" cellspacing="0">
+		<table id="myTable" width="100%" class="sortable" style="table-layout: fixed;" border="0" cellpadding="0" cellspacing="0">
 			<colgroup>
 				<col width="11%" axis="number">
-				<col width="10%" axis="string">
+				<col width="54" axis="string">
 				<col width="14%" axis="string">
 				<col width="14%" axis="string">
-				<col width="20%" axis="string">
+				<col width="24%" axis="string">
 				<col axis="string">
 			</colgroup>
 			<thead>
+			   <tr class="sortableHeaderRowIdentifier">
 				<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
-				<td class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
+				<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Destination"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Flowbits"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Message"); ?></th>
+			   </tr>
 			<thead>
 			<tbody>
 				<?php
@@ -218,22 +241,23 @@ if ($savemsg)
 							$tmp = trim(preg_replace('/^\s*#+\s*/', '', $tmp));
 							$rule_content = preg_split('/[\s]+/', $tmp);
 
-							$protocol = $rule_content[1]; //protocol
-							$source = truncate($rule_content[2], 14); //source
-							$destination = truncate($rule_content[5], 14); //destination
-							$message = snort_get_msg($v['rule']);
+							$protocol = $rule_content[1];         //protocol
+							$source = $rule_content[2];           //source
+							$destination = $rule_content[5];      //destination
+							$message = snort_get_msg($v['rule']); // description
 							$flowbits = implode("; ", snort_get_flowbits($v['rule']));
 							if (strstr($flowbits, "noalert"))
 								$supplink = "";
 							else {
 								if (!isset($supplist[$gid][$sid])) {
-									$supplink = "<a href=\"?id={$id}&act=addsuppress&sidid={$sid}&gen_id={$gid}\">";
-									$supplink .= "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\"";
+									$supplink = "<input type=\"image\" name=\"addsuppress[]\" onClick=\"document.getElementById('sid').value='{$sid}';";
+									$supplink .= "document.getElementById('gid').value='{$gid}';\" ";
+									$supplink .= "src=\"../themes/{$g['theme']}/images/icons/icon_plus.gif\" ";
 									$supplink .= "width='12' height='12' border='0' title='";
-									$supplink .= gettext("Click to add to Suppress List") . "'/></a>";
+									$supplink .= gettext("Click to add to Suppress List") . "'/>";
 								}
 								else {
-									$supplink .= "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus_d.gif\"";
+									$supplink = "<img src=\"../themes/{$g['theme']}/images/icons/icon_plus_d.gif\" ";
 									$supplink .= "width='12' height='12' border='0' title='";
 									$supplink .= gettext("Alert has been suppressed") . "'/>";
 								}
@@ -241,12 +265,12 @@ if ($savemsg)
 
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
-								"<td class=\"listr\">{$sid}&nbsp;{$supplink}</td>" . 
-								"<td class=\"listr\">{$protocol}</td>" . 
-								"<td class=\"listr\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
-								"<td class=\"listr\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
+								"<td class=\"listr\" style=\"sorttable_customkey:{$sid};\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
+								"<td class=\"listr\" style=\"text-align:center;\">{$protocol}</td>" . 
+								"<td class=\"listr\" style=\"overflow: hidden; text-overflow: ellipsis; text-align:center;\" nowrap><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
+								"<td class=\"listr\" style=\"overflow: hidden; text-overflow: ellipsis; text-align:center;\" nowrap><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
 								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$flowbits}</td>" . 
-								"<td class=\"listr\" style=\"word-wrap:break-word; word-break:normal;\">{$message}</td>" . 
+								"<td class=\"listbg\" style=\"word-wrap:break-word; word-break:normal;\">{$message}</td>" . 
 							"</tr>";
 							$count++;
 						}
@@ -260,9 +284,8 @@ if ($savemsg)
 	<?php if ($count > 20): ?>
 	<tr>
 		<td align="center" valign="middle">
-			<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" onclick="history.back()" <?php 
+			<input id="cancel" name="cancel" type="submit" class="formbtn" <?php 
 			echo "value=\"" . gettext("Return") . "\" title=\"" . gettext("Return to previous page") . "\""; ?>/>
-			<input name="id" type="hidden" value="<?=$id;?>" />
 		</td>
 	</tr>
 	<?php endif; ?>

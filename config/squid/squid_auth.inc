@@ -35,8 +35,7 @@ function global_eval_auth_options()
 {
 	global $config;
 	conf_mount_rw();
-	config_lock();
-	
+
 	switch ($config['installedpackages']['squidauth']['config'][0]['auth_method']) {
 		case "none":
 			dynamic_auth_content("pkg_edit");
@@ -69,7 +68,6 @@ function global_eval_auth_options()
 			break;
 	}
 	
-	config_unlock();
 	conf_mount_ro();
 	
 } /* end function global_eval_auth_options */

@@ -9,7 +9,7 @@
 /*
     postfix.xml
     part of the Postfix package for pfSense
-    Copyright (C) 2011-2013 Marcello Coutinho
+    Copyright (C) 2011-2014 Marcello Coutinho
     All rights reserved.            
                                                                   */
 /* ========================================================================== */
@@ -110,7 +110,7 @@
 								See http://www.postfix.org/header_checks.5.html for more help]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -124,7 +124,7 @@
 								See http://www.postfix.org/postconf.5.html#smtpd_helo_restrictions for more help]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -142,7 +142,7 @@
 								<strong>Note: a result of "OK" in this field is not allowed/wanted for safety reasons(it may accept forged senders as it will not do other spam checks). Instead, use DUNNO in order to exclude specific hosts from blacklists.</strong>]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -154,7 +154,7 @@
 								/^Content-(Disposition|Type):\s+.+?(?:file)?name="?.+?\.(386|ad[ept]|drv|em(ai)?l|ex[_e]|xms|\{[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}\})\b/ REJECT ".$2" file attachment types not allowed]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -166,7 +166,7 @@
        							~^[[:alnum:]+/]{60,}$~          OK]]>
 			</description>
 			<type>textarea</type>
-			<cols>83</cols>
+			<cols>80</cols>
 			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
@@ -221,7 +221,7 @@
 		postfix_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		postfix_validate_input($_POST, &amp;$input_errors);
+		postfix_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_postfix();

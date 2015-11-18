@@ -2,7 +2,8 @@
 /* $Id: load_balancer_pool_edit.php,v 1.24.2.23 2007/03/03 00:07:09 smos Exp $ */
 /*
 	haproxy_servers_edit.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
+	Copyright (C) 2013 Marcello Coutinho
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -28,7 +29,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$shortcut_section = "haproxy";
 require("guiconfig.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
@@ -69,7 +70,11 @@ if ($_POST) {
 	$reqdfields = explode(" ", "name address weight");
 	$reqdfieldsn = explode(",", "Name,Address,Weight");		
 
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
@@ -148,8 +153,8 @@ if ($_POST) {
 	}
 }
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "HAProxy: Server: Edit";
@@ -183,14 +188,29 @@ function clearcombo(){
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 	<form action="haproxy_servers_edit.php" method="post" name="iform" id="iform">
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td class="tabnavtbl">
+  <?php
+        /* active tabs */
+        $tab_array = array();
+		$tab_array[] = array("Settings", false, "haproxy_global.php");
+        $tab_array[] = array("Frontends", false, "haproxy_frontends.php");
+		$tab_array[] = array("Servers", true, "haproxy_servers.php");
+		$tab_array[] = array("Sync", false, "pkg_edit.php?xml=haproxy_sync.xml");
+		display_top_tabs($tab_array);
+  ?>
+  </td></tr>
+  <tr>
+    <td>
+	<div id="mainarea">
+		<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Edit HAProxy server</td>
 		</tr>	
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Name</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="16" maxlength="16">
+				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="16" maxlength="16"><br>
 			</td>
 		</tr>
 		<tr align="left">
@@ -225,7 +245,7 @@ function clearcombo(){
 								<?=$backend['name'];?>
 							</option>
 							<?php } ?>
-						</select>
+						</select><br>
 					</td>
 				<td>
 				<?php
@@ -244,7 +264,7 @@ function clearcombo(){
 		  </table>
 			<a onclick="javascript:addRowTo('frontendtable'); return false;" href="#">
 				<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
-			</a>
+			</a><br/>
 		</td>
 		</tr>
 		<tr>
@@ -253,8 +273,8 @@ function clearcombo(){
 				IP Address
 			</div>
 		  </td>
-		  <td width="78%" class="vtable">
-			<input name="address" type="text" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" />
+		  <td width="78%" class="vtable" colspan="2">
+			<input name="address" type="text" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" /><br/>
 		</td>
 		</tr>
 		<tr align="left">
@@ -274,7 +294,7 @@ function clearcombo(){
 				<option value="disabled" <?php  if($pconfig['status']=='disabled') echo "SELECTED";?>>disabled</option>
 				<option value="inactive" <?php  if($pconfig['status']=='inactive') echo "SELECTED";?>>inactive</option>
 				</select>
-			</td>
+			<br>Select Server Status</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Cookie</td>
@@ -286,20 +306,20 @@ function clearcombo(){
 				  sent to the client. There is nothing wrong in having several servers sharing
 				  the same cookie value, and it is in fact somewhat common between normal and
 				  backup servers. See also the "cookie" keyword in backend section.
-				
+				<br/>
 			</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Check inter</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="64">
+				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="10">
 				<br/>Defaults to 1000 if left blank.
 			</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Weight</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="weight" type="text" <?if(isset($pconfig['weight'])) echo "value=\"{$pconfig['weight']}\"";?>size="64"><br/>
+				<input name="weight" type="text" <?if(isset($pconfig['weight'])) echo "value=\"{$pconfig['weight']}\"";?>size="6"><br/>
 				The default weight is 1, and the maximal value is 255.<br/>
 				NOTE: If this 
 					  parameter is used to distribute the load according to server's capacity, it 
@@ -327,6 +347,7 @@ function clearcombo(){
 			</td>
 		</tr>
 	</table>
+	</div></td></tr></table>
 	</form>
 <br>
 <?php include("fend.inc"); ?>

@@ -90,7 +90,7 @@ anonymizelogs = {$anonymizelogs}
 #
 # Use syslog for access logging instead of logging to the file
 # at the defined or built-in "loglocation"
-#logsyslog = off
+logsyslog = {$logsyslog}
 
 # Log file location
 # 

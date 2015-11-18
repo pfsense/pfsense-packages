@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>squid</name>
-	<version>2.6.STABLE18</version>
+	<version>2.7.9 pkg v.4.3.4</version>
 	<title>Proxy server: General settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<menu>
@@ -96,57 +96,57 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid.inc</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_nac.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_nac.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_ng.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_ng.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_traffic.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_upstream.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_upstream.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_auth.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_auth.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_users.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_users.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/sqpmon.sh</item>
+		<item>https://packages.pfsense.org/packages/config/squid/sqpmon.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
+		<item>https://packages.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid/swapstate_check.php</item>
+		<item>https://packages.pfsense.org/packages/config/squid/swapstate_check.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -320,13 +320,13 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-		squid_before_form_general(&amp;$pkg);
+		squid_before_form_general($pkg);
 	</custom_php_command_before_form>
 	<custom_add_php_command>
 		squid_resync();
 	</custom_add_php_command>
 	<custom_php_validation_command>
-		squid_validate_general($_POST, &amp;$input_errors);
+		squid_validate_general($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();

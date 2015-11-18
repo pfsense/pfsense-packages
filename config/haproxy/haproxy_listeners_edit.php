@@ -2,7 +2,7 @@
 /* $Id: load_balancer_pool_edit.php,v 1.24.2.23 2007/03/03 00:07:09 smos Exp $ */
 /*
 	haproxy_listeners_edit.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -113,12 +113,19 @@ if ($_POST) {
 		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout");		
 	}
 	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	$reqdfields = explode(" ", "name type port max_connections client_timeout");
 	$reqdfieldsn = explode(",", "Name,Type,Port,Max connections,Client timeout");
 	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+	if ($pf_version < 2.1)
+		$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+	else
+		do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
@@ -241,8 +248,8 @@ if ($_POST) {
 	}
 }
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "HAProxy: Listener: Edit";

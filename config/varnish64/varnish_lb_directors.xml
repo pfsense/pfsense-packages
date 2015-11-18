@@ -49,17 +49,17 @@
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish64/varnish_settings.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish64/varnish_settings.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish64/varnish_custom_vcl.xml</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish64/varnish_custom_vcl.xml</item>
 	</additional_files_needed>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/varnish64/varnish.inc</item>
+	    <item>https://packages.pfsense.org/packages/config/varnish64/varnish.inc</item>
 	</additional_files_needed>
 	<menu>
 		<name>Varnish </name>
@@ -275,6 +275,6 @@
 		varnish_start();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		varnish_lb_directors_post_validate($_POST, &amp;$input_errors);
+		varnish_lb_directors_post_validate($_POST, $input_errors);
 	</custom_php_validation_command>	
 </packagegui>

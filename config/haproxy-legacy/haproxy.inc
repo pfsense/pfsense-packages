@@ -1,6 +1,7 @@
 <?php
 /*
     haproxy.inc
+    Copyright (C) 2013 Marcello Coutinho
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
     Copyright (C) 2008 Remco Hoef
     All rights reserved.
@@ -28,6 +29,7 @@
 */
 
 /* include all configuration functions */
+$shortcut_section = "haproxy";
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("notices.inc");
@@ -40,9 +42,33 @@ function haproxy_custom_php_deinstall_command() {
 	exec("rm /usr/local/www/haproxy*");
 }
 
+function migrate_old_sync_config(){
+	global $g, $config;
+	//move Sync HAProxy configuration (if enabled)
+	$write_config=0;
+	if(is_array($config['installedpackages']['haproxy'])){
+		$haproxy_cfg=$config['installedpackages']['haproxy'];
+		if (isset($haproxy_cfg['enablesync'])) {
+			for($si=1;$si<=3;$si++){
+				if($haproxy_cfg['synchost'.$si]) {
+					$config['installedpackages']['haproxysync']['config'][0]['row'][]=array('enabless'=>'ON',
+																			'ipaddress'=>$haproxy_cfg['synchost'.$si],
+																			'username'=> 'admin',
+																			'password'=> $haproxy_cfg['syncpassword']);
+					unset($config['installedpackages']['haproxy']['synchost'.$si]);
+					$write_config++;
+				 	}
+				}
+			}
+		}
+	if ($write_config > 0){
+		unset($config['installedpackages']['haproxy']['enablesync']);
+		unset($config['installedpackages']['haproxy']['syncpassword']);
+		write_config("Haproxy - Migrate old sync config from global to sync tab.");
+		}
+}
 function haproxy_custom_php_install_command() {
 	global $g, $config;
-	conf_mount_rw();
 
 	$haproxy = <<<EOD
 #!/bin/sh
@@ -54,7 +80,7 @@ function haproxy_custom_php_install_command() {
 . /etc/rc.subr
 
 name="haproxy"
-rcvar=`set_rcvar`
+rcvar="\${name}_enable"
 command="/usr/local/bin/haproxy"
 haproxy_enable=\${haproxy-"YES"}
 
@@ -90,8 +116,7 @@ EOD;
 	fwrite($fd, $haproxy);
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
-
-	conf_mount_ro();
+	migrate_old_sync_config();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
 }
@@ -274,34 +299,19 @@ function haproxy_configure() {
 			}
 			fwrite ($fd, "\n");
 		}
-		// Sync HAProxy configuration (if enabled)
-		if(isset($config['installedpackages']['haproxy']['enablesync'])) {
-			if($config['installedpackages']['haproxy']['synchost1']) {
-				haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost1'], 
-					$config['installedpackages']['haproxy']['syncpassword']);
-			}
-			if($config['installedpackages']['haproxy']['synchost2']) {
-				haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost2'], 
-					$config['installedpackages']['haproxy']['syncpassword']);
-			}
-			if($config['installedpackages']['haproxy']['synchost3']) {
-				haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost3'], 
-					$config['installedpackages']['haproxy']['syncpassword']);				
-			}
-		}
 	}
 
 	// create config file
 	fclose($fd);
-
+	
 	$freebsd_version = substr(trim(`uname -r`), 0, 1);
 	if(!file_exists("/usr/bin/limits")) {
-		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
+		exec("fetch -q -o /usr/bin/limits https://files.pfsense.org/extras/{$freebsd_version}/limits");
 		exec("chmod a+rx /usr/bin/limits");
 	}
 
 	exec("/usr/bin/limits -n 300014");
-
+	
 	// reload haproxy
 	if(isset($a_global['enable'])) {
 		if(is_process_running('haproxy')) {
@@ -309,13 +319,69 @@ function haproxy_configure() {
 		} else {
 			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -D");
 		}
+		haproxy_sync_on_changes();
 		return (0);
 	} else {
+		haproxy_sync_on_changes();
 		return (1);
 	}
 }
 
-function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
+/* Uses XMLRPC to synchronize the changes to a remote node */
+function haproxy_sync_on_changes() {
+	global $config, $g;		
+	if (is_array($config['installedpackages']['haproxysync']['config'])){
+		$haproxy_sync=$config['installedpackages']['haproxysync']['config'][0];
+		$synctimeout = $haproxy_sync['synctimeout'];
+		$synconchanges = $haproxy_sync['synconchanges'];
+		switch ($synconchanges){
+			case "manual":
+				if (is_array($haproxy_sync['row'])){
+					$rs=$haproxy_sync['row'];
+					}
+				else{
+					log_error("[haproxy] xmlrpc sync is enabled but there is no hosts to push haproxy config.");
+					return;
+					}
+				break;
+			case "auto":
+					if (is_array($config['hasync'])) {
+						$system_carp = $config['hasync'];
+						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
+						$rs[0]['username']=$system_carp['username'];
+						$rs[0]['password']=$system_carp['password'];
+						$rs[0]['enabless']=true;
+						if (! is_ipaddr($system_carp['synchronizetoip'])){
+							log_error("[haproxy] xmlrpc sync is enabled but there is no system backup hosts to push haproxy config.");
+							return;
+							}
+					}
+					else{
+						log_error("[haproxy] xmlrpc sync is enabled but there is no system backup hosts to push haproxy config.");
+						return;
+					}
+				break;			
+			default:
+				return;
+			break;
+		}
+		if (is_array($rs)){
+			log_error("[haproxy] xmlrpc sync is starting.");
+			foreach($rs as $sh){
+				$sync_to_ip = $sh['ipaddress'];
+				if($sh['username'])
+					$username = $sh['username'];
+				else
+					$username = 'admin';
+				if($sh['password'] && $sh['ipaddress'] && $sh['enabless'])
+					haproxy_do_xmlrpc_sync($sh['ipaddress'], $username, $sh['password'],$synctimeout);
+				}
+			log_error("[haproxy] xmlrpc sync is ending.");
+			}
+ 		}
+}
+
+function haproxy_do_xmlrpc_sync($sync_to_ip, $username="admin", $password,$synctimeout="30") {
 	global $config, $g;
 
 	if(!$password)
@@ -323,6 +389,7 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 
 	if(!$sync_to_ip)
 		return;
+		
 	
 	// Do not allow syncing to self.
 	$donotsync = false;
@@ -379,18 +446,18 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
+	$cli->setCredentials($username, $password);
 	if($g['debug'])
 		$cli->setDebug(1);
-	/* send our XMLRPC message and timeout after 250 seconds */
-	$resp = $cli->send($msg, "250");
+	/* send our XMLRPC message and timeout after $synctimeout seconds */
+	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting HAProxy XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
 		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
+		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting HAProxy XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
@@ -412,15 +479,15 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	log_error("HAProxy XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-	$resp = $cli->send($msg, "250");
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $synctimeout);
 	if(!$resp) {
 		$error = "A communications error occurred while attempting HAProxy XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "HAProxy Settings Reload", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
+		$resp = $cli->send($msg, $synctimeout);
 		$error = "An error code was received while attempting HAProxy XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");

@@ -101,7 +101,6 @@
 			<fielddescr>Max request per IP</fielddescr>
 			<fieldname>SecReadStateLimit</fieldname>
 			<description>
-			//274
 				<![CDATA[This option limits number of POSTS accepted from same IP address and help prevent the effects of a Slowloris-type of attack.<br>
 				 More info about this attack can be found here: http://en.wikipedia.org/wiki/Slowloris
 				]]>					
@@ -122,6 +121,36 @@
 			<description>Configures the maximum request body size ModSecurity will accept for buffering.</description>
 			<type>input</type>
 			<size>10</size>
+		</field>
+		<field>
+			<name>mod_security crs 10 setup</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>mod_security crs 10 setup</fielddescr>
+			<fieldname>crs10</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description><![CDATA[<b>modsecurity_crs_10_setup.conf file.</b><br>Leave empty to load setup defaults.]]></description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>15</rows>
+			<cols>90</cols>
+		</field>
+		<field>
+			<name>Custom mod_security ErrorDocument</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Custom mod_security ErrorDocument</fielddescr>
+			<fieldname>errordocument</fieldname>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<description>Custom mod_security ErrorDocument.</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+		      	<rows>10</rows>
+		      	<cols>90</cols>
 		</field>
 		<field>
 			<name>Modsecurity addons</name>

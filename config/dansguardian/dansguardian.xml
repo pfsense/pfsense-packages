@@ -59,132 +59,137 @@
 		<description><![CDATA[Award winning Open Source web content filter]]></description>
 	</service>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian.inc</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian.php</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_ldap.php</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_ldap.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_ldap.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_ldap.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_limits.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_limits.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_ips_header.template</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_ips_header.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_users_header.template</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_users_header.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_users_footer.template</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_users_footer.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_about.php</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_about.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_config.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_config.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_sync.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardianfx.conf.template</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardianfx.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_url_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_url_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_site_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_site_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_search_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_search_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_pics_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_pics_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_phrase_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_phrase_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_log.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_log.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_header_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_header_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_groups.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_groups.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_file_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_file_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_content_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_content_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_blacklist.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_blacklist.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_antivirus_acl.xml</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_antivirus_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian.conf.template</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/dansguardian/dansguardian_rc.template</item>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/icapscan.conf.template</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_rc.template</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -372,7 +377,7 @@
 		dansguardian_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		dansguardian_validate_input($_POST, &amp;$input_errors);
+		dansguardian_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_dansguardian();

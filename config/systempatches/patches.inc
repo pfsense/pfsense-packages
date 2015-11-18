@@ -1,7 +1,9 @@
 <?php
 /*
 	patches.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -25,11 +27,12 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require_once("globals.inc");
 require_once("util.inc");
+require_once("pfsense-utils.inc");
 
-$git_root_url = "http://github.com/pfsense/pfsense/commit/";
+global $git_root_url, $patch_suffix, $patch_dir, $patch_cmd;
+$git_root_url = "https://github.com/pfsense/pfsense/commit/";
 $patch_suffix = ".patch";
 $patch_dir = "/var/patches";
 $patch_cmd = "/usr/bin/patch";
@@ -54,10 +57,11 @@ function patch_commit($patch, $action, $test=false, $fulldetail=false) {
 	$full_patch_command = "{$patch_cmd} --directory={$directory} {$force} {$pathstrip} {$filename} {$check} {$direction} {$whitespace}";
 	conf_mount_rw();
 	patch_write($patch);
-	if (!$fulldetail)
+	if (!$fulldetail) {
 		$output = (mwexec($full_patch_command, true) == 0);
-	else
+	} else {
 		$output = $full_patch_command . "\n\n" . shell_exec($full_patch_command . ' 2>&1');
+	}
 	patch_erase($patch);
 	conf_mount_ro();
 	return $output;
@@ -85,12 +89,30 @@ function patch_test_revert($patch, $fulldetail=false) {
 
 /* Fetch a patch from a URL or github */
 function patch_fetch(& $patch) {
+	global $g;
 	$url = patch_fixup_url($patch['location']);
-	$text = @file_get_contents($url);
+	$temp_filename = tempnam("{$g['tmp_path']}/", "system_patches");
+	/*
+	 * Backwards compatibility with older 2.1.x pfSense versions
+	 * that did not contain download_file() function in pfsense-utils.inc
+	 */
+	if (!function_exists("download_file")) {
+		download_file_with_progress_bar($url, $temp_filename);
+	} else {
+		download_file($url, $temp_filename);
+	}
+	$text = @file_get_contents($temp_filename);
+	unlink($temp_filename);
 	if (empty($text)) {
 		return false;
 	} else {
 		$patch['patch'] = base64_encode($text);
+		// Detect pfSense move from / to /src and fix pathstrip
+		if (is_github_url($patch['location']) &&
+		    $patch['pathstrip'] == 1 &&
+		    preg_match('/\n--- a\/src\//', $text)) {
+			$patch['pathstrip'] = 2;
+		}
 		write_config("Fetched patch {$patch['descr']}");
 		return true;
 	}
@@ -153,12 +175,18 @@ function is_github_url($url) {
 function bootup_apply_patches() {
 	global $config;
 
+	if (!isset($config['installedpackages']['patches']['item']) ||
+	    !is_array($config['installedpackages']['patches']['item'])) {
+		$config['installedpackages']['patches']['item'] = array();
+	}
+
 	$a_patches = &$config['installedpackages']['patches']['item'];
 
 	foreach ($a_patches as $patch) {
 		/* Skip the patch if it should not be automatically applied. */
-		if (!isset($patch['autoapply']))
+		if (!isset($patch['autoapply'])) {
 			continue;
+		}
 		/* If the patch can be reverted it is already applied, so skip it. */
 		if (!patch_test_revert($patch)) {
 			/* Only attempt to apply if it can be applied. */
@@ -172,12 +200,15 @@ function bootup_apply_patches() {
 function patch_add_shellcmd() {
 	global $config;
 	$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
-	if (!is_array($a_earlyshellcmd))
+	if (!is_array($a_earlyshellcmd)) {
 		$a_earlyshellcmd = array();
+	}
 	$found = false;
-	foreach ($a_earlyshellcmd as $idx => $cmd)
-		if (stristr($cmd, "apply_patches.php"))
+	foreach ($a_earlyshellcmd as $idx => $cmd) {
+		if (stristr($cmd, "apply_patches.php")) {
 			$found = true;
+		}
+	}
 	if (!$found) {
 		$a_earlyshellcmd[] = "/usr/local/bin/php -f /usr/local/bin/apply_patches.php";
 		write_config("System Patches package added a shellcmd");
@@ -187,8 +218,9 @@ function patch_add_shellcmd() {
 function patch_remove_shellcmd() {
 	global $config;
 	$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
-	if (!is_array($a_earlyshellcmd))
+	if (!is_array($a_earlyshellcmd)) {
 		$a_earlyshellcmd = array();
+	}
 	$removed = false;
 	foreach ($a_earlyshellcmd as $idx => $cmd) {
 		if (stristr($cmd, "apply_patches.php")) {
@@ -196,8 +228,9 @@ function patch_remove_shellcmd() {
 			$removed = true;
 		}
 	}
-	if ($removed)
+	if ($removed) {
 		write_config("System Patches package removed a shellcmd");
+	}
 }
 
 ?>

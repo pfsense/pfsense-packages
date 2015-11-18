@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    spamd.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2008 Scott Ullrich
-    All rights reserved.            
-                                                                  */
-/* ========================================================================== */
+	spamd.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>spamdsources</name>
-	<version>4.2</version>
+	<version>1.1.7</version>
 	<title>SpamD: External Sources</title>
 	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<backup_file>/var/db/spamd</backup_file>
-	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>SpamD</name>
 		<section>Services</section>
 		<configfile>spamd.xml</configfile>
 	</menu>
 	<service>
-                <name>spamd</name>
-                <rcfile>spamd.sh</rcfile>
-                <executable>spamd</executable>
-        </service>
+		<name>spamd</name>
+		<rcfile>spamd.sh</rcfile>
+		<executable>spamd</executable>
+		<description>SpamD Greylisting Daemon</description>
+	</service>
 	<tabs>
 		<tab>
 			<text>SpamD External Sources</text>
@@ -76,8 +76,6 @@
 			<url>/spamd_db.php</url>
 		</tab>
 	</tabs>
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
 	<configpath>['installedpackages']['spamd']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
@@ -93,82 +91,59 @@
 			<fieldname>providerdescription</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
-    	<additional_files_needed>
-	    <prefix>/usr/local/www/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_rules.php</item>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/spamd/spamd_whitelist.xml</item>
 	</additional_files_needed>
-    	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_whitelist.xml</item>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/spamd/spamd.inc</item>
 	</additional_files_needed>
-    	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_outlook.xml</item>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/spamd/spamd.priv.inc</item>
 	</additional_files_needed>
-    	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd.inc</item>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/spamd/spamd_settings.xml</item>
 	</additional_files_needed>
-    	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_settings.xml</item>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<item>https://packages.pfsense.org/packages/config/spamd/spamd_db.php</item>
 	</additional_files_needed>
-    <additional_files_needed>
-	    <prefix>/usr/local/www/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_db.php</item>
-	</additional_files_needed>
-    <additional_files_needed>
-	    <prefix>/usr/local/www/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_db_ext.php</item>
-	</additional_files_needed>
-    <additional_files_needed>
-	    <prefix>/usr/local/bin/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd/spamd_gather_stats.php</item>
-	</additional_files_needed>	
-
-	<!-- fields gets invoked when the user adds or edits a item.   the following items
-         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
 			<fielddescr>Provider Name</fielddescr>
 			<fieldname>providername</fieldname>
-			<description>Enter the name of the source</description>
+			<description>Enter the name of the source.</description>
 			<type>input</type>
 			<size>30</size>
 		</field>
 		<field>
 			<fielddescr>Provider Type</fielddescr>
 			<fieldname>providertype</fieldname>
-			<description>Select the Provider Type</description>
+			<description>Select the Provider Type.</description>
 			<type>select</type>
 			<size>1</size>
 			<value>black</value>
 			<options>
-			    <option><name>Black List</name><value>black</value></option>
-			    <option><name>White List</name><value>white</value></option>
+				<option><name>Black List</name><value>black</value></option>
+				<option><name>White List</name><value>white</value></option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Provider Description</fielddescr>
 			<fieldname>providerdescription</fieldname>
-			<description>Enter the description for this item</description>
+			<description>Enter the description for this item.</description>
 			<type>textarea</type>
 			<size>30</size>
-			<cols>40</cols>			
+			<cols>40</cols>
 			<rows>4</rows>
 		</field>
 		<field>
 			<fielddescr>Reject message</fielddescr>
 			<fieldname>rejectmessage</fieldname>
-			<description>Enter the message to display to emailing parties that are on this providers list</description>
+			<description>Enter the message to display to emailing parties that are on this providers list.</description>
 			<type>textarea</type>
 			<size>30</size>
 			<cols>40</cols>
@@ -177,14 +152,14 @@
 		<field>
 			<fielddescr>Provider Method</fielddescr>
 			<fieldname>providermethod</fieldname>
-			<description>Select the Provider Method</description>
+			<description>Select the Provider Method.</description>
 			<type>select</type>
 			<size>1</size>
 			<value>http</value>
 			<options>
 				<option><name>File</name><value>file</value></option>
-			    <option><name>URL</name><value>http</value></option>
-			    <option><name>Execute command</name><value>exec</value></option>
+				<option><name>URL</name><value>http</value></option>
+				<option><name>Execute command</name><value>exec</value></option>
 			</options>
 		</field>
 		<field>
@@ -208,5 +183,7 @@
 	<custom_php_deinstall_command>
 		custom_php_deinstall_command();
 	</custom_php_deinstall_command>
-	<filter_rules_needed>spamd_generate_rules</filter_rules_needed>
+	<filter_rules_needed>
+		spamd_generate_rules
+	</filter_rules_needed>
 </packagegui>

@@ -63,8 +63,8 @@
 			<url>/pkg_edit.php?xml=dansguardian_blacklist.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Access Lists</text>
-			<url>/pkg_edit.php?xml=dansguardian_site_acl.xml&amp;id=0</url>
+			<text>ACLs</text>
+			<url>/pkg.php?xml=dansguardian_site_acl.xml</url>
 		</tab>
 		<tab>
 			<text>LDAP</text>

@@ -35,13 +35,13 @@ require_once("filter.inc");
 require_once("rrd.inc");
 
 $graph_length = array(
-	"8hour" => 28800,
+	"eighthour" => 28800,
 	"day" => 86400,
 	"week" => 604800,
 	"month" => 2764800,
 	"quarter" => 8035200,
 	"year" => 31622400,
-	"4year" => 126489600);
+	"fouryear" => 126489600);
 
 $logfile_friendly = array(
 	"dhcpd"      => "DHCP",
@@ -88,6 +88,7 @@ function get_dates($curperiod, $graph) {
 				$offset = 0;
 		}
 		switch($graph) {
+			case "eighthour":
 			case "8hour":
 				if($curhour < 24)
 					$starthour = 16;
@@ -142,6 +143,7 @@ function get_dates($curperiod, $graph) {
 				if($offset != 0)
 					$end = mktime(0, 0, 0, 1, 0, (($curyear + $offset) +1));
 				break;
+			case "fouryear":
 			case "4year":
 				$start = mktime(0, 0, 0, 1, 0, (($curyear - 3) + $offset));
 				if($offset != 0)
@@ -183,7 +185,7 @@ function set_mail_report_cron_jobs($a_mailreports) {
 	}
 }
 
-include('phpmailer/class.phpmailer.php');
+include('phpmailer/PHPMailerAutoload.php');
 
 function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	global $config, $g;
@@ -194,11 +196,13 @@ function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 	$mail = new PHPMailer();
 	$mail->IsSMTP();
 	$mail->Host = $config['notifications']['smtp']['ipaddress'];
+	$mail->Port = empty($config['notifications']['smtp']['port']) ? 25 : $config['notifications']['smtp']['port'];
 
-	if ($config['notifications']['smtp']['ssl'] == "checked")
+	if ((isset($config['notifications']['smtp']['ssl']) && $config['notifications']['smtp']['ssl'] != "unchecked") || $config['notifications']['smtp']['ssl'] == "checked")
 		$mail->SMTPSecure =  "ssl";
 
-	$mail->Port = empty($config['notifications']['smtp']['port']) ? 25 : $config['notifications']['smtp']['port'];
+	if ((isset($config['notifications']['smtp']['tls']) && $config['notifications']['smtp']['tls'] != "unchecked") || $config['notifications']['smtp']['tls'] == "checked")
+		$mail->SMTPSecure =  "tls";
 
 	if($config['notifications']['smtp']['username'] &&
 	   $config['notifications']['smtp']['password']) {
@@ -209,11 +213,11 @@ function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 
 	$mail->ContentType = 'text/html';
 	$mail->IsHTML(true);
-	$mail->AddReplyTo($config['notifications']['smtp']['fromaddress'], "Firewall Graph Report");
-	$mail->SetFrom($config['notifications']['smtp']['fromaddress'], "Firewall Graph Report");
+	$mail->AddReplyTo($config['notifications']['smtp']['fromaddress'], "Firewall Email Report");
+	$mail->SetFrom($config['notifications']['smtp']['fromaddress'], "Firewall Email Report");
 	$address = $config['notifications']['smtp']['notifyemailaddress'];
 	$mail->AddAddress($address, "Report Recipient");
-	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Graph Report: {$headertext}";
+	$mail->Subject = "{$config['system']['hostname']}.{$config['system']['domain']} Email Report: {$headertext}";
 	$mail->Body .= "This is a periodic report from your firewall, {$config['system']['hostname']}.{$config['system']['domain']}.<br /><br />Current report: {$headertext}<br />\n<br />\n";
 	if (!empty($cmdtext))
 		$mail->Body .= $cmdtext;
@@ -229,8 +233,6 @@ function mail_report_send($headertext, $cmdtext, $logtext, $attachments) {
 
 	if(!$mail->Send()) {
 		echo "Mailer Error: " . $mail->ErrorInfo;
-	} else {
-		echo "<strong>Message sent to {$address}!</strong>\n";
 	}
 }
 
@@ -240,7 +242,9 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 	require_once("filter.inc");
 	require_once("shaper.inc");
 	require_once("rrd.inc");
+	require_once("util.inc");
 	global $g;
+	$g['theme'] = get_current_theme();
 
 	$pgtitle = array(gettext("System"),gettext("RRD Graphs"),gettext("Image viewer"));
 
@@ -282,7 +286,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 
 	/* this should never happen */
 	if($end < $start) {
-		log_error("start $start is smaller than end $end");
+		log_error("start $start is greater than end $end");
 			$end = $now;
 	}
 
@@ -388,7 +392,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 
 	$speedlimit = ($upstream + $downstream);
 
-	/* Set default colors explicity, the theme can then override them below.
+	/* Set default colors explicitly, the theme can then override them below.
 	   This prevents missing colors in themes from crashing the graphs. */
 	$colortrafficup = array("666666", "CCCCCC");
 	$colortrafficdown = array("990000", "CC0000");
@@ -398,6 +402,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 	$colorstates = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
 	$colorprocessor = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
 	$colormemory = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
+	$colormbuf = array('990000','a83c3c','b36666','bd9090','cccccc','000000');
 	$colorqueuesup = array('000000','7B0000','990000','BB0000','CC0000','D90000','EE0000','FF0000','CC0000');
 	$colorqueuesdown = array('000000','7B7B7B','999999','BBBBBB','CCCCCC','D9D9D9','EEEEEE','FFFFFF','CCCCCC');
 	$colorqueuesdropup = array('000000','7B0000','990000','BB0000','CC0000','D90000','EE0000','FF0000','CC0000');
@@ -527,7 +532,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 		$graphcmd .= "--height 200 --width 620 ";
 
 		$iflist = get_configured_interface_list();
-		$g = 0;
+		$h = 0;
 		$operand = "";
 		$comma = "";
 		$graphtputbip = "";
@@ -573,7 +578,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_out_t_block={$ifname}-out_bytes,0,$speedlimit,LIMIT,UN,0,{$ifname}-out_bytes_block,IF,$seconds,*\" ";
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_t_pass={$ifname}-bytes_in_t_pass,{$ifname}-bytes_out_t_pass,+\" ";
 			$graphcmd .= "CDEF:\"{$ifname}-bytes_t_block={$ifname}-bytes_in_t_block,{$ifname}-bytes_out_t_block,+\" ";
-			if ($g > 0) {
+			if ($h > 0) {
 				$operand .= ",+";
 				$comma = ",";
 			}
@@ -589,7 +594,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 			$graphtputbyob .= "{$comma}{$ifname}-bytes_out_t_block";
 			$graphtputbytp .= "{$comma}{$ifname}-bytes_t_pass";
 			$graphtputbytb .= "{$comma}{$ifname}-bytes_t_block";
-			$g++;
+			$h++;
 		}
 		$graphcmd .= "CDEF:\"tput-in_bits_pass={$graphtputbip}{$operand}\" ";
 		$graphcmd .= "CDEF:\"tput-out_bits_pass={$graphtputbop}{$operand}\" ";
@@ -714,7 +719,7 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 		$graphcmd .= "COMMENT:\"\t\t\t\t\t\t\t\t\t\t\t\t\t`date +\"%b %d %H\:%M\:%S %Y\"`\" ";
 	}
 	elseif((strstr($curdatabase, "-wireless.rrd")) && (file_exists("$rrddbpath$curdatabase"))) {
-		/* define graphcmd for packets stats */
+		/* define graphcmd for wireless stats */
 		$graphcmd = "$rrdtool graph $rrdtmppath$curdatabase-$curgraph.png ";
 		$graphcmd .= "--start $start --end $end ";
 		$graphcmd .= "--vertical-label \"snr/channel/rate\" ";
@@ -920,6 +925,50 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 		$graphcmd .= "GPRINT:\"wire:AVERAGE:%7.2lf %s	\" ";
 		$graphcmd .= "GPRINT:\"wire:MAX:%7.2lf %s	\" ";
 		$graphcmd .= "GPRINT:\"wire:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"\t\t\t\t\t\t\t\t\t\t\t\t\t`date +\"%b %d %H\:%M\:%S %Y\"`\" ";
+	}
+	elseif((strstr($curdatabase, "-mbuf.rrd")) && (file_exists("$rrddbpath$curdatabase"))) {
+		/* define graphcmd for mbuf usage stats */
+		$graphcmd = "$rrdtool graph $rrdtmppath$curdatabase-$curgraph.png ";
+		$graphcmd .= "--start $start --end $end ";
+		$graphcmd .= "--vertical-label \"utilization, percent\" ";
+		$graphcmd .= "--color SHADEA#eeeeee --color SHADEB#eeeeee ";
+		$graphcmd .= "--title \"`hostname` - {$prettydb} clusters - {$hperiod} - {$havg} average\" ";
+		$graphcmd .= "--height 200 --width 620 ";
+		$graphcmd .= "DEF:\"current=$rrddbpath$curdatabase:current:AVERAGE\" ";
+		$graphcmd .= "DEF:\"cache=$rrddbpath$curdatabase:cache:AVERAGE\" ";
+		$graphcmd .= "DEF:\"total=$rrddbpath$curdatabase:total:AVERAGE\" ";
+		$graphcmd .= "DEF:\"max=$rrddbpath$curdatabase:max:AVERAGE\" ";
+		$graphcmd .= "LINE2:\"current#{$colormbuf[0]}:current\" ";
+		$graphcmd .= "LINE2:\"cache#{$colormbuf[1]}:cache\" ";
+		$graphcmd .= "LINE2:\"total#{$colormbuf[2]}:total\" ";
+		$graphcmd .= "LINE2:\"max#{$colormbuf[3]}:max\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"\t\t	minimum	average	maximum	current\\n\" ";
+		$graphcmd .= "COMMENT:\"Current.	\" ";
+		$graphcmd .= "GPRINT:\"current:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"current:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"current:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"current:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"Cache.	\" ";
+		$graphcmd .= "GPRINT:\"cache:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"cache:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"cache:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"cache:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"Total.	\" ";
+		$graphcmd .= "GPRINT:\"total:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"total:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"total:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"total:LAST:%7.2lf %S	\" ";
+		$graphcmd .= "COMMENT:\"\\n\" ";
+		$graphcmd .= "COMMENT:\"Max.		\" ";
+		$graphcmd .= "GPRINT:\"max:MIN:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"max:AVERAGE:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"max:MAX:%7.2lf %s	\" ";
+		$graphcmd .= "GPRINT:\"max:LAST:%7.2lf %S	\" ";
 		$graphcmd .= "COMMENT:\"\\n\" ";
 		$graphcmd .= "COMMENT:\"\t\t\t\t\t\t\t\t\t\t\t\t\t`date +\"%b %d %H\:%M\:%S %Y\"`\" ";
 	}
@@ -1234,15 +1283,20 @@ function mail_report_get_log($logfile, $tail, $grepfor) {
 	$logarr = "";
 	$grepline = "  ";
 	if(is_array($grepfor))
-		foreach($grepfor as $agrep)
-			$grepline .= " | grep \"$agrep\"";
+		$grepline = " | /usr/bin/egrep " . escapeshellarg(implode("|", $grepfor));
 	if($config['system']['disablesyslogclog']) {
 		exec("cat {$logfile}{$grepline} | /usr/bin/tail -n {$tail}", $logarr);
 	} else {
 		if(isset($config['system']['usefifolog'])) {
 			exec("/usr/sbin/fifolog_reader {$logfile}{$grepline} | /usr/bin/tail -n {$tail}", $logarr);
 		} else {
-			exec("/usr/sbin/clog {$logfile}{$grepline}| grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/tail -n {$tail}", $logarr);
+			if (is_executable("/usr/local/sbin/clog")) {
+				exec("/usr/local/sbin/clog {$logfile}{$grepline}| grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/tail -n {$tail}", $logarr);
+			} elseif (is_executable("/usr/sbin/clog")) {
+				exec("/usr/sbin/clog {$logfile}{$grepline}| grep -v \"CLOG\" | grep -v \"\033\" | /usr/bin/tail -n {$tail}", $logarr);
+			} else {
+				$logarr = array("Cannot locate clog which is required for reading log files.");
+			}
 		}
 	}
 	return($logarr);
@@ -1254,6 +1308,17 @@ function get_friendly_log_name($logfile) {
 	if (!empty($logfile_friendly[$friendly]))
 		$friendly = $logfile_friendly[$friendly];
 	return $friendly;
+}
+
+function fixup_graph_timespan($timespan) {
+	switch ($timespan) {
+		case "8hour":
+			return "eighthour";
+		case "4year":
+			return "fouryear";
+		default:
+			return $timespan;
+	}
 }
 
 ?>

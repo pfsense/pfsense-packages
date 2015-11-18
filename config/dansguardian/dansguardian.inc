@@ -87,6 +87,7 @@ function check_ca_hashes(){
 				$cert=0;
 				}
 			}
+		conf_mount_ro();
 		}
 }
 
@@ -163,7 +164,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	$maxips=($dansguardian['maxips']?$dansguardian['maxips']:"0");
 	$preforkchildren=($dansguardian['preforkchildren']?$dansguardian['preforkchildren']:"10");
 	$proxyip=($dansguardian['proxyip']?$dansguardian['proxyip']:"127.0.0.1");
-	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"127.0.0.1");
+	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"3128");
 	$proxytimeout=($dansguardian['proxytimeout']?$dansguardian['proxytimeout']:"30");
 	
 	#general options
@@ -185,6 +186,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	$icapscan=(preg_match('/icapscan/',$dansguardian_config['content_scanners'])?"on":"off");
 	$contentscannertimeout=($dansguardian_config['contentscannertimeout']?$dansguardian_config['contentscannertimeout']:"60");
 	$contentscanexceptions=($dansguardian_config['contentscanexceptions']?"on":"off");
+	$icapurl=($dansguardian_config['icapurl']?$dansguardian_config['icapurl']:"icap://icapserver:1344/avscan");
 	$recheckreplacedurls=(preg_match('/recheckreplacedurls/',$dansguardian_config['misc_options'])?"on":"off");
 	$forwardedfor=(preg_match('/forwardedfor/',$dansguardian_config['misc_options'])?"on":"off");
 	$recheckreplacedurls=(preg_match('/icapscan/',$dansguardian_config['misc_options'])?"on":"off");
@@ -231,6 +233,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	$nologger=(preg_match('/nologger/',$dansguardian_log['logging_options'])?"on":"off");
 	$logadblocks=(preg_match('/logadblocks/',$dansguardian_log['logging_options'])?"on":"off");
 	$anonymizelogs=(preg_match('/anonymizelogs/',$dansguardian_log['logging_options'])?"on":"off");
+	$logsyslog=(preg_match('/logsyslog/',$dansguardian_log['logging_options'])?"on":"off");
 
 	$loglevel=($dansguardian_log['loglevel']?$dansguardian_log['loglevel']:"2");
 	$logexceptionhits=($dansguardian_log['logexceptionhits']?$dansguardian_log['logexceptionhits']:"2");
@@ -321,7 +324,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	
 	#contentscanners preg_replace patterns
 	$match[0]="/(conf)/";
-	$match[1]="/(\/usr.local)/";
+	$match[1]="/\/usr.local|".str_replace("/","\\/",DANSGUARDIAN_DIR)."/";
 	$match[2]="/,/";
 	$replace[0]="$1'";
 	$replace[1]="contentscanner = '".DANSGUARDIAN_DIR;
@@ -331,7 +334,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	
 	#includes preg_replace patterns
 	$match[0]="/(.)$/";
-	$match[1]="/\/usr.local/";
+	$match[1]="/\/usr.local|".str_replace("/","\\/",DANSGUARDIAN_DIR)."/";
 	$match[2]="/,/";
 	$replace[0]="$1>\n";
 	$replace[1]="\n.Include<".DANSGUARDIAN_DIR;
@@ -932,8 +935,8 @@ EOF;
 		}
 	else{
 		if ($dansguardian_blacklist['cron']=="force_download"){
-			log_error("Blacklist udpate process started");
-			file_notice("Dansguardian - Blacklist udpate process started","");
+			log_error("Blacklist update process started");
+			file_notice("Dansguardian - Blacklist update process started","");
 			file_put_contents("/root/dansguardian_custom.script",base64_decode($dansguardian_blacklist['custom_script']),LOCK_EX);
 			if ($dansguardian_blacklist['enable_custom_script'] && $dansguardian_blacklist['custom_script'] != "")
 				mwexec_bg("/root/dansguardian_custom.script");
@@ -974,6 +977,7 @@ EOF;
 	$filterip=($filterip==""?"filterip = ":$filterip);
 	$filterports=($filterports==""?"filterports = $filterport":$filterports);
 	include("/usr/local/pkg/dansguardian.conf.template");	
+	include("/usr/local/pkg/icapscan.conf.template");	
 
 	#check cron_tab
 	$new_cron=array();
@@ -1091,6 +1095,7 @@ EOF;
 	conf_mount_rw();
 
 	write_config();
+
 	#update cron
 	if ($cron_found > 0){
 		$config['cron']=$new_cron;
@@ -1111,6 +1116,7 @@ EOF;
 	
 	#create config files
 	file_put_contents($dansguardian_dir."/dansguardian.conf", $dg, LOCK_EX);
+	file_put_contents($dansguardian_dir."/contentscanners/icapscan.conf", $icapconf, LOCK_EX);
 	
 	#check virus_scanner options
 	$libexec_dir= DANSGUARDIAN_DIR."/libexec/dansguardian/";
@@ -1176,8 +1182,8 @@ EOF;
 	$script='/usr/local/etc/rc.d/dansguardian.sh';
 	unlink_if_exists('/usr/local/etc/rc.d/dansguardian');
 	if($config['installedpackages']['dansguardian']['config'][0]['enable']=="on"){
-		copy('/usr/local/pkg/dansguardian_rc.template',$script);
-		chmod ($script,0755);
+		@copy('/usr/local/pkg/dansguardian_rc.template',$script);
+		@chmod ($script,0755);
 		if (is_process_running('dansguardian')){
 			log_error('Reloading Dansguardian');
 			exec("/usr/local/sbin/dansguardian -r");
@@ -1191,13 +1197,12 @@ EOF;
 		if (is_process_running('dansguardian')){
 			log_error('Dansguardian is disabled, stopping process...');
 			mwexec("$script stop");
-			}
-		if (file_exists($script))
-			chmod ($script,444);	
+		}
+		@unlink($script);
 	}
 	
 	if (!file_exists(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8'))
-		file_put_contents(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8',"",LOCK_EX);
+		@file_put_contents(DANSGUARDIAN_DIR . '/etc/dansguardian/lists/phraselists/pornography/weighted_russian_utf8',"",LOCK_EX);
 	
 	#check ca certs hashes	
 	check_ca_hashes();
@@ -1295,7 +1300,7 @@ function dansguardian_php_deinstall_command() {
 	
 	if (file_exists("/usr/local/etc/rc.d/dansguardian.sh")){
 		conf_mount_rw();
-		chmod ("/usr/local/etc/rc.d/dansguardian.sh",0444);
+		@unlink("/usr/local/etc/rc.d/dansguardian.sh");
 		conf_mount_ro();
 	}
 }

@@ -1,15 +1,15 @@
 <?php
 /*
 	postfix.php
-	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
-	based on varnish_view_config.
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2011-2014 Marcello Coutinho <marcellocoutinho@gmail.com>
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-	1. Redistributions of source code MUST retain the above copyright notice,
+	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 
 	2. Redistributions in binary form must reproduce the above copyright
@@ -33,115 +33,145 @@ require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("/usr/local/pkg/postfix.inc");
 
-$uname=posix_uname();
-if ($uname['machine']=='amd64')
+$uname = posix_uname();
+if ($uname['machine'] == 'amd64') {
         ini_set('memory_limit', '250M');
+}
 
-function get_remote_log(){
-	global $config,$g,$postfix_dir;
+function get_remote_log() {
+	global $config, $g, $postfix_dir;
 	$curr_time = time();
-	$log_time=date('YmdHis',$curr_time);
-	#get protocol
-    if($config['system']['webgui']['protocol'] != "") 
-		$synchronizetoip = $config['system']['webgui']['protocol']. "://";
-   	#get port
-    $port = $config['system']['webgui']['port'];
-    #if port is empty lets rely on the protocol selection 
-    if($port == "")
-    	$port =($config['system']['webgui']['protocol'] == "http"?"80":"443"); 
-	$synchronizetoip .= $sync_to_ip;
-	if (is_array($config['installedpackages']['postfixsync']))
-		foreach($config['installedpackages']['postfixsync']['config'][0]['row'] as $sh){
-			$sync_to_ip = $sh['ipaddress'];
-			$sync_type = $sh['sync_type'];
-			$password = $sh['password'];
-			$file= '/var/db/postfix/'.$server.'.sql';
-			#get remote data
-			if ($sync_type=='fetch'){
-				$url= $synchronizetoip . $sync_to_ip;
-				print "$sync_to_ip $url, $port\n";			
-				$method = 'pfsense.exec_php';
-				$execcmd  = "require_once('/usr/local/www/postfix.php');\n";
-				$execcmd .= '$toreturn=get_sql('.$log_time.');';
-				/* assemble xmlrpc payload */
-				$params = array(XML_RPC_encode($password),
-								XML_RPC_encode($execcmd));
-				log_error("postfix get sql data from {$sync_to_ip}.");
-				$msg = new XML_RPC_Message($method, $params);
-				$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-				$cli->setCredentials('admin', $password);
-				#$cli->setDebug(1);
-				$resp = $cli->send($msg, "250");
-				$a=$resp->value();
-				$errors=0;
-				#var_dump($sql);
-				foreach($a as $b)
-					foreach ($b as $c)
-						foreach ($c as $d)
-							foreach ($d as $e){
-							$update=unserialize($e['string']);
-							print $update['day']."\n";
-							if ($update['day'] != ""){
-							create_db($update['day'].".db");
-							if ($debug=true)
-								print $update['day'] ." writing from remote system to db...";
-							$dbhandle = sqlite_open($postfix_dir.'/'.$update['day'].".db", 0666, $error);
-							#file_put_contents("/tmp/".$key.'-'.$update['day'].".sql",gzuncompress(base64_decode($update['sql'])), LOCK_EX);
-							$ok = sqlite_exec($dbhandle, gzuncompress(base64_decode($update['sql'])), $error);
-								if (!$ok){
-									$errors++;
-									die ("Cannot execute query. $error\n".$update['sql']."\n");
-								}
-								else{
-									if ($debug=true)	
-										print "ok\n";
-								}
-								sqlite_close($dbhandle);
-							}
-							}
-				if ($errors ==0){
+	$log_time = date('YmdHis', $curr_time);
+
+	if (is_array($config['installedpackages']['postfixsync'])) {
+		$synctimeout = $config['installedpackages']['postfixsync']['config'][0]['synctimeout'] ?: '250';
+		foreach ($config['installedpackages']['postfixsync']['config'][0]['row'] as $sh) {
+			// Get remote data for enabled fetch hosts
+			if ($sh['enabless'] && $sh['sync_type'] == 'fetch') {
+				$sync_to_ip = $sh['ipaddress'];
+				$port = $sh['syncport'];
+				$username = $sh['username'] ?: 'admin';
+				$password = $sh['password'];
+				$protocol = $sh['syncprotocol'];
+				$file = '/var/db/postfix/' . $server . '.sql';
+
+				$error = '';
+				$valid = TRUE;
+
+				if ($password == "") {
+					$error = "Password parameter is empty. ";
+					$valid = FALSE;
+				}
+				if ($protocol == "") {
+					$error = "Protocol parameter is empty. ";
+					$valid = FALSE;
+				}
+				if (!is_ipaddr($sync_to_ip) && !is_hostname($sync_to_ip) && !is_domain($sync_to_ip)) {
+					$error .= "Misconfigured Replication Target IP Address or Hostname. ";
+					$valid = FALSE;
+				}
+				if (!is_port($port)) {
+					$error .= "Misconfigured Replication Target Port. ";
+					$valid = FALSE;
+				}
+				if ($valid) {
+					// Take care of IPv6 literal address
+					if (is_ipaddrv6($sync_to_ip)) {
+						$sync_to_ip = "[{$sync_to_ip}]";
+					}
+					$url = "{$protocol}://{$sync_to_ip}";
+
+					print "{$sync_to_ip} {$url}, {$port}\n";
 					$method = 'pfsense.exec_php';
 					$execcmd  = "require_once('/usr/local/www/postfix.php');\n";
-					$execcmd .= 'flush_sql('.$log_time.');';
-					/* assemble xmlrpc payload */
-					$params = array(XML_RPC_encode($password),
-									XML_RPC_encode($execcmd));
-					log_error("postfix flush sql buffer file from {$sync_to_ip}.");
+					$execcmd .= '$toreturn = get_sql('.$log_time.');';
+
+					/* Assemble XMLRPC payload. */
+					$params = array(XML_RPC_encode($password), XML_RPC_encode($execcmd));
+					log_error("[postfix] Fetching sql data from {$sync_to_ip}.");
 					$msg = new XML_RPC_Message($method, $params);
 					$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-					$cli->setCredentials('admin', $password);
-					#$cli->setDebug(1);
-					$resp = $cli->send($msg, "250");
+					$cli->setCredentials($username, $password);
+					//$cli->setDebug(1);
+					$resp = $cli->send($msg, $synctimeout);
+					$a = $resp->value();
+					$errors = 0;
+					//var_dump($sql);
+					foreach($a as $b) {
+						foreach ($b as $c) {
+							foreach ($c as $d) {
+								foreach ($d as $e) {
+									$update = unserialize($e['string']);
+									print $update['day'] . "\n";
+									if ($update['day'] != "") {
+										create_db($update['day'] . ".db");
+										if ($debug) {
+											print $update['day'] . " writing from remote system to db...";
+										}
+										$dbhandle = sqlite_open($postfix_dir . '/' . $update['day'] . ".db", 0666, $error);
+										//file_put_contents("/tmp/" . $key . '-' . $update['day'] . ".sql", gzuncompress(base64_decode($update['sql'])), LOCK_EX);
+										$ok = sqlite_exec($dbhandle, gzuncompress(base64_decode($update['sql'])), $error);
+										if (!$ok) {
+											$errors++;
+											die ("Cannot execute query. $error\n".$update['sql']."\n");
+										} elseif ($debug) {
+											print "ok\n";
+										}
+										sqlite_close($dbhandle);
+									}
+								}
+							}
+						}
 					}
+					if ($errors == 0) {
+						$method = 'pfsense.exec_php';
+						$execcmd  = "require_once('/usr/local/www/postfix.php');\n";
+						$execcmd .= 'flush_sql('.$log_time.');';
+						/* Assemble XMLRPC payload. */
+						$params = array(XML_RPC_encode($password), XML_RPC_encode($execcmd));
+						log_error("[postfix] Flushing sql buffer file from {$sync_to_ip}.");
+						$msg = new XML_RPC_Message($method, $params);
+						$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+						$cli->setCredentials($username, $password);
+						//$cli->setDebug(1);
+						$resp = $cli->send($msg, $synctimeout);
+					}
+				} else {
+					log_error("[postfix] Fetch sql database from '{$sync_to_ip}' aborted due to the following error(s): {$error}");
 				}
-		}	
-}
-function get_sql($log_time){
-	global $config,$xmlrpc_g;
-	$server=$_SERVER['REMOTE_ADDR'];
-	
-	if (is_array($config['installedpackages']['postfixsync']))
-		foreach($config['installedpackages']['postfixsync']['config'][0]['row']  as $sh){
-			$sync_to_ip = $sh['ipaddress'];
-			$sync_type = $sh['sync_type'];
-			$password = $sh['password'];
-			$file= '/var/db/postfix/'.$server.'.sql';
-			if ($sync_to_ip==$server && $sync_type=='share' && file_exists($file)){
-				rename($file,$file.".$log_time");
-				return (file($file.".$log_time"));
-				}
+			}
 		}
-		return "";
+		log_error("[postfix] Fetch sql database completed.");
+	}
 }
 
-function flush_sql($log_time){
-	if (preg_match("/\d+\.\d+\.\d+\.\d+/",$_SERVER['REMOTE_ADDR']))
-		unlink_if_exists('/var/db/postfix/'.$_SERVER['REMOTE_ADDR'].".sql.$log_time");
+function get_sql($log_time) {
+	global $config, $xmlrpc_g;
+	$server = $_SERVER['REMOTE_ADDR'];
+
+	if (is_array($config['installedpackages']['postfixsync'])) {
+		foreach($config['installedpackages']['postfixsync']['config'][0]['row'] as $sh) {
+			$sync_to_ip = $sh['ipaddress'];
+			$sync_type = $sh['sync_type'];
+			$file = '/var/db/postfix/' . $server . '.sql';
+			if ($sync_to_ip == "{$server}" && $sync_type == "share" && file_exists($file)) {
+				rename($file, $file . ".$log_time");
+				return (file($file . ".$log_time"));
+			}
+		}
+		return "";
+	}
+}
+
+function flush_sql($log_time) {
+	if (preg_match("/\d+\.\d+\.\d+\.\d+/", $_SERVER['REMOTE_ADDR'])) {
+		unlink_if_exists('/var/db/postfix/' . $_SERVER['REMOTE_ADDR'] . ".sql.{$log_time}");
+	}
 }
 
 function grep_log(){
 	global $postfix_dir,$postfix_arg,$config,$g;
-	
+
 	$total_lines=0;
 	$days=array();
 	$grep="\(MailScanner\|postfix.cleanup\|postfix.smtp\|postfix.error\|postfix.qmgr\)";
@@ -150,10 +180,13 @@ function grep_log(){
 	$m=date('M',strtotime($postfix_arg['time'],$curr_time));
 	$j=substr("  ".date('j',strtotime($postfix_arg['time'],$curr_time)),-3);
 	# file grep loop
+	$maillog_filename = "/var/log/maillog";
 	foreach ($postfix_arg['grep'] as $hour){
-	  print "/usr/bin/grep '^".$m.$j." ".$hour.".*".$grep."' /var/log/maillog\n"; 
+		if (!file_exists($maillog_filename) || !is_readable($maillog_filename))
+			continue;
+	  print "/usr/bin/grep '^".$m.$j." ".$hour.".*".$grep."' {$maillog_filename}\n";
 	  $lists=array();
-	  exec("/usr/bin/grep " . escapeshellarg('^'.$m.$j." ".$hour.".*".$grep)." /var/log/maillog", $lists);
+	  exec("/usr/bin/grep " . escapeshellarg('^'.$m.$j." ".$hour.".*".$grep)." {$maillog_filename}", $lists);
 	  foreach ($lists as $line){
 	  	#check where is first mail record
 	  	if (preg_match("/ delay=(\d+)/",$line,$delay)){
@@ -200,7 +233,7 @@ function grep_log(){
 		#Nov 16 00:00:14 srvch011 postfix/smtp[7363]: 7AEB91F797D: to=<alessandra.bueno@mg.test.com>, relay=mail.mg.test.com[172.25.3.5]:25, delay=39, delays=35/1.1/0.04/2.7, dsn=5.7.1, status=bounced (host mail.mg.test.com[172.25.3.5] said: 550 5.7.1 Unable to relay for alessandra.bueno@mg.test.com (in reply to RCPT TO command))
 		else if(preg_match("/(\w+\s+\d+\s+[0-9,:]+) (\w+) postfix.\w+\W\d+\W+(\w+): to=\<(.*)\>, relay=(.*), delay=([0-9,.]+), .* dsn=([0-9,.]+), status=(\w+) (.*)/",$line,$email)){
 			$stm_queue[$day].= "insert or ignore into mail_status (info) values ('".$email[8]."');\n";
-			$stm_queue[$day].= "insert or ignore into mail_to (from_id,too,status,status_info,relay,delay,dsn) values ((select id from mail_from where sid='".$email[3]."' and server='".$email[2]."'),'".strtolower($email[4])."',(select id from mail_status where info='".$email[8]."'),'".preg_replace("/(\<|\>|\s+|\'|\")/"," ",$email[9])."','".$email[5]."','".$email[6]."','".$email[7]."');\n";	
+			$stm_queue[$day].= "insert or ignore into mail_to (from_id,too,status,status_info,relay,delay,dsn) values ((select id from mail_from where sid='".$email[3]."' and server='".$email[2]."'),'".strtolower($email[4])."',(select id from mail_status where info='".$email[8]."'),'".preg_replace("/(\<|\>|\s+|\'|\")/"," ",$email[9])."','".$email[5]."','".$email[6]."','".$email[7]."');\n";
 			$stm_queue[$day].= "update or ignore mail_to set status=(select id from mail_status where info='".$email[8]."'), status_info='".preg_replace("/(\<|\>|\s+|\'|\")/"," ",$email[9])."', dsn='".$email[7]."', delay='".$email[6]."', relay='".$email[5]."', too='".strtolower($email[4])."' where from_id in (select id from mail_from where sid='".$email[3]."' and server='".$email[2]."');\n";
 		}
 		#Nov 13 01:48:44 srvch011 postfix/cleanup[16914]: D995B1F570B: message-id=<61.40.11745.10E3FBE4@ofertas6>
@@ -220,7 +253,7 @@ function grep_log(){
 	  		$stm_queue[$day].= "insert or ignore into mail_status (info) values ('".$email[8]."');\n";
 			$stm_queue[$day].= "update mail_to set status=(select id from mail_status where info='reject'), status_info='queue file size limit exceeded' where from_id in (select id from mail_from where sid='".$email[3]."' and server='".$email[2]."');\n";
 		}
-		
+
 		#Nov  9 02:14:57 srvch011 postfix/cleanup[6856]: 617A51F5AC5: warning: header Subject: Mapeamento de Processos from lxalpha.12b.com.br[66.109.29.225]; from=<apache@lxalpha.12b.com.br> to=<ritiele.faria@mail.test.com> proto=ESMTP helo=<lxalpha.12b.com.br>
 		#Nov  8 09:31:50 srvch011 postfix/cleanup[11471]: 19C281F59C8: reject: header From: "Giuliana Flores - Parceiro do Grupo Virtual" <publicidade@parceiro-grupovirtual.com.br> from pm03-974.auinmeio.com.br[177.70.232.225]; from=<publicidade@parceiro-grupovirtual.com.br> to=<jorge.lustosa@mail.test.com> proto=ESMTP helo=<pm03-974.auinmeio.com.br>: 5.7.1 [SN007]
 		#Nov 13 00:03:24 srvch011 postfix/cleanup[4192]: 8A5B31F52D2: reject: body http://platform.roastcrack.info/mj0ie6p-48qtiyq from move2.igloojack.info[173.239.63.16]; from=<ljmd6u8lrxke4@move2.igloojack.info> to=<edileva@aasdf..br> proto=SMTP helo=<move2.igloojack.info>: 5.7.1 [BD040]
@@ -268,9 +301,9 @@ function grep_log(){
 			$status['status_info']=$email[4];
 			$status['from']=$email[5];
 			$status['to']=$email[6];
-			$status['helo']=$email[7];	
+			$status['helo']=$email[7];
 			$values="'".$status['date']."','".$status['status']."','".$status['status_info']."','".strtolower($status['from'])."','".strtolower($status['to'])."','".$status['helo']."','".$status['server']."'";
-			$stm_noqueue[$day].='insert or ignore into mail_noqueue(date,status,status_info,fromm,too,helo,server) values ('.$values.');'."\n";		
+			$stm_noqueue[$day].='insert or ignore into mail_noqueue(date,status,status_info,fromm,too,helo,server) values ('.$values.');'."\n";
 		}
 		if ($total_lines%1500 == 0){
 			#save log in database
@@ -292,74 +325,61 @@ function grep_log(){
 		$stm_queue[$d]="BEGIN;\n";
 		}
 	}
-	
-	$config=parse_xml_config("{$g['conf_path']}/config.xml", $g['xml_rootobj']);
-	print count($config['installedpackages']);
-	#start db replication if configured
-	if ($config['installedpackages']['postfixsync']['config'][0]['rsync'])
-		foreach ($config['installedpackages']['postfixsync']['config'] as $rs )
-			foreach($rs['row'] as $sh){
-				$sync_to_ip = $sh['ipaddress'];
-				$sync_type = $sh['sync_type'];
-				$password = $sh['password'];
-				print "checking replication to $sync_to_ip...";
-				if ($password && $sync_to_ip && preg_match("/(both|database)/",$sync_type))
-					postfix_do_xmlrpc_sync($sync_to_ip, $password,$sync_type);
-				print "ok\n";
-				}
-	
+
 }
 
-function write_db($stm,$table,$days){
-	global $postfix_dir,$config,$g;
+function write_db($stm, $table, $days) {
+	global $postfix_dir, $config, $g;
 	conf_mount_rw();
-	$do_sync=array();
+	$do_sync = array();
 	print "writing to database...";
-	foreach ($days as $day)
-		if (strlen($stm[$day]) > 10){
-		  if ($config['installedpackages']['postfixsync']['config'][0])
-			foreach ($config['installedpackages']['postfixsync']['config'] as $rs )
-				foreach($rs['row'] as $sh){
+	foreach ($days as $day) {
+		if ((strlen($stm[$day]) > 10) && (is_array($config['installedpackages']['postfixsync']['config']))) {
+			foreach ($config['installedpackages']['postfixsync']['config'] as $rs) {
+				foreach($rs['row'] as $sh) {
 					$sync_to_ip = $sh['ipaddress'];
 					$sync_type = $sh['sync_type'];
 					$password = $sh['password'];
-					$sql_file='/var/db/postfix/'.$sync_to_ip.'.sql';
-					${$sync_to_ip}="";
-					if (file_exists($sql_file))
-						${$sync_to_ip}=file_get_contents($sql_file);
-					if ($sync_to_ip && $sync_type=="share"){
-						${$sync_to_ip}.=serialize(array('day'=> $day,'sql'=> base64_encode(gzcompress($stm[$day]."COMMIT;",9))))."\n";
-						if (! in_array($sync_to_ip,$do_sync))
-							$do_sync[]=$sync_to_ip;
+					$sql_file = '/var/db/postfix/' . $sync_to_ip . '.sql';
+					${$sync_to_ip} = "";
+					if (file_exists($sql_file)) {
+						${$sync_to_ip} = file_get_contents($sql_file);
+					}
+					if ($sync_to_ip && $sync_type == "share") {
+						${$sync_to_ip} .= serialize(array('day' => $day, 'sql' => base64_encode(gzcompress($stm[$day] . "COMMIT;", 9)))) . "\n";
+						if (!in_array($sync_to_ip, $do_sync)) {
+							$do_sync[] = $sync_to_ip;
 						}
 					}
-			#write local db file
-			create_db($day.".db");
-			if ($debug=true)
-				print " writing to local db $day...";
-			$dbhandle = sqlite_open($postfix_dir.$day.".db", 0666, $error);
-			if (!$dbhandle) die ($error);	
-			#file_put_contents("/tmp/".$key.'-'.$update['day'].".sql",gzuncompress(base64_decode($update['sql'])), LOCK_EX);
-			$ok = sqlite_exec($dbhandle, $stm[$day]."COMMIT;", $error);
-			if (!$ok){
-				if ($debug=true)
-					print ("Cannot execute query. $error\n".$stm[$day]."COMMIT;\n");
 				}
-			else{
-				if ($debug=true)
-					print "ok\n";
-				}
-			sqlite_close($dbhandle);
 			}
-	#write update sql files
-	if (count ($do_sync) > 0 ){
-		
-		foreach($do_sync as $ip)
-			file_put_contents('/var/db/postfix/'.$ip.'.sql',${$ip},LOCK_EX);
-		conf_mount_ro();
+			/* Write local db file */
+			create_db($day . ".db");
+			if ($debug) {
+				print "writing to local db $day...";
+			}
+			$dbhandle = sqlite_open($postfix_dir.$day.".db", 0666, $error);
+			if (!$dbhandle) {
+				die ($error);
+			}
+			//file_put_contents("/tmp/" . $key . '-' . $update['day'] . ".sql", gzuncompress(base64_decode($update['sql'])), LOCK_EX);
+			$ok = sqlite_exec($dbhandle, $stm[$day] . "COMMIT;", $error);
+			if (!$ok) {
+				print ("Cannot execute query. $error\n" . $stm[$day] . "COMMIT;\n");
+			} elseif ($debug) {
+				print "ok\n";
+			}
+			sqlite_close($dbhandle);
+		}
 	}
-	#write local file
-	
+	/* Write updated sql files */
+	if (count($do_sync) > 0 ) {
+		foreach ($do_sync as $ip) {
+			file_put_contents('/var/db/postfix/' . $ip . '.sql', ${$ip}, LOCK_EX);
+		}
+	}
+	conf_mount_ro();
+	/* Write local file */
 }
 
 function create_db($postfix_db){
@@ -510,14 +530,14 @@ switch ($argv[1]){
 											'12:','13:','14:','15:','16:','17:','18:','19:','20:','21:','22:','23:'),
 							'time' => '-03 day');
 		break;
-		
+
 		default:
 		die ("invalid parameters\n");
 }
 # get remote log from remote server
 get_remote_log();
 # get local log from logfile
-grep_log();	
+grep_log();
 }
 
 #http client call
@@ -537,7 +557,7 @@ if ($_REQUEST['files']!= ""){
 	$stm_fetch=array();
 	$total_result=0;
 	foreach ($files as $postfix_db)
-		if (file_exists($postfix_dir.'/'.$postfix_db)){ 
+		if (file_exists($postfix_dir.'/'.$postfix_db)){
 			$dbhandle = sqlite_open($postfix_dir.'/'.$postfix_db, 0666, $error);
 			if ($_REQUEST['from']!= ""){
 				$next=($last_next==" and "?" and ":" where ");
@@ -592,7 +612,7 @@ if ($_REQUEST['files']!= ""){
 				else
 					$stm .=$next."server = '".$_REQUEST['server']."'";
 				}
-				
+
 		if ($_REQUEST['status']!= ""){
 				$next=($last_next==" and "?" and ":" where ");
 				$last_next=" and ";
@@ -601,7 +621,7 @@ if ($_REQUEST['files']!= ""){
 					#print "<pre>".$stm;
 				#$stm = "select * from mail_to,mail_status where mail_to.status=mail_status.id";
 				$result = sqlite_query($dbhandle, $stm." order by date desc $limit_prefix $limit ");
-				#$result = sqlite_query($dbhandle, $stm."  $limit_prefix $limit ");	
+				#$result = sqlite_query($dbhandle, $stm."  $limit_prefix $limit ");
 			if (preg_match("/\d+/",$_REQUEST['limit'])){
 				for ($i = 1; $i <= $limit; $i++) {
 					$row = sqlite_fetch_array($result, SQLITE_ASSOC);
@@ -741,8 +761,8 @@ if ($_REQUEST['files']!= ""){
 	print '<tr>';
 	print '<td ><strong>Total:</strong></td>';
 	print '<td ><strong>'.$total_result.'</strong></td>';
-	print '</tr>';	
+	print '</tr>';
 	print '</table>';
-	}				
+	}
 }
 ?>

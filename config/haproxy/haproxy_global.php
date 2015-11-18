@@ -2,7 +2,7 @@
 /* $Id: load_balancer_pool.php,v 1.5.2.6 2007/03/02 23:48:32 smos Exp $ */
 /*
 	haproxy_global.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
@@ -45,9 +45,7 @@ if ($_POST) {
 	
 	if ($_POST['apply']) {
 		$retval = 0;
-		config_lock();
 		$retval = haproxy_configure();
-		config_unlock();
 		$savemsg = get_std_save_message($retval);
 		unlink_if_exists($d_haproxyconfdirty_path);
 	} else {
@@ -59,7 +57,11 @@ if ($_POST) {
 		if ($_POST['carpdev'] == "disabled")
 			unset($_POST['carpdev']);
 
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version < 2.1)
+			$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+		else
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";
@@ -82,11 +84,18 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['logfacility'] = $_POST['logfacility'] ? $_POST['logfacility'] : false;
 			$config['installedpackages']['haproxy']['loglevel'] = $_POST['loglevel'] ? $_POST['loglevel'] : false;
 			$config['installedpackages']['haproxy']['carpdev'] = $_POST['carpdev'] ? $_POST['carpdev'] : false;
+			$config['installedpackages']['haproxy']['syncusername'] = $_POST['syncusername'] ? $_POST['syncusername'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
-			$config['installedpackages']['haproxy']['advanced'] = base64_encode($_POST['advanced']) ? $_POST['advanced'] : false;
+			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? base64_encode($_POST['advanced']) : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
 			touch($d_haproxyconfdirty_path);
 			write_config();
+		}
+
+		if ($_POST['Submit'] == "Save and Check Config") {
+			$check_output = haproxy_check_config();
+			if (empty($check_output))
+				$check_output = "No output.";
 		}
 	}
 	
@@ -95,6 +104,7 @@ if ($_POST) {
 $pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
 $pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
 $pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
+$pconfig['syncusername'] = $config['installedpackages']['haproxy']['syncusername'];
 $pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
 $pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
 $pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
@@ -112,8 +122,8 @@ if (!$pconfig['logfacility'])
 if (!$pconfig['loglevel'])
 	$pconfig['loglevel'] = 'info';
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "Services: HAProxy: Settings";
@@ -157,6 +167,14 @@ function enable_change(enable_change) {
 	<td>
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+		<?php if ($_POST['Submit'] == "Save and Check Config"): ?>
+			<tr><td colspan="2" valign="top" class="vncell">
+Configuration check output:
+<pre>
+<?= $check_output; ?>
+</pre>
+		</td></tr>
+		<?php endif; ?>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">General settings</td>
 			</tr>
@@ -336,6 +354,14 @@ function enable_change(enable_change) {
 				</td>
 			</tr>
 			<tr>
+				<td width="22%" valign="top" class="vncell">Synchronization username</td>
+				<td width="78%" class="vtable">
+					<input name="syncusername" type="text" value="<?= empty($pconfig['syncusername']) ? 'admin' : $pconfig['syncusername'];?>">
+					<br/>
+					<strong>Enter the username that will be used during configuration synchronization.  This is generally "admin" or an admin-level privileged account on the target system.</strong>
+				</td>
+			</tr>
+			<tr>
 				<td width="22%" valign="top" class="vncell">Synchronization password</td>
 				<td width="78%" class="vtable">
 					<input name="syncpassword" type="password" value="<?=$pconfig['syncpassword'];?>">
@@ -376,6 +402,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top">&nbsp;</td>
 					<td width="78%">
 						<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)">
+						<input name="Submit" type="submit" class="formbtn" value="Save and Check Config" onClick="enable_change(true)">
 					</td>
 				</td>
 			</tr>

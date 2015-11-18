@@ -167,15 +167,6 @@ function sync_package_pfblocker($cron="") {
 					#Create rule if action permits
 					switch($continent_config['action']){
 						case "Deny_Both":
-							$rule = $base_rule;
-							$rule["type"] = $deny_action_inbound;
-							$rule["descr"]= "$pfb_alias auto rule";
-							$rule["source"]= array("address"=> $pfb_alias);
-							$rule["destination"]=array("any"=>"");
-							if ($pfblocker_config['enable_log']){
-								$rule["log"]="";
-							}
-							$deny_inbound[]=$rule;					
 						case "Deny_Outbound":
 							$rule = $base_rule;
 							$rule["type"] = $deny_action_outbound;
@@ -185,8 +176,9 @@ function sync_package_pfblocker($cron="") {
 							if ($pfblocker_config['enable_log']){
 								$rule["log"]="";
 							}
-							$deny_outbound[]=$rule;					
-							break;
+							$deny_outbound[]=$rule;
+							if ($continent_config['action'] != "Deny_Both")
+								break;
 						case "Deny_Inbound":
 							$rule = $base_rule;
 							$rule["type"] = $deny_action_inbound;
@@ -198,6 +190,7 @@ function sync_package_pfblocker($cron="") {
 							}
 							$deny_inbound[]=$rule;					
 							break;
+						case "Permit_Both":
 						case "Permit_Outbound":
 							$rule = $base_rule;
 							$rule["type"] = "pass";
@@ -208,7 +201,8 @@ function sync_package_pfblocker($cron="") {
 								$rule["log"]="";
 							}
 							$permit_outbound[]=$rule;					
-							break;
+							if ($continent_config['action'] != "Permit_Both")
+								break;
 						case "Permit_Inbound":
 							$rule = $base_rule;
 							$rule["type"] = "pass";
@@ -317,15 +311,6 @@ function sync_package_pfblocker($cron="") {
 						#Create rule if action permits
 						switch($list['action']){
 							case "Deny_Both":
-								$rule = $base_rule;
-								$rule["type"] = $deny_action_inbound;
-								$rule["descr"]= "$alias auto rule";
-								$rule["source"]= array("address"=> $alias);
-								$rule["destination"]=array("any"=>"");
-								if ($pfblocker_config['enable_log']){
-									$rule["log"]="";
-								}
-								$deny_inbound[]=$rule;
 							case "Deny_Outbound":
 								$rule = $base_rule;
 								$rule["type"] = $deny_action_outbound;
@@ -335,8 +320,9 @@ function sync_package_pfblocker($cron="") {
 								if ($pfblocker_config['enable_log']){
 									$rule["log"]="";
 								}
-								$deny_outbound[]=$rule;					
-								break;
+								$deny_outbound[]=$rule;
+								if ($list['action'] != "Deny_Both")
+									break;
 							case "Deny_Inbound":
 								$rule = $base_rule;
 								$rule["type"] = $deny_action_inbound;
@@ -348,6 +334,7 @@ function sync_package_pfblocker($cron="") {
 								}
 								$deny_inbound[]=$rule;					
 								break;
+							case "Permit_Both":
 							case "Permit_Outbound":
 								$rule = $base_rule;
 								$rule["type"] = "pass";
@@ -358,7 +345,8 @@ function sync_package_pfblocker($cron="") {
 									$rule["log"]="";
 								}
 								$permit_outbound[]=$rule;					
-								break;
+								if ($list['action'] != "Permit_Both")
+									break;
 							case "Permit_Inbound":
 								$rule = $base_rule;
 								$rule["type"] = "pass";

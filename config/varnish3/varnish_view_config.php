@@ -1,7 +1,7 @@
 <?php
 /*
 	varnish_view_config.php
-	part of pfSense (http://www.pfsense.com/)
+	part of pfSense (https://www.pfsense.org/)
 	Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
 	All rights reserved.
 
@@ -28,9 +28,9 @@
 */
 
 require("guiconfig.inc");
-
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+require("varnish.inc");
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
 	$one_two = true;
 
 $pgtitle = "Varnish: View Configuration";
@@ -44,10 +44,10 @@ include("head.inc");
 <p class="pgtitle"><?=$pgtitle?></font></p>
 <?php endif; ?>
 
-<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php varnish_check_config();if ($savemsg) print_info_box($savemsg); ?>
 
 <form action="varnishstat_view_config.php" method="post">
-	
+
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
@@ -70,9 +70,10 @@ include("head.inc");
 						<tr>
      						<td class="tabcont" >
 									<textarea id="varnishlogs" rows="50" cols="100%">
-<?php 
-	$config_file = file_get_contents("/var/etc/default.vcl");
-	echo $config_file;
+<?php
+	$config_file = file("/var/etc/default.vcl");
+	foreach ($config_file as $l => $v)
+		echo ($l+1)." - {$v}";
 ?>
 									</textarea>
 							</td>

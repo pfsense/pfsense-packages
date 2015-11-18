@@ -38,8 +38,8 @@ require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
 require_once("guiconfig.inc");
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
+$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pf_version < 2.0)
         $one_two = true;
 
 $pgtitle = "Apache Proxy: Logs";
@@ -68,7 +68,7 @@ include("head.inc");
 		<?php
 			$tab_array = array();
 			$tab_array[] = array(gettext("Apache"), false, "/pkg_edit.php?xml=apache_settings.xml&amp;id=0");
-			$tab_array[] = array(gettext("ModSecurity"), false, "/pkg_edit.php?xml=apache_mod_security_setttings.xml");
+			$tab_array[] = array(gettext("ModSecurity"), false, "/pkg_edit.php?xml=apache_mod_security_settings.xml");
 			$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=apache_mod_security_sync.xml");
 			$tab_array[] = array(gettext("Backends"), false, "/pkg.php?xml=apache_mod_security_backends.xml",2);
 			$tab_array[] = array(gettext("VirtualHosts"), false, "/pkg.php?xml=apache_mod_security.xml",2);

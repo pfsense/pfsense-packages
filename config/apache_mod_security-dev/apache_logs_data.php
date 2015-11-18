@@ -92,7 +92,7 @@ if ($_GET) {
 						// Apply filter and color
 						if ($filter != "")
 							$line = preg_replace("@($filter)@i","<spam><font color='red'>$1</font></span>",$line);
-						$agent_info="onmouseover=\"jQuery('#bowserinfo').empty().html('{$line[13]}');\"\n";
+						$agent_info="onmouseover=\"jQuery('#browserinfo').empty().html('{$line[13]}');\"\n";
 						echo "<tr valign=\"top\" $agent_info>\n";
 						echo "<td class=\"listlr\" align=\"center\" nowrap>{$line[5]}({$line[6]})</td>\n";
 						echo "<td class=\"listr\" align=\"center\">{$line[1]}</td>\n";

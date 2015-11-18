@@ -36,39 +36,118 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $snort_rules_upd_log, $snort_rules_file, $emergingthreats_filename;
-
+/* Define some locally required variables from Snort constants */
 $snortdir = SNORTDIR;
+$snort_rules_upd_log = SNORT_RULES_UPD_LOGFILE;
+$snortbinver = SNORT_BIN_VERSION;
+$snortbinver = str_replace(".", "", $snortbinver);
 
-$log = $snort_rules_upd_log;
+$snort_rules_file = "snortrules-snapshot-{$snortbinver}.tar.gz";
+$snort_community_rules_filename = SNORT_GPLV2_DNLD_FILENAME;
+$snort_openappid_filename = SNORT_OPENAPPID_DNLD_FILENAME;
 
-/* load only javascript that is needed */
-$snort_load_jquery = 'yes';
-$snort_load_jquery_colorbox = 'yes';
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
+$etpro = $config['installedpackages']['snortglobal']['emergingthreats_pro'];
 $snortcommunityrules = $config['installedpackages']['snortglobal']['snortcommunityrules'];
+$openappid_detectors = $config['installedpackages']['snortglobal']['openappid_detectors'];
 
-/* quick md5s chk */
-$snort_org_sig_chk_local = 'N/A';
-if (file_exists("{$snortdir}/{$snort_rules_file}.md5"))
+/* Get last update information if available */
+if (!empty($config['installedpackages']['snortglobal']['last_rule_upd_time']))
+	$last_rule_upd_time = date('M-d Y H:i', $config['installedpackages']['snortglobal']['last_rule_upd_time']);
+else
+	$last_rule_upd_time = gettext("Unknown");
+if (!empty($config['installedpackages']['snortglobal']['last_rule_upd_status']))
+	$last_rule_upd_status = htmlspecialchars($config['installedpackages']['snortglobal']['last_rule_upd_status']);
+else
+	$last_rule_upd_status = gettext("Unknown");
+
+if ($etpro == "on") {
+	$emergingthreats_filename = SNORT_ETPRO_DNLD_FILENAME;
+	$et_name = gettext("Emerging Threats Pro Rules");
+}
+else {
+	$emergingthreats_filename = SNORT_ET_DNLD_FILENAME;
+	$et_name = gettext("Emerging Threats Open Rules");
+}
+
+/* quick md5 chk of downloaded rules */
+if ($snortdownload == 'on') {
+	$snort_org_sig_chk_local = gettext("Not Downloaded");
+	$snort_org_sig_date = gettext("Not Downloaded");
+}
+else {
+	$snort_org_sig_chk_local = gettext("Not Enabled");
+	$snort_org_sig_date = gettext("Not Enabled");
+}
+if (file_exists("{$snortdir}/{$snort_rules_file}.md5") && $snortdownload == 'on') {
 	$snort_org_sig_chk_local = file_get_contents("{$snortdir}/{$snort_rules_file}.md5");
+	$snort_org_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_rules_file}.md5"));
+}
 
-$emergingt_net_sig_chk_local = 'N/A';
-if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5"))
+if ($etpro == "on" || $emergingthreats == "on") {
+	$emergingt_net_sig_chk_local = gettext("Not Downloaded");
+	$emergingt_net_sig_date = gettext("Not Downloaded");
+}
+else {
+	$emergingt_net_sig_chk_local = gettext("Not Enabled");
+	$emergingt_net_sig_date = gettext("Not Enabled");
+}
+if (file_exists("{$snortdir}/{$emergingthreats_filename}.md5") && ($etpro == "on" || $emergingthreats == "on")) {
 	$emergingt_net_sig_chk_local = file_get_contents("{$snortdir}/{$emergingthreats_filename}.md5");
+	$emergingt_net_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$emergingthreats_filename}.md5"));
+}
 
-$snort_community_sig_chk_local = 'N/A';
-if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5"))
+if ($snortcommunityrules == 'on') {
+	$snort_community_sig_chk_local = gettext("Not Downloaded");
+	$snort_community_sig_date = gettext("Not Downloaded");
+}
+else {
+	$snort_community_sig_chk_local = gettext("Not Enabled");
+	$snort_community_sig_date = gettext("Not Enabled");
+}
+if (file_exists("{$snortdir}/{$snort_community_rules_filename}.md5") && $snortcommunityrules == 'on') {
 	$snort_community_sig_chk_local = file_get_contents("{$snortdir}/{$snort_community_rules_filename}.md5");
+	$snort_community_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_community_rules_filename}.md5"));
+}
+
+if ($openappid_detectors == 'on') {
+	$openappid_detectors_sig_chk_local = gettext("Not Downloaded");
+	$openappid_detectors_sig_date = gettext("Not Downloaded");
+}
+else {
+	$openappid_detectors_sig_chk_local = gettext("Not Enabled");
+	$openappid_detectors_sig_date = gettext("Not Enabled");
+}
+if (file_exists("{$snortdir}/{$snort_openappid_filename}.md5") && $openappid_detectors == 'on') {
+	$openappid_detectors_sig_chk_local = file_get_contents("{$snortdir}/{$snort_openappid_filename}.md5");
+	$openappid_detectors_sig_date = date(DATE_RFC850, filemtime("{$snortdir}/{$snort_openappid_filename}.md5"));
+}
 
 /* Check for postback to see if we should clear the update log file. */
 if (isset($_POST['clear'])) {
-	if (file_exists("{$snort_rules_upd_log}"))
-		mwexec("/bin/rm -f {$snort_rules_upd_log}");
+	unlink_if_exists($snort_rules_upd_log);
 }
 
 if (isset($_POST['update'])) {
+	header("Location: /snort/snort_download_rules.php");
+	exit;
+}
+
+if ($_POST['force']) {
+	// Mount file system R/W since we need to remove files
+	conf_mount_rw();
+
+	// Remove the existing MD5 signature files to force a download
+	unlink_if_exists("{$snortdir}/{$emergingthreats_filename}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_community_rules_filename}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_rules_file}.md5");
+	unlink_if_exists("{$snortdir}/{$snort_openappid_filename}.md5");
+
+	// Revert file system to R/O.
+	conf_mount_ro();
+	
+	// Go download the updates
 	header("Location: /snort/snort_download_rules.php");
 	exit;
 }
@@ -78,32 +157,22 @@ $snort_rules_upd_logfile_chk = 'no';
 if (file_exists("{$snort_rules_upd_log}"))
 	$snort_rules_upd_logfile_chk = 'yes';
 
-$pgtitle = "Services: Snort: Updates";
+if ($_POST['view']&& $snort_rules_upd_logfile_chk == 'yes') {
+	$contents = @file_get_contents($snort_rules_upd_log);
+	if (empty($contents))
+		$input_errors[] = gettext("Unable to read log file: {$snort_rules_upd_log}");
+}
+
+if ($_POST['hide'])
+	$contents = "";
+
+$pgtitle = gettext("Snort: Updates");
 include_once("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 
 <?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
-<script language="javascript" type="text/javascript">
-function wopen(url, name, w, h)
-{
-// Fudge factors for window decoration space.
-// In my tests these work well on all platforms & browsers.
-w += 32;
-h += 96;
- var win = window.open(url,
-  name, 
-  'width=' + w + ', height=' + h + ', ' +
-  'location=no, menubar=no, ' +
-  'status=no, toolbar=no, scrollbars=yes, resizable=yes');
- win.resizeTo(w, h);
- win.focus();
-}
-
-</script>
 
 <form action="snort_download_updates.php" method="post" name="iform" id="iform">
 
@@ -116,110 +185,141 @@ h += 96;
         $tab_array[2] = array(gettext("Updates"), true, "/snort/snort_download_updates.php");
         $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
         $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
-        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
-        $tab_array[7] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
-        display_top_tabs($tab_array);
+	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+        display_top_tabs($tab_array, true);
 ?>
 </td></tr>
 <tr>
 		<td>
 		<div id="mainarea">
 		<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-			<tr align="center">
-				<td>
-				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
+			<tr>
+				<td valign="top" class="listtopic" align="center"><?php echo gettext("INSTALLED RULE SET MD5 SIGNATURE");?></td>
+			</tr>
+			<tr>
+				<td align="center"><br/>
+				<table width="95%" border="0" cellpadding="2" cellspacing="2">
+					<thead>
+						<tr>
+							<th class="listhdrr"><?=gettext("Rule Set Name/Publisher");?></th>
+							<th class="listhdrr"><?=gettext("MD5 Signature Hash");?></th>
+							<th class="listhdrr"><?=gettext("MD5 Signature Date");?></th>
+						</tr>
+					</thead>
 					<tr>
-						<td id="download_rules_td" style="background-color: #eeeeee">
-						<div height="32" width="725px" style="background-color: #eeeeee">
-						<font color="#777777" size="2.5px">
-						<p style="text-align: left; margin-left: 225px;">
-							<b><?php echo gettext("INSTALLED RULESET SIGNATURES"); ?></b></font><br/><br/>
-							<font color="#FF850A" size="1px"><b>SNORT.ORG&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_org_sig_chk_local; ?></font><br/>
-							<font color="#FF850A" size="1px"><b>EMERGINGTHREATS.NET&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $emergingt_net_sig_chk_local; ?></font><br/>
-							<font color="#FF850A" size="1px"><b>SNORT GPLv2 COMMUNITY RULES&nbsp;&nbsp;--></b></font>
-							<font size="1px" color="#000000">&nbsp;&nbsp;<? echo $snort_community_sig_chk_local; ?></font><br/>
-						</p>
-						</div>
-						</td>
+						<td align="center" class="vncell vexpl"><b><?=gettext("Snort VRT Rules");?></b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($snort_org_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($snort_org_sig_date);?></td>
 					</tr>
-				</table>
-				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
 					<tr>
-						<td id="download_rules_td" style='background-color: #eeeeee'>
-						<div height="32" width="725px" style='background-color: #eeeeee'>
-						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='2.5px'><b><?php echo gettext("UPDATE YOUR RULESET"); ?></b></font><br/>
+						<td align="center" class="vncell vexpl"><b><?=gettext("Snort GPLv2 Community Rules");?></b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($snort_community_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($snort_community_sig_date);?></td>
+					</tr>
+					<tr>
+						<td align="center" class="vncell vexpl"><b><?=$et_name;?></b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($emergingt_net_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($emergingt_net_sig_date);?></td>
+					</tr>
+					<tr>
+						<td align="center" class="vncell vexpl"><b><?=gettext("Snort OpenAppID Detectors");?></b></td>
+						<td align="center" class="vncell vexpl"><? echo trim($openappid_detectors_sig_chk_local);?></td>
+						<td align="center" class="vncell vexpl"><?php echo gettext($openappid_detectors_sig_date);?></td>
+					</tr>
+				</table><br/>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="listtopic" align="center"><?php echo gettext("UPDATE YOUR RULE SET");?></td>
+			</tr>
+			<tr>
+				<td align="center">
+					<table width="45%" border="0" cellpadding="0" cellspacing="0">
+						<tbody>
+						<tr>
+							<td class="list" align="right"><strong><?php echo gettext("Last Update:");?></strong></td>
+							<td class="list" align="left"><?php echo $last_rule_upd_time;?></td>
+						</tr>
+						<tr>
+							<td class="list" align="right"><strong><?php echo gettext("Result:");?></strong></td>
+							<td class="list" align="left"><?php echo $last_rule_upd_status;?></td>
+						</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td align="center">
+					<?php if ($snortdownload != 'on' && $emergingthreats != 'on' && $etpro != 'on'): ?>
+						<br/><button disabled="disabled"><?=gettext("Check");?></button>&nbsp;&nbsp;&nbsp;&nbsp;
+						<button disabled="disabled"><?=gettext("Force");?></button>
 						<br/>
-
-			<?php
-
-						if ($snortdownload != 'on' && $emergingthreats != 'on') {
-							echo '
-			<button disabled="disabled"><span class="download">' . gettext("Update Rules") . '</span></button><br/>
-			<p style="text-align:left; margin-left:150px;">
-			<font color="#fc3608" size="2px"><b>' . gettext("WARNING:") . '</b></font><font size="1px" color="#000000">&nbsp;&nbsp;' . gettext('No rule types have been selected for download. ') .
-			gettext('Visit the ') . '<a href="snort_interfaces_global.php">Global Settings Tab</a>' . gettext(' to select rule types.') . '</font><br/>';
-
-							echo '</p>' . "\n";
-						} else {
-
-							echo '
-			<input type="submit" value="' . gettext("Update Rules") . '" name="update" id="Submit" class="formbtn" /><br/>' . "\n";
-
-						}
-
-			?> <br/>
-						</p>
-						</div>
-						</td>
-					</tr>
-				</table>
-				<br/>
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
-					<tr>
-						<td id="download_rules_td" style='background-color: #eeeeee'>
-						<div height="32" width="725px" style='background-color: #eeeeee'>
-						<p style="text-align: left; margin-left: 225px;">
-						<font color='#777777' size='2.5px'><b><?php echo gettext("VIEW UPDATE LOG"); ?></b></font><br/>
-						<br>
-				<?php
-
-						if ($snort_rules_upd_logfile_chk == 'yes') {
-							echo "
-				<button class=\"formbtn\" onclick=\"wopen('snort_log_view.php?logfile={$log}', 'LogViewer', 800, 600)\"><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>";
-				echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"submit\" value=\"Clear Log\" name=\"clear\" id=\"Submit\" class=\"formbtn\" />\n";
-						}else{
-							echo "
-				<button disabled='disabled'><span class='pwhitetxt'>" . gettext("View Log") . "</span></button>&nbsp;&nbsp;&nbsp;" . gettext("Log is empty.") . "\n";
-						}
-						echo '<br><br>' . gettext("The log file is limited to 1024K in size and automatically clears when the limit is exceeded.");
-				?>
+						<p style="text-align:center;" class="vexpl">
+						<font class="red"><b><?php echo gettext("WARNING:");?></b></font>&nbsp;
+						<?php echo gettext('No rule types have been selected for download. ') . 
+						gettext('Visit the ') . '<a href="/snort/snort_interfaces_global.php">Global Settings Tab</a>' . gettext(' to select rule types.'); ?>
+						<br/></p>
+					<?php else: ?>
 						<br/>
-						</p>
+						<input type="submit" value="<?=gettext("Update");?>" name="update" id="update" class="formbtn" 
+						title="<?php echo gettext("Check for and apply new update to enabled rule sets"); ?>"/>&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?=gettext("Force");?>" name="force" id="force" class="formbtn" 
+						title="<?=gettext("Force an update of all enabled rule sets");?>" 
+						onclick="return confirm('<?=gettext("This will zero-out the MD5 hashes to force a fresh download of enabled rule sets.  Click OK to continue or CANCEL to quit");?>');"/>
+						<br/><br/>
+					<?php endif; ?>
+				</td>
+			</tr>
+
+			<tr>
+				<td valign="top" class="listtopic" align="center"><?php echo gettext("MANAGE RULE SET LOG");?></td>
+			</tr>
+			<tr>
+				<td align="center" valign="middle" class="vexpl">
+					<?php if ($snort_rules_upd_logfile_chk == 'yes'): ?>
+						<br/>
+					<?php if (!empty($contents)): ?>
+						<input type="submit" value="<?php echo gettext("Hide"); ?>" name="hide" id="hide" class="formbtn" 
+						title="<?php echo gettext("Hide rules update log"); ?>"/>
+					<?php else: ?>
+						<input type="submit" value="<?php echo gettext("View"); ?>" name="view" id="view" class="formbtn" 
+						title="<?php echo gettext("View rules update log"); ?>"/>
+					<?php endif; ?>
+						&nbsp;&nbsp;&nbsp;&nbsp;
+						<input type="submit" value="<?php echo gettext("Clear"); ?>" name="clear" id="clear" class="formbtn" 
+						title="<?php echo gettext("Clear rules update log"); ?>" onClick="return confirm('Are you sure you want to delete the log contents?\nOK to confirm, or CANCEL to quit');"/>
+						<br/>
+					<?php else: ?>
+						<br/>
+						<button disabled='disabled'><?php echo gettext("View Log"); ?></button><br/><?php echo gettext("Log is empty."); ?><br/>
+					<?php endif; ?>
+					<br/><?php echo gettext("The log file is limited to 1024K in size and automatically clears when the limit is exceeded."); ?><br/><br/>
+				</td>
+			</tr>
+			<?php if (!empty($contents)): ?>
+				<tr>
+					<td valign="top" class="listtopic" align="center"><?php echo gettext("RULE SET UPDATE LOG");?></td>
+				</tr>
+				<tr>
+					<td align="center">
+						<div style="background: #eeeeee; width:100%; height:100%;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
+							<textarea style="width:100%; height:100%;" readonly wrap="off" rows="24" cols="80" name="logtext"><?=$contents;?></textarea>
 						</div>
-						</td>
-					</tr>
-				</table>
-
-				<br/>
-
-				<table id="download_rules" height="32px" width="725px" border="0" cellpadding="5px" cellspacing="0">
-					<tr>
-						<td id="download_rules_td" style='background-color: #eeeeee'>
-						<div height="32" width="725px" style='background-color: #eeeeee'><span class="vexpl">
-							<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
-							&nbsp;&nbsp;<?php echo gettext("Snort.org and EmergingThreats.net " .
-							"will go down from time to time. Please be patient."); ?></span>
-						</div>
-						</td>
-					</tr>
-				</table>
-
+					</td>
+				</tr>
+			<?php endif; ?>
+			<tr>
+				<td align="center">
+					<span class="vexpl"><br/>
+					<span class="red"><b><?php echo gettext("NOTE:"); ?></b></span>
+					&nbsp;<a href="http://www.snort.org/" target="_blank"><?php echo gettext("Snort.org") . "</a>" . 
+					gettext(" and ") . "<a href=\"http://www.emergingthreats.net/\" target=\"_blank\">" . gettext("EmergingThreats.net") . "</a>" . 
+					gettext(" will go down from time to time. Please be patient."); ?></span><br/>
 				</td>
 			</tr>
 		</table>
@@ -228,7 +328,6 @@ h += 96;
 		</td>
 	</tr>
 </table>
-<!-- end of final table -->
 </form>
 <?php include("fend.inc"); ?>
 </body>

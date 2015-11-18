@@ -274,7 +274,7 @@
 		</field>
 		<field>
 			<fielddescr>ICAP URL</fielddescr>
-			<fieldname>contentscannertimeout</fieldname>
+			<fieldname>icapurl</fieldname>
 			<type>input</type>
 			<size>40</size>
 			<description><![CDATA[Enter ICAP URL in <strong>icap://icapserver:1344/avscan</strong> format<br>
@@ -306,7 +306,7 @@
 		dansguardian_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		dansguardian_validate_input($_POST, &amp;$input_errors);
+		dansguardian_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_dansguardian();

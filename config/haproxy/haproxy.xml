@@ -42,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>haproxy</name>
-	<version>1.0</version>
+	<version>1.2.4</version>
 	<title>HAProxy</title>
 	<aftersaveredirect>/pkg_edit.php?xml=haproxy_pools.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/haproxy.inc</include_file>
@@ -62,45 +62,38 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy.inc</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_listeners.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_listeners.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_listeners_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_listeners_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_global.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_global.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_pools.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_pools.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_pool_edit.php</item>
+		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_pool_edit.php</item>
 	</additional_files_needed>
-	<custom_delete_php_command>
-	</custom_delete_php_command>
-	<custom_add_php_command>
-	</custom_add_php_command>
-	<custom_php_resync_config_command>
-	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		/*
 		included in package install
 		$freebsdv=trim(`uname -r | cut -d'.' -f1`);
-		conf_mount_rw();
-		`fetch -q -o /usr/local/sbin/ http://www.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy`;
+		`fetch -q -o /usr/local/sbin/ https://packages.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy`;
 		exec("chmod a+rx /usr/local/sbin/haproxy");
 		*/
 		haproxy_custom_php_install_command();
@@ -108,6 +101,4 @@
 	<custom_php_deinstall_command>
 		haproxy_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
-	<custom_php_command_before_form>	
-	</custom_php_command_before_form>
 </packagegui>
