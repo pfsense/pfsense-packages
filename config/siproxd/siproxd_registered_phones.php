@@ -82,7 +82,7 @@ require("head.inc");
 <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "pkg_edit.php?xml=siproxd.xml&amp;id=0");
+	$tab_array[] = array(gettext("Settings"), false, "pkg_edit.php?xml=siproxd.xml");
 	$tab_array[] = array(gettext("Users"), false, "pkg.php?xml=siproxdusers.xml");
 	$tab_array[] = array(gettext("Registered Phones"), true, "siproxd_registered_phones.php");
 	display_top_tabs($tab_array);
