@@ -25,13 +25,8 @@ now=$(/bin/date +%m/%d/%y' '%T)
 
 # Application Locations
 pathgrepcidr="${prefix}/bin/grepcidr"
-
-
-# MUST EDIT !!!!!
-pathaggregate=/usr/local/bin/aggregate
-pathmwhois=/usr/local/bin/mwhois
-
-
+pathaggregate="${prefix}/bin/aggregate"
+pathmwhois="${prefix}/bin/mwhois"
 pathgeoip="${prefix}/bin/geoiplookup"
 pathgunzip=/usr/bin/gunzip
 pathhost=/usr/bin/host
