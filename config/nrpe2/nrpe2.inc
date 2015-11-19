@@ -28,7 +28,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-require_once('filter.inc');
+require_once("filter.inc");
+require_once("pkg-utils.inc");
+require_once("util.inc");
 
 global $pfs_version;
 $pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
@@ -50,20 +52,9 @@ define('NRPE_RCFILE', '/usr/local/etc/rc.d/nrpe2.sh');
 
 
 function nrpe2_custom_php_install_command() {
-	global $g, $config;
-	$NRPE_BASE = NRPE_BASE;
-	$NRPE_CONFIG_DIR = NRPE_CONFIG_DIR;
+	global $config;
 
-	$ip = $config['interfaces']['lan']['ipaddr'];
-
-	if (!is_array($config['installedpackages']['nrpe2'])) {
-		$config['installedpackages']['nrpe2']['config'][0]['enabled'] = "on";
-		$config['installedpackages']['nrpe2']['config'][0]['server_address'] = $ip;
-		$config['installedpackages']['nrpe2']['config'][0]['server_port'] = 5666;
-		$config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'] = "127.0.0.1";
-		$config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'] = "on";
-	}
-
+	/* Create default commands configuration */
 	if (!is_array($config['installedpackages']['nrpe2']['config'][0]['row'])) {
 		$config['installedpackages']['nrpe2']['config'][0]['row'] = array(
 			0 => array(
@@ -107,8 +98,19 @@ function nrpe2_custom_php_install_command() {
 			)
 		);
 	}
+
+	/* Remove the rc script installed with the package */
 	unlink_if_exists(NRPE_CONFIG_DIR . '/rc.d/nrpe2');
-	$nrpe2_binary = NRPE_BINARY;
+
+}
+
+function nrpe2_custom_php_deinstall_command() {
+	unlink_if_exists(NRPE_RCFILE);
+}
+
+function nrpe2_write_rc_file() {
+	$NRPE_CONFIG_DIR = NRPE_CONFIG_DIR;
+	$NRPE2_BINARY = NRPE_BINARY;
 	$fd = fopen(NRPE_RCFILE, 'w');
 	$rc_file = <<<EOD
 #!/bin/sh
@@ -135,7 +137,7 @@ nrpe2_enable=\${nrpe2_enable-"YES"}
 name="nrpe2"
 rcvar="\${name}_enable"
 
-command="{$nrpe2_binary}"
+command="{$NRPE2_BINARY}"
 command_args="-d"
 extra_commands="reload"
 
@@ -160,31 +162,34 @@ EOD;
 
 }
 
+function nrpe2_resync_package() {
+	conf_mount_rw();
+	nrpe2_custom_php_write_config();
+	nrpe2_custom_php_service();
+	conf_mount_ro();
+}
+
 function nrpe2_custom_php_write_config() {
-	global $g, $config;
+	global $config;
 	$nagios_check_path = NRPE_BASE . "/libexec/nagios";
 
-	conf_mount_rw();
 	$cmds = array();
 	foreach ($config['installedpackages']['nrpe2']['config'][0]['row'] as $cmd) {
 		$sudo_bin = "/usr/local/bin/sudo";
 		$sudo = (isset($cmd['sudo']) && is_executable($sudo_bin)) ? "{$sudo_bin} " : "";
 		$wcmd = !empty($cmd['warning']) ? "-w {$cmd['warning']}" : "";
 		$ccmd = !empty($cmd['critical']) ? "-c {$cmd['critical']}" : "";
-		if (is_executable("{$nagios_check_path}/{$cmd['command']}"))
+		if (is_executable("{$nagios_check_path}/{$cmd['command']}")) {
 			$cmds[] = "command[{$cmd['name']}]={$sudo}{$nagios_check_path}/{$cmd['command']} {$wcmd} {$ccmd} {$cmd['extra']}\n";
+		}
 	}
 	$commands = implode($cmds);
 
-	$server_port = $config['installedpackages']['nrpe2']['config'][0]['server_port'];
-	$allowed_hosts = $config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'];
-	$dont_blame_nrpe = $config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'];
-	if ($config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'] == "on") {
-		$dont_blame_nrpe = 1;
-	} else {
-		$dont_blame_nrpe = 0;
-	}
+	$server_port = $config['installedpackages']['nrpe2']['config'][0]['server_port'] ?: '5666';
+	$allowed_hosts = $config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'] ?: '127.0.0.1';
+	$dont_blame_nrpe = $config['installedpackages']['nrpe2']['config'][0]['dont_blame_nrpe'] == "on" ? '1' : '0';
 
+	/* Create configuration file */
 	$fd = fopen(NRPE_CONFIG_DIR . '/nrpe.cfg', 'w');
 	$nrpe_cfg = <<<EOD
 log_facility=daemon
@@ -199,22 +204,29 @@ command_timeout=60
 connection_timeout=300
 {$commands}
 EOD;
-	if (defined($config['installedpackages']['nrpe2']['config'][0]['server_address'])) {
-		$server_address = $config['installedpackages']['nrpe2']['config'][0]['server_address'];
-		$nrpe_cfg .= "server_address={$server_address}";
+	if ($config['installedpackages']['nrpe2']['config'][0]['server_address'] != "") {
+		$nrpe_cfg .= "server_address={$config['installedpackages']['nrpe2']['config'][0]['server_address']}";
 	}
 	fwrite($fd, $nrpe_cfg);
 	fclose($fd);
-	conf_mount_ro();
+
 }
 
 function nrpe2_custom_php_service() {
 	global $config;
 
 	if ($config['installedpackages']['nrpe2']['config'][0]['enabled'] == "on") {
-		restart_service("nrpe2");
+		nrpe2_write_rc_file();
+		if (is_service_running("nrpe2")) {
+			restart_service("nrpe2");
+		} else {
+			start_service("nrpe2");
+		}
 	} else {
-		stop_service("nrpe2");
+		if (is_service_running("nrpe2")) {
+			stop_service("nrpe2");
+		}
+		unlink_if_exists(NRPE_RCFILE);
 	}
 }
 
@@ -222,8 +234,26 @@ function nrpe2_get_commands() {
 	$nagios_check_path = NRPE_BASE . "/libexec/nagios";
 	$commands = glob("{$nagios_check_path}/check_*");
 	$cmdarr = array();
-	foreach ($commands as $cmd)
+	foreach ($commands as $cmd) {
 		$cmdarr[]["command"] = basename($cmd);
+	}
 	return $cmdarr;
 }
+
+function nrpe2_custom_php_validation_command($post, &$input_errors) {
+	if (!is_port($post['server_port'])) {
+		$input_errors[] = gettext("'Port Number' must be a valid port.");
+	}
+	if ($post['server_address'] != "") {
+		if (!is_ipaddr($post['server_address'])) {
+			$input_errors[] = gettext("'Bind IP Address' must be a valid IP address.");
+		}
+	}
+	foreach (explode(",", $post['allowed_hosts']) as $host) {
+		if (!empty($host) && !is_ipaddr($host)) {
+			$input_errors[] = gettext("'Nagios Server(s)' entry '{$host}' is not a valid IP address.");
+		}
+	}
+}
+
 ?>

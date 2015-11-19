@@ -409,10 +409,9 @@
 		<pkginfolink>https://doc.pfsense.org/index.php/PHPService</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/phpservice/phpservice.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.4.2</version>
+		<version>0.5.2</version>
 		<status>Beta</status>
-		<required_version>1.2.1</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
+		<required_version>2.1</required_version>
 		<configurationfile>phpservice.xml</configurationfile>
 	</package>
 	<package>
@@ -849,10 +848,10 @@
 		<depends_on_package>nmap-6.25_1.tbz</depends_on_package>
 		<depends_on_package_pbi>nmap-6.40_2-i386.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>nmap-6.40_2 pkg v1.3</version>
+		<version>6.40_2 pkg v1.4.1</version>
 		<status>Stable</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<configurationfile>nmap.xml</configurationfile>
 		<build_port_path>/usr/ports/security/nmap</build_port_path>
 		<depends_on_package>libpcap-1.2.1.tbz</depends_on_package>
@@ -929,7 +928,7 @@
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>pfflowd-0.8.tbz</depends_on_package>
 		<depends_on_package_pbi>pfflowd-0.8-i386.pbi</depends_on_package_pbi>
-		<version>0.8.3 pkg v1.0.1</version>
+		<version>0.8.3 pkg v1.0.4</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
@@ -1456,9 +1455,9 @@
 		</build_pbi>
 		<build_options>nrpe_SET=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.12_4 v2.2_4</version>
+		<version>2.13_2 pkg v2.2.6</version>
 		<status>Beta</status>
-		<required_version>1.2</required_version>
+		<required_version>2.1</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
 		<configurationfile>nrpe2.xml</configurationfile>
 	</package>

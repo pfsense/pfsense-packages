@@ -27,12 +27,13 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once('pkg-utils.inc');
+
 function phpservice_sync_package() {
 	global $config; 
-	
+	conf_mount_rw();
+
 	if ($config['installedpackages']['phpservice']['config'] != "") {
-	
-		conf_mount_rw();
 		$tmp = <<<EOF
 <?php
 
@@ -47,10 +48,10 @@ fclose($fp);
 unset($filename);
 
 function send_to_syslog($syslogaddress, $syslogport, $syslogmsg) {
-	
+
 	$syslogaddress = "127.0.0.1";
 	$syslogport = 514;
-	
+
 	$fp = fsockopen("udp://".$syslogaddress, $syslogport, $errno, $errstr);
 	if (!$fp) {
 		return;
@@ -75,8 +76,8 @@ EOF;
 				$tmp_php = base64_decode($rowhelper['php']);
 				if (strlen($tmp_php) > 0) {
 					$tmp .= "// name: ".$rowhelper['name']." \n";
-					$tmp .= "// description: ".$rowhelper['description']." \n\n";
-					$tmp .= base64_decode($rowhelper['php']);
+					$tmp .= "// description: " . $rowhelper['description'] . " \n\n";
+					$tmp .= preg_replace('/\r\n/', "\n", base64_decode($rowhelper['php']));
 					$tmp .= "\n";
 				}
 			}
@@ -96,21 +97,36 @@ EOF;
 		unset($tmp);
 		fclose($fout);
 
-		restart_service("phpservice");
-		conf_mount_ro();
+		phpservice_write_rcfile();
+		if (is_service_running("phpservice")) {
+			restart_service("phpservice");
+		} else {
+			start_service("phpservice");
+		}
 	} else {
 		stop_service("phpservice");
+		unlink_if_exists("/usr/local/etc/rc.d/phpservice.sh");
 	}
+	conf_mount_ro();
 }
 
-function phpservice_install_command() {
+function phpservice_write_rcfile() {
 	write_rcfile(array(
 		"file" => "phpservice.sh",
-		"start" => "/usr/local/bin/php /usr/local/pkg/phpservice.php >> /var/log/phpservice.log &",
+		"start" => "/usr/local/bin/php -f /usr/local/pkg/phpservice.php >> /var/log/phpservice.log &",
 		"stop" => "/bin/rm -f /tmp/phpmonitor.pid; sleep 3"
 		)
 	);
-	phpservice_sync_package();
+}
+
+function phpservice_custom_php_service_status_command() {
+	exec("/bin/pgrep -fq phpservice", $output, $retval);
+	return $retval;
+}
+
+function phpservice_deinstall_command() {
+	rmdir_recursive("/usr/local/www/packages/phpservice");
+	unlink_if_exists("/usr/local/pkg/phpservice.php");
 }
 
 ?>

@@ -347,10 +347,9 @@
 		<category>Services</category>
 		<pkginfolink>https://doc.pfsense.org/index.php/PHPService</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/phpservice/phpservice.xml</config_file>
-		<version>0.5.1</version>
+		<version>0.5.2</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>phpservice.xml</configurationfile>
 		<maximum_version>2.2.999</maximum_version>
 	</package>
@@ -810,7 +809,7 @@
 		<category>Security</category>
 		<depends_on_package_pbi>nmap-6.47-##ARCH##.pbi</depends_on_package_pbi>
 		<config_file>https://packages.pfsense.org/packages/config/nmap/nmap.xml</config_file>
-		<version>1.4</version>
+		<version>1.4.1</version>
 		<status>RELEASE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -898,7 +897,7 @@
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.xml</config_file>
 		<depends_on_package_pbi>pfflowd-0.8_1-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.0.3</version>
+		<version>1.0.4</version>
 		<status>RELEASE</status>
 		<required_version>3.0</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
@@ -1354,7 +1353,7 @@
 		</build_pbi>
 		<build_options>nrpe_SET_FORCE=SSL;nrpe_UNSET_FORCE=ARGS</build_options>
 		<config_file>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.xml</config_file>
-		<version>2.2.5</version>
+		<version>2.2.6</version>
 		<status>BETA</status>
 		<required_version>2.2.1</required_version>
 		<maintainer>erik@erikkristensen.com</maintainer>
