@@ -29,6 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 require_once("filter.inc");
+require_once("pfsense-utils.inc");
 require_once("pkg-utils.inc");
 require_once("util.inc");
 
@@ -245,8 +246,8 @@ function nrpe2_custom_php_validation_command($post, &$input_errors) {
 		$input_errors[] = gettext("'Port Number' must be a valid port.");
 	}
 	if ($post['server_address'] != "") {
-		if (!is_ipaddr($post['server_address'])) {
-			$input_errors[] = gettext("'Bind IP Address' must be a valid IP address.");
+		if (!is_ipaddr_configured($post['server_address']) && !preg_match("/(127.0.0.1|0.0.0.0)/", $post['server_address'])) {
+			$input_errors[] = gettext("'Bind IP Address' is not a valid, locally configured IP address.");
 		}
 	}
 	foreach (explode(",", $post['allowed_hosts']) as $host) {
