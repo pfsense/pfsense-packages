@@ -45,7 +45,6 @@ function update_static_output($text) {
 	return;
 }
 
-
 // Set 'Install flag' to skip sync process during installations.
 $g['pfblockerng_install'] = true;
 
@@ -57,22 +56,104 @@ if (!empty($old_ccfiles)) {
 	}
 }
 
-update_static_output("\nDownloading MaxMind Country databases.\n This may take a minute...");
+$pfs_version = substr(trim(file_get_contents('/etc/version')), 0, 3);
+if ($pfs_version == '2.2') {
+	$pfb['prefix'] = '/usr/pbi/pfblockerng-' . php_uname('m');
+} else {
+	$pfb['prefix'] = '/usr/local';
+}
+$pfb['geoipshare'] = "{$pfb['prefix']}/share/GeoIP";
 
-// Only Download the MaxMind Database files (Skip Alexa)
-unset($pfb['extras'][5]);
+$pfb['maxmind'][0]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz';
+$pfb['maxmind'][0]['file_dwn']	= 'GeoIP.dat.gz';
+$pfb['maxmind'][0]['file']	= 'GeoIP.dat';
+$pfb['maxmind'][1]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz';
+$pfb['maxmind'][1]['file_dwn']	= 'GeoIPv6.dat.gz';
+$pfb['maxmind'][1]['file']	= 'GeoIPv6.dat';
+$pfb['maxmind'][2]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip';
+$pfb['maxmind'][2]['file_dwn']	= 'GeoIPCountryCSV.zip';
+$pfb['maxmind'][2]['file']	= 'GeoIPCountryWhois.csv';
+$pfb['maxmind'][3]['url']	= 'http://dev.maxmind.com/static/csv/codes/country_continent.csv';
+$pfb['maxmind'][3]['file_dwn']	= 'country_continent.csv';
+$pfb['maxmind'][3]['file']	= 'country_continent.csv';
+$pfb['maxmind'][4]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoIPv6.csv.gz';
+$pfb['maxmind'][4]['file_dwn']	= 'GeoIPv6.csv.gz';
+$pfb['maxmind'][4]['file']	= 'GeoIPv6.csv';
 
-if (!pfblockerng_download_extras()) {
-	update_static_output(" MaxMind download failed!\nFetching MaxMind archive from pfSense package repo...");
-	// Fetch archived MaxMind database
-	$url = 'https://packages.pfsense.org/packages/config/pfblockerng/countrycodes.tar.bz2';
-	exec("/usr/bin/fetch -o /tmp/countrycodes.tar.bz2 {$url}");
-	// Uncompress archived Country code file
-	exec("/usr/bin/tar -jx -C {$pfb['ccdir']} -f /tmp/countrycodes.tar.bz2");
-	update_static_output(" done.\n");
+// Only download MaxMind Database if files do not exist.
+$maxmind_verify = 0;
+if (!file_exists("{$pfb['geoipshare']}/{$pfb['maxmind'][0]['file']}") ||
+    !file_exists("{$pfb['geoipshare']}/{$pfb['maxmind'][1]['file']}") ||
+    !file_exists("{$pfb['geoipshare']}/{$pfb['maxmind'][2]['file']}") ||
+    !file_exists("{$pfb['geoipshare']}/{$pfb['maxmind'][3]['file']}") ||
+    !file_exists("{$pfb['geoipshare']}/{$pfb['maxmind'][4]['file']}")) {
+
+	update_static_output("\nDownloading MaxMind Country databases. This may take a minute...\n");
+	foreach ($pfb['maxmind'] as $feed) {
+
+		$file_dwn = "{$pfb['geoipshare']}/{$feed['file_dwn']}";
+		if (($fhandle = fopen("{$file_dwn}", 'w')) !== FALSE) {
+			update_static_output(" {$feed['file']}...");
+			if (!($ch = curl_init("{$feed['url']}"))) {
+				update_static_output(" Failed to create cURL resource.\n");
+				break;
+			}
+
+			curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 Chrome/43.0.2357.65 Safari/537.36');
+			curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'TLSv1.2, TLSv1');
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
+			curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+			curl_setopt($ch, CURLOPT_FILE, $fhandle);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 600);
+
+			// Attempt 3 Downloads before failing.
+			for ($retries = 1; $retries <= 3; $retries++) {
+				if (curl_exec($ch)) {
+					break;	// Break on success
+				}
+
+				$curl_error = curl_errno($ch);
+				update_static_output(" cURL Error: {$curl_error}. ", 1);
+			}
+
+			$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			if ($http_status == '200 OK') {
+				if (strpos($file_dwn, '.gz') !== FALSE) {
+					exec("/usr/bin/gunzip -dfq {$file_dwn} {$pfb['geoipshare']}");
+				} elseif (strpos($file_dwn, '.zip') !== FALSE) {
+					exec("/usr/bin/tar -xOf {$file_dwn} > {$pfb['geoipshare']}/{$feed['file']}");
+					unlink_if_exists("{$file_dwn}");
+				}
+				update_static_output(" done.\n");
+				$maxmind_verify += 1;
+			}
+			else {
+				update_static_output(" failed!\n");
+				break;
+			}
+		}
+		curl_close($ch);
+		fclose($fhandle);
+	}
+
+	if ($maxmind_verify != 5) {
+		update_static_output(" MaxMind download failed!\nFetching MaxMind archive from pfSense package repo...");
+		// Fetch archived MaxMind database
+		$url = 'https://packages.pfsense.org/packages/config/pfblockerng/countrycodes.tar.bz2';
+		exec("/usr/bin/fetch -o /tmp/countrycodes.tar.bz2 {$url}");
+		// Uncompress archived Country code file
+		exec("/usr/bin/tar -jx -C {$pfb['ccdir']} -f /tmp/countrycodes.tar.bz2");
+		update_static_output(" done.\n");
+	}
+	else {
+		update_static_output("Downloading MaxMind Country databases... done.\n");
+	}
 }
 else {
-	update_static_output(" done.\n");
+	update_static_output("\nMaxMind Country databases previously downloaded.\n");
 }
 
 update_static_output("Converting MaxMind Country databases for pfBlockerNG.\n This may take a few minutes...");
