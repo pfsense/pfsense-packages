@@ -146,6 +146,7 @@ function sync_package_siproxd() {
 	}
 	$siproxd_conffile = SIPROXD . '/etc/siproxd.conf';
 	$siproxd_pwfile = SIPROXD . '/etc/siproxd_passwd.cfg';
+	$siproxd_chroot = "/var/siproxd/";
 
 	$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 	if ($pfs_version == '2.2') {
