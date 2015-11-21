@@ -39,7 +39,7 @@
 		</descr>
 		<website>http://www.asterisk.org/</website>
 		<category>Services</category>
-		<version>0.3.3</version>
+		<version>0.3.4</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/asterisk/asterisk.xml</config_file>
