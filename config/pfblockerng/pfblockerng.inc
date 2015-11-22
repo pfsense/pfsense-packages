@@ -1315,14 +1315,21 @@ function pfb_download_failure($alias, $header, $pfbfolder, $vtype, $list_url) {
 		$log = "   Local File Failure\n";
 		pfb_logger("{$log}", 2);
 	} else {
-		// Determine if Firewall/IDS is blocking download.
-		$ip = @gethostbyname($host);
+		// Determine if Firewall/IDS/DNSBL is blocking download.
+		$ip = @gethostbyname($host['host']);
 
 		if (!empty($ip)) {
 			// Query Firewall aliastables
 			$result = find_reported_header($ip, "{$pfbfolder}/*", TRUE);
 			if (!empty($result)) {
 				$log = " [ {$ip} ] Firewall IP block found in: [ {$result} ]\n";
+				pfb_logger("{$log}", 2);
+				$pfbfound = TRUE;
+			}
+
+			// Determine if Host is listed in DNSBL
+			if ($ip == $pfb['dnsbl_vip']) {
+				$log = " [ {$host['host']} ] Domain listed in DNSBL\n";
 				pfb_logger("{$log}", 2);
 				$pfbfound = TRUE;
 			}
