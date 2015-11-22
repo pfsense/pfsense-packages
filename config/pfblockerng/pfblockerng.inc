@@ -1315,7 +1315,7 @@ function pfb_download_failure($alias, $header, $pfbfolder, $vtype, $list_url) {
 		$log = "   Local File Failure\n";
 		pfb_logger("{$log}", 2);
 	} else {
-		// Determine if Firewall/IDS/DNSBL is blocking download.
+		// Determine if Firewall/IPS/DNSBL is blocking download.
 		$ip = @gethostbyname($host['host']);
 
 		if (!empty($ip)) {
