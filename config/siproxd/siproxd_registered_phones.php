@@ -40,8 +40,10 @@
 
 require_once("guiconfig.inc");
 
-$phonetext = file_get_contents("/var/siproxd/siproxd_registrations");
-$phonedata = explode("\n", $phonetext);
+if (file_exists("/var/siproxd/siproxd_registrations")) {
+	$phonetext = file_get_contents("/var/siproxd/siproxd_registrations");
+	$phonedata = explode("\n", $phonetext);
+}
 
 if (!is_array($phonedata)) {
 	$phonedata = array();
