@@ -30,6 +30,13 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 /* ========================================================================== */
+require_once("config.inc");
+require_once("globals.inc");
+require_once("notices.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
+
 function filer_text_area_decode($text) {
 	return preg_replace('/\r\n/', "\n", base64_decode($text));
 }
