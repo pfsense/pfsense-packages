@@ -28,9 +28,13 @@
 
 */
 $shortcut_section = "mailscanner";
-require_once("util.inc");
+require_once("config.inc");
 require_once("globals.inc");
-#require("guiconfig.inc");
+require_once("notices.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
+
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version == "2.1" || $pf_version == "2.2") {
