@@ -30,7 +30,11 @@
 */
 
 require_once("config.inc");
+require_once("globals.inc");
+require_once("notices.inc");
 require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 
 function restart_sshd() {
 	mwexec_bg("/etc/sshd");
