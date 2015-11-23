@@ -55,30 +55,30 @@ $pfb['extras'][0]['file_dwn']	= 'GeoIP.dat.gz';
 $pfb['extras'][0]['file']	= 'GeoIP.dat';
 $pfb['extras'][0]['folder']	= "{$pfb['geoipshare']}";
 
-$pfb['extras'][1]['url']	= "http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz";
+$pfb['extras'][1]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz';
 $pfb['extras'][1]['file_dwn']	= 'GeoIPv6.dat.gz';
 $pfb['extras'][1]['file']	= 'GeoIPv6.dat';
 $pfb['extras'][1]['folder']	= "{$pfb['geoipshare']}";
 
-$pfb['extras'][2]['url']	= "http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip";
+$pfb['extras'][2]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoIPCountryCSV.zip';
 $pfb['extras'][2]['file_dwn']	= 'GeoIPCountryCSV.zip';
 $pfb['extras'][2]['file']	= 'GeoIPCountryWhois.csv';
 $pfb['extras'][2]['folder']	= "{$pfb['geoipshare']}";
 $pfb['extras'][2]['install']	= TRUE;		// Flag for package installation
 
-$pfb['extras'][3]['url']	= "http://dev.maxmind.com/static/csv/codes/country_continent.csv";
+$pfb['extras'][3]['url']	= 'http://dev.maxmind.com/static/csv/codes/country_continent.csv';
 $pfb['extras'][3]['file_dwn']	= 'country_continent.csv';
 $pfb['extras'][3]['file']	= 'country_continent.csv';
 $pfb['extras'][3]['folder']	= "{$pfb['geoipshare']}";
 $pfb['extras'][3]['install']	= TRUE;		// Flag for package installation
 
-$pfb['extras'][4]['url']	= "http://geolite.maxmind.com/download/geoip/database/GeoIPv6.csv.gz";
+$pfb['extras'][4]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoIPv6.csv.gz';
 $pfb['extras'][4]['file_dwn']	= 'GeoIPv6.csv.gz';
 $pfb['extras'][4]['file']	= 'GeoIPv6.csv';
 $pfb['extras'][4]['folder']	= "{$pfb['geoipshare']}";
 $pfb['extras'][4]['install']	= TRUE;		// Flag for package installation
 
-$pfb['extras'][5]['url']	= "https://s3.amazonaws.com/alexa-static/top-1m.csv.zip";
+$pfb['extras'][5]['url']	= 'https://s3.amazonaws.com/alexa-static/top-1m.csv.zip';
 $pfb['extras'][5]['file_dwn']	= 'top-1m.csv.zip';
 $pfb['extras'][5]['file']	= 'top-1m.csv';
 $pfb['extras'][5]['folder']	= "{$pfb['dbdir']}";
@@ -171,7 +171,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 
 	// Check if List file doesn't exist or Format is 'whois'.
 	if (!file_exists("{$pfbfolder}/{$header}.txt") || $format == 'whois') {
-		$log = "\t\t\t\t\t\t\tUpdate Found\n";
+		$log = "\t\t\t\t\t\t\tUpdate found\n";
 		pfb_logger("{$log}", 1);
 		$pfb['update_cron'] = TRUE;
 		return;
@@ -183,7 +183,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 	// Compare previously downloaded file timestamp with remote timestamp
 	if (file_exists($local_file)) {
 		if ($format == 'rsync') {
-			$log = "\t\t\t\t( rsync )\t\tUpdate Found\n";
+			$log = "\t\t\t\t( rsync )\t\tUpdate found\n";
 			pfb_logger("{$log}", 1);
 			$pfb['update_cron'] = TRUE;
 			unlink_if_exists("{$pfbfolder}/{$header}.txt");
@@ -234,7 +234,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 			$local_md5	= @md5_file($local_file);
 
 			if ($remote_md5 != $local_md5) {
-				$log = "\t\t\t\t( md5 changed )\t\tUpdate Found\n";
+				$log = "\t\t\t\t( md5 changed )\t\tUpdate found\n";
 				pfb_logger("{$log}", 1);
 				$pfb['update_cron'] = TRUE;
 				unlink_if_exists("{$pfbfolder}/{$header}.txt");
@@ -271,7 +271,7 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 		// Trigger CRON process if updates are found.
 		$pfb['update_cron'] = TRUE;
 
-		$log = "Update Found\n";
+		$log = "Update found\n";
 		pfb_logger("{$log}", 1);
 		unlink_if_exists("{$pfbfolder}/{$header}.txt");
 	}
