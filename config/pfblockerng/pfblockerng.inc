@@ -42,6 +42,8 @@ require_once('pfsense-utils.inc');
 require_once('globals.inc');
 require_once('services.inc');
 require_once('service-utils.inc');
+require_once('xmlrpc.inc');
+require_once('xmlrpc_client.inc');
 require_once('/usr/local/pkg/pfblockerng/pfblockerng_extra.inc');	// 'include functions' not yet merged into pfSense
 
 global $g, $config, $pfb;
