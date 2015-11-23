@@ -2360,7 +2360,7 @@ function sync_package_pfblockerng($cron='') {
 					}
 
 					if (!empty($list['custom'])) {
-						$list['row'][] = array( 'header'	=> "{$list['aliasname']}_custom",
+						$list['row'][] = array( 'header'	=> preg_replace("/\W/", '', $list['aliasname']) . '_custom',
 									'custom'	=> $list['custom'],
 									'state'		=> 'Enabled',
 									'update'	=> $list['custom_update'],
@@ -2433,9 +2433,9 @@ function sync_package_pfblockerng($cron='') {
 
 							if (file_exists("{$pfbfolder}/{$header}.txt") && $pfbreuse == '') {
 								if ($row['state'] == 'Hold') {
-									$log = "\n[ {$header} ]{$logtab} Static Hold [ NOW ]";
+									$log = "\n[ {$header} ]{$logtab} static hold. [ NOW ]";
 								} else {
-									$log = "\n[ {$header} ]{$logtab} exists, Reloading [ NOW ]";
+									$log = "\n[ {$header} ]{$logtab} exists. [ NOW ]";
 								}
 								pfb_logger("{$log}", 1);
 
@@ -3135,7 +3135,7 @@ function sync_package_pfblockerng($cron='') {
 						if ($continent === $continent_ex && !empty($pfctlck) &&
 						    file_exists("{$pfbfolder}/{$ccfile}.txt") && $pfb['reuse'] == '') {
 							if (!$pfb['save']) {
-								$log = "\n[ {$pfb_alias}{$vtype} ]{$logtab} exists, Reloading [ NOW ]";
+								$log = "\n[ {$pfb_alias}{$vtype} ]{$logtab} exists. [ NOW ]";
 								pfb_logger("{$log}", 1);
 							}
 						} else {
@@ -3252,7 +3252,7 @@ function sync_package_pfblockerng($cron='') {
 					}
 
 					if (!empty($list['custom'])) {
-						$list['row'][] = array(	'header'	=> "{$list['aliasname']}_custom",
+						$list['row'][] = array(	'header'	=> preg_replace("/\W/", '', $list['aliasname']) . '_custom',
 									'custom'	=> $list['custom'],
 									'state'		=> 'Enabled',
 									'update'	=> $list['custom_update'],
@@ -3307,9 +3307,9 @@ function sync_package_pfblockerng($cron='') {
 
 						if (file_exists("{$pfbfolder}/{$header}.txt") && $pfbreuse == '') {
 							if ($row['state'] == 'Hold') {
-								$log = "\n[ {$header} ]{$logtab} Static Hold [ NOW ]";
+								$log = "\n[ {$header} ]{$logtab} static hold. [ NOW ]";
 							} else {
-								$log = "\n[ {$header} ]{$logtab} exists, Reloading [ NOW ]";
+								$log = "\n[ {$header} ]{$logtab} exists. [ NOW ]";
 							}
 							pfb_logger("{$log}", 1);
 						} else {

@@ -146,7 +146,7 @@
 		<field>
 			<fielddescr>Alias Name</fielddescr>
 			<fieldname>aliasname</fieldname>
-			<description><![CDATA[Enter Alias Name ( Example: Badguys )<br />
+			<description><![CDATA[Enter Alias Name (Example: Badguys)<br />
 				Do not include <strong>'pfBlocker' or 'pfB_'</strong> in the Alias Name, it's done by package.<br />
 				<strong>International, special or space characters will be ignored in firewall alias names.
 				</strong><br />]]>
@@ -174,7 +174,7 @@
 				<ul><li><strong>'Country code'</strong>: /usr/pbi/pfblockerng-amd64/share/GeoIP/cc/US_v4.txt
 					&emsp;(Change 'US' to required code)</li></ul>
 				<ul><li><strong>'Whois'</strong>: Domain name or AS&emsp;(ie: facebook.com or AS13414)
-					&emsp;( <a target="_blank" href='https://asn.cymru.com/'>Click for ASN Lookup</a> )</li></ul>
+					&emsp;(<a target="_blank" href='https://asn.cymru.com/'>Click for ASN Lookup</a>)</li></ul>
 				<strong><u>'Header/Label'</u></strong>: This field must be <u>unique.</u> This names the file and is referenced in the widget.
 					&emsp;(ie: Spamhaus_drop, Spamhaus_edrop)<br /><br />]]>
 			</description>
@@ -439,8 +439,8 @@
 		<field>
 			<type>info</type>
 			<description><![CDATA[<font color='red'>Note: </font>&emsp;Custom List can be used in <strong>ONE</strong> of two ways:<br />
-				<ul>1. IPv4 addresses entered directly into the custom list, as per the required format.</ul>
-				<ul>2. Domain names or AS numbers, which will be converted into their respective IPv4 addresses.</ul>]]>
+				<ul>1. IPv4 addresses entered directly into the custom list, as per the required format.
+				<br />2. Domain names or AS numbers, which will be converted into their respective IPv4 addresses.</ul>]]>
 			</description>
 		</field>
 		<field>

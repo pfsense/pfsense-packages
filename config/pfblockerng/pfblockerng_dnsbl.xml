@@ -389,7 +389,7 @@
 		<field>
 			<fielddescr>Alexa TLD Inclusion</fielddescr>
 			<fieldname>alexa_inclusion</fieldname>
-			<description><![CDATA[Select the TLDs for Whitelist. ( Only showing the Top 150 TLDs )<br />
+			<description><![CDATA[Select the TLDs for Whitelist. (Only showing the Top 150 TLDs)<br />
 				<strong>Default: COM, NET, ORG, CA, CO, IO</strong><br /><br />
 				Detailed listing : <a target=_blank href="http://www.iana.org/domains/root/db">Root Zone top-level domains.</a> ]]>
 			</description>
@@ -565,7 +565,7 @@
 			<fieldname>suppression</fieldname>
 			<description><![CDATA[No Regex Entries Allowed!<br /><br />
 				Enter one &emsp; <strong>Domain Name</strong>&emsp; per line<br />
-				You may use "<strong>#</strong>" after any Domain name to add comments. example ( google.com # Suppress Google.com )<br />
+				You may use "<strong>#</strong>" after any Domain name to add comments. example (google.com # Suppress Google.com)<br />
 				This List is stored as 'Base64' format in the config.xml file.<br /><br />
 				<font color='red'>Note: </font>These entries are only suppressed when Feeds are downloaded or on a
 				<font color='red'>'Force Reload'.</font><br />
