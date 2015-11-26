@@ -28,8 +28,13 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 require_once("filter.inc");
+require_once("globals.inc");
+require_once("interfaces.inc");
+require_once("notices.inc");
 require_once("pfsense-utils.inc");
 require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 
 define('ETC_SERVICES', '/etc/services');
 

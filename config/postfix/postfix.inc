@@ -29,10 +29,16 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 $shortcut_section = "postfix";
-require_once("util.inc");
+require_once("config.inc");
 require_once("functions.inc");
-require_once("pkg-utils.inc");
 require_once("globals.inc");
+require_once("interfaces.inc");
+require_once("notices.inc");
+require_once("pkg-utils.inc");
+require_once("services.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pfs_version == "2.1" || $pfs_version == "2.2") {

@@ -31,6 +31,8 @@ require_once("/etc/inc/util.inc");
 require_once("/etc/inc/functions.inc");
 require_once("/etc/inc/pkg-utils.inc");
 require_once("/etc/inc/globals.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 require_once("/usr/local/pkg/postfix.inc");
 
 $uname = posix_uname();

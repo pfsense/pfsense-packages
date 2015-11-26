@@ -32,6 +32,12 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
+require_once("globals.inc");
+require_once("notices.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
+
 $shortcut_section = "varnish";
 
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);

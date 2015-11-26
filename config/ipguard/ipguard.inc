@@ -28,7 +28,11 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 require_once("config.inc");
+require_once("globals.inc");
+require_once("notices.inc");
 require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 
 function ipguard_custom_php_deinstall_command() {
 	unlink_if_exists("/usr/local/etc/rc.d/ipguard.sh");
