@@ -337,7 +337,7 @@ function squid_reverse_enabled() {
 		if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_http'] == "on" ||
 		    $config['installedpackages']['squidreversegeneral']['config'][0]['reverse_https'] == "on") {
 			// ... and has at least one reverse interface configured
-			if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
+			if (!empty($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'])) {
 				$reverse_proxy_enabled = true;
 			}
 		}
@@ -410,7 +410,7 @@ function squid_validate_reverse($post, &$input_errors) {
 	}
 
 	if ($post['reverse_http'] == 'on' || $post['reverse_https'] == 'on') {
-		if ($post['reverse_interface'] == '') {
+		if (empty($post['reverse_interface'])) {
 			$input_errors[] = "You must select at least one interface under 'Reverse Proxy Interface(s)' to enable HTTP Reverse Proxy.";
 		}
 		$fqdn = trim($post['reverse_external_fqdn']);
