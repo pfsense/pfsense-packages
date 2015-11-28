@@ -381,7 +381,7 @@
 				]]>
 			</description>
 			<type>checkbox</type>
-			<enablefields>transparent_active_interface,private_subnet_proxy_off,defined_ip_proxy_off,defined_ip_proxy_off_dest</enablefields>
+			<enablefields>transparent_active_interface,private_subnet_proxy_off,defined_ip_proxy_off,defined_ip_proxy_off_dest,ssl_proxy</enablefields>
 		</field>
 		<field>
 			<fielddescr>Transparent Proxy Interface(s)</fielddescr>
@@ -394,6 +394,7 @@
 			</description>
 			<type>interfaces_selection</type>
 			<default_value>lan</default_value>
+			<hideinterfaceregex>loopback</hideinterfaceregex>
 			<multiple/>
 		</field>
 		<field>
@@ -454,6 +455,7 @@
 			</description>
 			<type>interfaces_selection</type>
 			<default_value>lan</default_value>
+			<hideinterfaceregex>loopback</hideinterfaceregex>
 			<multiple/>
 		</field>
 		<field>
@@ -483,6 +485,8 @@
 			<source><![CDATA[$config['ca']]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
+			<show_disable_value>none</show_disable_value>
+			<default_value>none</default_value>
 		</field>
 		<field>
 			<fielddescr>SSL Certificate Deamon Children</fielddescr>
