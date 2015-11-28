@@ -794,9 +794,6 @@ function squid_validate_general($post, &$input_errors) {
 	}
 
 	if ($post['ssl_proxy'] == 'on') {
-		if ($post['transparent_proxy'] != 'on') {
-			$input_errors[] = "SSL interception cannot be enabled without enabling 'Transparent HTTP Proxy'.";
-		}
 		if ($post['dca'] == 'none') {
 			$input_errors[] = "SSL interception cannot be enabled without a CA.";
 		}
@@ -804,16 +801,16 @@ function squid_validate_general($post, &$input_errors) {
 			$input_errors[] = "You must select at least one interface under 'SSL Intercept Interface(s)' when 'HTTPS/SSL Interception' is enabled.";
 		} else {
 			// allow HTTPS/SSL Interception only on interfaces where transparent proxy is enabled
-			$t_ifaces = $post['transparent_active_interface'] ?: array();
+			$a_ifaces = $post['active_interface'] ?: array();
 			$s_ifaces = $post['ssl_active_interface'];
 			foreach ($s_ifaces as $s_iface) {
-				if (!in_array($s_iface, $t_ifaces)) {
+				if (!in_array($s_iface, $a_ifaces)) {
 					$err_iface = convert_friendly_interface_to_friendly_descr($s_iface);
-					$input_errors[] = "'SSL Intercept Interface(s)' may only contain interfaces also selected in 'Transparent Proxy Interface(s)' above. '{$err_iface}' is not valid.";
+					$input_errors[] = "'SSL Intercept Interface(s)' may only contain interfaces also selected in 'Proxy Interface(s)' above. '{$err_iface}' is not valid.";
 					unset($err_iface);
 				}
 			}
-			unset($t_ifaces, $s_ifaces, $s_iface);
+			unset($a_ifaces, $s_ifaces, $s_iface);
 		}
 	}
 
