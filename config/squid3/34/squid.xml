@@ -381,7 +381,7 @@
 				]]>
 			</description>
 			<type>checkbox</type>
-			<enablefields>transparent_active_interface,private_subnet_proxy_off,defined_ip_proxy_off,defined_ip_proxy_off_dest,ssl_proxy</enablefields>
+			<enablefields>transparent_active_interface,private_subnet_proxy_off,defined_ip_proxy_off,defined_ip_proxy_off_dest</enablefields>
 		</field>
 		<field>
 			<fielddescr>Transparent Proxy Interface(s)</fielddescr>
