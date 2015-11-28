@@ -800,7 +800,7 @@ function squid_validate_general($post, &$input_errors) {
 		if (empty($post['ssl_active_interface'])) {
 			$input_errors[] = "You must select at least one interface under 'SSL Intercept Interface(s)' when 'HTTPS/SSL Interception' is enabled.";
 		} else {
-			// allow HTTPS/SSL Interception only on interfaces where transparent proxy is enabled
+			// allow HTTPS/SSL Interception only on interfaces where Squid is actually running to keep configuration sane
 			$a_ifaces = $post['active_interface'] ?: array();
 			$s_ifaces = $post['ssl_active_interface'];
 			foreach ($s_ifaces as $s_iface) {
