@@ -327,6 +327,25 @@ function squid_refresh_crl() {
 	}
 }
 
+/* Check whether Squid reverse proxy is enabled */
+function squid_reverse_enabled() {
+	global $config, $reverse_proxy_enabled;
+	$reverse_proxy_enabled = false;
+
+	if (is_array($config['installedpackages']['squidreversegeneral']['config'])) {
+		// check whether HTTP or HTTPS reverse proxy is enabled ...
+		if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_http'] == "on" ||
+		    $config['installedpackages']['squidreversegeneral']['config'][0]['reverse_https'] == "on") {
+			// ... and has at least one reverse interface configured
+			if ($config['installedpackages']['squidreversegeneral']['config'][0]['reverse_interface'] != "") {
+				$reverse_proxy_enabled = true;
+			}
+		}
+	}
+
+	return $reverse_proxy_enabled;
+}
+
 /* Migrate reverse proxy configuration from old Squid package versions */
 function squid_reverse_upgrade_config() {
 	global $config;
