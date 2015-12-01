@@ -25,7 +25,7 @@ SecRequestBodyAccess On
 # Initiate XML Processor in case of xml content-type
 #
 SecRule REQUEST_HEADERS:Content-Type "text/xml" \
-     "phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
+     "id:20001,phase:1,t:none,t:lowercase,pass,nolog,ctl:requestBodyProcessor=XML"
 
 
 # Maximum request body size we will accept for buffering. If you support
@@ -56,7 +56,7 @@ SecRequestBodyLimitAction Reject
 # or log a high-severity alert (when deployed in detection-only mode).
 #
 SecRule REQBODY_ERROR "!@eq 0" \
-"phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
+"id:20002,phase:2,t:none,log,deny,status:400,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}',severity:2"
 
 # By default be strict with what we accept in the multipart/form-data
 # request body. If the rule below proves to be too strict for your
@@ -64,7 +64,7 @@ SecRule REQBODY_ERROR "!@eq 0" \
 # _not_ to remove it altogether.
 #
 SecRule MULTIPART_STRICT_ERROR "!@eq 0" \
-"phase:2,t:none,log,deny,status:44,msg:'Multipart request body \
+"id:20003,phase:2,t:none,log,deny,status:44,msg:'Multipart request body \
 failed strict validation: \
 PE %{REQBODY_PROCESSOR_ERROR}, \
 BQ %{MULTIPART_BOUNDARY_QUOTED}, \
@@ -81,7 +81,7 @@ IH %{MULTIPART_FILE_LIMIT_EXCEEDED}'"
 # Did we see anything that might be a boundary?
 #
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" \
-"phase:2,t:none,log,deny,status:44,msg:'Multipart parser detected a possible unmatched boundary.'"
+"id:20004,phase:2,t:none,log,deny,status:44,msg:'Multipart parser detected a possible unmatched boundary.'"
 
 # PCRE Tuning
 # We want to avoid a potential RegEx DoS condition
