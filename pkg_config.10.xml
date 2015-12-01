@@ -1237,6 +1237,8 @@
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
 		<configurationfile>openvpn-client-export.xml</configurationfile>
+		<!-- Skip auto sync to 2.3 format -->
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>HAVP antivirus</name>
