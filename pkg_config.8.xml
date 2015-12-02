@@ -1432,7 +1432,7 @@
 		<category>Services</category>
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/shellcmd/shellcmd.xml</config_file>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<configurationfile>shellcmd.xml</configurationfile>
