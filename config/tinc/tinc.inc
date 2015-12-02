@@ -26,7 +26,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+require_once('config.inc');
+require_once('service-utils.inc');
+require_once('util.inc');
 /* include_once('guiconfig.inc'); is needed for clear_log_file() during package installation while booting.
  * However, guiconfig.inc includes authgui.inc which requires a valid php session_auth() and exits when not found.
  * So we include the function here.
@@ -34,7 +36,8 @@
 if (!function_exists('clear_log_file')) {
 
 	function clear_log_file($logfile = "/var/log/system.log", $restart_syslogd = true) {
-		global $config, $g;
+		require_once('system.inc');
+		global $config;
 		if ($restart_syslogd) {
 			exec("/usr/bin/killall syslogd");
 		}
@@ -65,8 +68,11 @@ function tinc_save() {
 	safe_mkdir("{$configpath}");
 	safe_mkdir("{$configpath}/hosts");
 	touch("{$configpath}/WARNING-ENTIRE_DIRECTORY_ERASED_ON_SAVE_FROM_GUI");
-	$tincconf = &$config['installedpackages']['tinc']['config'][0];
-	$fout = fopen("{$configpath}/tinc.conf", "w");
+	if (is_array($config['installedpackages']['tinc']['config'])) {
+		$tincconf = &$config['installedpackages']['tinc']['config'][0];
+	} else {
+		$tincconf = array();
+	}
 
 	// No proper config, bail out.
 	if (!isset($tincconf['name']) || empty($tincconf['name'])) {
@@ -74,13 +80,15 @@ function tinc_save() {
 		return;
 	}
 
+	$fout = fopen("{$configpath}/tinc.conf", "w");
 	fwrite($fout, "name=" . $tincconf['name'] . "\n");
 	fwrite($fout, "AddressFamily=" . $tincconf['addressfamily'] . "\n");
+
 	if (!is_array($config['installedpackages']['tinchosts']['config'])) {
-		$config['installedpackages']['tinchosts']['config']= array();
+		$config['installedpackages']['tinchosts']['config'] = array();
 	}
 	foreach ($config['installedpackages']['tinchosts']['config'] as $host) {
-		if($host['connect']) {
+		if ($host['connect']) {
 			fwrite($fout, "ConnectTo=" . $host['name'] . "\n");
 		}
 
@@ -158,13 +166,28 @@ function tinc_save() {
 	}
 
 	if ($tincconf['enable'] != "") {
-		restart_service("tinc");
-	} elseif (is_process_running("tincd")) {
-		stop_service("tinc");
+		tinc_write_rcfile();
+		if (is_service_running("tinc")) {
+			restart_service("tinc");
+		} else {
+			start_service("tinc");
+		}
+	} else {
+		if (is_process_running("tincd")) {
+			stop_service("tinc");
+		}
+		unlink_if_exists("/usr/local/etc/rc.d/tinc.sh");
 	}
 
 	rmdir_recursive("/usr/local/etc/tinc.old");
 	conf_mount_ro();
+}
+
+function tinc_write_rcfile() {
+	$rc['file'] = 'tinc.sh';
+	$rc['start'] .= "/usr/local/sbin/tincd --config=/usr/local/etc/tinc\n\t";
+	$rc['stop'] .= "/usr/local/sbin/tincd --kill \n\t";
+	write_rcfile($rc);
 }
 
 function tinc_install() {
@@ -172,10 +195,7 @@ function tinc_install() {
 
 	safe_mkdir("/usr/local/etc/tinc");
 	safe_mkdir("/usr/local/etc/tinc/hosts");
-	$rc['file'] = 'tinc.sh';
-	$rc['start'] .= "/usr/local/sbin/tincd --config=/usr/local/etc/tinc\n\t";
-	$rc['stop'] .= "/usr/local/sbin/tincd --kill \n\t";
-	write_rcfile($rc);
+	tinc_write_rcfile();
 	unlink_if_exists("/usr/local/etc/rc.d/tincd");
 	clear_log_file("/var/log/tinc.log");
 
