@@ -42,13 +42,13 @@
 	]]>
 	</copyright>
 	<name>widentd</name>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<title>Services: widentd</title>
 	<menu>
 		<name>widentd</name>
 		<tooltiptext>Modify widentd settings.</tooltiptext>
 		<section>Services</section>
-		<url>pkg_edit.php?xml=widentd.xml</url>
+		<url>/pkg_edit.php?xml=widentd.xml</url>
 	</menu>
 	<service>
 		<name>widentd</name>
@@ -59,7 +59,6 @@
 		<item>https://packages.pfsense.org/packages/config/widentd/widentd.priv.inc</item>
 		<prefix>/etc/inc/priv/</prefix>
 	</additional_files_needed>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
 			<fielddescr>Enable widentd Daemon</fielddescr>
