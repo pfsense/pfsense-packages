@@ -91,7 +91,7 @@ if ($_GET) {
 					if (preg_match($regex, $logline[0],$line)) {
 						// Apply filter and color
 						if ($filter != "")
-							$line = preg_replace("@($filter)@i","<spam><font color='red'>$1</font></span>",$line);
+							$line = preg_replace("@($filter)@i","<span><font color='red'>$1</font></span>",$line);
 						$agent_info="onmouseover=\"jQuery('#browserinfo').empty().html('{$line[13]}');\"\n";
 						echo "<tr valign=\"top\" $agent_info>\n";
 						echo "<td class=\"listlr\" align=\"center\" nowrap>{$line[5]}({$line[6]})</td>\n";
