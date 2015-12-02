@@ -882,7 +882,7 @@
 		<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
 		<website>http://www.addressplus.net</website>
 		<category>Network Management</category>
-		<version>0.3.1</version>
+		<version>0.3.2</version>
 		<maintainer>ptaylor@addressplus.net</maintainer>
 		<required_version>1.2.1</required_version>
 		<status>BETA</status>
