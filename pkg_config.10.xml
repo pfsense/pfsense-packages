@@ -1446,6 +1446,8 @@
 		<port_category>sysutils</port_category>
 		<required_version>2.2</required_version>
 		<configurationfile>systempatches.xml</configurationfile>
+		<!-- Skip auto sync to 2.3 format -->
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>bacula-client</name>
