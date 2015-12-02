@@ -133,17 +133,6 @@ if ($savemsg) {
 ?>
 
 <div id="mainlevel">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td class="tabnavtbl">
-<?php
-
-	$tab_array = array();
-	$tab_array[] = array(gettext("TFTP"), false, "tftp_files.php");
-	display_top_tabs($tab_array);
-
-?>
-</td></tr>
-</table>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
