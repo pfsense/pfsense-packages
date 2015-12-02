@@ -42,13 +42,13 @@
 	]]>
 	</copyright>
 	<name>diag_new_states</name>
-	<version>0.3</version>
+	<version>0.3.1</version>
 	<title>Diagnostics: States New</title>
 	<menu>
 		<name>States New</name>
 		<tooltiptext>States by Paul Taylor</tooltiptext>
 		<section>Diagnostics</section>
-		<url>diag_new_states.php</url>
+		<url>/diag_new_states.php</url>
 	</menu>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
