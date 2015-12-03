@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>bindzone</name>
-	<version>none</version>
+	<version>0.4.3</version>
 	<title>BIND: Zones Settings</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
 	<tabs>
@@ -68,7 +68,6 @@
 			<url>/pkg_edit.php?xml=bind_sync.xml</url>
 		</tab>
 	</tabs>
-	<configpath>['installedpackages']['bindzone']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Status</fielddescr>

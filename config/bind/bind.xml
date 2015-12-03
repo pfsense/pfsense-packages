@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>bind</name>
-	<version>0.4.0</version>
+	<version>0.4.3</version>
 	<title>BIND: DNS Settings</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
 	<menu>
@@ -100,6 +100,10 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/bind/bind.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/bind/bind.priv.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
