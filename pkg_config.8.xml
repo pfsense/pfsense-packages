@@ -1494,7 +1494,7 @@
 		<name>Quagga OSPF</name>
 		<descr>OSPF routing protocol using Quagga -- WARNING! Installs files to the same place as OpenBGPD. Installing both will break things.</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.99.22.3 v0.6.8</version>
+		<version>0.99.22.3 pkg v0.6.9</version>
 		<category>Routing</category>
 		<status>BETA</status>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
