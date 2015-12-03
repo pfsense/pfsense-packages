@@ -94,7 +94,12 @@ function get_hostnames() {
 	$curl_session = curl_init();
 	curl_setopt($curl_session, CURLOPT_URL, $stats_url);
 	curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+	if ($pf_version < 2.2) {
+		// pre-2.2 doesn't have ca-root-nss
+		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+	} else {
+		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+	}
 	curl_setopt($curl_session, CURLOPT_POST, 1);
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showstats");
@@ -180,7 +185,12 @@ function get_hostnames() {
 					curl_setopt($curl_session, CURLOPT_URL, $del_url);
 					curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 					curl_setopt($curl_session, CURLOPT_POST, 3);
-					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					if ($pf_version < 2.2) {
+						// pre-2.2 doesn't have ca-root-nss
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					} else {
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+					}
 					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=delete" . "&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['rmver']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
@@ -209,7 +219,12 @@ function get_hostnames() {
 					curl_setopt($curl_session, CURLOPT_URL, $get_url);
 					curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 					curl_setopt($curl_session, CURLOPT_POST, 3);
-					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					if ($pf_version < 2.2) {
+						// pre-2.2 doesn't have ca-root-nss
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					} else {
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+					}
 					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . "&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['newver']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
@@ -279,7 +294,12 @@ EOF;
 					curl_setopt($curl_session, CURLOPT_URL, $get_url);
 					curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 					curl_setopt($curl_session, CURLOPT_POST, 3);
-					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					if ($pf_version < 2.2) {
+						// pre-2.2 doesn't have ca-root-nss
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					} else {
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+					}
 					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . "&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['download']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
@@ -335,7 +355,12 @@ EOF;
 				$curl_session = curl_init();
 				curl_setopt($curl_session, CURLOPT_URL, $get_url);
 				curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
-				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+				if ($pf_version < 2.2) {
+					// pre-2.2 doesn't have ca-root-nss
+					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+				} else {
+					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+				}
 				curl_setopt($curl_session, CURLOPT_POST, 1);
 				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");

@@ -145,7 +145,6 @@ function test_connection($post) {
 	} else {
 		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
 	}
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($curl_session, CURLOPT_POST, 1);
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
@@ -260,7 +259,12 @@ function upload_config($reasonm = "") {
 			curl_setopt($curl_session, CURLOPT_POST, count($post_fields));
 			curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
 			curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+			if ($pf_version < 2.2) {
+				// pre-2.2 doesn't have ca-root-nss
+				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+			} else {
+				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+			}
 			curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
 			curl_setopt($curl_session, CURLOPT_TIMEOUT, 30);
 			curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
