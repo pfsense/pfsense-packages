@@ -42,10 +42,9 @@
 	</copyright>
 	<description>A self-contained VPN solution designed to connect multiple sites together in a secure way.</description>
 	<name>tinc</name>
-	<version>1.2.4</version>
+	<version>1.2.5</version>
 	<title>VPN: Tinc: Settings</title>
 	<include_file>/usr/local/pkg/tinc.inc</include_file>
-	<configpath>['installedpackages']['package']['$packagename']['config']</configpath>
 	<menu>
 		<name>tinc</name>
 		<section>VPN</section>
