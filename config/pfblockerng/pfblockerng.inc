@@ -200,6 +200,7 @@ function pfb_global() {
 	$pfb['dnsbl']		= $pfb['dnsblconfig']['pfb_dnsbl'];		// Enabled state of DNSBL
 	$pfb['dnsbl_port']	= $pfb['dnsblconfig']['pfb_dnsport']	?: '';	// Lighttpd web server http port setting
 	$pfb['dnsbl_port_ssl']	= $pfb['dnsblconfig']['pfb_dnsport_ssl']?: '';	// Lighttpd web server https port setting
+	$pfb['dnsbl_alexa']	= $pfb['dnsblconfig']['alexa_enable']; // Alexa whitelist
 
 	// Restore previous download on failure (default to 'on')
 	$pfb['restore']		= $pfb['config']['restore_feed'] != '' ? $pfb['config']['restore_feed'] : 'on';
