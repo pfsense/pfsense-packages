@@ -108,7 +108,7 @@ if (in_array($argv[1], array('update', 'updateip', 'updatednsbl', 'dc', 'bu', 'u
 			}
 
 			// Skip Alexa update, if disabled
-			if ($pfb['dnsbl_alexa'] == 'Disabled') {
+			if ($pfb['dnsbl_alexa'] != 'on') {
 				unset($pfb['extras'][5]);
 			}
 

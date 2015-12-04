@@ -118,7 +118,7 @@
 		<category>Security</category>
 		<pkginfolink>https://forum.pfsense.org/index.php?topic=86212.0</pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/pfblockerng/pfblockerng.xml</config_file>
-		<version>2.0.1</version>
+		<version>2.0.2</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<maintainer>BBCan177@gmail.com</maintainer>
