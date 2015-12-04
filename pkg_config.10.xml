@@ -317,6 +317,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/ntopng/ntopng.xml</config_file>
 		<configurationfile>ntopng.xml</configurationfile>
 		<noembedded>true</noembedded>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Notes</name>
