@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>sargschedule</name>
-	<version>0.6.5</version>
+	<version>0.6.6</version>
 	<title>Status: Sarg Schedules</title>
 	<include_file>/usr/local/pkg/sarg.inc</include_file>
 	<tabs>
@@ -94,10 +94,6 @@
 			<fieldname>gzip</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Post Action</fielddescr>
-			<fieldname>action</fieldname>
-		</columnitem>
-		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
@@ -106,7 +102,6 @@
 	<fields>
 		<field>
 			<type>listtopic</type>
-			<fieldname>temp</fieldname>
 			<name>Schedule Options</name>
 		</field>
 		<field>
@@ -154,21 +149,7 @@
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Action After Sarg</fielddescr>
-			<fieldname>action</fieldname>
-			<description>Choose an action to run after Sarg finishes.</description>
-			<type>select</type>
- 			<options>
-				<option><name>None (default)</name><value>none</value></option>
-				<option><name>Rotate logs</name><value>rotate</value></option>
-				<option><name>Restart proxy daemon</name><value>restart</value></option>
-				<option><name>Rotate log and restart proxy daemon</name><value>both</value></option>
-			</options>
-			<default_value>none</default_value>
-		</field>
-		<field>
 			<type>listtopic</type>
-			<fieldname>temp</fieldname>
 			<name>Compress Options</name>
 		</field>
 		<field>
