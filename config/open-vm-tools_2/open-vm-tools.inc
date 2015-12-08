@@ -26,6 +26,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("service-utils.inc");
+require_once("util.inc");
+
 function open_vm_tools_deinstall() {
 	unlink_if_exists("/usr/local/etc/rc.d/vmware-kmod.sh");
 	unlink_if_exists("/boot/kernel/vmblock.ko");
