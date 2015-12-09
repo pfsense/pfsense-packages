@@ -463,7 +463,7 @@
 		<descr>RIP v1 and v2 daemon.</descr>
 		<category>Network Management</category>
 		<config_file>https://packages.pfsense.org/packages/config/routed/routed.xml</config_file>
-		<version>1.2.2</version>
+		<version>1.2.3</version>
 		<status>Stable</status>
 		<required_version>2.1</required_version>
 		<configurationfile>routed.xml</configurationfile>
