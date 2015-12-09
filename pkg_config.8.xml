@@ -640,7 +640,7 @@
 		<depends_on_package>sarg-2.3.6_2.tbz</depends_on_package>
 		<depends_on_package>gd-2.0.35_8,1.tbz</depends_on_package>
 		<depends_on_package_pbi>sarg-2.3.6_2-i386.pbi</depends_on_package_pbi>
-		<version>2.3.6_2 pkg v0.6.7</version>
+		<version>2.3.6_2 pkg v0.6.9</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<configurationfile>sarg.xml</configurationfile>
