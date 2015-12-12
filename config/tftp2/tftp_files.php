@@ -28,6 +28,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("config.inc");
 require_once("guiconfig.inc");
 require_once("util.inc");
 require_once("/usr/local/pkg/tftp.inc");
@@ -117,13 +118,13 @@ if ($_GET['act'] == "del") {
 	}
 }
 
+$pgtitle = "TFTP: Settings/Files";
 include("head.inc");
 
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">TFTP: Settings/Files</p>
 
 <?php
 $savemsg = $_GET["savemsg"];
