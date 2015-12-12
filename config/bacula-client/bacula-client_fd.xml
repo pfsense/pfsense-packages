@@ -68,8 +68,16 @@
 		<field>
 			<type>listtopic</type>
 			<fieldname>Daemon</fieldname>
-			<name>daemon</name>
+			<name>File Daemon</name>
 		</field>
+		<field>
+                        <fielddescr>FileDaemon Name</fielddescr>
+                        <fieldname>fdname</fieldname>
+                        <type>input</type>
+                        <size>60</size>
+                        <description>Name of FileDaemon</description>
+                        <required/>
+                </field>
 		<field>
 			<fielddescr>File Daemon Port</fielddescr>
 			<fieldname>port</fieldname>

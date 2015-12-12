@@ -140,15 +140,10 @@
 			<type>select</type>
  				<options>
 	 				<option><name>Director</name><value>Director</value></option>
-					<option><name>Local</name><value>Local</value></option>
+					<!-- <option><name>Local</name><value>Local</value></option> -->
 					<option><name>Monitor</name><value>Monitor</value></option>
 				</options>
-			<description>
-				<![CDATA[
-				Select director type.<br />
-				<strong>NOTE: You need at least one local Director.</strong>
-				]]>
-			</description>
+			<description>Director Type. You need at least one main director.</description>
 		</field>
 	</fields>
 	<custom_php_install_command>
