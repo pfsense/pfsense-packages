@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>sarg</name>
-	<version>0.6.5</version>
+	<version>0.6.6</version>
 	<title>Status: Sarg Settings</title>
 	<include_file>/usr/local/pkg/sarg.inc</include_file>
 	<menu>
@@ -391,6 +391,9 @@
 			<encoding>base64</encoding>
 		</field>
 	</fields>
+	<custom_php_install_command>
+		sarg_package_install();
+	</custom_php_install_command>
 	<custom_php_validation_command>
 		sarg_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>

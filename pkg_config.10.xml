@@ -273,12 +273,13 @@
 			<ports_after>net/avahi-app devel/dbus</ports_after>
 		</build_pbi>
 		<depends_on_package_pbi>avahi-0.6.31-##ARCH##.pbi</depends_on_package_pbi>
-		<version>1.10.3</version>
+		<version>1.10.4</version>
 		<status>BETA</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/avahi/avahi.xml</config_file>
 		<configurationfile>avahi.xml</configurationfile>
 		<after_install_info>Please visit Services - Avahi menu, enable the service and select which interfaces you do NOT wish Avahi to listen on. Save settings to start the service.</after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>ntop</name>
@@ -443,7 +444,7 @@
 		<category>Network Management</category>
 		<port_category>net</port_category>
 		<config_file>https://packages.pfsense.org/packages/config/routed/routed.xml</config_file>
-		<version>1.2.2</version>
+		<version>1.2.3</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<configurationfile>routed.xml</configurationfile>
@@ -633,7 +634,7 @@
 		<config_file>https://packages.pfsense.org/packages/config/sarg/sarg.xml</config_file>
 		<pkginfolink>https://forum.pfsense.org/index.php/topic,47765.0.html</pkginfolink>
 		<depends_on_package_pbi>sarg-2.3.9-##ARCH##.pbi</depends_on_package_pbi>
-		<version>0.6.8</version>
+		<version>0.6.9</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<port_category>www</port_category>
@@ -749,7 +750,7 @@
 		<descr>VMware Tools is a suite of utilities that enhances the performance of the virtual machine's guest operating system and improves management of the virtual machine.</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>System</category>
-		<version>1280544.12</version>
+		<version>1280544.13</version>
 		<status>RELEASE</status>
 		<pkginfolink>https://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.2</required_version>
@@ -1105,6 +1106,7 @@
 		<configurationfile>squid.xml</configurationfile>
 		<depends_on_package_pbi>squid-3.4.10_2-##ARCH##.pbi</depends_on_package_pbi>
 		<after_install_info>Please visit Services - Squid Proxy Server menu to configure the package and enable the proxy.</after_install_info>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>LCDproc</name>
