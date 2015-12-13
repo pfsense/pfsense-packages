@@ -50,15 +50,11 @@ run($argc, $argv);
 function run($argc, $argv) {
 	require_once("config.inc");
 	require_once("pfsense-utils.inc");
-	
-//	echo "input: " . $argv[2] . "\r\n";
-	
+		
 	$dhfile = $argv[2];
 	$pathinfo = pathinfo($dhfile);
 	
 	if (!empty($dhfile) && !empty($pathinfo["dirname"]) && !empty($pathinfo["basename"]) && is_dir($pathinfo["dirname"])) {
-//		echo "Dir: {$pathinfo['dirname']}\r\n";
-//		echo "Base: {$pathinfo['basename']}\r\n";
 		echo "Generating a DH Parameter of " . $argv[1] . " bits.\r\n";
 		
 		// Mount the filesystem rw
@@ -66,20 +62,16 @@ function run($argc, $argv) {
 		
 		// Get a temp file
 		$tmpfile = get_tmp_file();
-//		echo "Tmp file: {$tmpfile}\r\n";
 		
 		// Generate the DHParams at a lower priority
 		exec("/usr/bin/nice -n -1 openssl dhparam -out {$tmpfile} {$argv[1]} >/dev/null 2>&1");
 		// Move the temp file to the destination
-//		echo "Moving {$tmpfile} to {$dhfile}\r\n";
 		exec("mv {$tmpfile} {$dhfile}");
-//		echo "dh: {$dhfile}\r\n";
 		
 		// Check the file exists
 		if (file_exists($dhfile)) {
 			// Check or the ownership needs to be set
 			if($argc == 5) {
-//				echo "Setting file ownership to U:{$argv[3]} G:{$argv[4]}\r\n";
 				chown($dhfile, $argv[3]);
 				chgrp($dhfile, $argv[4]);
 			}
