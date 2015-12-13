@@ -198,9 +198,9 @@ function pfb_global() {
 	$pfb['24hour']		= $pfb['config']['pfb_dailystart'];		// Start hour of the 'Once a day' schedule
 	$pfb['iplocal']		= $config['interfaces']['lan']['ipaddr'];	// Lan IP address
 	$pfb['dnsbl']		= $pfb['dnsblconfig']['pfb_dnsbl'];		// Enabled state of DNSBL
-	$pfb['dnsbl_port']	= $pfb['dnsblconfig']['pfb_dnsport']	?: '';	// Lighttpd web server http port setting
-	$pfb['dnsbl_port_ssl']	= $pfb['dnsblconfig']['pfb_dnsport_ssl']?: '';	// Lighttpd web server https port setting
-	$pfb['dnsbl_alexa']	= $pfb['dnsblconfig']['alexa_enable']; // Alexa whitelist
+	$pfb['dnsbl_port']	= $pfb['dnsblconfig']['pfb_dnsport'];		// Lighttpd web server http port setting
+	$pfb['dnsbl_port_ssl']	= $pfb['dnsblconfig']['pfb_dnsport_ssl'];	// Lighttpd web server https port setting
+	$pfb['dnsbl_alexa']	= $pfb['dnsblconfig']['alexa_enable'];		// Alexa whitelist
 
 	// Restore previous download on failure (default to 'on')
 	$pfb['restore']		= $pfb['config']['restore_feed'] != '' ? $pfb['config']['restore_feed'] : 'on';
@@ -236,6 +236,7 @@ pfb_global();
 
 // DNSBL Lighttpd HTTPS Daemon (Scans Lighttpd dnsbl_error.log for requested https domain names)
 if ($argv[1] == 'dnsbl') {
+	set_time_limit(0);
 	pfb_livetail($pfb['dnserrlog'], 'dnsbl');
 	exit;
 }
@@ -1778,7 +1779,7 @@ function sync_package_pfblockerng($cron='') {
 		log_error('[pfBlockerNG] Sync terminated during boot process.');
 		return;
 	}
-	syslog(LOG_NOTICE, '[pfBlockerNG] Starting sync process.');
+	syslog(LOG_NOTICE, '[pfBlockerNG] Starting cron process.');
 
 	// Reloads existing lists without downloading new lists when defined 'on'
 	$pfb['reuse'] = $pfb['config']['pfb_reuse'];
@@ -4119,7 +4120,8 @@ function sync_package_pfblockerng($cron='') {
 			$log = "\n===[  Aliastables / Rules  ]================================\n\n";
 			pfb_logger("{$log}", 1);
 
-			$log = "Firewall Rule Changes found, Applying Filter Reload\n";
+			$log = "Firewall rule changes found, applying Filter Reload\n";
+			syslog(LOG_NOTICE, "[pfBlockerNG] {$log}");
 			pfb_logger("{$log}", 1);
 		}
 
@@ -4142,7 +4144,8 @@ function sync_package_pfblockerng($cron='') {
 			$log = "\n\n===[  Aliastables / Rules  ]==========================================\n\n";
 			pfb_logger("{$log}", 1);
 
-			$log = "No Changes to Firewall Rules, Skipping Filter Reload\n";
+			$log = "No changes to Firewall rules, skipping Filter Reload\n";
+			syslog(LOG_NOTICE, "[pfBlockerNG] {$log}");
 			pfb_logger("{$log}", 1);
 
 			// Only Save Aliases that have been updated.
