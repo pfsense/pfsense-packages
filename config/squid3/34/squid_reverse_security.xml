@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	squid_reverse_security.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2015 Gekkenhuis
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+        ]]>
+        </copyright>
+	<name>squidreversesecurity</name>
+	<version>0.4.8</version>
+	<title>Reverse Proxy server: Security</title>
+	<include_file>/usr/local/pkg/squid.inc</include_file>
+	<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=squid_reverse_general.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Web Servers</text>
+			<url>/pkg.php?xml=squid_reverse_peer.xml</url>
+		</tab>
+		<tab>
+			<text>Mappings</text>
+			<url>/pkg.php?xml=squid_reverse_uri.xml</url>
+		</tab>
+		<tab>
+			<text>Redirects</text>
+			<url>/pkg.php?xml=squid_reverse_redir.xml</url>
+		</tab>
+		<tab>
+			<text>Security</text>
+			<url>/pkg_edit.php?xml=squid_reverse_security.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Real Time</text>
+			<url>/squid_monitor.php?menu=reverse</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=squid_reverse_sync.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	<advanced_options>enabled</advanced_options>
+	<fields>
+		<field>
+			<name>Squid Reverse proxy Security Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Warning</fielddescr>
+			<fieldname>ciphers_warning</fieldname>
+			<type>info</type>
+			<description>
+				<![CDATA[
+				<strong>You may break compatibility with some (older) clients if you use these settings!</strong>
+				]]>
+			</description>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Enable custom SSL security</fielddescr>
+			<fieldname>custom_ssl_security_active</fieldname>
+			<description>
+				<![CDATA[
+				Enable this option to activate the custom SSL security settings.
+				]]>
+			</description>
+			<type>checkbox</type>
+			<enablefields>disable_sslv2,disable_sslv3,disable_tlsv1,single_dh_use,cipher_server_preference,disable_session_reuse,use_dhparams,disable_weak_ciphers</enablefields>
+			<required/>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<name>Squid Reverse proxy SSL Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Disable SSLv2</fielddescr>
+			<fieldname>disable_sslv2</fieldname>
+			<description>
+				<![CDATA[
+				Do not use the SSLv2 protocol.
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>Disable SSLv3</fielddescr>
+			<fieldname>disable_sslv3</fieldname>
+			<description>
+				<![CDATA[
+				Do not use the SSLv3 protocol.
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>Disable TLSv1</fielddescr>
+			<fieldname>disable_tlsv1</fieldname>
+			<description>
+				<![CDATA[
+				Do not use the TLSv1 protocol.<br/><br/>
+				<strong><span class="errmsg">Warning: </span>Disabling TLSv1 may give problems for many clients.</strong>
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>Single DH use</fielddescr>
+			<fieldname>single_dh_use</fieldname>
+			<description>
+				<![CDATA[
+				Always create a new key when using temporary/ephemeral DH parameters. This option must be used to prevent small subgroup attacks, when the DH parameters were not generated using "strong" primes (e.g. when using DSA-parameters). If "strong" primes were used, it is not strictly necessary to generate a new DH key during each handshake but it is also recommended. This option should therefore be enabled whenever temporary/ephemeral DH parameters are used.
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>Cipher server preference</fielddescr>
+			<fieldname>cipher_server_preference</fieldname>
+			<description>
+				<![CDATA[
+				When choosing a cipher, use the server's preferences instead of the client preferences. When not set, the SSL server will always follow the clients preferences. When set, the SSLv3/TLSv1 server will choose following its own preferences. Because of the different protocol, for SSLv2 the server will send its list of preferences to the client and the client chooses.
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>Disable session resumption (caching)</fielddescr>
+			<fieldname>disable_session_reuse</fieldname>
+			<description>
+				<![CDATA[
+				Don't allow session reuse. Each connection will result in a new SSL session.<br/><br/>
+				<strong><span class="errmsg">Warning: </span>Disabling session resumption will increase the clients latency and the server load but can improve security for Perfect Forward Secrecy (DHE and ECDH).</strong>
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>Use DHParams</fielddescr>
+			<fieldname>use_dhparams</fieldname>
+			<description>
+				<![CDATA[
+				Use a file containing DH parameters for temporary/ephemeral DH key exchanges. This will improve security by enabling the use of DHE ciphers.
+				]]>
+			</description>
+			<type>checkbox</type>
+			<enablefields>dhparams_size</enablefields>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>DHParams key size</fielddescr>
+			<fieldname>dhparams_size</fieldname>
+			<description>
+				<![CDATA[
+				By default the pre-generated DH parameters keys provided with pfSense are used. It's recommended that, and more secure if, you generate your own DH parameters key.<br/><br/>
+				Press a button to generate your own DH parameters key.<br/>
+				<input name='generate_dhparams1024' id='generate_dhparams1024' type='submit' value='Generate 1024 key' />&nbsp;
+				<input name='generate_dhparams2048' id='generate_dhparams2048' type='submit' value='Generate 2048 key' />&nbsp;
+				<input name='generate_dhparams4096' id='generate_dhparams4096' type='submit' value='Generate 4096 key' /><br/><br/>
+				<strong><span class="errmsg">Warning:</span> Pressing a generate button may result in a high CPU load during the generation of the DH parameters. This could take up to a few minutes or even an hour, depending on the speed of your firewall, so choose the time carefully! It's not advised to press more than one button at a time.</strong><br/><br/>
+				When the file is generated you will find the custom key in the DHParams key size field.
+				]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>1024 pre-generated</name>
+					<value>1024</value>
+				</option>
+				<option>
+					<name>2048 pre-generated</name>
+					<value>2048</value>
+				</option>
+				<option>
+					<name>4096 pre-generated</name>
+					<value>4096</value>
+				</option>
+			</options>
+			<size>1</size>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<name>Squid Reverse proxy Cipher Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Disable weak ciphers</fielddescr>
+			<fieldname>disable_weak_ciphers</fieldname>
+			<description>
+				<![CDATA[
+				Do not use the weak ciphers like RC4 and MD5.<br />
+				This option also will order the ciphers by strength (strongest first).
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+		</field>
+	</fields>
+	<custom_php_after_form_command>
+		squid_print_javascript_dhparams();
+	</custom_php_after_form_command>
+	<custom_php_validation_command> 
+		squid_validate_reverse_security($_POST, $input_errors); 
+	</custom_php_validation_command> 
+	<custom_php_resync_config_command>
+		<![CDATA[
+		if ($_POST['generate_dhparams1024'] == "Generate 1024 key" || $_POST['generate_dhparams2048'] == "Generate 2048 key" || $_POST['generate_dhparams4096'] == "Generate 4096 key") {
+			return;
+		}
+		squid_resync();
+		]]>
+	</custom_php_resync_config_command>
+</packagegui>
