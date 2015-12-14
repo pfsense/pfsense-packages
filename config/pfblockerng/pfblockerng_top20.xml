@@ -282,6 +282,7 @@
 				<option><name>Alias Deny</name><value>Alias_Deny</value></option>
 				<option><name>Alias Permit</name><value>Alias_Permit</value></option>
 				<option><name>Alias Match</name><value>Alias_Match</value></option>
+				<option><name>Alias Native</name><value>Alias_Native</value></option>
 			</options>
 		</field>
 		<field>

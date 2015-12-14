@@ -47,7 +47,7 @@ require_once('services.inc');
 require_once('/usr/local/pkg/pfblockerng/pfblockerng.inc');
 require_once('/usr/local/pkg/pfblockerng/pfblockerng_extra.inc');	// 'include functions' not yet merged into pfSense
 
-global $config, $pfb;
+global $config, $g, $pfb;
 
 // Extras - MaxMind/Alexa Download URLs/filenames/settings
 $pfb['extras'][0]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz';
@@ -406,7 +406,7 @@ function pfblockerng_sync_cron() {
 
 // Function to process the downloaded MaxMind database and format into Continent txt files.
 function pfblockerng_uc_countries() {
-	global $pfb;
+	global $g, $pfb;
 
 	$maxmind_cont	= "{$pfb['geoipshare']}/country_continent.csv";
 	$maxmind_cc4	= "{$pfb['geoipshare']}/GeoIPCountryWhois.csv";
@@ -564,7 +564,7 @@ function pfblockerng_uc_countries() {
 
 // Function to process Continent txt files and create Country ISO files and to Generate GUI XML files.
 function pfblockerng_get_countries() {
-	global $pfb;
+	global $g, $pfb;
 
 	$files = array (	'Africa'		=> "{$pfb['ccdir']}/Africa_v4.txt",
 				'Asia'			=> "{$pfb['ccdir']}/Asia_v4.txt",

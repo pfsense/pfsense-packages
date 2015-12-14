@@ -34,7 +34,7 @@
 require_once('/usr/local/pkg/pfblockerng/pfblockerng.inc');
 require_once('/usr/local/www/pfblockerng/pfblockerng.php');
 
-global $config, $pfb, $static_output;
+global $config, $g, $pfb, $static_output;
 pfb_global();
 
 function update_static_output($text) {
@@ -184,6 +184,7 @@ unlink_if_exists('/usr/local/sbin/lighttpd_pfb');
 link('/usr/local/sbin/lighttpd', '/usr/local/sbin/lighttpd_pfb');
 
 update_static_output(" done.\nCreating DNSBL web server start-up script...");
+$pfb['dnsbl_conf'] = '/var/unbound/pfb_dnsbl_lighty.conf';
 $rc = array();
 $rc['file'] = 'dnsbl.sh';
 $rc['start'] = <<<EOF
@@ -255,7 +256,7 @@ debug.log-condition-handling	= "enable"
 
 \$SERVER["socket"] == "0.0.0.0:{$pfb['dnsbl_port_ssl']}" {
 	ssl.engine		= "enable"
-	ssl.pemfile		= "{$pfb['dnsbl_cert']}"
+	ssl.pemfile		= "/var/unbound/dnsbl_cert.pem"
 	ssl.use-sslv2		= "disable"
 	ssl.use-sslv3		= "disable"
 	ssl.honor-cipher-order	= "enable"
@@ -273,7 +274,7 @@ EOF;
 	update_static_output(" done.\n");
 
 	update_static_output("Starting DNSBL Service...");
-	start_service('dnsbl');
+	restart_service('dnsbl');
 	update_static_output(" done.\n");
 }
 
