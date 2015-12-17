@@ -94,7 +94,9 @@ function sarg_check_dirs() {
 		if (is_dir($pbidir) && !is_link($pbidir)) {
 			rmdir_recursive($pbidir);
 		}
-		symlink("/usr/local/sarg-reports", "{$pbidir}");
+		if (!is_link($pbidir)) {
+			symlink("/usr/local/sarg-reports", "{$pbidir}");
+		}
 	}
 
 	// images
