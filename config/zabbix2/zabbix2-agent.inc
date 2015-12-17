@@ -33,33 +33,19 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 
-function php_zabbix2_pfs_version() {
-	$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
-	return $pfs_version;
+global $zabbix2_pkg_base;
+$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
+if ($pfs_version == "2.2") {
+	// pfSense 2.2 with zabbix 2.4
+	$zabbix2_pkg_base = "zabbix24";
+} else {
+	// pfSense 2.1 with zabbix 2.2
+	$zabbix2_pkg_base = "zabbix22";
 }
-
-function php_zabbix2_pkg_base($pfs_version) {
-	if ($pfs_version >= 2.2) {
-		// pfSense 2.2 with zabbix 2.4
-		$zabbix2_pkg_base = "zabbix24";
-	} else {
-		// pfSense 2.1 with zabbix 2.2
-		$zabbix2_pkg_base = "zabbix22";
-	}
-	return $zabbix2_pkg_base;
-}
+define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
 
 function php_deinstall_zabbix2_agent() {
-	global $config, $g;
-
-	$pfs_version = php_zabbix2_pfs_version();
-	$zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
-
-	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
-		define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
-	} else {
-		define('ZABBIX_AGENT_BASE', '/usr/local');
-	}
+	global $config, $g, $zabbix2_pkg_base;
 
 	mwexec("/usr/bin/killall zabbix_agentd");
 
@@ -144,17 +130,9 @@ function validate_input_zabbix2_agent($post, &$input_errors) {
 }
 
 function sync_package_zabbix2_agent() {
-	global $config, $g;
+	global $config, $g, $zabbix2_pkg_base;
 
 	conf_mount_rw();
-	$pfs_version = php_zabbix2_pfs_version();
-	$zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
-
-	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
-		define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
-	} else {
-		define('ZABBIX_AGENT_BASE', '/usr/local');
-	}
 
 	// Check zabbix agent settings
 	if (is_array($config['installedpackages']['zabbixagent'])) {
