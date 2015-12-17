@@ -128,45 +128,57 @@ function show_advanced_config() {
 	<form action="cron_edit.php" method="post" name="iform" id="iform">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0" summary="form">
 		<tr>
-			<td width="25%" valign="top" class="vncellreq">minute</td>
-			<td width="75%" class="vtable">
-				<input name="minute" type="text" class="formfld" id="minute" size="40" value="<?=htmlspecialchars($pconfig['minute']);?>" />
+			<td width="10%" valign="top" class="vncellreq">Minute</td>
+			<td width="90%" class="vtable">
+				<input name="minute" type="text" class="formfld" id="minute" size="40" value="<?=htmlspecialchars($pconfig['minute']);?>" /><br/>
+				The minute(s) at which the command will be executed.<br/>
+				(0-59, ranges, or divided, *=all)
 			</td>
 		</tr>
 		<tr>
-			<td width="25%" valign="top" class="vncellreq">hour</td>
-			<td width="75%" class="vtable">
-				<input name="hour" type="text" class="formfld" id="hour" size="40" value="<?=htmlspecialchars($pconfig['hour']);?>" />
+			<td width="10%" valign="top" class="vncellreq">Hour</td>
+			<td width="90%" class="vtable">
+				<input name="hour" type="text" class="formfld" id="hour" size="40" value="<?=htmlspecialchars($pconfig['hour']);?>" /><br/>
+				The day(s) of the month on which the command will be executed.<br/>
+				(1-31, ranges, or divided, *=all)
 			</td>
 		</tr>
 		<tr>
-			<td width="25%" valign="top" class="vncellreq">mday</td>
-			<td width="75%" class="vtable">
-				<input name="mday" type="text" class="formfld" id="mday" size="40" value="<?=htmlspecialchars($pconfig['mday']);?>" />
+			<td width="10%" valign="top" class="vncellreq">Day of the Month</td>
+			<td width="90%" class="vtable">
+				<input name="mday" type="text" class="formfld" id="mday" size="40" value="<?=htmlspecialchars($pconfig['mday']);?>" /><br/>
+				The day(s) of the month on which the command will be executed.<br/>
+				(1-31, ranges, or divided, *=all)
 			</td>
 		</tr>
 		<tr>
-			<td width="25%" valign="top" class="vncellreq">month</td>
-			<td width="75%" class="vtable">
-				<input name="month" type="text" class="formfld" id="month" size="40" value="<?=htmlspecialchars($pconfig['month']);?>" />
+			<td width="10%" valign="top" class="vncellreq">Month of the Year</td>
+			<td width="90%" class="vtable">
+				<input name="month" type="text" class="formfld" id="month" size="40" value="<?=htmlspecialchars($pconfig['month']);?>" /><br/>
+				The month(s) of the year during which the command will be executed.<br/>
+				(1-12, ranges, or divided, *=all)
 			</td>
 		</tr>
 		<tr>
-			<td width="25%" valign="top" class="vncellreq">wday</td>
-			<td width="75%" class="vtable">
-				<input name="wday" type="text" class="formfld" id="wday" size="40" value="<?=htmlspecialchars($pconfig['wday']);?>" />
+			<td width="10%" valign="top" class="vncellreq">Day of the Week</td>
+			<td width="90%" class="vtable">
+				<input name="wday" type="text" class="formfld" id="wday" size="40" value="<?=htmlspecialchars($pconfig['wday']);?>" /><br/>
+				The day(s) of the week on which the command will be executed.<br/>
+				(0-7, 7=Sun or use names, ranges, or divided, *=all)
 			</td>
 		</tr>
 		<tr>
-			<td width="25%" valign="top" class="vncellreq">who</td>
-			<td width="75%" class="vtable">
-				<input name="who" type="text" class="formfld" id="who" size="40" value="<?=htmlspecialchars($pconfig['who']);?>" />
+			<td width="10%" valign="top" class="vncellreq">User</td>
+			<td width="90%" class="vtable">
+				<input name="who" type="text" class="formfld" id="who" size="40" value="<?=htmlspecialchars($pconfig['who']);?>" /><br/>
+				The user executing the command (typically "root")
 			</td>
 		</tr>
 		<tr>
-			<td width="25%" valign="top" class="vncellreq">command</td>
-			<td width="75%" class="vtable">
-				<textarea rows="3" cols="68" name="command" id="command"><?=htmlspecialchars($pconfig['command']);?></textarea>
+			<td width="10%" valign="top" class="vncellreq">Command</td>
+			<td width="90%" class="vtable">
+				<textarea rows="3" cols="68" name="command" id="command"><?=htmlspecialchars($pconfig['command']);?></textarea><br/>
+				The <strong>full path</strong> to the command, plus parameters.
 			</td>
 		</tr>
 		<tr>
@@ -176,6 +188,18 @@ function show_advanced_config() {
 				<?php if (isset($id) && $a_cron[$id]): ?>
 					<input name="id" type="hidden" value="<?=$id;?>" />
 				<?php endif; ?>
+			</td>
+		</tr>
+		<tr class="listtopic">
+			<td colspan="2">Help</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				'Using "*" for a time entry means "all" or "every", and is the same as a range from first to last.
+				<br/>Ranges may also be used, for example "1-5" in the "Day of Week" field means Monday through Friday.
+				<br/>Time entries may be divided and will be executed when they divide evenly, for example "*/15" in the Minute field means "Every 15 minutes".
+				<br/><br/>For more information see: <a href="http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html">FreeBSD Handbook - Configuring cron(8)</a>
+				and <a href="https://www.freebsd.org/cgi/man.cgi?query=crontab&amp;sektion=5">crontab(5) man page</a>.
 			</td>
 		</tr>
 		</table>
