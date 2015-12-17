@@ -140,7 +140,7 @@ function show_advanced_config() {
 			<td width="90%" class="vtable">
 				<input name="hour" type="text" class="formfld" id="hour" size="40" value="<?=htmlspecialchars($pconfig['hour']);?>" /><br/>
 				The day(s) of the month on which the command will be executed.<br/>
-				(1-31, ranges, or divided, *=all)
+				(0-23, ranges, or divided, *=all)
 			</td>
 		</tr>
 		<tr>
