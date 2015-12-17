@@ -423,7 +423,7 @@
 		<pkginfolink></pkginfolink>
 		<config_file>https://packages.pfsense.org/packages/config/cron/cron.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.3.3</version>
+		<version>0.3.4</version>
 		<status>RC</status>
 		<required_version>2.1</required_version>
 		<configurationfile>cron.xml</configurationfile>
