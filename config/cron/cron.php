@@ -76,7 +76,8 @@ include("head.inc");
 	<tr><td>
 		<div>
 		Cron controls the scheduling of commands.<br /><br />
-		For more information see: <a href='http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html'>http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html</a>
+		For more information see: <a href="http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html">FreeBSD Handbook - Configuring cron(8)</a>
+		and <a href="https://www.freebsd.org/cgi/man.cgi?query=crontab&amp;sektion=5">crontab(5) man page</a>.
 		</div>
 	</td></tr>
 	</table>
