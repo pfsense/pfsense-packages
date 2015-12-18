@@ -195,7 +195,7 @@ if ($savemsg) {
 				<tr>
 					<td width="25%" class="listhdrr">File Name (download)</td>
 					<td width="50%" class="listhdr">Last Modified</td>
-					<td width="50%" class="listhdr">Size</td>
+					<td width="25%" class="listhdr">Size</td>
 				</tr>
 
 <?php
