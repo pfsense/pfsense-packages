@@ -1075,7 +1075,7 @@ function find_reported_header($ip, $pfbfolder, $exclude=FALSE) {
 
 	// Query for any active pfBlockerNG CRON jobs
 	exec('/bin/ps -wax', $result_cron);
-	if (preg_grep("/pfblockerng[.]php\s+?(cron|update)/", $result_cron)) {
+	if (preg_grep("/pfblockerng[.]php\s+?(cron|update|updatednsbl)/", $result_cron)) {
 		return array('updating..', 'CRON Task');
 	}
 	return array('', 'no match', FALSE);
@@ -1532,7 +1532,7 @@ function pfb_firewall_rule($action, $pfb_alias, $vtype='', $pfb_log, $adest='', 
 				$rule['log'] = '';
 			}
 			$rule['created'] = array('time' => (int)microtime(true), 'username' => 'Auto');
-			$rule['match_outbound'][] = $rule;
+			$pfb['match_outbound'][] = $rule;
 			if ($action != 'Match_Both') {
 				break;
 			}
@@ -1860,7 +1860,6 @@ function sync_package_pfblockerng($cron='') {
 	$pfb['dnsbl_iface']	= $pfb['dnsblconfig']['dnsbl_interface']?: 'lan';	// VIP Local Interface setting
 	$pfb['dnsbl_ip']	= $pfb['dnsblconfig']['action']		?: 'Disabled';	// Enable/Disable IP blocking from DNSBL lists
 	$pfb['dnsbl_rule']	= $pfb['dnsblconfig']['pfb_dnsbl_rule'] ?: 'Disabled';	// Auto create a Floating Pass Rule for other Lan subnets
-	$pfb['dnsbl_alexa']	= $pfb['dnsblconfig']['alexa_enable'] ?: 'Disabled';	// Enable Alexa whitelist
 	$pfb['dnsbl_alexa_cnt']	= $pfb['dnsblconfig']['alexa_count'] ?: '1000';		// Alexa whitelist domain setting
 	$pfb['dnsbl_alexa_inc']	= $pfb['dnsblconfig']['alexa_inclusion'] ?: '';		// Alexa TLDs inclusions for whitelisting
 
@@ -2163,8 +2162,8 @@ function sync_package_pfblockerng($cron='') {
 			}
 		}
 
-		$pfb['remove'] = FALSE;		// Flag to execute pfctl and rules ordering or reload of DNSBL domains
-		$pfb['summary'] = FALSE;	// Execute final summary as a list was removed
+		$pfb['remove']	= FALSE;		// Flag to execute pfctl and rules ordering or reload of DNSBL domains
+		$pfb['summary']	= FALSE;		// Execute final summary as a list was removed
 
 		// Process to remove lists from Masterfile/DB folder if they do not exist
 		if (isset($pfb['existing'])) {
@@ -2214,7 +2213,7 @@ function sync_package_pfblockerng($cron='') {
 									// Query for any active pfBlockerNG CRON jobs
 									$result_cron = array();
 									exec('/bin/ps -wax', $result_cron);
-									if (preg_grep("/pfblockerng[.]php\s+?(cron|update)/", $result_cron)) {
+									if (preg_grep("/pfblockerng[.]php\s+?(cron|update|updatednsbl)/", $result_cron)) {
 										$log = "\n ** DNSBL Reload Terminated due to active pfBlockerNG cron process\n";
 										pfb_logger("{$log}", 1);
 									} else {
@@ -2223,7 +2222,7 @@ function sync_package_pfblockerng($cron='') {
 											// Clear any existing pfBlockerNG Cron Jobs to avoid collision
 											install_cron_job('pfblockerng.php cron', false);
 											$cmd = "/usr/local/bin/php /usr/local/www/pfblockerng/pfblockerng.php";
-											mwexec_bg("${cmd} updatednsbl >> {$pfb['log']} 2>&1");
+											mwexec_bg("{$cmd} updatednsbl >> {$pfb['log']} 2>&1");
 										}
 									}
 								}
@@ -2301,6 +2300,15 @@ function sync_package_pfblockerng($cron='') {
 		$dnsbl_error = FALSE;
 		if (empty($pfb['dnsbl_vip']) || empty($pfb['dnsbl_port']) || empty($pfb['dnsbl_port_ssl'])) {
 			$log = "\n\n===[  DNSBL Virtual IP and/or Ports are not defined. Exiting  ]======\n";
+			pfb_logger("{$log}", 1);
+			$dnsbl_error = TRUE;
+		}
+
+		// Determine if a DNSBL Reload is running
+		$result_cron = array();
+		exec('/bin/ps -wax', $result_cron);
+		if (preg_grep("/pfblockerng[.]php\s+?(updatednsbl)/", $result_cron)) {
+			$log = "\n ** DNSBL Update Terminated due to active pfBlockerNG cron process\n";
 			pfb_logger("{$log}", 1);
 			$dnsbl_error = TRUE;
 		}
