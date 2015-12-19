@@ -291,7 +291,7 @@
 			<fieldname>custom</fieldname>
 			<description><![CDATA[No Regex Entries Allowed!<br /><br />
 				Enter one &emsp; <strong>'Domain Name'</strong> &emsp; per line<br /><br />
-				You may use "<strong>#</strong>" after any Domain name to add comments. example ( ads.google.com # Block Google Ads )<br />
+				You may use "<strong>#</strong>" after any Domain name to add comments. example (ads.google.com # Block Google Ads)<br />
 				This List is stored as 'Base64' format in the config.xml file.]]>
 			</description>
 			<type>textarea</type>
