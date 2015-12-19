@@ -81,8 +81,9 @@ function pfb_cron_update($type) {
 
 	// Query for any active pfBlockerNG CRON jobs
 	exec('/bin/ps -wx', $result_cron);
-	if (preg_grep("/pfblockerng[.]php\s+?(cron|update)/", $result_cron)) {
+	if (preg_grep("/pfblockerng[.]php\s+?(cron|update|updatednsbl)/", $result_cron)) {
 		pfbupdate_status(gettext("Force {$type} Terminated - Failed due to Active Running Task. Click 'View' for running process"));
+		header('Location: /pfblockerng/pfblockerng_update.php');
 		exit;
 	}
 
@@ -254,7 +255,7 @@ include_once('fbegin.inc');
 
 					// Query for any active pfBlockerNG CRON jobs
 					exec('/bin/ps -wax', $result_cron);
-					if (preg_grep("/pfblockerng[.]php\s+?(cron|update)/", $result_cron)) {
+					if (preg_grep("/pfblockerng[.]php\s+?(cron|update|updatednsbl)/", $result_cron)) {
 						echo "<font size=\"2\"><span class=\"red\">&emsp;&emsp;
 							Active pfBlockerNG CRON Job </span></font>&emsp;";
 						echo "<img src = '/themes/{$g['theme']}/images/icons/icon_pass.gif' alt='' width='15' height='15'
