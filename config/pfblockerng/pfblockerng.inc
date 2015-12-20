@@ -1784,6 +1784,7 @@ function sync_package_pfblockerng($cron='') {
 	// Reloads existing lists without downloading new lists when defined 'on'
 	$pfb['reuse'] = $pfb['config']['pfb_reuse'];
 	$pfb['reuse_dnsbl'] = '';
+	$pfb['updatednsbl'] = FALSE;	// Set flag to allow DNSBL Reload, only when called via background cmd.
 
 	// Define update process (update or reload)
 	switch ($cron) {
@@ -1801,6 +1802,7 @@ function sync_package_pfblockerng($cron='') {
 		case 'updatednsbl':
 			$pfb['reuse'] = '';
 			$pfb['reuse_dnsbl'] = 'on';
+			$pfb['updatednsbl'] = TRUE;
 			break;
 		case 'updateip':
 			$pfb['reuse'] = 'on';
@@ -2304,13 +2306,15 @@ function sync_package_pfblockerng($cron='') {
 			$dnsbl_error = TRUE;
 		}
 
-		// Determine if a DNSBL Reload is running
-		$result_cron = array();
-		exec('/bin/ps -wax', $result_cron);
-		if (preg_grep("/pfblockerng[.]php\s+?(updatednsbl)/", $result_cron)) {
-			$log = "\n ** DNSBL Update Terminated due to active pfBlockerNG cron process\n";
-			pfb_logger("{$log}", 1);
-			$dnsbl_error = TRUE;
+		if (!$pfb['updatednsbl']) {
+			// Determine if a DNSBL Reload is running
+			$result_cron = array();
+			exec('/bin/ps -wax', $result_cron);
+			if (preg_grep("/pfblockerng[.]php\s+?(updatednsbl)/", $result_cron)) {
+				$log = "\n ** DNSBL Reload Terminated due to active pfBlockerNG cron process\n";
+				pfb_logger("{$log}", 1);
+				$dnsbl_error = TRUE;
+			}
 		}
 	}
 
