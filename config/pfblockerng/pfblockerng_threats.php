@@ -92,7 +92,7 @@ include('fbegin.inc');
 					<?=gettext("McAfee Threat Center");?></a><br />
 				<a target="_blank" href="https://sitecheck.sucuri.net/results/<?php echo $host; ?>">
 					<?=gettext("Securi SiteCheck");?></a><br />
-				<a target="_blank" href="https://www.dshield.org/ipinfo.html?IP=<?php echo $host; ?>">
+				<a target="_blank" href="https://www.dshield.org/ipinfo.html?ip=<?php echo $host; ?>">
 					<?=gettext("DShield Threat Lookup");?></a><br />
 				<a target="_blank" href="https://isc.sans.edu/ipinfo.html?ip=<?php echo $host; ?>">
 					<?=gettext("Internet Storm Center");?></a><br />
@@ -126,6 +126,8 @@ include('fbegin.inc');
 					<?=gettext("HerdProtect");?></a><br />
 				<a target="_blank" href="https://sitecheck.sucuri.net/results/<?php echo $domain; ?>">
 					<?=gettext("Sucuri");?></a><br />
+				<a target="_blank" href="http://www.tcpiputils.com/browse/domain/<?php echo $domain; ?>/">
+					<?=gettext("TCPUtils");?></a></td>
 
 				<?php } ?>
 

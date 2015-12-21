@@ -48,7 +48,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>pfblockerng</name>
-	<version>2.0.3</version>
+	<version>2.0.4</version>
 	<title>pfBlockerNG: General Settings</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
 	<addedit_string>pfBlockerNG: Save General Settings</addedit_string>
@@ -418,6 +418,8 @@
 			</description>
 			<type>select</type>
 			<options>
+				<option><name>5000</name><value>5000</value></option>
+				<option><name>10000</name><value>10000</value></option>
 				<option><name>20000</name><value>20000</value></option>
 				<option><name>40000</name><value>40000</value></option>
 				<option><name>60000</name><value>60000</value></option>
@@ -560,8 +562,9 @@
 		<field>
 			<fielddescr>Support</fielddescr>
 			<type>info</type>
-			<description><![CDATA[This package has been developed by BBcan177.<br />
-				 If you like this package, please support the developer @ BBCan177@gmail.com.]]>
+			<description><![CDATA[<a target="_blank" title="Your support is appreciated. Thank you!"
+					href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RHZUKWX2Y85ZA">
+					If you like this package, please support the developer.&emsp;<u>Paypal accepted.<u></a>]]>
 			</description>
 		</field>
 		<field>

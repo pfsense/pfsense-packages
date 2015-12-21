@@ -62,7 +62,8 @@ if ($pfs_version == '2.2') {
 } else {
 	$pfb['prefix'] = '/usr/local';
 }
-$pfb['geoipshare'] = "{$pfb['prefix']}/share/GeoIP";
+$pfb['geoipshare']	= "{$pfb['prefix']}/share/GeoIP";
+$pfb['ccdir']		= "{$pfb['prefix']}/share/GeoIP/cc";
 
 $pfb['maxmind'][0]['url']	= 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz';
 $pfb['maxmind'][0]['file_dwn']	= 'GeoIP.dat.gz';
