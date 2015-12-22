@@ -1798,5 +1798,22 @@
 		<required_version>2.2</required_version>
 		<configurationfile>ftpproxy.xml</configurationfile>
 	</package>
+        <package>
+                <name>Surftool</name>
+                <internal_name>surftool</internal_name>
+                <pkginfolink>https://forum.pfsense.org/</pkginfolink>
+                <descr><![CDATA[Manage your squidguard groups. You can set every group very easily.
+                                The modes on/off/only/on plus and adminfree are available. This tool was made for schools.
+                                <strong>Requires SquidGuard package.</strong>]]></descr>
+                <website>https://github.com/reimht/surftool</website>
+                <category>Network Management</category>
+                <version>0.02c</version>
+                <status>ALPHA</status>
+                <required_version>2.2</required_version>
+                <config_file>https://packages.pfsense.org/packages/config/surftool/surftool.xml</config_file>
+                <maintainer>mail@hreimers.com</maintainer>
+                <configurationfile>surftool.xml</configurationfile>
+                <only_for_archs>i386 amd64</only_for_archs>
+        </package>
 </packages>
 </pfsensepkgs>
