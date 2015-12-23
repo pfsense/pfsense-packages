@@ -42,8 +42,8 @@ class HaproxyHtmlList
 			<tableId>_field_changed(tableId, rowNr, fieldId, field)
 	*/
 
-	private $tablename = "";
-	private $fields = array();
+	public $tablename = "";
+	public $fields = array();
 	public $editmode = false;
 	public $fields_details = null;
 	public $keyfield = "";
@@ -269,7 +269,13 @@ class HaproxyHtmlList
 						foreach($itemdetails as $item) {
 							$itemname = $item['name'];
 							$itemvalue = $value[$itemname];
-							//TODO don't filter empty items, filter context un-related items through customizable function..
+							if ($this->fields_details_showfieldfunction != null) {
+								// filter context un-related items through customizable function.
+								$fn = &$this->fields_details_showfieldfunction;
+								if ($fn($this, $itemname, $value) == false) {
+									continue;
+								}
+							} else
 							if (empty($itemvalue)) {
 								continue;
 							}
@@ -488,7 +494,10 @@ function haproxy_htmllist_js(){
 				subtr.appendChild(subtd);
 				subtd = d.createElement("td");
 				subtd.setAttribute("class","vncell");
-				subtd.innerHTML = field['description'] + "<br/>" + fieldhtml;
+				if (field['description']) {
+					fieldhtml = field['description'] + "<br/>" + fieldhtml;
+				}
+				subtd.innerHTML = fieldhtml;
 				subtr.appendChild(subtd);
 				table.appendChild(subtr);
 			}
@@ -538,6 +547,13 @@ function haproxy_htmllist_js(){
 		var fn = window[javascript_row_added];
 		if (typeof fn === 'function'){
 			fn(tableId, totalrows);
+		}
+
+		// show/hide conditional fields if applicable using a custom function.
+		javascript_event = tableId + "_listitem_change";
+		var fn = window[javascript_event];
+		if (typeof fn === 'function'){
+			fn(tableId, "toggle_details", totalrows, null);
 		}
 	}
 	function editRow(num) {

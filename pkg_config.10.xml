@@ -172,7 +172,7 @@
 		</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>0.35</version>
+		<version>0.36</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>

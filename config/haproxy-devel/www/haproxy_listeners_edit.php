@@ -251,14 +251,33 @@ function customdrawcell_actions($object, $item, $itemvalue, $editable, $itemname
 $htmllist_extaddr = new HaproxyHtmlList("table_extaddr", $fields_externalAddress);
 $htmllist_extaddr->editmode = true;
 
+function fields_details_showfieldfunction($items, $action,  $itemname) {
+	if (is_array($items[$action]) && is_array($items[$action]['fields'])) {
+		foreach($items[$action]['fields'] as $item) {
+			if ($action . "" . $item['name'] == $itemname) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+function fields_acls_details_showfieldfunction($htmltable, $itemname, $values) {
+	$items = $htmltable->fields[1]['items'];
+	$action = $values['expression'];
+	return fields_details_showfieldfunction($items, $action, $itemname);
+}
 $htmllist_acls = new HaproxyHtmlList("table_acls", $fields_aclSelectionList);
 $htmllist_acls->fields_details = $fields_acl_details;
-//$htmllist_acls->editmode = true;
+$htmllist_acls->fields_details_showfieldfunction = fields_acls_details_showfieldfunction;
 
+function fields_actions_details_showfieldfunction($htmltable, $itemname, $values) {
+	$items = $htmltable->fields[0]['items'];
+	$action = $values['action'];
+	return fields_details_showfieldfunction($items, $action, $itemname);
+}
 $htmllist_actions = new HaproxyHtmlList("table_actions", $fields_actions);
 $htmllist_actions->fields_details = $fields_actions_details;
-//$htmllist_actions->keyfield = "name";
-//$htmllist_actions->editmode = true;
+$htmllist_actions->fields_details_showfieldfunction = fields_actions_details_showfieldfunction;
 
 $htmllist_sslCertificates = new HaproxyHtmlList("tbl_sslCerts", $fields_sslCertificates);
 $htmllist_caCertificates = new HaproxyHtmlList("tbl_caCerts", $fields_caCertificates );
