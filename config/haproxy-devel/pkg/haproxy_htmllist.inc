@@ -33,6 +33,7 @@
 
 require_once("config.inc");
 require_once("haproxy_utils.inc");
+require_once("haproxy_gui.inc");
 
 class HaproxyHtmlList
 {
@@ -193,20 +194,20 @@ class HaproxyHtmlList
 					<td class='list'>
 					<table border='0' cellspacing='0' cellpadding='1'><tr>
 					<td valign='middle'>
-					<img src='/themes/{$g['theme']}/images/icons/icon_e.gif' title='edit entry' width='17' height='17' border='0' onclick='editRow({$counter}); return false;' />
+					<a onclick='editRow({$counter}); return false;'>".haproxyicon('edit','edit entry')."</a>
 					</td>
 					<td valign='middle'>
-					<img src='/themes/{$g['theme']}/images/icons/icon_x.gif' title='delete entry' width='17' height='17' border='0' onclick='deleteRow({$counter}, \"{$tablename}\"); return false;' />
+					<a onclick='deleteRow({$counter}, \"{$tablename}\"); return false;'>".haproxyicon('delete','delete entry')."</a>
 					</td>
 					<td valign='middle'>
-					<img src='/themes/{$g['theme']}/images/icons/icon_plus.gif' title='duplicate entry' width='17' height='17' border='0' onclick='dupRow({$counter}, \"{$tablename}\"); return false;' />
+					<a onclick='dupRow({$counter}, \"{$tablename}\"); return false;'>".haproxyicon('clone','duplicate entry')."</a>
 					</td>";
 					if (empty($this->noindex)) {
 						echo "<td valign='middle'>
-						<img src='/themes/{$g['theme']}/images/icons/icon_up.gif' title='move row up' width='17' height='17' border='0' onclick='moveRowUp({$counter}, \"{$tablename}\"); return false;' />
+						<a onclick='moveRowUp({$counter}, \"{$tablename}\"); return false;'>".haproxyicon('moveup','move row up')."</a>
 						</td>
 						<td valign='middle'>
-						<img src='/themes/{$g['theme']}/images/icons/icon_down.gif' title='move row down' width='17' height='17' border='0' onclick='moveRowDown({$counter}, \"{$tablename}\"); return false;' />
+						<a onclick='moveRowDown({$counter}, \"{$tablename}\"); return false;'>".haproxyicon('movedown','move row down')."</a>
 						</td>";
 					}
 					echo "</tr></table>
@@ -232,17 +233,17 @@ class HaproxyHtmlList
 			<table border='0' cellspacing='0' cellpadding='1'><tr>
 			<td valign='middle'>
 			<input name='{$tablename}_rowindex{$counter}' id='{$tablename}_rowindex{$counter}' type='hidden' value='{$counter}' />
-			<img src='/themes/{$g['theme']}/images/icons/icon_x.gif' title='delete entry' width='17' height='17' border='0' onclick='deleteRow({$counter}, \"{$tablename}\"); return false;' />
+			<a onclick='deleteRow({$counter}, \"{$tablename}\"); return false;' >".haproxyicon('delete','delete entry')."</a>
 			</td>
 			<td valign='middle'>
-			<img src='/themes/{$g['theme']}/images/icons/icon_plus.gif' title='duplicate entry' width='17' height='17' border='0' onclick='dupRow({$counter}, \"{$tablename}\"); return false;' />
+			<a onclick='dupRow({$counter}, \"{$tablename}\"); return false;' />".haproxyicon('clone','duplicate entry')."</a>
 			</td>";
 			if (empty($this->noindex)) {
 				echo "<td valign='middle'>
-				<img src='/themes/{$g['theme']}/images/icons/icon_up.gif' title='move row up' width='17' height='17' border='0' onclick='moveRowUp({$counter}, \"{$tablename}\"); return false;' />
+				<a onclick='moveRowUp({$counter}, \"{$tablename}\"); return false;' />".haproxyicon('moveup','move row up')."</a>
 				</td>
 				<td valign='middle'>
-				<img src='/themes/{$g['theme']}/images/icons/icon_down.gif' title='move row down' width='17' height='17' border='0' onclick='moveRowDown({$counter}, \"{$tablename}\"); return false;' />
+				<a onclick='moveRowDown({$counter}, \"{$tablename}\"); return false;' />".haproxyicon('movedown','move row down')."</a>
 				</td>";
 			}
 			echo "</tr></table>
@@ -328,7 +329,7 @@ class HaproxyHtmlList
 		echo "</tbody>
 		</table>
 			<a onclick='javascript:addRowTo(\"{$tablename}\"); return false;' href='#'>
-			<img border='0' src='/themes/{$g['theme']}/images/icons/icon_plus.gif' alt='' title='add another entry' />
+			".haproxyicon('add','add another entry')."
 			</a>";
 	}
 }
@@ -445,12 +446,12 @@ function haproxy_htmllist_js(){
 		btd.setAttribute("valign", "middle");
 		btd.innerHTML =
 			'<input name="'+tableId+'_rowindex'+totalrows+'" id="'+tableId+'_rowindex'+totalrows+'" type="hidden" value="'+totalrows+'" />' +
-			'<img src="/themes/' + theme + '/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="deleteRow(' + totalrows + ", '" + tableId + "'); return false;\" />";
+			'<a onclick="deleteRow(' + totalrows + ", '" + tableId + "'); return false;\" ><?=haproxyicon('delete','delete entry')?></a>";
 		btr.appendChild(btd);
 		
 		btd = document.createElement("td");
 		btd.setAttribute("valign", "middle");
-		btd.innerHTML = '<img src="/themes/' + theme + "/images/icons/icon_plus.gif\" title=\"duplicate entry\" width=\"17\" height=\"17\" border=\"0\" onclick=\"dupRow(" + totalrows + ", '" + tableId + "'); return false;\" />";
+		btd.innerHTML = '<a onclick=\"dupRow(' + totalrows + ", '" + tableId + "'); return false;\" ><?=haproxyicon('clone','duplicate entry')?></a>";
 		btr.appendChild(btd);
 
 		
@@ -458,12 +459,12 @@ function haproxy_htmllist_js(){
 		if (tabledefinition && tabledefinition['keyfield'] == "") {
 			btd = document.createElement("td");
 			btd.setAttribute("valign", "middle");
-			btd.innerHTML = '<img src="/themes/' + theme + "/images/icons/icon_up.gif\" title=\"move entry up\" width=\"17\" height=\"17\" border=\"0\" onclick=\"moveRowUp(" + totalrows + ", '" + tableId + "'); return false;\" />";
+			btd.innerHTML = '<a onclick=\"moveRowUp(' + totalrows + ", '" + tableId + "'); return false;\" ><?=haproxyicon('moveup','move row up')?></a>";
 			btr.appendChild(btd);
 			
 			btd = document.createElement("td");
 			btd.setAttribute("valign", "middle");
-			btd.innerHTML = '<img src="/themes/' + theme + "/images/icons/icon_down.gif\" title=\"move entry down\" width=\"17\" height=\"17\" border=\"0\" onclick=\"moveRowDown(" + totalrows + ", '" + tableId + "'); return false;\" />";
+			btd.innerHTML = '<a onclick=\"moveRowDown(' + totalrows + ", '" + tableId + "'); return false;\" ><?=haproxyicon('movedown','move row down')?></a>";
 			btr.appendChild(btd);
 		}
 		

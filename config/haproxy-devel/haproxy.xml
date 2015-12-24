@@ -111,6 +111,10 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/haproxy-devel/pkg/haproxy_gui.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/haproxy-devel/pkg/haproxy_socketinfo.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
