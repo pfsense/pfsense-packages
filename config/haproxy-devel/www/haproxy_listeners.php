@@ -86,7 +86,8 @@ if ($_GET['act'] == "del") {
 	if (isset($a_frontend[$id])) {
 		if (!$input_errors) {
 			unset($a_frontend[$id]);
-			write_config();
+			$changedesc .= " Frontend delete";
+			write_config($changedesc);
 			touch($d_haproxyconfdirty_path);
 		}
 		header("Location: haproxy_listeners.php");

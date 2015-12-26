@@ -47,6 +47,26 @@ $haproxy_icons = array(
 	'stats' => array(
 		"faicon" => "fa-tasks",
 		"icon" => "icon_log_s.gif",
+		"iconsize" => 11),
+	'stop' => array(
+		"faicon" => "fa-stop-circle-o",
+		"icon" => "icon_service_stop.gif",
+		"iconsize" => 17),
+	'start' => array(
+		"faicon" => "fa-play-circle",
+		"icon" => "icon_service_start.gif",
+		"iconsize" => 17),
+	'up' => array(
+		"faicon" => "fa-check-circle",
+		"icon" => "icon_interface_up.gif",
+		"iconsize" => 11),
+	'down' => array(
+		"faicon" => "fa-times-circle",
+		"icon" => "icon_interface_down.gif",
+		"iconsize" => 11),
+	'resolvedns' => array(
+		"faicon" => "fa-info ",
+		"icon" => "icon_log.gif",
 		"iconsize" => 11)
 );
 

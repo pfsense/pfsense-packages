@@ -58,7 +58,7 @@ if ($_POST) {
 if ($_GET['act'] == "del") {
 	if (isset($a_pools[$_GET['id']])) {
 		unset($a_pools[$_GET['id']]);
-		write_config();
+		write_config("Services: HAProxy: Backend delete");
 		touch($d_haproxyconfdirty_path);
 	}
 	header("Location: haproxy_pools.php");
