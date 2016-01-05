@@ -76,7 +76,9 @@ if ($_GET['a'] == "other") {
 			//echo "The file $filename exists";
 			conf_mount_rw();
 			mwexec("/usr/bin/tar -xpzC / -f {$backup_path}");
-			mwexec("/bin/chmod -R 744 {$files_dir}/*");
+			if (tftp_dir_contains_files($files_dir)) {
+				mwexec("/bin/chmod -R 744 {$files_dir}/*");
+			}
 			header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
 			conf_mount_ro();
 		} else {
@@ -92,7 +94,9 @@ if ($_POST['submit'] == "Save") {
 		write_config();
 		send_event("filter reload");
 	} else {
-		unset($config['installedpackages']['tftpd']['config'][0]['tftpdinterface']);
+		if (isset($config['installedpackages']['tftpd']['config'][0]['tftpdinterface'])) {
+			unset($config['installedpackages']['tftpd']['config'][0]['tftpdinterface']);
+		}
 		write_config();
 		send_event("filter reload");
 	}
@@ -102,7 +106,9 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 	conf_mount_rw();
 	move_uploaded_file($_FILES['ulfile']['tmp_name'], "{$files_dir}/{$_FILES['ulfile']['name']}");
 	$savemsg = "Uploaded file to {$files_dir}/" . htmlentities($_FILES['ulfile']['name']);
-	mwexec('/bin/chmod -R 744 {$files_dir}/*');
+	if (tftp_dir_contains_files($files_dir)) {
+		mwexec('/bin/chmod -R 744 {$files_dir}/*');
+	}
 	unset($_POST['txtCommand']);
 	conf_mount_ro();
 }

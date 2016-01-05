@@ -41,6 +41,19 @@ function tftp_byte_convert($bytes) {
 	return round($bytes/pow($convention, $e), 2) . ' ' . $s[$e];
 }
 
+function tftp_dir_contains_files($dir) {
+	if (!is_readable($dir)) {
+		return NULL;
+	}
+	$handle = opendir($dir);
+	while (false !== ($entry = readdir($handle))) {
+		if ($entry != "." && $entry != "..") {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 function tftp_install_command() {
 	global $config;
 
@@ -54,7 +67,9 @@ function tftp_install_command() {
 	// Restore backup if it exists
 	if (file_exists($tftpbackup)) {
 		mwexec("/usr/bin/tar xvpfz {$tftpbackup} -C /");
-		mwexec("/bin/chmod -R 0744 {$tftpdir}/*");
+		if (tftp_dir_contains_files($tftpdir)) {
+			mwexec("/bin/chmod -R 0744 {$tftpdir}/*");
+		}
 	}
 	unset($tftpdir, $tftpbackup);
 }
