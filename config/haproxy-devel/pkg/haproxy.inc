@@ -253,7 +253,7 @@ $a_action["use_server"] = array('name' => "Use Server", 'mode' => '', 'syntax' =
 		'server' => array('name'=>"server",'columnheader'=>"Server",'type'=>"select",'size'=>"50",'mask'=>'server')
 	));
 //
-$a_action["custom"] = array('name' => "Custom", 'mode' => '', 
+$a_action["custom"] = array('name' => "Custom", 'mode' => '', 'syntax' => '{customaction}',
 	'fields' => array(
 		array('name'=>"customaction",'columnheader'=>"Custom action",'type'=>"textbox",'size'=>"50",'mask'=>'freetext')
 	));

@@ -177,7 +177,7 @@
 				Supports ACLs for smart backend switching.]]></descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>1.5.3 pkg v 0.35</version>
+		<version>1.5.3 pkg v 0.36</version>
 		<status>Release</status>
 		<required_version>2.1</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -383,7 +383,7 @@
 		<pkginfolink/>
 		<config_file>https://packages.pfsense.org/packages/config/tftp2/tftp.xml</config_file>
 		<depends_on_package_base_url>https://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>2.2.4</version>
+		<version>2.2.5</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<configurationfile>tftp.xml</configurationfile>

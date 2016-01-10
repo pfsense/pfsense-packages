@@ -33,7 +33,7 @@ $shortcut_section = "haproxy";
 require_once("guiconfig.inc");
 require_once("haproxy.inc");
 require_once("pkg_haproxy_tabs.inc");
-
+require_once("haproxy_gui.inc");
 
 if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
 	$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
@@ -58,7 +58,7 @@ if ($_POST) {
 if ($_GET['act'] == "del") {
 	if (isset($a_pools[$_GET['id']])) {
 		unset($a_pools[$_GET['id']]);
-		write_config();
+		write_config("Services: HAProxy: Backend delete");
 		touch($d_haproxyconfdirty_path);
 	}
 	header("Location: haproxy_pools.php");
@@ -97,7 +97,6 @@ haproxy_css();
 			<td width="10%" class="list"></td>
 		</tr>
 <?php
-		$img_adv = "/themes/{$g['theme']}/images/icons/icon_advanced.gif";
 		$i = 0;
 		foreach ($a_pools as $pool){
 			$fe_list = "";
@@ -131,14 +130,19 @@ haproxy_css();
 			<tr class="<?=$textgray?>">
 			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 			  <?
-				if ($pool['stats_enabled']=='yes'){
-					echo "<img src=\"./themes/{$g['theme']}/images/icons/icon_log_s.gif\"" . ' title="stats enabled" width="11" height="15" border="0" />';
+				if ($pool['stats_enabled']=='yes') {
+					echo haproxyicon("stats", gettext("stats enabled"));
 				}
 				$isadvset = "";
-				if ($pool['advanced']) $isadvset .= "Per server pass thru\r\n";
-				if ($pool['advanced_backend']) $isadvset .= "Backend pass thru\r\n";
-				if ($isadvset)
-					echo "<img src=\"$img_adv\" title=\"" . gettext("advanced settings set") . ": {$isadvset}\" border=\"0\" />";
+				if ($pool['advanced']) {
+					$isadvset .= "Per server pass thru\r\n";
+				}
+				if ($pool['advanced_backend']) {
+					$isadvset .= "Backend pass thru\r\n";
+				}
+				if ($isadvset) {
+					echo haproxyicon("advanced", gettext("advanced settings set") . ": {$isadvset}");
+				}
 			  ?>
 			  </td>
 			  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
@@ -156,9 +160,15 @@ haproxy_css();
 			  <td class="list" nowrap>
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit backend");?>" width="17" height="17" border="0" /></a></td>
-					<td valign="middle"><a href="haproxy_pools.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete backend");?>" width="17" height="17" border="0" /></a></td>
-					<td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("clone backend");?>" width="17" height="17" border="0" /></a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php?id=<?=$i;?>">
+						<?=haproxyicon("edit", gettext("edit backend"))?>
+					</a></td>
+					<td valign="middle"><a href="haproxy_pools.php?act=del&amp;id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')">
+						<?=haproxyicon("delete", gettext("delete backend"))?>
+					</a></td>
+					<td valign="middle"><a href="haproxy_pool_edit.php?dup=<?=$i;?>">
+						<?=haproxyicon("clone", gettext("clone backend"))?>
+					</a></td>
 				  </tr>
 				</table>
 			  </td>
@@ -173,7 +183,10 @@ haproxy_css();
 			  <td class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
 				  <tr>
-					<td valign="middle"><a href="haproxy_pool_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add new backend");?>" width="17" height="17" border="0" /></a></td>
+					<td valign="middle">
+					<a href="haproxy_pool_edit.php">
+						<?=haproxyicon("add", gettext("add new backend"))?>
+					</a></td>
 				  </tr>
 				</table>
 			  </td>
