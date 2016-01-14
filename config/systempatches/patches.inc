@@ -225,8 +225,6 @@ function patch_remove_shellcmd() {
 		if ($removed) {
 			write_config("System Patches package removed existing early shellcmd: apply patches");
 		}
-	} else {
-		$a_earlyshellcmd = array();
 	}
 }
 
