@@ -202,10 +202,9 @@ function patch_add_shellcmd() {
 				$found = true;
 			}
 		}
-	} else {
-		$a_earlyshellcmd = array();
 	}
 	if (!$found) {
+		// Implicitly creates array if needed
 		$a_earlyshellcmd[] = "/usr/local/bin/php -f /usr/local/bin/apply_patches.php";
 		write_config("System Patches package added an early shellcmd: apply patches");
 	}
