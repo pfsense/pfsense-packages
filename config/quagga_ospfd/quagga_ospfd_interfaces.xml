@@ -107,6 +107,20 @@
 			<source_value>value</source_value>
 			<required/>
 		</field>
+ 		<field>
+			<fielddescr>Network Type</fielddescr>
+			<fieldname>networktype</fieldname>
+			<description>Select OSPF Network Type of the interface.</description>
+			<type>select</type>
+			<default_value></default_value>
+			<options>
+				<option><value></value><name>Not specified (default)</name></option>
+				<option><value>broadcast</value><name>Broadcast</name></option>
+				<option><value>non-broadcast</value><name>Non-Broadcast</name></option>
+				<option><value>point-to-multipoint</value><name>Point-to-Multipoint</name></option>
+				<option><value>point-to-point</value><name>Point-to-Point</name></option>
+			</options>
+		</field>
 		<field>
 			<fielddescr>Metric</fielddescr>
 			<fieldname>metric</fieldname>
