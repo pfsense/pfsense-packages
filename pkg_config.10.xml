@@ -1423,7 +1423,7 @@
 			]]>
 		</descr>
 		<maintainer>jimp@pfsense.org</maintainer>
-		<version>0.6.9</version>
+		<version>0.6.9.1</version>
 		<category>Network Management</category>
 		<status>BETA</status>
 		<depends_on_package_pbi>quagga-0.99.23.1_2-##ARCH##.pbi</depends_on_package_pbi>
