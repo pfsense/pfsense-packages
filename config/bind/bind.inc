@@ -517,7 +517,7 @@ EOD;
 							$hostname = (preg_match("/(MX|NS)/", $zone['row'][$y]['hosttype']) ? "@" : $zone['row'][$y]['hostname']);
 							$hosttype = $zone['row'][$y]['hosttype'];
 							$hostdst = $zone['row'][$y]['hostdst'];
-							if (preg_match("/[a-zA-Z]/", $hostdst) && !preg_match("/(TXT|SPF|AAAA)/", $hosttype)) {
+							if (preg_match("/[a-zA-Z]/", $hostdst) && !preg_match("/(TXT|SPF|AAAA|LOC)/", $hosttype)) {
 								$hostdst .= ".";
 							}
 							$hostvalue = $zone['row'][$y]['hostvalue'];
