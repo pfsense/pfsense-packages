@@ -108,12 +108,12 @@
 			<description>
 				<![CDATA[
 				Set master zone ip you want to use to sync backup server zones with master.<br />
+				Leave empty if the backup server will also be a master.
 				<strong>Note: All master zones will be configured as backup on slave servers.</strong>
 				]]>
 			</description>
 			<type>input</type>
 			<size>20</size>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Remote Server</fielddescr>
