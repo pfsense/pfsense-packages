@@ -57,6 +57,9 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 $a_nat = &$config['installedpackages']['suricata']['rule'];
 $id_gen = count($config['installedpackages']['suricata']['rule']);
 
+// Get list of configured firewall interfaces
+$ifaces = get_configured_interface_list();
+
 if ($_POST['del_x']) {
 	/* delete selected interfaces */
 	if (is_array($_POST['rule'])) {
@@ -65,8 +68,8 @@ if ($_POST['del_x']) {
 			$if_real = get_real_interface($a_nat[$rulei]['interface']);
 			$suricata_uuid = $a_nat[$rulei]['uuid'];
 			suricata_stop($a_nat[$rulei], $if_real);
-			exec("/bin/rm -r {$suricatalogdir}suricata_{$if_real}{$suricata_uuid}");
-			exec("/bin/rm -r {$suricatadir}suricata_{$suricata_uuid}_{$if_real}");
+			rmdir_recursive("{$suricatalogdir}suricata_{$if_real}{$suricata_uuid}");
+			rmdir_recursive("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}");
 			unset($a_nat[$rulei]);
 		}
 		conf_mount_ro();
@@ -75,19 +78,12 @@ if ($_POST['del_x']) {
 		if (empty($a_nat))
 			unset($a_nat);
 
-		write_config();
+		write_config("Suricata pkg: deleted one or more Suricata interfaces.");
 		sleep(2);
 	  
-		/* if there are no ifaces remaining do not create suricata.sh */
-		if (!empty($config['installedpackages']['suricata']['rule']))
-			suricata_create_rc();
-		else {
-			conf_mount_rw();
-			@unlink("{$rcdir}/suricata.sh");
-			conf_mount_ro();
-		}
-	  
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -107,7 +103,9 @@ if ($_POST['bartoggle']) {
 
 	if (!suricata_is_running($suricatacfg['uuid'], $if_real, 'barnyard2')) {
 		log_error("Toggle (barnyard starting) for {$if_friendly}({$suricatacfg['descr']})...");
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		suricata_barnyard_start($suricatacfg, $if_real);
 	} else {
 		log_error("Toggle (barnyard stopping) for {$if_friendly}({$suricatacfg['descr']})...");
@@ -132,7 +130,9 @@ if ($_POST['toggle']) {
 		log_error("Toggle (suricata starting) for {$if_friendly}({$suricatacfg['descr']})...");
 		// set flag to rebuild interface rules before starting Snort
 		$rebuild_rules = true;
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		$rebuild_rules = false;
 		suricata_start($suricatacfg, $if_real);
 	}
@@ -145,8 +145,9 @@ if ($_POST['toggle']) {
 	header("Location: /suricata/suricata_interfaces.php");
 	exit;
 }
+$suri_bin_ver = SURICATA_BIN_VERSION;
 $suri_pkg_ver = SURICATA_PKG_VER;
-$pgtitle = "Services: {$suri_pkg_ver} - Intrusion Detection System";
+$pgtitle = "Services: Suricata {$suri_bin_ver} pkg v{$suri_pkg_ver} - Intrusion Detection System";
 include_once("head.inc");
 
 ?>
@@ -166,19 +167,23 @@ include_once("head.inc");
 ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr>
 	<td>
 	<?php
 		$tab_array = array();
-		$tab_array[] = array(gettext("Suricata Interfaces"), true, "/suricata/suricata_interfaces.php");
+		$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 		$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-		$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+		$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 		$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-		$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+		$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 		$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 		$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-		$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+		$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php");
 		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+		$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+		$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+		$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 		display_top_tabs($tab_array, true);
 	?>
 	</td>
@@ -187,7 +192,6 @@ include_once("head.inc");
 	<td>
 	<div id="mainarea">
 	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-
 		<colgroup>
 			<col width="3%" align="center">
 			<col width="12%">
@@ -207,12 +211,26 @@ include_once("head.inc");
 			<th class="listhdrr"><?php echo gettext("Block"); ?></th>
 			<th class="listhdrr"><?php echo gettext("Barnyard2"); ?></th>
 			<th class="listhdr"><?php echo gettext("Description"); ?></th>
-			<th class="list"><a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>">
-				<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
-				width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a>
+			<th class="list">
+				<?php if ($id_gen < count($ifaces)): ?>
+					<a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>">
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a>
+				<?php else: ?>
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+					title="<?php echo gettext('No available interfaces for a new Suricata mapping');?>">
+				<?php endif; ?>
+				<?php if ($id_gen == 0): ?>
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" " border="0">
+				<?php else: ?>
+					<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" 
+					width="17" height="17" title="<?php echo gettext("Delete selected Suricata interface mapping(s)"); ?>"
+					onclick="return intf_del()">
+				<?php endif; ?>
 			</th>
 		</tr>
 		</thead>
+		<tbody>
 		<?php $nnats = $i = 0;
 
 		// Turn on buffering to speed up rendering
@@ -342,7 +360,15 @@ include_once("head.inc");
 			<td valign="middle" class="list" nowrap>
 				<a href="suricata_interfaces_edit.php?id=<?=$i;?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-				width="17" height="17" border="0" title="<?php echo gettext('Edit Suricata interface mapping'); ?>"></a>
+				width="17" height="17" border="0" title="<?php echo gettext('Edit this Suricata interface mapping'); ?>"></a>
+				<?php if ($id_gen < count($ifaces)): ?>
+					<a href="suricata_interfaces_edit.php?id=<?=$i;?>&action=dup">
+					<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					width="17" height="17" border="0" title="<?php echo gettext('Add new interface mapping based on this one'); ?>"></a>
+				<?php else: ?>
+					<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+					title="<?php echo gettext('No available interfaces for a new Suricata mapping');?>">
+				<?php endif; ?>
 			</td>	
 		</tr>
 		<?php $i++; $nnats++; endforeach; ob_end_flush(); ?>
@@ -354,8 +380,16 @@ include_once("head.inc");
 				<?php else: ?>&nbsp;
 				<?php endif; ?>					 
 			</td>
-			<td class="list" valign="middle" nowrap>
-				<?php if ($nnats == 0): ?>
+			<td class="list">
+				<?php if ($id_gen < count($ifaces)): ?>
+					<a href="suricata_interfaces_edit.php?id=<?php echo $id_gen;?>">
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
+					width="17" height="17" border="0" title="<?php echo gettext('Add Suricata interface mapping');?>"></a>
+				<?php else: ?>
+					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus_d.gif" width="17" height="17" border="0" 
+					title="<?php echo gettext('No available interfaces for a new Suricata mapping');?>">
+				<?php endif; ?>
+				<?php if ($id_gen == 0): ?>
 					<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" " border="0">
 				<?php else: ?>
 					<input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" 
@@ -371,6 +405,7 @@ include_once("head.inc");
 			<td>&nbsp;</td>
 			<td colspan="6">
 			<table class="tabcont" width="100%" border="0" cellpadding="1" cellspacing="0">
+				<tbody>
 				<tr>
 					<td colspan="3" class="vexpl"><span class="red"><strong><?php echo gettext("Note:"); ?></strong></span> <br>
 						<?php echo gettext("This is the ") . "<strong>" . gettext("Suricata Menu ") . 
@@ -423,14 +458,17 @@ include_once("head.inc");
 						delete an interface and settings.
 					</td>
 				</tr>
+				</tbody>
 			</table>
 			</td>
 			<td>&nbsp;</td>
 		</tr>
+		</tbody>
 	</table>
 	</div>
 	</td>
 </tr>
+</tbody>
 </table>
 </form>
 

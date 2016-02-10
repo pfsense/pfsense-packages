@@ -115,7 +115,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<name>GENERAL CONFIGURATION - SERVER 1</name>
+			<name>General Configuration - SERVER 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -207,7 +207,7 @@
 			<default_value>1</default_value>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION - SERVER 1</name>
+			<name>Miscellaneous Configuration - SERVER 1</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -434,7 +434,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<name>GENERAL CONFIGURATION - SERVER 2</name>
+			<name>General Configuration - SERVER 2</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -526,7 +526,7 @@
 			<default_value>1</default_value>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION - SERVER 2</name>
+			<name>Miscellaneous Configuration - SERVER 2</name>
 			<type>listtopic</type>
 		</field>
 		<field>

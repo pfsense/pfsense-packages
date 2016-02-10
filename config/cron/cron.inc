@@ -1,14 +1,11 @@
 <?php
-/* $Id$ */
 /*
-/* ========================================================================== */
-/*
-    cron.inc
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
-/*
+	cron.inc
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008 Mark J Crane
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -30,85 +27,30 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+require_once("pfsense-utils.inc");
 require_once("services.inc");
+require_once("util.inc");
 
-function cron_pkg_is_service_running($servicename)
-{
-	exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-	array_shift($psout);
-	foreach($psout as $line) {
-		$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-	}
-	if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
-
-function cron_sync_package()
-{
-
-	global $config;   
-	//synch cron tab
+function cron_sync_package() {
 	configure_cron();
-	$handle = popen("/usr/local/etc/rc.d/cron.sh stop", "r");
-	pclose($handle);
-	$handle = popen("/usr/local/etc/rc.d/cron.sh start", "r");
-	pclose($handle);
-
-}
-    
-
-function cron_install_command()
-{
-
-	global $config;
-	conf_mount_rw();
-	config_lock();
-
-	if (!is_dir('/usr/local/www/packages/cron/')) {
-		exec("mkdir -p /usr/local/www/packages/cron/");
+	// Previous package versions were "helpfully" killing cron on uninstall.
+	// Also, need to make sure cron is running, otherwise the package is useless.
+	// configure_cron() function in services.inc already does this check on pfSense >=2.2.5
+	$pfs_version = str_replace(".", "", substr(trim(file_get_contents("/etc/version")), 0, 5));
+	if ($pfs_version < 225) {
+		if (!is_process_running("cron")) {
+			exec("cd /tmp && /usr/sbin/cron -s 2>/dev/null");
+		}
 	}
-
-	//Copy PHP files from .tmp to .php - don't move or put them in /tmp or the pkg system will miss them if it gets cleared.
-	exec("cp /usr/local/pkg/cron.tmp /usr/local/www/packages/cron/cron.php");
-	exec("cp /usr/local/pkg/cron_edit.tmp /usr/local/www/packages/cron/cron_edit.php");
-
-	//write_config();
-
-	write_rcfile(array(
-		"file" => "cron.sh",
-		"start" => "[ `/bin/pgrep -f 'cron -s' | wc -l` -eq 0 ] && /usr/sbin/cron -s &",
-		"stop" => "[ -f \"/var/run/cron.pid\" ] && kill -9 `cat /var/run/cron.pid`; rm -f /var/run/cron.pid; /bin/pkill -f 'cron -s'"
-		)
-	);
-
-	cron_sync_package();
-
-	//if (pkg_is_service_running('cron')) {
-		//documentation purposes
-	//}
-
-	conf_mount_ro();
-	config_unlock();
-
 }
 
+function cron_install_command() {
+	// Clean up possible lingering garbage after previous package versions
+	unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
+}
 
-function cron_deinstall_command()
-{
-	conf_mount_rw();
-	config_lock();
-	$handle = popen("/usr/local/etc/rc.d/cron.sh stop", "r");
-	unlink_if_exists("/usr/local/pkg/cron.xml");
-	unlink_if_exists("/usr/local/www/cron.inc");
-	exec("rm -R /usr/local/www/packages/cron");
-	//unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
-	conf_mount_ro();
-	config_unlock();
+function cron_deinstall_command() {
+	rmdir_recursive("/usr/local/www/packages/cron");
 }
 
 ?>

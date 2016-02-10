@@ -1,10 +1,10 @@
 <?php
-/* $Id$ */
 /*
 	tinydns_dhcp_filter.php
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006 Scott Ullrich
-	Parts Copyright (C) 2007 Goffredo Andreone <GAndreone@imapro.com>
-	part of pfSense
+	Copyright (C) 2007 Goffredo Andreone
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -39,20 +39,16 @@
 require("/usr/local/pkg/tinydns.inc");
 require("guiconfig.inc");
 
+$closehead = false;
 $pgtitle = "TinyDNS: DHCP Domains";
 include("head.inc");
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version < 2.0)
-	$one_two = true;
-
 ?>
+<meta http-equiv="refresh" content="60;url=<?php print $_SERVER['SCRIPT_NAME']; ?>">
+</head>
+
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-
-<?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
-<?php endif; ?>
 
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
@@ -64,7 +60,7 @@ if ($pf_version < 2.0)
 	$tab_array[] = array(gettext("Add/Edit Record"), false, "/tinydns_filter.php");
 	$tab_array[] = array(gettext("Failover Status"), false, "/tinydns_status.php");
 	$tab_array[] = array(gettext("Logs"), false, "/tinydns_view_logs.php");
-	$tab_array[] = array(gettext("Zone Sync"), false, "/tinydns_xmlrpc_sync.php");
+	$tab_array[] = array(gettext("Zone Sync"), false, "/pkg_edit.php?xml=tinydns_sync.xml");
 	$tab_array[] = array(gettext("New domain wizard"), false, "/wizard.php?xml=new_zone_wizard.xml");	
 	display_top_tabs($tab_array);
 ?>
@@ -124,6 +120,5 @@ while ($startofrecord < $datalen ){
 </table>
 </div>
 <?php include("fend.inc"); ?>
-<meta http-equiv="refresh" content="60;url=<?php print $_SERVER['SCRIPT_NAME']; ?>">
 </body>
 </html>

@@ -1,0 +1,516 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* ========================================================================== */
+/*
+	pfBlockerNG_v6lists.xml
+
+	pfBlockerNG
+	Copyright (c) 2015 BBcan177@gmail.com
+	All rights reserved.
+
+	Based upon pfblocker for pfSense
+	Copyright (c) 2011 Marcello Coutinho
+
+	part of pfSense (http://www.pfSense.org)
+	Copyright (c) 2015 Electric Sheep Fencing, LLC. All rights reserved.
+	Copyright (c) 2004-2005 Scott Ullrich
+	All rights reserved.
+*/
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>pfblockernglistsv6</name>
+	<version>1.0</version>
+	<title>pfBlockerNG: IPv6 Alias/List Configuration</title>
+	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
+	<addedit_string>pfBlockerNG: Save IPv6 settings</addedit_string>
+	<menu>
+		<name>pfBlockerNG</name>
+		<tooltiptext></tooltiptext>
+		<section>Firewall</section>
+		<configfile>pfblockerng_v6lists.xml</configfile>
+	</menu>
+	<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=pfblockerng.xml</url>
+			<tooltiptext></tooltiptext>
+		</tab>
+		<tab>
+			<text>Update</text>
+			<url>/pfblockerng/pfblockerng_update.php</url>
+		</tab>
+		<tab>
+			<text>Alerts</text>
+			<url>/pfblockerng/pfblockerng_alerts.php</url>
+		</tab>
+		<tab>
+			<text>Reputation</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_reputation.xml</url>
+		</tab>
+		<tab>
+			<text>IPv4</text>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v4lists.xml</url>
+		</tab>
+		<tab>
+			<text>IPv6</text>
+			<url>/pkg.php?xml=/pfblockerng/pfblockerng_v6lists.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>DNSBL</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_dnsbl.xml</url>
+		</tab>
+		<tab>
+			<text>Country</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_top20.xml</url>
+		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/pfblockerng/pfblockerng_log.php</url>
+		</tab>
+		<tab>
+			<text>Sync</text>
+			<url>/pkg_edit.php?xml=/pfblockerng/pfblockerng_sync.xml</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Alias Name</fielddescr>
+			<fieldname>aliasname</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Alias Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Action</fielddescr>
+			<fieldname>action</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Frequency</fielddescr>
+			<fieldname>cron</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Logging</fielddescr>
+			<fieldname>aliaslog</fieldname>
+		</columnitem>
+		<addtext>Add a new Alias</addtext>
+		<movable>on</movable>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<name><![CDATA[IPv6 - &emsp; Run 'Force Update' to deploy new Settings. &emsp;]]></name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>LINKS</fielddescr>
+			<description><![CDATA[<a href="/firewall_aliases.php">Firewall Alias</a>&emsp;
+				<a href="/firewall_rules.php">Firewall Rules</a>&emsp;<a href="diag_logs_filter.php">Firewall Logs</a>]]>
+			</description>
+			<type>info</type>
+		</field>
+		<field>
+			<fielddescr>Alias Name</fielddescr>
+			<fieldname>aliasname</fieldname>
+			<description><![CDATA[Enter Alias Name (Example: Badguys)<br />
+				Do not include <strong>'pfBlocker' or 'pfB_'</strong> in the Alias Name, it's done by package.<br />
+				<strong>International, special or space characters will be ignored in firewall alias names.
+				</strong><br />]]>
+			</description>
+			<type>input</type>
+			<size>20</size>
+		</field>
+		<field>
+			<fielddescr>List Description</fielddescr>
+			<fieldname>description</fieldname>
+			<type>input</type>
+			<size>90</size>
+		</field>
+		<field>
+			<type>info</type>
+			<description><![CDATA[<strong><u>'Format'</u></strong>: Select the Format type.<br /><br />
+				<strong><u>'State'</u></strong>: Select the run state.<br /><br />
+				<strong><u>'Source'</u></strong>:
+				<ul><li><strong>'URL'</strong>: External link to source
+					&emsp;(ie: <a target="_blank" href='https://lists.blocklist.de/lists/all.txt'>Blocklist.de</a>)</li></ul>
+				<ul><li><strong>'Local File'</strong>: http(s)://127.0.0.1/filename
+					&emsp;<strong>or</strong>&emsp; /var/db/pfblockerng/filename</li></ul>
+				<ul><li><strong>'Country code'</strong>: /usr/pbi/pfblockerng-amd64/share/GeoIP/cc/US_v6.txt
+					&emsp;(Change 'US' to required code)</li></ul>
+				<ul><li><strong>'Whois'</strong>: Domain name or AS&emsp;(ie: facebook.com or AS13414)
+					&emsp;(<a target="_blank" href='https://asn.cymru.com/'>Click for ASN Lookup</a>)</li></ul>
+				<strong><u>'Header/Label'</u></strong>: This field must be <u>unique.</u> This names the file and is referenced in the widget.
+					&emsp;(ie: Spamhaus_drop, Spamhaus_edrop)<br /><br />]]>
+			</description>
+		</field>
+		<field>
+			<fielddescr><![CDATA[<strong>IPv6</strong> Lists]]></fielddescr>
+			<description><![CDATA[<br /><strong>'Format'</strong>: Select the file format that URL will retrieve.<br />
+				<ul><li><strong>'auto'</strong>&emsp;- Default parser</li>
+				<li><strong>'regex'</strong> - 'Regex' style parsing (ie: html Lists)</li>
+				<li><strong>'whois'</strong> - Convert a Domain name or AS into its respective IP addresses.</li>
+				<li><strong>'rsync'</strong> - RSync Lists</li></ul>
+				<strong>'State'</strong>: Select the Run State for each list<br />
+				<ul><li><strong>'ON/OFF'</strong> - Enabled / Disabled</li>
+				<li><strong>'HOLD'</strong> - Once a List has been Downloaded, list will remain Static</li>
+				<li><strong>'FLEX'</strong> - Not Recommended - Allow downgraded SSL connections</li></ul>
+				<strong>'Note'</strong>: Downloaded or pfsense local file musts have the syntax (See customlist below)</ul>]]>
+			</description>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>Format</fielddescr>
+					<fieldname>format</fieldname>
+					<type>select</type>
+					<options>
+						<option><name>Auto</name><value>auto</value></option>
+						<option><name>Regex</name><value>regex</value></option>
+						<option><name>Whois</name><value>whois</value></option>
+						<option><name>RSync</name><value>rsync</value></option>
+					</options>
+					<default_value>auto</default_value>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>State</fielddescr>
+					<fieldname>state</fieldname>
+					<type>select</type>
+					<options>
+						<option><name>ON</name><value>Enabled</value></option>
+						<option><name>OFF</name><value>Disabled</value></option>
+						<option><name>HOLD</name><value>Hold</value></option>
+						<option><name>FLEX</name><value>Flex</value></option>
+					</options>
+					<default_value>Enabled</default_value>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Source</fielddescr>
+					<fieldname>url</fieldname>
+					<type>input</type>
+					<size>50</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Header/Label</fielddescr>
+					<fieldname>header</fieldname>
+					<type>input</type>
+					<size>15</size>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+		<field>
+			<fielddescr>List Action</fielddescr>
+			<description><![CDATA[<br />Default: <strong>Disabled</strong><br /><br />
+				Select the <strong>Action</strong> for Firewall Rules on lists you have selected.<br /><br />
+				<strong><u>'Disabled' Rules:</u></strong> Disables selection and does nothing to selected Alias.<br /><br />
+
+				<strong><u>'Deny' Rules:</u></strong><br />
+				'Deny' rules create high priority 'block' or 'reject' rules on the stated interfaces. They don't change the 'pass' rules on other
+				interfaces. Typical uses of 'Deny' rules are:<br />
+				<ul><li><strong>Deny Both</strong> - blocks all traffic in both directions, if the source or destination IP is in the block list</li>
+				<li><strong>Deny Inbound/Deny Outbound</strong> - blocks all traffic in one direction <u>unless</u> it is part of a session started by
+				traffic sent in the other direction. Does not affect traffic in the other direction.</li>
+				<li>One way 'Deny' rules can be used to selectively block <u>unsolicited</u> incoming (new session) packets in one direction, while
+				still allowing <u>deliberate</u> outgoing sessions to be created in the other direction.</li></ul>
+				<strong><u>'Permit' Rules:</u></strong><br />
+				'Permit' rules create high priority 'pass' rules on the stated interfaces. They are the opposite of Deny rules, and don't create
+				any 'blocking' effect anywhere. They have priority over all Deny rules. Typical uses of 'Permit' rules are:<br />
+				<ul><li><strong>To ensure</strong> that traffic to/from the listed IPs will <u>always</u> be allowed in the stated directions. They
+				override <u>almost all other</u> Firewall rules on the stated interfaces.</li>
+				<li><strong>To act as a whitelist</strong> for Deny rule exceptions, for example if a large IP range or pre-created blocklist blocks a
+				few IPs that should be accessible.</li></ul>
+				<strong><u>'Match' Rules:</u></strong><br />
+				'Match' or 'Log' only the traffic on the stated interfaces. This does not Block or Reject. It just Logs the traffic.
+				<ul><li><strong>Match Both</strong> - Matches all traffic in both directions, if the source or destination IP is in the list.</li>
+				<li><strong>Match Inbound/Match Outbound</strong> - Matches all traffic in one direction only.</li></ul>
+				<strong><u>'Alias' Rules:</u></strong><br />
+				<strong>'Alias'</strong> rules create an <a href="/firewall_aliases.php">alias</a> for the list (and do nothing else).
+				This enables a pfBlockerNG list to be used by name, in any firewall rule or pfSense function, as desired.
+				<ul><li><strong>Options - Alias Deny,&nbsp; Alias Permit,&nbsp; Alias Match,&nbsp; Alias Native</strong></li><br />
+				<li>'Alias Deny' can use De-Duplication and Reputation Processes if configured.</li><br />
+				<li>'Alias Permit' and 'Alias Match' will be saved in the Same folder as the other Permit/Match Auto-Rules</li><br />
+				<li>'Alias Native' lists are kept in their Native format without any modifications.</li></ul>
+				<font color='red'>Note: </font><ul>When manually creating 'Alias' type firewall rules; <strong>Do not add</strong> (pfB_) to the
+				start of the rule description, use (pfb_) (Lowercase prefix). Manually created 'Alias' rules with 'pfB_' in the
+				description will be auto-removed by package when 'Auto' rules are defined.</ul>]]>
+			</description>
+			<fieldname>action</fieldname>
+			<type>select</type>
+			<options>
+				<option><name>Disabled</name><value>Disabled</value></option>
+				<option><name>Deny Inbound</name><value>Deny_Inbound</value></option>
+				<option><name>Deny Outbound</name><value>Deny_Outbound</value></option>
+				<option><name>Deny Both</name><value>Deny_Both</value></option>
+				<option><name>Permit Inbound</name><value>Permit_Inbound</value></option>
+				<option><name>Permit Outbound</name><value>Permit_Outbound</value></option>
+				<option><name>Permit Both</name><value>Permit_Both</value></option>
+				<option><name>Match Inbound</name><value>Match_Inbound</value></option>
+				<option><name>Match Outbound</name><value>Match_Outbound</value></option>
+				<option><name>Match Both</name><value>Match_Both</value></option>
+				<option><name>Alias Deny</name><value>Alias_Deny</value></option>
+				<option><name>Alias Permit</name><value>Alias_Permit</value></option>
+				<option><name>Alias Match</name><value>Alias_Match</value></option>
+				<option><name>Alias Native</name><value>Alias_Native</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Update Frequency</fielddescr>
+			<fieldname>cron</fieldname>
+			<description><![CDATA[Default: <strong>Never</strong><br />
+				Select how often List files will be downloaded. <strong>This must be within the Cron Interval/Start Hour settings.</strong>]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option><name>Never</name><value>Never</value></option>
+				<option><name>Every Hour</name><value>01hour</value></option>
+				<option><name>Every 2 Hours</name><value>02hours</value></option>
+				<option><name>Every 3 Hours</name><value>03hours</value></option>
+				<option><name>Every 4 Hours</name><value>04hours</value></option>
+				<option><name>Every 6 Hours</name><value>06hours</value></option>
+				<option><name>Every 8 Hours</name><value>08hours</value></option>
+				<option><name>Every 12 Hours</name><value>12hours</value></option>
+				<option><name>Once a day</name><value>EveryDay</value></option>
+				<option><name>Weekly</name><value>Weekly</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Weekly (Day of Week)</fielddescr>
+			<fieldname>dow</fieldname>
+			<description><![CDATA[Default: <strong>Monday</strong><br />
+				Select the 'Weekly' ( Day of the Week ) to Update <br />
+				This is only required for the 'Weekly' Frequency Selection. The 24 Hour Download 'Time' will be used.]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option><name>Monday</name><value>1</value></option>
+				<option><name>Tuesday</name><value>2</value></option>
+				<option><name>Wednesday</name><value>3</value></option>
+				<option><name>Thursday</name><value>4</value></option>
+				<option><name>Friday</name><value>5</value></option>
+				<option><name>Saturday</name><value>6</value></option>
+				<option><name>Sunday</name><value>7</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Enable Logging</fielddescr>
+			<fieldname>aliaslog</fieldname>
+			<description><![CDATA[Default: <strong>Enable</strong><br />
+				Select - Logging to Status: System Logs: FIREWALL ( Log )<br />
+				This can be overriden by the 'Global Logging' Option in the General Tab.]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option><name>Enable</name><value>enabled</value></option>
+				<option><name>Disable</name><value>disabled</value></option>
+			</options>
+		</field>
+		<field>
+			<fieldname>stateremoval</fieldname>
+			<fielddescr>States Removal</fielddescr>
+			<description>With the 'Kill States' option (General Tab), you can disable States removal for this Alias.</description>
+			<type>select</type>
+			<options>
+				<option><name>Enable</name><value>enabled</value></option>
+				<option><name>Disable</name><value>disabled</value></option>
+			</options>
+			<default_value>enabled</default_value>
+		</field>
+		<field>
+			<name>Advanced Inbound Firewall Rule Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<type>info</type>
+			<description><![CDATA[<font color='red'>Note: </font>&emsp;In general, Auto-Rules are created as follows:<br />
+				<ul>Inbound &emsp;- 'any' port, 'any' protocol and 'any' destination<br />
+				Outbound - 'any' port, 'any' protocol and 'any' destination address in the lists</ul>
+				Configuring the Adv. Inbound Rule settings, will allow for more customization of the Inbound Auto-Rules.<br />
+				<strong>Select the pfSense 'Port' and/or 'Destination' Alias below:</strong>]]>
+			</description>
+		</field>
+		<field>
+			<fieldname>autoports</fieldname>
+			<fielddescr>Enable Custom Port</fielddescr>
+			<type>checkbox</type>
+			<enablefields>aliasports</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fielddescr>Define Alias</fielddescr>
+			<fieldname>aliasports</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=port">Click Here to add/edit Aliases</a>
+				Do not manually enter port numbers. <br />Do not use 'pfB_' in the Port Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>port</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fieldname>autodest</fieldname>
+			<fielddescr>Enable Custom Destination</fielddescr>
+			<type>checkbox</type>
+			<enablefields>aliasdest,autonot</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fieldname>aliasdest</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=ip">Click Here to add/edit Aliases</a>
+				Do not manually enter Addresses(es). <br />Do not use 'pfB_' in the 'IP Network Type' Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>network</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields/>
+		</field>
+		<field>
+			<fielddescr>Invert</fielddescr>
+			<fieldname>autonot</fieldname>
+			<description><![CDATA[<div style="padding-left: 22px;"><strong>Invert</strong> - Option to invert the sense of the match.<br />
+				ie - Not (!) Destination Address(es)</div>]]>
+			</description>
+			<type>checkbox</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fielddescr>Custom Protocol</fielddescr>
+			<fieldname>autoproto</fieldname>
+			<description><![CDATA[<strong>Default: any</strong><br />Select the Protocol used for Inbound Firewall Rule(s).<br />
+				Do not use 'any' with Adv. Inbound Rules as it will bypass these settings!]]></description>
+			<type>select</type>
+			<options>
+				<option><name>any</name><value></value></option>
+				<option><name>TCP</name><value>tcp</value></option>
+				<option><name>UDP</name><value>udp</value></option>
+				<option><name>TCP/UDP</name><value>tcp/udp</value></option>
+			</options>
+			<size>4</size>
+			<default_value></default_value>
+		</field>
+		<field>
+			<name>IPv6 Custom list</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<type>info</type>
+			<description><![CDATA[<font color='red'>Note: </font>&emsp;Custom List can be used in <strong>ONE</strong> of two ways:<br />
+				<ul>1. IPv6 addresses entered directly into the custom list, as per the required format.
+				<br />2. Domain names or AS numbers, which will be converted into their respective IPv6 addresses.</ul>]]>
+			</description>
+		</field>
+		<field>
+			<fieldname>whois_convert</fieldname>
+			<description><![CDATA[Select to enable 'Domain/AS' conversion.
+				<font color='red'>DO NOT</font> mix IPs with Domains/ASs in this custom list.]]>
+			</description>
+			<fielddescr>Enable Domain/AS</fielddescr>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Custom Address(es)</fielddescr>
+			<fieldname>custom</fieldname>
+			<description><![CDATA[Please limit the size of the Custom List as this is stored as 'Base64' format in the config.xml file.<br /><br />
+				<strong>Format IPv6:</strong><br /><br />
+
+				Source of Regex and format descriptions: <a href="http://labs.spritelink.net/regex">SpriteLink</a><br />
+				fe80:0000:0000:0000:0204:61ff:fe9d:f156 // full form of IPv6<br />
+				fe80:0:0:0:204:61ff:fe9d:f156 // drop leading zeroes<br />
+				fe80::204:61ff:fe9d:f156 // collapse multiple zeroes to :: in the IPv6 address<br />
+				fe80:0000:0000:0000:0204:61ff:254.157.241.086 // IPv4 dotted quad at the end<br />
+				fe80:0:0:0:0204:61ff:254.157.241.86 // drop leading zeroes, IPv4 dotted quad at the end<br />
+				fe80::204:61ff:254.157.241.86 // dotted quad at the end, multiple zeroes collapsed<br /><br />
+
+				In addition, the regular expression matches these IPv6 forms:<br /><br />
+
+				::1 // localhost<br />
+				fe80:: // link-local prefix<br />
+				2000:: // global unicast prefix<br />
+				Any slash-notation style prefix<br /><br />
+
+				Private IPv6 addresses may be used in a custom list.<br />
+				You may use "<strong>#</strong>" after any IP/CIDR/Range to add comments. ie: x::x:x:x:x # Safe IP Address<br /><br />
+				If you select the <strong>Domain/AS</strong> checkbox above, the custom list can <strong>only</strong>
+				be used for Domain names/AS's.<br /><br />
+				<strong>Format Domain/AS:</strong><br /><br />
+				One 'Domain' or 'AS' per line.<br />
+				Domains and/or ASs can be used in the same list.<br /><br />
+				Conversion of Domains/ASs utilize <a target="_blank" href="http://www.team-cymru.org/IP-ASN-mapping.html">Team CYMRU</a>
+				and the <a target="_blank" href="http://www.radb.net/">RADb</a> whois registry.<br />
+				Configure the 'update frequency', so that it does not <strong>abuse</strong> these free services.]]>
+			</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>Update Custom List</fielddescr>
+			<fieldname>custom_update</fieldname>
+			<description><![CDATA[Select - '<strong>Default</strong>' to update Custom List as per Update Frequency setting.<br />
+				Select - '<strong>Update Custom List</strong>' followed by a 'Force Update' to apply Custom List Changes.<br />
+				Cron will also resync this Custom List at the next Update Frequency.]]>
+			</description>
+			<type>select</type>
+			<options>
+				<option><name>Default</name><value>disabled</value></option>
+				<option><name>Update Custom List</name><value>enabled</value></option>
+			</options>
+		</field>
+		<field>
+			<name><![CDATA[<center>Click to SAVE Settings and/or Rule Edits. &emsp; Changes are Applied via CRON or
+				'Force Update'</center>]]></name>
+			<type>listtopic</type>
+		</field>
+	</fields>
+	<custom_php_validation_command>
+		<![CDATA[
+		pfblockerng_validate_input($_POST, $input_errors);
+		]]>
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		<![CDATA[
+		global $pfb;
+		$pfb['save'] = TRUE;
+		sync_package_pfblockerng();
+		]]>
+	</custom_php_resync_config_command>
+</packagegui>

@@ -1,37 +1,32 @@
 <?php
-/* $Id$ */
-/* ========================================================================== */
 /*
-    syslog-ng_log_viewer.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Lance Leger
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
-/*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	syslog-ng_log_viewer.php
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Lance Leger
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 require("guiconfig.inc");
 require("/usr/local/pkg/syslog-ng.inc");
 
@@ -41,50 +36,56 @@ $default_logfile = $config['installedpackages']['syslogng']['config'][0]['defaul
 $compress_archives = $config['installedpackages']['syslogng']['config'][0]['compress_archives'];
 $compress_type = $config['installedpackages']['syslogng']['config'][0]['compress_type'];
 
-if($_POST['logfile'])
+if ($_POST['logfile']) {
 	$logfile = $_POST['logfile'];
-else
+} else {
 	$logfile = $default_logdir . "/" . $default_logfile;
- 
-if($_POST['limit'])
+}
+
+if ($_POST['limit']) {
 	$limit = intval($_POST['limit']);
-else
+} else {
 	$limit = "10";
+}
 
-if($_POST['archives'])
+if ($_POST['archives']) {
 	$archives = true;
+}
 
-if($_POST['filter'])
+if ($_POST['filter']) {
 	$filter = $_POST['filter'];
+}
 
-if($_POST['not'])
+if ($_POST['not']) {
 	$not = true;
+}
 
 $log_messages = array();
-if(file_exists($logfile) && (filesize($logfile) > 0)) {
+if (file_exists($logfile) && (filesize($logfile) > 0)) {
 	$grep = "grep -ih";
-	
-	if(($compress_archives == 'on') && glob($logfile . "*" . $compress_type) && $archives) {
+
+	if (($compress_archives == 'on') && glob($logfile . "*" . $compress_type) && $archives) {
 		if($compress_type == 'bz2') {
 			$grep = "bzgrep -ih";
 		} else {
 			$grep = "zgrep -ih";
 		}
 	}
-	
-	if(isset($filter) && $not) {
+
+	if (isset($filter) && $not) {
 		$grepcmd = "$grep -v '$filter' $logfile";
 	} else {
 		$grepcmd = "$grep '$filter' $logfile";
 	}
-	
-	if($archives)
+
+	if ($archives) {
 		$grepcmd = $grepcmd . "*";
-	
+	}
+
 	$log_lines = trim(shell_exec("$grepcmd | wc -l"));
 	$log_output = trim(shell_exec("$grepcmd | sort -M | tail -n $limit"));
-	
-	if(!empty($log_output)) {
+
+	if (!empty($log_output)) {
 		$log_messages = explode("\n", $log_output);
 		$log_messages_count = sizeof($log_messages);
 	}
@@ -92,7 +93,7 @@ if(file_exists($logfile) && (filesize($logfile) > 0)) {
 
 $pgtitle = "Services: Syslog-ng Log Viewer";
 include("head.inc");
-?>                                                                          
+?>
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -107,11 +108,11 @@ include("head.inc");
 	display_top_tabs($tab_array);
 ?>
 	</td></tr>
-  	<tr><td>
+	<tr><td>
 	<div id="mainarea">
-		<table id="maintable" name="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 			<tr><td>
-			
+
 			<table>
 				<tr><td width="22%">Log File</td><td width="78%"><select name="logfile">
 				<?php
@@ -143,7 +144,7 @@ include("head.inc");
 				<?php
 				if(!empty($log_messages)) {
 					echo "<tr><td class=\"listtopic\">Showing $log_messages_count of $log_lines messages</td></tr>\n";
-					foreach($log_messages as $log_message) {	
+					foreach($log_messages as $log_message) {
 						echo "<tr><td class=\"listr\">$log_message</td></tr>\n";
 					}
 				} else {
@@ -156,7 +157,7 @@ include("head.inc");
 				<tr><td width="22%">Inverse Filter (NOT)</td><td width="78%"><input type="checkbox" name="not" <?php if($not) echo " CHECKED"; ?> /></td></tr>
 				<tr><td colspan="2"><input type="submit" value="Refresh" /></td></tr>
 			</table>
-	
+
 			</td></tr>
 		</table>
 	</div>
@@ -165,3 +166,4 @@ include("head.inc");
 </form>
 <?php include("fend.inc"); ?>
 </body>
+</html>

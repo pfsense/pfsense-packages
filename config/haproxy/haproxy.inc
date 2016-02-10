@@ -73,7 +73,6 @@ function haproxy_custom_php_deinstall_command() {
 
 function haproxy_custom_php_install_command() {
 	global $g, $config;
-	conf_mount_rw();
 
 	$haproxy = <<<EOD
 #!/bin/sh
@@ -85,7 +84,7 @@ function haproxy_custom_php_install_command() {
 . /etc/rc.subr
 
 name="haproxy"
-rcvar=`set_rcvar`
+rcvar="\${name}_enable"
 command="/usr/local/bin/haproxy"
 haproxy_enable=\${haproxy-"YES"}
 
@@ -227,8 +226,6 @@ EOD;
 		}
 		write_config();
 	}
-
-	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
 }

@@ -1,69 +1,63 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
-	/* ========================================================================== */
-	/*
-	    open-vm-tools.xml
-	    part of pfSense (http://www.pfSense.org)
-	    Copyright (C) 2008 BSD Perimeter LLC
-	    All rights reserved.
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	open-vm-tools.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2008-2015 Electric Sheep Fencing LP
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-	    Based on m0n0wall (http://m0n0.ch/wall)
-	    Copyright (C) 2003-2008 Manuel Kasper <mk@neon1.net>.
-	    All rights reserved.
-	                                                                              */
-	/* ========================================================================== */
-	/*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>open-vm-tools</name>
-	<version>313025</version>
+	<version>1280544.11</version>
 	<title>Open VM Tools</title>
+	<include_file>/usr/local/pkg/open-vm-tools.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
 		<item>https://packages.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.inc</item>
-	</additional_files_needed>	
-    <custom_add_php_command>
-    </custom_add_php_command>
-    <custom_php_install_command>
-		conf_mount_rw();
+	</additional_files_needed>
+	<service>
+		<name>vmware-guestd</name>
+		<rcfile>vmware-guestd.sh</rcfile>
+		<executable>vmtoolsd</executable>
+		<description>VMware Guest Daemon</description>
+	</service>
+	<custom_php_install_command>
 		open_vm_tools_install();
-		exec("/usr/local/etc/rc.d/vmware-guestd.sh start");
-		exec("/usr/local/etc/rc.d/vmware-kmod.sh start");
-		conf_mount_ro();
-    </custom_php_install_command>
-    <custom_php_deinstall_command>
-		conf_mount_rw();
-		exec("/usr/local/etc/rc.d/vmware-guestd.sh stop");
-		exec("/usr/local/etc/rc.d/vmware-kmod.sh stop");
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
 		open_vm_tools_deinstall();
-		conf_mount_ro();
-    </custom_php_deinstall_command>
-	<include_file>/usr/local/pkg/open-vm-tools.inc</include_file>
+	</custom_php_deinstall_command>
 </packagegui>

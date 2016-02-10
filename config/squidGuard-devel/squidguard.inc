@@ -1,43 +1,44 @@
 <?php
-# ------------------------------------------------------------------------------
-/*  squidguard.inc
-
+/*
+	squidguard.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006-2011 Serg Dvoriancev
 	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
 	Copyright (C) 2013 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 
-    part of pfSense (www.pfSense.com)
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    1. Redistributions of source code MUST retain the above copyright notice,
-       this list of conditions and the following disclaimer.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-    2. Redistributions in binary form MUST reproduce the above copyright
-       notice, this list of conditions and the following disclaimer in the
-       documentation and/or other materials provided with the distribution.
-
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
 */
-# ------------------------------------------------------------------------------
-
-require_once('globals.inc');
 require_once('config.inc');
-require_once('util.inc');
+require_once('filter.inc');
+require_once('globals.inc');
+require_once("notices.inc");
 require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
-require_once('filter.inc');
 require_once('service-utils.inc');
+require_once('util.inc');
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 require_once('squidguard_configurator.inc');
 
 # ------------------------------------------------------------------------------
@@ -101,12 +102,24 @@ sg_init(convert_pfxml_to_sgxml());
 # ==============================================================================
 # Validations
 # ==============================================================================
-function squidguard_validate($post, $input_errors)
+function squidguard_validate($post, &$input_errors)
 {
+    global $config, $g;
     $submit = isset($_GET['submit']) ? $_GET['submit'] : $_POST['submit'];
 
     # check config if 'Apply'
-    if ($submit === APPLY_BTN)  sg_check_config_data(&$input_errors);
+    if ($submit === APPLY_BTN) {
+    	// XXX:Bug #4608
+    	if (($g['platform'] == "pfSense") && isset($config['system']['use_mfs_tmpvar'])) {
+    		$input_errors[] = "Please, disable 'Use RAM Disks' under System: Advanced: Miscellaneous to avoid SquidGuard configuration breakage on reboot.";
+    	}
+	if ($g['platform'] != "pfSense") {
+		if ($post['blacklist'] != "" || $post['blacklist_proxy'] != "" || $post['blacklist_url'] != "") {
+			$input_errors[] = "Blacklists usage is NOT supported on NanoBSD. Disable 'Blacklist' option in 'General settings'.";
+		}
+	}
+    	sg_check_config_data($input_errors);
+    }
 }
 
 # ------------------------------------------------------------------------------
@@ -114,13 +127,13 @@ function squidguard_validate($post, $input_errors)
 # ------------------------------------------------------------------------------
 function squidguard_validate_default($post, $input_errors)
 {
-    squidguard_validate_acl($post, &$input_errors);
+    squidguard_validate_acl($post, $input_errors);
 }
 
 # ------------------------------------------------------------------------------
 # validate acl
 # ------------------------------------------------------------------------------
-function squidguard_validate_acl($post, $input_errors)
+function squidguard_validate_acl(&$post, &$input_errors)
 {
     $pass_up = array();
     $deny_up = array();
@@ -134,7 +147,7 @@ function squidguard_validate_acl($post, $input_errors)
     $name = trim($post[F_NAME]);
     if(!empty($name)) {
         # validate name format
-        check_name_format($name, &$input_errors);
+        check_name_format($name, $input_errors);
 
         # check unique name
         if (!sg_check_unique_name(F_ACLS, $name))
@@ -148,7 +161,7 @@ function squidguard_validate_acl($post, $input_errors)
         $sgx = array();
         $sgx[F_NAME] = $post[F_NAME];
         $sgx[F_SOURCE] = $post[F_SOURCE];
-        sg_check_src($sgx, &$input_errors);
+        sg_check_src($sgx, $input_errors);
     }
 
     # store destinations to 'dest' value
@@ -192,7 +205,7 @@ function squidguard_validate_acl($post, $input_errors)
 
     # check redirect
     $errmsg = '';
-    if (!sg_check_redirect($post[F_RMOD], $post[F_REDIRECT], &$errmsg)) {
+    if (!sg_check_redirect($post[F_RMOD], $post[F_REDIRECT], $errmsg)) {
          $input_errors[] = "Redirect info error. $errmsg";
     }
 }
@@ -203,14 +216,14 @@ function squidguard_validate_acl($post, $input_errors)
 #    date:   <date(or range)><time (or range)> -- days not parsed (reset to *)
 #    weekly: <day or *><time or range>         -- dates not parsed (reset to '')
 # ------------------------------------------------------------------------------
-function squidguard_validate_times($post, $input_errors)
+function squidguard_validate_times(&$post, &$input_errors)
 {
     $id = get_item_id();
 
     # check name
     $name = trim($post[F_NAME]);
     if(!empty($name)) {
-        check_name_format($name, &$input_errors);
+        check_name_format($name, $input_errors);
 
         # check unique name
         if (!sg_check_unique_name(F_TIMES, $name))
@@ -246,18 +259,18 @@ function squidguard_validate_times($post, $input_errors)
         $sgx[F_ITEM][] = $sgx_row;
     }
     #
-    sg_check_time($sgx, &$input_errors);
+    sg_check_time($sgx, $input_errors);
 
 }
 
 # ------------------------------------------------------------------------------
 # validate destinations
 # ------------------------------------------------------------------------------
-function squidguard_validate_destination($post, $input_errors) {
+function squidguard_validate_destination($post, &$input_errors) {
     # check name
     $name = trim($post[F_NAME]);
     if(!empty($name)) {
-        check_name_format($name, &$input_errors);
+        check_name_format($name, $input_errors);
 
         # check unique name
         if (!sg_check_unique_name(F_DESTINATIONS, $name))
@@ -277,18 +290,18 @@ function squidguard_validate_destination($post, $input_errors) {
     $sgx[F_RMOD]        = $post[F_RMOD];
     $sgx[F_REDIRECT]    = $post[F_REDIRECT];
     #
-    sg_check_dest($sgx, &$input_errors);
+    sg_check_dest($sgx, $input_errors);
 }
 
 # ------------------------------------------------------------------------------
 # validate rewrites
 # ------------------------------------------------------------------------------
-function squidguard_validate_rewrite($post, $input_errors) {
+function squidguard_validate_rewrite($post, &$input_errors) {
          # check name
          $name = trim($post[F_NAME]);
          if(!empty($name)) {
             # check name format <char><symbols without space> - Ab123
-            check_name_format($name, &$input_errors);
+            check_name_format($name, $input_errors);
 
             # check unique name
             if (!sg_check_unique_name(F_REWRITES, $name))
@@ -447,7 +460,7 @@ function get_sgconf_items_list($data_group, $fieldname) {
 # ==============================================================================
 # squidguard_before_form
 # ------------------------------------------------------------------------------
-function squidguard_before_form($pkg) {
+function squidguard_before_form(&$pkg) {
     $i=0;
 
     foreach($pkg['fields']['field'] as $field) {
@@ -470,7 +483,7 @@ function squidguard_before_form($pkg) {
 # -----------------------------------------------------------------------------
 # squidguard_before_form_acl
 # -----------------------------------------------------------------------------
-function squidguard_before_form_acl($pkg, $is_acl=true) {
+function squidguard_before_form_acl(&$pkg, $is_acl=true) {
     global $g;
     global $squidguard_config;
 
@@ -638,7 +651,7 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
 # -----------------------------------------------------------------------------
 # squidguard_before_form_dest
 # -----------------------------------------------------------------------------
-function squidguard_before_form_dest($pkg) {
+function squidguard_before_form_dest(&$pkg) {
 	global $g, $squidguard_config;
 	$destination_items = get_sgconf_items_list(F_DESTINATIONS, 'name');
 //var_dump($squidguard_config);
@@ -1301,12 +1314,12 @@ function squidguard_adt_rewrite_safesrch()
     $res[F_NAME] = SAFESEARCH;
     $res[F_DESCRIPTION] = "Google, Yandex safesearch";
     $res[F_LOG]         = 'on';
-    squidguard_adt_safesrch_add(&$res[F_ITEM]);
+    squidguard_adt_safesrch_add($res[F_ITEM]);
 
     return $res;
 }
 
-function squidguard_adt_safesrch_add($rewrite_item)
+function squidguard_adt_safesrch_add(&$rewrite_item)
 {
     if (!is_array($rewrite_item)) $rewrite_item = array();
 
@@ -1331,7 +1344,7 @@ function squidguard_adt_safesrch_add($rewrite_item)
 }
 
 # log dump
-function squidguard_logdump($filename, $lnoffset, $lncount, $reverse)
+function squidguard_logdump($filename, &$lnoffset, $lncount, $reverse)
 {
     define('LOGSHOW_BUFSIZE', '262144');
     $cnt = '';
@@ -1371,10 +1384,10 @@ function squidguard_logdump($filename, $lnoffset, $lncount, $reverse)
 }
 
 # dump SG log
-function squidguard_filterdump($lnoffset, $lncount, $reverse)
+function squidguard_filterdump(&$lnoffset, $lncount, $reverse)
 {
     $res  = array();
-    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/squidGuard.log', &$lnoffset, $lncount, $reverse);
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/squidGuard.log', $lnoffset, $lncount, $reverse);
 
     foreach($cont as $cn) {
         $cn = explode(" ", trim($cn), 4);
@@ -1385,10 +1398,10 @@ function squidguard_filterdump($lnoffset, $lncount, $reverse)
 }
 
 # dump SG Gui log
-function squidguard_guidump($lnoffset, $lncount, $reverse)
+function squidguard_guidump(&$lnoffset, $lncount, $reverse)
 {
     $res  = array();
-    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . SQUIDGUARD_CONFLOGFILE, &$lnoffset, $lncount, $reverse);
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . SQUIDGUARD_CONFLOGFILE, $lnoffset, $lncount, $reverse);
 
     foreach($cont as $cn) {
         $cn = explode(" ", trim($cn), 4);
@@ -1399,10 +1412,10 @@ function squidguard_guidump($lnoffset, $lncount, $reverse)
 }
 
 # dump SG blocked
-function squidguard_blockdump($lnoffset, $lncount, $reverse)
+function squidguard_blockdump(&$lnoffset, $lncount, $reverse)
 {
     $res  = array();
-    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/' . SQUIDGUARD_LOGFILE, &$lnoffset, $lncount, $reverse);
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/' . SQUIDGUARD_LOGFILE, $lnoffset, $lncount, $reverse);
 
     foreach($cont as $cn) {
         $cn = explode(" ", trim($cn), 9);
@@ -1469,100 +1482,114 @@ function squidguard_blacklist_list()
     return $res;
 }
 
-// ##### The following part is based on the code of pfblocker #####
-
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function squidguard_sync_on_changes() {
 	global $config, $g;
-	if (is_array($config['installedpackages']['squidguardsync'])){
+
+	if (is_array($config['installedpackages']['squidguardsync'])) {
 		$synconchanges = $config['installedpackages']['squidguardsync']['config'][0]['varsyncenablexmlrpc'];
-		$varsynctimeout = $config['installedpackages']['squidguardsync']['config'][0]['varsynctimeout'];
-		}
-	else
-	{
+		$varsynctimeout = $config['installedpackages']['squidguardsync']['config'][0]['varsynctimeout'] ?: '150';
+	} else {
 		return;
 	}
 
-	// if checkbox is NOT checked do nothing
-	switch ($synconchanges){
+	switch ($synconchanges) {
 		case "manual":
-			if (is_array($config['installedpackages']['squidguardsync']['config'][0]['row'])){
-				$rs=$config['installedpackages']['squidguardsync']['config'][0]['row'];
-				}
-			else{
-				log_error("[Squidguard] xmlrpc sync is enabled but there is no hosts to push on Squidguard config.");
+			if (is_array($config['installedpackages']['squidguardsync']['config'][0]['row'])) {
+				$rs = $config['installedpackages']['squidguardsync']['config'][0]['row'];
+			} else {
+				log_error("[Squidguard]  XMLRPC sync is enabled but there are no hosts configured as replication targets.");
 				return;
-				}
+			}
 			break;
 		case "auto":
-				if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-					$system_carp=$config['installedpackages']['carpsettings']['config'][0];
-					$rs[0]['varsyncdestinenable']="on";
-					$rs[0]['varsyncprotocol']=($config['system']['webgui']['protocol']!=""?$config['system']['webgui']['protocol']:"https");
-					$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
-					$rs[0]['varsyncpassword']=$system_carp['password'];
-					$rs[0]['varsyncport']=($config['system']['webgui']['port']!=""?$config['system']['webgui']['port']:"443");
-					if (! is_ipaddr($system_carp['synchronizetoip'])){
-						log_error("[Squidguard] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
-						return;
-						}
+			if (is_array($config['hasync'])) {
+				$system_carp = $config['hasync'];
+				$rs[0]['varsyncipaddress'] = $system_carp['synchronizetoip'];
+				$rs[0]['varsyncusername'] = $system_carp['username'];
+				$rs[0]['varsyncpassword'] = $system_carp['password'];
+				$rs[0]['varsyncdestinenable'] = FALSE;
+
+				// XMLRPC sync is currently only supported over connections using the same protocol and port as this system
+				if ($config['system']['webgui']['protocol'] == 'http') {
+					$rs[0]['varsyncprotocol'] = 'http';
+					$rs[0]['varsyncport'] = $config['system']['webgui']['port'] ?: '80';
+				} else {
+					$rs[0]['varsyncprotocol'] = 'https';
+					$rs[0]['varsyncport'] = $config['system']['webgui']['port'] ?: '443';
 				}
-				else{
-					log_error("[Squidguard] xmlrpc sync is enabled but there is no system backup hosts to push squid config.");
+				if ($system_carp['synchronizetoip'] == "") {
+					log_error("[Squidguard] XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
 					return;
+				} else {
+					$rs[0]['varsyncdestinenable'] = TRUE;
 				}
-			break;		
+			} else {
+				log_error("[Squidguard] XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
+				return;
+			}
+			break;
 		default:
 			return;
-		break;
+			break;
+	}
+	if (is_array($rs)) {
+		log_error("[SquidGuard] XMLRPC sync is starting with timeout {$varsynctimeout} seconds.");
+		foreach ($rs as $sh) {
+			// Only sync enabled replication targets
+			if ($sh['varsyncdestinenable']) {
+				$varsyncprotocol = $sh['varsyncprotocol'];
+				$sync_to_ip = $sh['varsyncipaddress'];
+				$username = $sh['varsyncusername'] ?: 'admin';
+				$password = $sh['varsyncpassword'];
+				$varsyncport = $sh['varsyncport'];
+
+				$error = '';
+				$valid = TRUE;
+
+				if ($password == "") {
+					$error = "Password parameter is empty. ";
+					$valid = FALSE;
+				}
+				if (!is_ipaddr($sync_to_ip) && !is_hostname($sync_to_ip) && !is_domain($sync_to_ip)) {
+					$error .= "Misconfigured Replication Target IP Address or Hostname. ";
+					$valid = FALSE;
+				}
+				if (!is_port($varsyncport)) {
+					$error .= "Misconfigured Replication Target Port. ";
+					$valid = FALSE;
+				}
+				if ($valid) {
+					squidguard_do_xmlrpc_sync($sync_to_ip, $varsyncport, $varsyncprotocol, $username, $password, $varsynctimeout);
+				} else {
+					log_error("[SquidGuard] XMLRPC sync with '{$sync_to_ip}' aborted due to the following error(s): {$error}");
+				}
+			} else {
+				log_error("[SquidGuard] XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
+			}
 		}
-		if (is_array($rs)){
-			log_error("[SquidGuard] xmlrpc sync is starting with timeout {$varsynctimeout} seconds.");
-			foreach($rs as $sh){
-				if($sh['varsyncdestinenable']){
-					$varsyncprotocol 	= $sh['varsyncprotocol'];
-					$sync_to_ip 		= $sh['varsyncipaddress'];
-					$password   		= $sh['varsyncpassword'];
-					$varsyncport 		= $sh['varsyncport'];
-					if($password && $sync_to_ip)
-						squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout);
-					else
-						log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
-				}
-				else {
-				log_error("SquidGuard: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
-				}
-			}
-			log_error("[SquidGuard] xmlrpc sync is ending.");
-			}
+		log_error("[SquidGuard] XMLRPC sync is ending.");
+	}
 }
 
 /* Do the actual XMLRPC sync */
-function squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout) {
+function squidguard_do_xmlrpc_sync($sync_to_ip, $varsyncport, $varsyncprotocol, $username, $password, $varsynctimeout) {
 	global $config, $g;
 
-	if($varsynctimeout == '' || $varsynctimeout == 0)
-		$varsynctimeout = 150;
-
-	if(!$password)
+	if ($username == "" || $password == "" || $sync_to_ip == "" || $varsyncport == "" || $varsyncprotocol == "") {
+		log_error("[SquidGuard] A required XMLRPC sync parameter (username, password, replication target, port or protocol) is empty ... aborting pkg sync");
 		return;
+	}
 
-	if(!$sync_to_ip)
-		return;
-	
-	if(!$varsyncport)
-		return;
+	// Take care of IPv6 literal address
+	if (is_ipaddrv6($sync_to_ip)) {
+		$sync_to_ip = "[{$sync_to_ip}]";
+	}
 
-	if(!$varsyncprotocol)
-		return;
-	
-	// Check and choose correct protocol type, port number and IP address
-	$synchronizetoip .= "$varsyncprotocol" . '://';
-	$port = "$varsyncport";
+	$url = "{$varsyncprotocol}://{$sync_to_ip}";
+	$port = $varsyncport;
 
-	$synchronizetoip .= $sync_to_ip;
-
-	/* xml will hold the sections to sync */
+	/* XML will hold the sections to sync. */
 	$xml = array();
 	$xml['squidguardgeneral'] = $config['installedpackages']['squidguardgeneral'];
 	$xml['squidguardacl'] = $config['installedpackages']['squidguardacl'];
@@ -1570,82 +1597,74 @@ function squidguard_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyn
 	$xml['squidguarddest'] = $config['installedpackages']['squidguarddest'];
 	$xml['squidguardrewrite'] = $config['installedpackages']['squidguardrewrite'];
 	$xml['squidguardtime'] = $config['installedpackages']['squidguardtime'];
-	
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($xml)
-	);
 
-	/* set a few variables needed for sync code borrowed from filter.inc */
-	$url = $synchronizetoip;
-	log_error("SquidGuard: Beginning squidguard XMLRPC sync with {$url}:{$port}.");
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($xml));
+
+	/* Set a few variables needed for sync code */
+	log_error("[SquidGuard] Beginning XMLRPC sync with {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-		if($g['debug'])
-			$cli->setDebug(1);
-		/* send our XMLRPC message and timeout after $varsynctimeout seconds */
+	$cli->setCredentials($username, $password);
+	if ($g['debug']) {
+		$cli->setDebug(1);
+	}
+	/* Send our XMLRPC message and timeout after $varsynctimeout seconds */
+	$resp = $cli->send($msg, $varsynctimeout);
+	if (!$resp) {
+		$error = "A communications error occurred while attempting XMLRPC sync with {$url}:{$port}.";
+		log_error("[SquidGuard] {$error}");
+		file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+	} elseif ($resp->faultCode()) {
+		$cli->setDebug(1);
 		$resp = $cli->send($msg, $varsynctimeout);
-		if(!$resp) {
-			$error = "A communications error occurred while squidguard was attempting XMLRPC sync with {$url}:{$port}.";
-			log_error("SquidGuard: $error");
-			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
-		} elseif($resp->faultCode()) {
-			$cli->setDebug(1);
-			$resp = $cli->send($msg, $varsynctimeout);
-			$error = "An error code was received while squidguard XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-			log_error("SquidGuard: $error");
-			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
-		} else {
-			log_error("SquidGuard: XMLRPC has synced data successfully with {$url}:{$port}.");
-		}
-	
-	/* tell squidguard to reload our settings on the destionation sync host. */
+		$error = "An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[SquidGuard] {$error}");
+		file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+	} else {
+		log_error("[SquidGuard] XMLRPC sync successfully completed with {$url}:{$port}.");
+	}
+
+	/* Tell Squidguard to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/squidguard.inc');\n";
-	// pfblocker just needed one fuction to reload after XMLRPC. squidguard needs more so we point to a fuction below which contains all fuctions
+	// Squidguard needs more functions; we point to a function below which contains all the required functions
 	$execcmd .= "squidguard_all_after_XMLRPC_resync();";
-	
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($execcmd)
-	);
 
-	log_error("SquidGuard XMLRPC is reloading data on {$url}:{$port}.");
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($execcmd));
+
+	log_error("[SquidGuard] XMLRPC is reloading data on {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $varsynctimeout);
+	if (!$resp) {
+		$error = "A communications error occurred while attempting XMLRPC sync with {$url}:{$port} (exec_php).";
+		log_error("[SquidGuard] {$error}");
+		file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+	} elseif ($resp->faultCode()) {
+		$cli->setDebug(1);
 		$resp = $cli->send($msg, $varsynctimeout);
-		if(!$resp) {
-			$error = "A communications error occurred while squidguard was attempting XMLRPC sync with {$url}:{$port} (exec_php).";
-			log_error($error);
-			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
-		} elseif($resp->faultCode()) {
-			$cli->setDebug(1);
-			$resp = $cli->send($msg, $varsynctimeout);
-			$error = "An error code was received while squidguard XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-			log_error($error);
-			file_notice("sync_settings", $error, "squidguard Settings Sync", "");
-		} else {
-			log_error("SquidGuard: XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
-		}
+		$error = "An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[SquidGuard] {$error}");
+		file_notice("sync_settings", $error, "squidguard Settings Sync", "");
+	} else {
+		log_error("[SquidGuard] XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
+	}
 
 }
 
-// ##### The part above is based on the code of pfblocker #####
-
-// This function restarts all other needed functions after XMLRPC so that the content of .XML + .INC will be written in the files
+// This function restarts all other needed functions after XMLRPC sync so that the content of .XML + .INC will be written in the files
 // Adding more functions will increase the time to sync
 function squidguard_all_after_XMLRPC_resync() {
-	
+
 	squidguard_resync_acl();
 	squidguard_resync_dest();
 	squidguard_resync();
-	
-	log_error("SquidGuard: Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
+
+	log_error("[SquidGuard] Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
 }
 
 ?>

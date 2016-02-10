@@ -41,7 +41,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
-global $g, $rebuild_rules;
+global $g, $config, $rebuild_rules;
 
 $suricatadir = SURICATADIR;
 $rules_map = array();
@@ -107,9 +107,27 @@ $emergingdownload = $config['installedpackages']['suricata']['config'][0]['enabl
 $etpro = $config['installedpackages']['suricata']['config'][0]['enable_etpro_rules'];
 $categories = explode("||", $pconfig['rulesets']);
 
-// Add any previously saved rules files to the categories array
-if (!empty($pconfig['rulesets']))
-	$categories = explode("||", $pconfig['rulesets']);
+// Get any automatic rule category enable/disable modifications
+// if auto-SID Mgmt is enabled, and adjust the available rulesets
+// in the CATEGORY drop-down box as necessary.
+$cat_mods = suricata_sid_mgmt_auto_categories($a_rule[$id], FALSE);
+foreach ($cat_mods as $k => $v) {
+	switch ($v) {
+		case 'disabled':
+			if (($key = array_search($k, $categories)) !== FALSE)
+				unset($categories[$key]);
+			break;
+
+		case 'enabled':
+			if (!in_array($k, $categories))
+				$categories[] = $k;
+			break;
+
+		default:
+			break;
+	}
+}
+
 
 if ($_GET['openruleset'])
 	$currentruleset = htmlspecialchars($_GET['openruleset'], ENT_QUOTES | ENT_HTML401);
@@ -148,7 +166,10 @@ if ($currentruleset != 'custom.rules') {
 		$rules_map = suricata_load_rules_map($rulefile);
 }
 
-/* Load up our enablesid and disablesid arrays with enabled or disabled SIDs */
+/* Process the current category rules through any auto SID MGMT changes if enabled */
+suricata_auto_sid_mgmt($rules_map, $a_rule[$id], FALSE);
+
+/* Load up our enablesid and disablesid arrays with manually enabled or disabled SIDs */
 $enablesid = suricata_load_sid_mods($a_rule[$id]['rule_sid_on']);
 $disablesid = suricata_load_sid_mods($a_rule[$id]['rule_sid_off']);
 
@@ -159,12 +180,16 @@ if ($_POST['toggle'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid']) &
 	$sid = $_POST['sid'];
 
 	// See if the target SID is in our list of modified SIDs,
-	// and toggle it back to default if present; otherwise,
+	// and toggle it opposite state if present; otherwise,
 	// add it to the appropriate modified SID list.
-	if (isset($enablesid[$gid][$sid]))
+	if (isset($enablesid[$gid][$sid])) {
 		unset($enablesid[$gid][$sid]);
-	elseif (isset($disablesid[$gid][$sid]))
+		$disablesid[$gid][$sid] = "disablesid";
+	}
+	elseif (isset($disablesid[$gid][$sid])) {
 		unset($disablesid[$gid][$sid]);
+		$enablesid[$gid][$sid] = "enablesid";
+	}
 	else {
 		if ($rules_map[$gid][$sid]['disabled'] == 1)
 			$enablesid[$gid][$sid] = "enablesid";
@@ -198,8 +223,12 @@ if ($_POST['toggle'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid']) &
 		unset($a_rule[$id]['rule_sid_off']);
 
 	/* Update the config.xml file. */
-	write_config();
+	write_config("Suricata pkg: modified state for rule {$gid}:{$sid} on {$a_rule[$id]['interface']}.");
 
+	// We changed a rule state, remind user to apply the changes
+	mark_subsystem_dirty('suricata_rules');
+
+	// Set a scroll-to anchor location
 	$anchor = "rule_{$gid}_{$sid}";
 }
 elseif ($_POST['disable_all'] && !empty($rules_map)) {
@@ -238,7 +267,10 @@ elseif ($_POST['disable_all'] && !empty($rules_map)) {
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
 
-	write_config();
+	// We changed a rule state, remind user to apply the changes
+	mark_subsystem_dirty('suricata_rules');
+
+	write_config("Suricata pkg: disabled all rules in category {$currentruleset} for {$a_rule[$id]['interface']}.");
 }
 elseif ($_POST['enable_all'] && !empty($rules_map)) {
 
@@ -275,7 +307,10 @@ elseif ($_POST['enable_all'] && !empty($rules_map)) {
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
 
-	write_config();
+	// We changed a rule state, remind user to apply the changes
+	mark_subsystem_dirty('suricata_rules');
+
+	write_config("Suricata pkg: enable all rules in category {$currentruleset} for {$a_rule[$id]['interface']}.");
 }
 elseif ($_POST['resetcategory'] && !empty($rules_map)) {
 
@@ -314,7 +349,10 @@ elseif ($_POST['resetcategory'] && !empty($rules_map)) {
 	else				
 		unset($a_rule[$id]['rule_sid_off']);
 
-	write_config();
+	// We changed a rule state, remind user to apply the changes
+	mark_subsystem_dirty('suricata_rules');
+
+	write_config("Suricata pkg: remove enablesid/disablesid changes for category {$currentruleset} on {$a_rule[$id]['interface']}.");
 }
 elseif ($_POST['resetall'] && !empty($rules_map)) {
 
@@ -322,51 +360,73 @@ elseif ($_POST['resetall'] && !empty($rules_map)) {
 	unset($a_rule[$id]['rule_sid_on']);
 	unset($a_rule[$id]['rule_sid_off']);
 
+	// We changed a rule state, remind user to apply the changes
+	mark_subsystem_dirty('suricata_rules');
+
 	/* Update the config.xml file. */
-	write_config();
+	write_config("Suricata pkg: remove all enablesid/disablesid changes for {$a_rule[$id]['interface']}.");
 }
 elseif ($_POST['clear']) {
 	unset($a_rule[$id]['customrules']);
-	write_config();
+	write_config("Suricata pkg: clear all custom rules for {$a_rule[$id]['interface']}.");
 	$rebuild_rules = true;
+	conf_mount_rw();
 	suricata_generate_yaml($a_rule[$id]);
+	conf_mount_ro();
 	$rebuild_rules = false;
 	$pconfig['customrules'] = '';
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['cancel']) {
 	$pconfig['customrules'] = base64_decode($a_rule[$id]['customrules']);
+	clear_subsystem_dirty('suricata_rules');
 }
 elseif ($_POST['save']) {
 	$pconfig['customrules'] = $_POST['customrules'];
 	if ($_POST['customrules'])
-		$a_rule[$id]['customrules'] = base64_encode($_POST['customrules']);
+		$a_rule[$id]['customrules'] = base64_encode(str_replace("\r\n", "\n", $_POST['customrules']));
 	else
 		unset($a_rule[$id]['customrules']);
-	write_config();
+	write_config("Suricata pkg: save modified custom rules for {$a_rule[$id]['interface']}.");
 	$rebuild_rules = true;
+	conf_mount_rw();
 	suricata_generate_yaml($a_rule[$id]);
+	conf_mount_ro();
 	$rebuild_rules = false;
 	/* Signal Suricata to "live reload" the rules */
 	suricata_reload_config($a_rule[$id]);
+	clear_subsystem_dirty('suricata_rules');
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['apply']) {
 
 	/* Save new configuration */
-	write_config();
+	write_config("Suricata pkg: new rules configuration for {$a_rule[$id]['interface']}.");
 
 	/*************************************************/
 	/* Update the suricata.yaml file and rebuild the */
 	/* rules for this interface.                     */
 	/*************************************************/
 	$rebuild_rules = true;
+	conf_mount_rw();
 	suricata_generate_yaml($a_rule[$id]);
+	conf_mount_ro();
 	$rebuild_rules = false;
 
 	/* Signal Suricata to "live reload" the rules */
 	suricata_reload_config($a_rule[$id]);
+
+	// We have saved changes and done a soft restart, so clear "dirty" flag
+	clear_subsystem_dirty('suricata_rules');
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 
-require_once("guiconfig.inc");
 include_once("head.inc");
 
 $if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
@@ -376,15 +436,6 @@ $pgtitle = gettext("Suricata: Interface {$if_friendly} - Rules: {$currentruleset
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-/* Display error or save messages if present */
-if ($input_errors) {
-        print_input_errors($input_errors); // TODO: add checks
-}
-
-if ($savemsg) {
-        print_info_box($savemsg);
-}
-
 ?>
 
 <form action='/suricata/suricata_rules.php' method='post' name='iform' id='iform'>
@@ -392,19 +443,38 @@ if ($savemsg) {
 <input type='hidden' name='openruleset' id='openruleset' value='<?=$currentruleset;?>'/>
 <input type='hidden' name='sid' id='sid' value=''/>
 <input type='hidden' name='gid' id='gid' value=''/>
+
+<?php if (is_subsystem_dirty('suricata_rules')): ?><p>
+<?php print_info_box_np(gettext("A change has been made to a rule state.") . "<br/>" . gettext("Click APPLY when finished to send the changes to the running configuration."));?>
+<?php endif; ?>
+<?php
+/* Display error or save messages if present */
+if ($input_errors) {
+        print_input_errors($input_errors);
+}
+
+if ($savemsg) {
+        print_info_box($savemsg);
+}
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody>
 	<tr><td>
 	<?php
 		$tab_array = array();
-		$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+		$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 		$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-		$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+		$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 		$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
-		$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+		$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 		$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 		$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-		$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
+		$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+		$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+		$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+		$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 		display_top_tabs($tab_array, true);
 		echo '</td></tr>';
 		echo '<tr><td class="tabnavtbl">';
@@ -417,11 +487,13 @@ if ($savemsg) {
 		$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
 		display_top_tabs($tab_array, true);
 	?>
 	</td></tr>
 	<tr><td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="4" cellspacing="0">
+			<tbody>
 			<tr>
 				<td class="listtopic"><?php echo gettext("Available Rule Categories"); ?></td>
 			</tr>
@@ -430,7 +502,7 @@ if ($savemsg) {
 					<select id="selectbox" name="selectbox" class="formselect" onChange="go();">
 					<option value='custom.rules'>custom.rules</option>
 					<?php
-						$files = explode("||", $pconfig['rulesets']);
+						$files = $categories;
 						if ($a_rule[$id]['ips_policy_enable'] == 'on')
 							$files[] = "IPS Policy - " . ucfirst($a_rule[$id]['ips_policy']);
 						if ($a_rule[$id]['autoflowbitrules'] == 'on')
@@ -478,6 +550,7 @@ if ($savemsg) {
 			<tr>
 				<td class="vncell">
 					<table width="100%" align="center" border="0" cellpadding="0" cellspacing="0">
+						<tbody>
 						<tr>
 							<td rowspan="5" width="48%" valign="middle"><input type="submit" name="apply" id="apply" value="<?php echo gettext("Apply"); ?>" class="formbtn" 
 							title="<?php echo gettext("Click to rebuild the rules with your changes"); ?>"/><br/><br/>
@@ -534,6 +607,7 @@ if ($savemsg) {
 							gettext("clicking here") . ".</a>";?></td>
 						</tr>
 						<?php endif;?>
+						</tbody>
 					</table>
 				</td>
 			</tr>
@@ -544,7 +618,7 @@ if ($savemsg) {
 				<td>
 					<table id="myTable" class="sortable" style="table-layout: fixed;" width="100%" border="0" cellpadding="0" cellspacing="0">
 						<colgroup>
-							<col width="14" align="left" valign="middle">
+							<col width="16" align="center" valign="middle">
 							<col width="6%" align="center" axis="number">
 							<col width="9%" align="center" axis="number">
 							<col width="52" align="center" axis="string">
@@ -555,8 +629,8 @@ if ($savemsg) {
 							<col axis="string">
 						</colgroup>
 						<thead>
-						   <tr>
-							<th class="list">&nbsp;</th>
+						   <tr class="sortableHeaderRowIdentifier">
+							<th class="list sorttable_nosort">&nbsp;</th>
 							<th class="listhdrr"><?php echo gettext("GID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("SID"); ?></th>
 							<th class="listhdrr"><?php echo gettext("Proto"); ?></th>
@@ -570,18 +644,36 @@ if ($savemsg) {
 						<tbody>
 
 					<?php
-						$counter = $enable_cnt = $disable_cnt = 0;
+						$counter = $enable_cnt = $disable_cnt = $user_enable_cnt = $user_disable_cnt = $managed_count = 0;
 						foreach ($rules_map as $k1 => $rulem) {
 							foreach ($rulem as $k2 => $v) {
 								$sid = suricata_get_sid($v['rule']);
 								$gid = suricata_get_gid($v['rule']);
+								$ruleset = $currentruleset;
+								$style = "";
 
-								if (isset($disablesid[$gid][$sid])) {
+								if ($v['managed'] == 1) {
+									if ($v['disabled'] == 1) {
+										$textss = "<span class=\"gray\">";
+										$textse = "</span>";
+										$style= "style=\"opacity: 0.4; filter: alpha(opacity=40);\"";
+										$title = gettext("Auto-disabled by settings on SID Mgmt tab");
+									}
+									else {
+										$textss = $textse = "";
+										$ruleset = "suricata.rules";
+										$title = gettext("Auto-managed by settings on SID Mgmt tab");
+									}
+									$iconb = "icon_advanced.gif";
+									$managed_count++;
+								}
+								elseif (isset($disablesid[$gid][$sid])) {
 									$textss = "<span class=\"gray\">";
 									$textse = "</span>";
 									$iconb = "icon_reject_d.gif";
 									$disable_cnt++;
-									$title = gettext("Disabled by user. Click to toggle to default state");
+									$user_disable_cnt++;
+									$title = gettext("Disabled by user. Click to toggle to enabled state");
 								}
 								elseif (($v['disabled'] == 1) && (!isset($enablesid[$gid][$sid]))) {
 									$textss = "<span class=\"gray\">";
@@ -594,7 +686,8 @@ if ($savemsg) {
 									$textss = $textse = "";
 									$iconb = "icon_reject.gif";
 									$enable_cnt++;
-									$title = gettext("Enabled by user. Click to toggle to default state");
+									$user_enable_cnt++;
+									$title = gettext("Enabled by user. Click to toggle to disabled state");
 								}
 								else {
 									$textss = $textse = "";
@@ -623,36 +716,44 @@ if ($savemsg) {
 								$message = suricata_get_msg($v['rule']);
 								$sid_tooltip = gettext("View the raw text for this rule");
 
-								echo "<tr><td class=\"listt\" align=\"left\" valign=\"middle\" sorttable_customkey=\"\">{$textss}
-								<a id=\"rule_{$gid}_{$sid}\" href='#'><input type=\"image\" onClick=\"document.getElementById('sid').value='{$sid}';
-								document.getElementById('gid').value='{$gid}';\" 
-								src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\"  
-								title='{$title}' name=\"toggle[]\"/></a>{$textse}
-							       </td>
-							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+								echo "<tr><td class=\"listt\" style=\"align:center;\" valign=\"middle\">{$textss}";
+
+								if ($v['managed'] == 1) {
+									echo "<img {$style} src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\" 
+									title='{$title}'/>{$textse}";
+								}
+								else {
+									echo "<a id=\"rule_{$gid}_{$sid}\" href='#'><input type=\"image\" onClick=\"document.getElementById('sid').value='{$sid}';
+									document.getElementById('gid').value='{$gid}';\" 
+									src=\"../themes/{$g['theme']}/images/icons/{$iconb}\" width=\"11\" height=\"11\" border=\"0\"  
+									title='{$title}' name=\"toggle[]\"/></a>{$textse}";
+								}
+							       echo "</td>
+
+							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$textss}{$gid}{$textse}
 							       </td>
-							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									<a href=\"javascript: void(0)\" 
-									onclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\" 
+									onclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\" 
 									title='{$sid_tooltip}'>{$textss}{$sid}{$textse}</a>
 							       </td>
-							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr\" style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$textss}{$protocol}{$textse}
 							       </td>
-							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$srcspan}{$source}</span>
 							       </td>
-							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$srcprtspan}{$source_port}</span>
 							       </td>
-							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 									{$dstspan}{$destination}</span>
 							       </td>
-							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
+							       <td class=\"listr ellipsis\" nowrap style=\"text-align:center;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\">
 								       {$dstprtspan}{$destination_port}</span>
 							       </td>
-								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$currentruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\"> 
+								<td class=\"listbg\" style=\"word-wrap:break-word; whitespace:pre-line;\" ondblclick=\"wopen('suricata_rules_edit.php?id={$id}&openruleset={$ruleset}&sid={$sid}&gid={$gid}','FileViewer',800,600);\"> 
 									{$textss}{$message}{$textse}
 							       </td>
 							</tr>";
@@ -667,13 +768,17 @@ if ($savemsg) {
 			<tr>
 				<td>
 					<table width="100%" border="0" cellspacing="0" cellpadding="1">
+						<tbody>
 						<tr>
 							<td width="16"></td>
 							<td class="vexpl" height="35" valign="top">
 							<strong><?php echo gettext("---  Category Rules Summary  ---") . "</strong><br/>" . 
 							gettext("Total Rules: {$counter}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
 							gettext("Enabled: {$enable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
-							gettext("Disabled: {$disable_cnt}"); ?></td>
+							gettext("Disabled: {$disable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
+							gettext("User Enabled: {$user_enable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
+							gettext("User Disabled: {$user_disable_cnt}") . "&nbsp;&nbsp;&nbsp;&nbsp;" . 
+							gettext("Auto-Managed: {$managed_count}"); ?></td>
 						</tr>
 						<tr>
 							<td width="16"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
@@ -695,14 +800,29 @@ if ($savemsg) {
 								width="11" height="11"></td>
 							<td nowrap><?php echo gettext("Rule changed to Disabled by user"); ?></td>
 						</tr>
+					<?php if (!empty($cat_mods)): ?>
+						<tr>
+							<td width="16"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_advanced.gif"
+								width="11" height="11"></td>
+							<td nowrap><?php echo gettext("Rule auto-enabled by files configured on SID Mgmt tab"); ?></td>
+						</tr>
+						<tr>
+							<td width="16"><img style="opacity: 0.4; filter: alpha(opacity=40);" src="../themes/<?= $g['theme']; ?>/images/icons/icon_advanced.gif"
+								width="11" height="11"></td>
+							<td nowrap><?php echo gettext("Rule auto-disabled by files configured on SID Mgmt tab"); ?></td>
+						</tr>
+					<?php endif; ?>
+						</tbody>
 					</table>
 				</td>
 			</tr>
 		<?php endif;?>
+			</tbody>
 		</table>
 	</div>
 	</td>
 	</tr>
+	</tbody>
 </table>
 </form>
 <script language="javascript" type="text/javascript">

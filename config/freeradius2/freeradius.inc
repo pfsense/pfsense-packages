@@ -1,19 +1,12 @@
 <?php
-/* copyright */
-/* ========================================================================== */
 /*
 	freeradius.inc
-	part of pfSense (http://www.pfSense.com)
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2013 Alexander Wilke <nachtfalkeaw@web.de>
 	Copyright (C) 2013 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-									      */
-/* ========================================================================== */
-/*
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -34,77 +27,95 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
-									      */
-/* ========================================================================== */
-
-require_once('config.inc');
-require_once('service-utils.inc');
-require_once("util.inc");
-require_once("functions.inc");
-require_once("pkg-utils.inc");
-require_once("globals.inc");
+*/
+require_once("config.inc");
 require_once("filter.inc");
+require_once("functions.inc");
+require_once("globals.inc");
+require_once("notices.inc");
+require_once("pkg-utils.inc");
 require_once("services.inc");
+require_once("service-utils.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 
 // Check pfSense version
 $pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pfs_version > 2.0){
+if ($pfs_version == "2.1" || $pfs_version == "2.2")
 	define('FREERADIUS_BASE', '/usr/pbi/freeradius-' . php_uname("m"));
-}
-else{
-	define('FREERADIUS_BASE', '/usr/local');		
+else
+	define('FREERADIUS_BASE', '/usr/local');
+$bash_path = FREERADIUS_BASE . "/bin/bash";
+
+if ($pfs_version == "2.2") {
+	define('FREERADIUS_LIB', FREERADIUS_BASE . '/local/lib');
+	define('FREERADIUS_ETC', FREERADIUS_BASE . '/local/etc');
+} else {
+	define('FREERADIUS_LIB', FREERADIUS_BASE . '/lib');
+	define('FREERADIUS_ETC', FREERADIUS_BASE . '/etc');
 }
 
 // Check freeradius lib version
 	$frlib="";
-	$libfiles = scandir(FREERADIUS_BASE . "/lib/");
-	foreach ($libfiles as $libfile){
-		if (preg_match("/freeradius-/",$libfile))
-			$frlib=FREERADIUS_BASE . "/lib/{$libfile}";
+	if (file_exists(FREERADIUS_LIB)) {
+		$libfiles = scandir(FREERADIUS_LIB);
+		foreach ($libfiles as $libfile){
+			if (preg_match("/freeradius-/",$libfile))
+				$frlib=FREERADIUS_LIB . '/' . $libfile;
+		}
 	}
 	if ($frlib == ""){
-		log_error("freeRADIUS - No freeradius lib found on ".FREERADIUS_BASE."/lib");
+		log_error("freeRADIUS - No freeradius lib found on ".FREERADIUS_LIB);
 	}
 	
 function freeradius_deinstall_command() {
-	if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
-		exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
-		exec("rm -rf " . FREERADIUS_BASE . "/etc/raddb");
-		exec("rm -rf /var/run/radiusd/");
+	$pidFile = "/var/run/radiusd.pid";
+	$i = 0;
+
+	while (isvalidpid($pidFile) && $i < 3) {
+		$sig = ($i == 2 ? SIGKILL : SIGTERM);
+		sigkillbypid($pidFile, $sig);
+		sleep(1);
+		$i++;
 	}
+	return;
 }
 
 function freeradius_install_command() {
-	global $config;
-	conf_mount_rw();
-	
-	// put the constant to a variable
-	$varFREERADIUS_BASE = FREERADIUS_BASE;
+	global $config, $frlib;
 
 	// We create here different folders for different counters.
-	if (!file_exists("/var/log/radacct/datacounter/")) { exec("mkdir /var/log/radacct/datacounter && mkdir /var/log/radacct/datacounter/daily && mkdir /var/log/radacct/datacounter/weekly && mkdir /var/log/radacct/datacounter/monthly && mkdir /var/log/radacct/datacounter/forever"); }
-	if (!file_exists("/var/log/radacct/timecounter/")) { exec("mkdir /var/log/radacct/timecounter");	}
-	
-	exec("mkdir " . FREERADIUS_BASE . "/etc/raddb/scripts");
+	@mkdir("/var/log/radacct/datacounter/daily", 0755, true);
+	@mkdir("/var/log/radacct/datacounter/weekly", 0755, true);
+	@mkdir("/var/log/radacct/datacounter/monthly", 0755, true);
+	@mkdir("/var/log/radacct/datacounter/forever", 0755, true);
+	@mkdir("/var/log/radacct/timecounter", 0755, true);
+	@mkdir(FREERADIUS_ETC . "/raddb/scripts", 0755, true);
+
+	unlink_if_exists("/usr/local/etc/raddb");
+	@symlink(FREERADIUS_ETC . "/raddb", "/usr/local/etc/raddb");
 	if (!file_exists("/var/log/radutmp")) { exec("touch /var/log/radutmp");	}
 	if (!file_exists("/var/log/radwtmp")) {	exec("touch /var/log/radwtmp");	}
-	exec("chown -R root:wheel " . FREERADIUS_BASE . "/etc/raddb && chown -R root:wheel {$frlib} && chown -R root:wheel /var/log/radacct");
+	exec("chown -R root:wheel " . FREERADIUS_ETC . "/raddb /var/log/radacct");
+	if (file_exists($frlib))
+		exec("chown -R root:wheel {$frlib}");
 
 	// creating a backup file of the original policy.conf no matter if user checked this or not
-	if (!file_exists(FREERADIUS_BASE . "/etc/raddb/policy.conf.backup")) {
-		log_error("FreeRADIUS: Creating backup of the original file to " . FREERADIUS_BASE . "/etc/raddb/policy.conf.backup");
-		copy(FREERADIUS_BASE . "/etc/raddb/policy.conf", FREERADIUS_BASE . "/etc/raddb/policy.conf.backup");
+	if (!file_exists(FREERADIUS_ETC . "/raddb/policy.conf.backup")) {
+		log_error("FreeRADIUS: Creating backup of the original file to " . FREERADIUS_ETC . "/raddb/policy.conf.backup");
+		copy(FREERADIUS_ETC . "/raddb/policy.conf", FREERADIUS_ETC . "/raddb/policy.conf.backup");
 	}
 
 	// creating a backup file of the original /modules/files no matter if user checked this or not
-	if (!file_exists(FREERADIUS_BASE . "/etc/raddb/files.backup")) {
-		log_error("FreeRADIUS: Creating backup of the original file to " . FREERADIUS_BASE . "/etc/raddb/files.backup");
-		copy(FREERADIUS_BASE . "/etc/raddb/modules/files", FREERADIUS_BASE . "/etc/raddb/files.backup");
+	if (!file_exists(FREERADIUS_ETC . "/raddb/files.backup")) {
+		log_error("FreeRADIUS: Creating backup of the original file to " . FREERADIUS_ETC . "/raddb/files.backup");
+		copy(FREERADIUS_ETC . "/raddb/modules/files", FREERADIUS_ETC . "/raddb/files.backup");
 	}
 
 	// Disable virtual-server we do not need by default
-	if (file_exists(FREERADIUS_BASE . "/etc/raddb/sites-enabled/control-socket")) { unlink(FREERADIUS_BASE . "/etc/raddb/sites-enabled/control-socket"); }
-	if (file_exists(FREERADIUS_BASE . "/etc/raddb/sites-enabled/inner-tunnel")) { unlink(FREERADIUS_BASE . "/etc/raddb/sites-enabled/inner-tunnel"); }
+	if (file_exists(FREERADIUS_ETC . "/raddb/sites-enabled/control-socket")) { unlink(FREERADIUS_ETC . "/raddb/sites-enabled/control-socket"); }
+	if (file_exists(FREERADIUS_ETC . "/raddb/sites-enabled/inner-tunnel")) { unlink(FREERADIUS_ETC . "/raddb/sites-enabled/inner-tunnel"); }
 
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
@@ -127,13 +138,48 @@ function freeradius_install_command() {
 	freeradius_sqlconf_resync();
 	freeradius_eapconf_resync();
 	freeradius_clients_resync();
+	freeradius_modulesldap_resync();
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = "$varFREERADIUS_BASE" . '/etc/rc.d/radiusd onestart';
-	$rcfile['stop'] = "$varFREERADIUS_BASE" . '/etc/rc.d/radiusd onestop';
+	$freeradius_etc_dir = FREERADIUS_ETC;
+	$rcfile['start'] = <<<EOD
+SERVICENAME="radiusd"
+	LOCKFILE="/tmp/\${SERVICENAME}_start.lock"
+	PIDFILE="/var/run/\${SERVICENAME}.pid"
+
+	# prevent this part of script from running in parallel
+	if ( set -o noclobber; echo "\$\$" > "\$LOCKFILE") 2> /dev/null; then
+		# make sure lock file is removed even if script is terminated
+		trap 'rm -f "\$LOCKFILE"; exit \$?' INT TERM EXIT
+
+		{$freeradius_etc_dir}/rc.d/radiusd onestart
+
+		# try to wait until the service starts
+		if [ ! -f "\$PIDFILE" ]; then
+			echo "\$SERVICENAME.sh: PID file was not found"
+
+			for i in 1 2 3 4 5; do
+				if [ -f "\$PIDFILE" ]; then
+					echo "\$SERVICENAME.sh: Service started PID: `cat \$PIDFILE`"
+					break
+				else
+					echo "\$SERVICENAME.sh: Waiting 0.5 seconds"
+					sleep 0.5
+				fi
+			done
+		else
+			echo "\$SERVICENAME.sh: Service running PID: `cat \$PIDFILE`"
+		fi
+
+		rm -f "\$LOCKFILE"
+		trap - INT TERM EXIT
+	else
+		echo "\$SERVICENAME.sh: Cannot continue at this moment, this script is already trying to start service PID: \$(cat \$LOCKFILE)"
+	fi
+EOD;
+	$rcfile['stop'] = FREERADIUS_ETC . '/rc.d/radiusd onestop';
 	write_rcfile($rcfile);
-		conf_mount_ro();
 	start_service("radiusd");
 }
 
@@ -251,7 +297,7 @@ extended_expressions = $varsettingsextendedexpressions
 EOD;
 
 // Deletes virtual-server coa by default. Will be re-enabled if there is an interface-type "coa"
-exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/sites-enabled/coa");
+exec("rm -f " . FREERADIUS_ETC . "/raddb/sites-enabled/coa");
 
 $arrinterfaces = $config['installedpackages']['freeradiusinterfaces']['config'];
 	if (is_array($arrinterfaces)  && !empty($arrinterfaces)) {
@@ -278,7 +324,7 @@ EOD;
 			// Begin "if" for interface-type = coa
 			if ($item['varinterfacetype'] == 'coa') {
 			// Enables virtual-server coa because interface-type is coa
-			exec("ln -s " . FREERADIUS_BASE . "/etc/raddb/sites-available/coa " . FREERADIUS_BASE . "/etc/raddb/sites-enabled/");
+			exec("ln -s " . FREERADIUS_ETC . "/raddb/sites-available/coa " . FREERADIUS_ETC . "/raddb/sites-enabled/");
 			$conf .= <<<EOD
 listen {
 		type = $varinterfacetype
@@ -369,7 +415,7 @@ instantiate {
 EOD;
 
 	conf_mount_rw();
-	file_put_contents(FREERADIUS_BASE . '/etc/raddb/radiusd.conf', $conf);
+	file_put_contents(FREERADIUS_ETC . '/raddb/radiusd.conf', $conf);
 	conf_mount_ro();
 	
 	// "freeradius_sqlconf_resync" is pointing to this function because we need to run "freeradius_serverdefault_resync" and after that restart freeradius.
@@ -570,7 +616,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	if ($varusersmaxtotaloctets != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
 		//create exec script
-		$varusersreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh ' . FREERADIUS_BASE . '/etc/raddb/scripts/datacounter_auth.sh ' . "$varusersusername $varusersmaxtotaloctetstimerange" . '"';
+		$varusersreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh ' . FREERADIUS_ETC . '/raddb/scripts/datacounter_auth.sh ' . "$varusersusername $varusersmaxtotaloctetstimerange" . '"';
 		// create limit file - will be always overwritten so we can increase limit from GUI
 		exec("`echo $varusersmaxtotaloctets > /var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/max-octets-$varusersusername`");
 		// if used-octets file exist we do NOT overwrite this file!!!
@@ -579,7 +625,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	// If an octet limit is NOT set we delete the files for the limit and the counter.
 	else {
 		if (file_exists("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/max-octets-$varusersusername")) { unlink("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/max-octets-$varusersusername"); }
-		if (file_exists("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername")) { unlink("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername"); }
+		if (file_exists("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername")) { unlink("/var/log/radacct/datacounter/$varusersmaxtotaloctetstimerange/used-octets-$varusersusername*"); }
 	}
 	if ($varusersadditionaloptionsreplyitems != '') {
 		if ($varusersreplyitem != '') { $varusersreplyitem .=","; }
@@ -598,7 +644,7 @@ EOD;
 	} //end foreach
 } // end if
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/users';
+	$filename = FREERADIUS_ETC . '/raddb/users';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -764,7 +810,7 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	if ($varmacsmaxtotaloctets != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
 		//create exec script
-		$varmacsreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh ' . FREERADIUS_BASE . '/etc/raddb/scripts/datacounter_auth.sh ' . "$varmacsaddress $varmacsmaxtotaloctetstimerange" . '"';
+		$varmacsreplyitem .= "\n\tExec-Program-Wait = " . '"/bin/sh ' . FREERADIUS_ETC . '/raddb/scripts/datacounter_auth.sh ' . "$varmacsaddress $varmacsmaxtotaloctetstimerange" . '"';
 		// create limit file - will be always overwritten so we can increase limit from GUI
 		exec("`echo $varmacsmaxtotaloctets > /var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/max-octets-$varmacsaddress`");
 		// if used-octets file exist we do NOT overwrite this file!!!
@@ -773,7 +819,7 @@ if (is_array($arrmacs) && !empty($arrmacs)) {
 	// If an octet limit is NOT set we delete the files for the limit and the counter.
 	else {
 		if (file_exists("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/max-octets-$varmacsaddress")) { unlink("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/max-octets-$varmacsaddress"); }
-		if (file_exists("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress")) { unlink("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress"); }
+		if (file_exists("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress")) { unlink("/var/log/radacct/datacounter/$varmacsmaxtotaloctetstimerange/used-octets-$varmacsaddress*"); }
 	}
 	if ($varmacsadditionaloptionsreplyitems != '') {
 		if ($varmacsreplyitem != '') { $varmacsreplyitem .=","; }
@@ -792,7 +838,7 @@ EOD;
 	} //end foreach
 } // end if
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/authorized_macs';
+	$filename = FREERADIUS_ETC . '/raddb/authorized_macs';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -863,7 +909,7 @@ EOD;
 	}
 
 	conf_mount_rw();
-	file_put_contents(FREERADIUS_BASE . '/etc/raddb/clients.conf', $conf);
+	file_put_contents(FREERADIUS_ETC . '/raddb/clients.conf', $conf);
 	conf_mount_ro();
 	
 	freeradius_sync_on_changes();
@@ -931,12 +977,12 @@ function freeradius_eapconf_resync() {
 	// This is for enable/disbable MS SoH in EAP-PEAP and the virtuial-server "soh-server"
 	if ($eapconf['vareapconfpeapsohenable'] == 'Enable') {
 		$vareapconfpeapsoh = 'soh = yes' . "\n\t\t\tsoh_virtual_server = " . '"' . "soh-server" . '"';
-		exec("ln -s " . FREERADIUS_BASE . "/etc/raddb/sites-available/soh " . FREERADIUS_BASE . "/etc/raddb/sites-enabled/");
+		exec("ln -s " . FREERADIUS_ETC . "/raddb/sites-available/soh " . FREERADIUS_ETC . "/raddb/sites-enabled/");
 	}
 	else {
 		$vareapconfpeapsoh = '### MS SoH Server is disabled ###';
-			if (file_exists(FREERADIUS_BASE . "/etc/raddb/sites-enabled/soh")) {
-			exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/sites-enabled/soh");
+			if (file_exists(FREERADIUS_ETC . "/raddb/sites-enabled/soh")) {
+			exec("rm -f " . FREERADIUS_ETC . "/raddb/sites-enabled/soh");
 			}
 	}
 		
@@ -950,9 +996,9 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 		$ca_cert = lookup_ca($eapconf["ssl_ca_cert"]);
 		if ($ca_cert != false) {
 			if(base64_decode($ca_cert['prv'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/ca_key.pem", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/ca_key.pem", 
 					base64_decode($ca_cert['prv']));
-				$conf['ssl_ca_key'] = FREERADIUS_BASE . '/etc/raddb/certs/ca_key.pem';
+				$conf['ssl_ca_key'] = FREERADIUS_ETC . '/raddb/certs/ca_key.pem';
 			}
 
 
@@ -965,24 +1011,24 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 				else{
 					$check_crl="check_crl = no";
 				}
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/ca_cert.pem", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/ca_cert.pem", 
 					base64_decode($ca_cert['crt']). $crl);
-				$conf['ssl_ca_cert'] = FREERADIUS_BASE . "/etc/raddb/certs/ca_cert.pem";
+				$conf['ssl_ca_cert'] = FREERADIUS_ETC . "/raddb/certs/ca_cert.pem";
 			}
 			$svr_cert = lookup_cert($eapconf["ssl_server_cert"]);
 			if ($svr_cert != false) {
 				if(base64_decode($svr_cert['prv'])) {
-					file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/server_key.pem", 
+					file_put_contents(FREERADIUS_ETC . "/raddb/certs/server_key.pem", 
 						base64_decode($svr_cert['prv']));
-					$conf['ssl_key'] = FREERADIUS_BASE . '/etc/raddb/certs/server_key.pem';
+					$conf['ssl_key'] = FREERADIUS_ETC . '/raddb/certs/server_key.pem';
 				}
 			}
 
 
 			if(base64_decode($svr_cert['crt'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/server_cert.pem", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/server_cert.pem", 
 					base64_decode($svr_cert['crt']));
-				$conf['ssl_server_cert'] = FREERADIUS_BASE . "/etc/raddb/certs/server_cert.pem";
+				$conf['ssl_server_cert'] = FREERADIUS_ETC . "/raddb/certs/server_cert.pem";
 			}
 			
 			/* Not needed anymore because pfsense can do this by default
@@ -990,23 +1036,23 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 				$svr_cert = lookup_cert($eapconf["ssl_client_cert"]);
 				if ($svr_cert != false) {
 					if(base64_decode($svr_cert['prv'])) {
-						file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/client_key.pem", 
+						file_put_contents(FREERADIUS_ETC . "/raddb/certs/client_key.pem", 
 							base64_decode($svr_cert['prv']));
-						$conf['ssl_key'] = FREERADIUS_BASE . '/etc/raddb/certs/client_key.pem';
+						$conf['ssl_key'] = FREERADIUS_ETC . '/raddb/certs/client_key.pem';
 					}
 				}
 
 
 				if(base64_decode($svr_cert['crt'])) {
-					file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/client_cert.pem", 
+					file_put_contents(FREERADIUS_ETC . "/raddb/certs/client_cert.pem", 
 						base64_decode($svr_cert['crt']));
-					$conf['ssl_client_cert'] = FREERADIUS_BASE . "/etc/raddb/certs/client_cert.pem";
+					$conf['ssl_client_cert'] = FREERADIUS_ETC . "/raddb/certs/client_cert.pem";
 				}
 			
-			exec("openssl pkcs12 -export -in " . FREERADIUS_BASE . "/etc/raddb/certs/client_cert.pem -inkey " . FREERADIUS_BASE . "/etc/raddb/certs/client_key.pem -out " . FREERADIUS_BASE . "/etc/raddb/certs/client_cert.p12 -passout pass\:");	
+			exec("openssl pkcs12 -export -in " . FREERADIUS_ETC . "/raddb/certs/client_cert.pem -inkey " . FREERADIUS_ETC . "/raddb/certs/client_key.pem -out " . FREERADIUS_ETC . "/raddb/certs/client_cert.p12 -passout pass\:");	
 			}
 			*/
-			$conf['ssl_cert_dir'] = FREERADIUS_BASE . '/etc/raddb/certs';
+			$conf['ssl_cert_dir'] = FREERADIUS_ETC . '/raddb/certs';
 		}
 
 	$vareapconfprivatekeyfile = 'server_key.pem';
@@ -1015,11 +1061,11 @@ if ($eapconf['vareapconfchoosecertmanager'] == 'on') {
 	
 	// generate new DH and RANDOM file
 	// We create a single empty file just to check if there is really a change from one to another cert manager to avoid building ne DH and random files
-	if (!file_exists(FREERADIUS_BASE . "/etc/raddb/certs/pfsense_cert_mgr")) {
-		log_error("freeRADIUS: Switched to pfSense Cert-Manager. Creating new DH and random file in " . FREERADIUS_BASE . "/etc/raddb/certs");
-		exec("cd " . FREERADIUS_BASE . "/etc/raddb/certs && openssl dhparam -out dh 1024");
-		exec("cd " . FREERADIUS_BASE . "/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
-		exec("touch " . FREERADIUS_BASE . "/etc/raddb/certs/pfsense_cert_mgr");
+	if (!file_exists(FREERADIUS_ETC . "/raddb/certs/pfsense_cert_mgr")) {
+		log_error("freeRADIUS: Switched to pfSense Cert-Manager. Creating new DH and random file in " . FREERADIUS_ETC . "/raddb/certs");
+		exec("cd " . FREERADIUS_ETC . "/raddb/certs && openssl dhparam -out dh 1024");
+		exec("cd " . FREERADIUS_ETC . "/raddb/certs && dd if=/dev/urandom of=./random count=10");
+		exec("touch " . FREERADIUS_ETC . "/raddb/certs/pfsense_cert_mgr");
 	}
 }
 
@@ -1114,7 +1160,7 @@ else {
 	}
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/eap.conf';
+	$filename = FREERADIUS_ETC . '/raddb/eap.conf';
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
 	conf_mount_ro();
@@ -1280,7 +1326,7 @@ sql sql2 {
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/sql.conf';
+	$filename = FREERADIUS_ETC . '/raddb/sql.conf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -2128,7 +2174,7 @@ post-proxy {
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/sites-available/default';
+	$filename = FREERADIUS_ETC . '/raddb/sites-available/default';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -2223,7 +2269,7 @@ authorityKeyIdentifier	= keyid:always,issuer:always
 basicConstraints	= CA:true
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/certs/ca.cnf';
+	$filename = FREERADIUS_ETC . '/raddb/certs/ca.cnf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -2308,7 +2354,7 @@ emailAddress		= $varcertsserveremailaddress
 commonName		= "$varcertsservercommonname"
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/certs/server.cnf';
+	$filename = FREERADIUS_ETC . '/raddb/certs/server.cnf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -2393,7 +2439,7 @@ emailAddress		= $varcertsclientemailaddress
 commonName		= "$varcertsclientcommonname"
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/certs/client.cnf';
+	$filename = FREERADIUS_ETC . '/raddb/certs/client.cnf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -2426,12 +2472,12 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 		if ($arrcerts['varcertscreateclient'] == 'yes') {
 		
 		// delete all old certificates and keys
-		log_error("freeRADIUS: deleting all client.csr .crt .key .pem .tar in " . FREERADIUS_BASE . "/etc/raddb/certs");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.csr");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.crt");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.key");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.pem");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.tar");
+		log_error("freeRADIUS: deleting all client.csr .crt .key .pem .tar in " . FREERADIUS_ETC . "/raddb/certs");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/client.csr");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/client.crt");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/client.key");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/client.pem");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/client.tar");
 				
 			
 		// run fuction to create ONLY new client.cnf files based on user input from freeradiuscert.xml
@@ -2439,21 +2485,21 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 	
 	
 		// make bootstrap executable and run to create cert based on client.cnf files
-		exec("chmod 0770 " . FREERADIUS_BASE . "/etc/raddb/certs/bootstrap");
-		exec(FREERADIUS_BASE . "/etc/raddb/certs/bootstrap");
+		exec("chmod 0770 " . FREERADIUS_ETC . "/raddb/certs/bootstrap");
+		exec(FREERADIUS_ETC . "/raddb/certs/bootstrap");
 			
 		// rename client generated XX.pem to client.pem // use regex to replace spaces and so on.
-		$varserial = preg_replace("/\s/","",file_get_contents(FREERADIUS_BASE . '/etc/raddb/certs/serial.old'));
-		if (file_exists(FREERADIUS_BASE . "/etc/raddb/certs/$varserial.pem"))
-		rename(FREERADIUS_BASE . "/etc/raddb/certs/$varserial.pem",FREERADIUS_BASE . "/etc/raddb/certs/client.pem");
+		$varserial = preg_replace("/\s/","",file_get_contents(FREERADIUS_ETC . '/raddb/certs/serial.old'));
+		if (file_exists(FREERADIUS_ETC . "/raddb/certs/$varserial.pem"))
+		rename(FREERADIUS_ETC . "/raddb/certs/$varserial.pem",FREERADIUS_ETC . "/raddb/certs/client.pem");
 		
 		
 		// tar client-cert files
-		exec("cd " . FREERADIUS_BASE . "/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
+		exec("cd " . FREERADIUS_ETC . "/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
 		
 		// Make all files in certs folder read/write only for root
-		exec("chmod -R 0600 " . FREERADIUS_BASE . "/etc/raddb/certs/");
-		log_error("freeRADIUS: Created new client.csr .crt .key .pem and added them together with ca.der in " . FREERADIUS_BASE . "/etc/raddb/certs/client.tar");
+		exec("chmod -R 0600 " . FREERADIUS_ETC . "/raddb/certs/");
+		log_error("freeRADIUS: Created new client.csr .crt .key .pem and added them together with ca.der in " . FREERADIUS_ETC . "/raddb/certs/client.tar");
 		}
 	}
 	else {
@@ -2461,18 +2507,18 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 		if ($arrcerts['varcertsdeleteall'] == 'yes') {
 	
 		// delete all old certificates and keys - deletes certs from pfsense cert-manager IN THIS FOLDER, too.
-		log_error("freeRADIUS: deleting all CA, Server and Client certs, DH, random and database files in " . FREERADIUS_BASE . "/etc/raddb/certs");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/ca.pem && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/server.pem && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.pem");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/ca.der && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/server.der && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.der");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/ca.csr && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/server.csr && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.csr");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/ca.crt && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/server.crt && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.crt");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/ca.key && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/server.key && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.key");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/ca.p12 && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/server.p12 && rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.p12");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/serial*");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/index*");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/dh");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/random");
-		exec("rm -f " . FREERADIUS_BASE . "/etc/raddb/certs/client.tar");
+		log_error("freeRADIUS: deleting all CA, Server and Client certs, DH, random and database files in " . FREERADIUS_ETC . "/raddb/certs");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/ca.pem && rm -f " . FREERADIUS_ETC . "/raddb/certs/server.pem && rm -f " . FREERADIUS_ETC . "/raddb/certs/client.pem");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/ca.der && rm -f " . FREERADIUS_ETC . "/raddb/certs/server.der && rm -f " . FREERADIUS_ETC . "/raddb/certs/client.der");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/ca.csr && rm -f " . FREERADIUS_ETC . "/raddb/certs/server.csr && rm -f " . FREERADIUS_ETC . "/raddb/certs/client.csr");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/ca.crt && rm -f " . FREERADIUS_ETC . "/raddb/certs/server.crt && rm -f " . FREERADIUS_ETC . "/raddb/certs/client.crt");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/ca.key && rm -f " . FREERADIUS_ETC . "/raddb/certs/server.key && rm -f " . FREERADIUS_ETC . "/raddb/certs/client.key");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/ca.p12 && rm -f " . FREERADIUS_ETC . "/raddb/certs/server.p12 && rm -f " . FREERADIUS_ETC . "/raddb/certs/client.p12");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/serial*");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/index*");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/dh");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/random");
+		exec("rm -f " . FREERADIUS_ETC . "/raddb/certs/client.tar");
 		
 	
 		// run fuctions to create new .cnf files based on user input from freeradiuscert.xml
@@ -2481,28 +2527,28 @@ if ($eapconf['vareapconfchoosecertmanager'] == '') {
 		freeradius_clientcertcnf_resync();
 		
 		// this command deletes the pfsense_cert_mgr checkfile so when we change back to pfsense cert manager a new DH + random file will be created
-		if (file_exists(FREERADIUS_BASE . "/etc/raddb/certs/pfsense_cert_mgr")) {
-			unlink(FREERADIUS_BASE . "/etc/raddb/certs/pfsense_cert_mgr");
+		if (file_exists(FREERADIUS_ETC . "/raddb/certs/pfsense_cert_mgr")) {
+			unlink(FREERADIUS_ETC . "/raddb/certs/pfsense_cert_mgr");
 		}
 		
 		// generate new DH and RANDOM file
-		log_error("freeRADIUS: Creating new DH and random file in " . FREERADIUS_BASE . "/etc/raddb/certs");
-		exec("cd " . FREERADIUS_BASE . "/etc/raddb/certs && openssl dhparam -out dh 1024");
-		exec("cd " . FREERADIUS_BASE . "/etc/raddb/certs && dd if=/dev/urandom of=./random count=10");
+		log_error("freeRADIUS: Creating new DH and random file in " . FREERADIUS_ETC . "/raddb/certs");
+		exec("cd " . FREERADIUS_ETC . "/raddb/certs && openssl dhparam -out dh 1024");
+		exec("cd " . FREERADIUS_ETC . "/raddb/certs && dd if=/dev/urandom of=./random count=10");
 		
-		log_error("freeRADIUS: Creating new CA, Server and Client certs in " . FREERADIUS_BASE . "/etc/raddb/certs");
+		log_error("freeRADIUS: Creating new CA, Server and Client certs in " . FREERADIUS_ETC . "/raddb/certs");
 		// make bootstrap executable and run to create certs based on .cnf files
-		exec("chmod 0770 " . FREERADIUS_BASE . "/etc/raddb/certs/bootstrap");
-		exec(FREERADIUS_BASE . "/etc/raddb/certs/bootstrap");
+		exec("chmod 0770 " . FREERADIUS_ETC . "/raddb/certs/bootstrap");
+		exec(FREERADIUS_ETC . "/raddb/certs/bootstrap");
 		
 		// rename client generated 02.pem to client.pem
-		if (file_exists(FREERADIUS_BASE . "/etc/raddb/certs/02.pem"))
-		rename(FREERADIUS_BASE . "/etc/raddb/certs/02.pem",FREERADIUS_BASE . "/etc/raddb/certs/client.pem");
+		if (file_exists(FREERADIUS_ETC . "/raddb/certs/02.pem"))
+		rename(FREERADIUS_ETC . "/raddb/certs/02.pem",FREERADIUS_ETC . "/raddb/certs/client.pem");
 		
 		// tar client-cert files
-		exec("cd " . FREERADIUS_BASE . "/etc/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
-		exec("chmod -R 0600 " . FREERADIUS_BASE . "/etc/raddb/certs/");
-		log_error("freeRADIUS: Added client.csr .crt .key .pem together with ca.der in " . FREERADIUS_BASE . "/etc/raddb/certs/client.tar");
+		exec("cd " . FREERADIUS_ETC . "/raddb/certs && tar -cf client.tar client.crt client.csr client.key ca.der client.pem");
+		exec("chmod -R 0600 " . FREERADIUS_ETC . "/raddb/certs/");
+		log_error("freeRADIUS: Added client.csr .crt .key .pem together with ca.der in " . FREERADIUS_ETC . "/raddb/certs/client.tar");
 		
 		// If there were changes on the certificates we need to restart freeradius
 		restart_service('radiusd');
@@ -2520,163 +2566,181 @@ conf_mount_ro();
 
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function freeradius_sync_on_changes() {
-	global $config, $g;
-	if (is_array($config['installedpackages']['freeradiussync'])){
+	global $config;
+
+	if (is_array($config['installedpackages']['freeradiussync'])) {
 		$synconchanges = $config['installedpackages']['freeradiussync']['config'][0]['varsyncenablexmlrpc'];
-		$varsynctimeout = $config['installedpackages']['freeradiussync']['config'][0]['varsynctimeout'];
-		}
-	else
-	{
+		$varsynctimeout = $config['installedpackages']['freeradiussync']['config'][0]['varsynctimeout'] ?: '150';
+	} else {
 		return;
 	}
 
 	// if checkbox is NOT checked do nothing
-	switch ($synconchanges){
+	switch ($synconchanges) {
 		case "manual":
-			if (is_array($config['installedpackages']['freeradiussync']['config'][0]['row'])){
-				$rs=$config['installedpackages']['freeradiussync']['config'][0]['row'];
-				}
-			else{
-				log_error("[FreeRADIUS]: xmlrpc sync is enabled but there is no hosts to push on FreeRADIUS config.");
+			if (is_array($config['installedpackages']['freeradiussync']['config'][0]['row'])) {
+				$rs = $config['installedpackages']['freeradiussync']['config'][0]['row'];
+			} else {
+				log_error("[FreeRADIUS]: XMLRPC sync is enabled but there are no hosts configured as replication targets.");
 				return;
-				}
+			}
 			break;
 		case "auto":
-				if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-					$system_carp=$config['installedpackages']['carpsettings']['config'][0];
-					$rs[0]['varsyncdestinenable']="on";
-					$rs[0]['varsyncprotocol']=($config['system']['webgui']['protocol']!=""?$config['system']['webgui']['protocol']:"https");
-					$rs[0]['varsyncipaddress']=$system_carp['synchronizetoip'];
-					$rs[0]['varsyncpassword']=$system_carp['password'];
-					$rs[0]['varsyncport']=($config['system']['webgui']['port']!=""?$config['system']['webgui']['port']:"443");
-					if (! is_ipaddr($system_carp['synchronizetoip'])){
-						log_error("[FreeRADIUS]: xmlrpc sync is enabled but there is no system backup hosts to push FreeRADIUS config.");
-						return;
-						}
+			if (is_array($config['hasync'])) {
+				$system_carp = $config['hasync'];
+				$rs[0]['varsyncipaddress'] = $system_carp['synchronizetoip'];
+				$rs[0]['varsyncusername'] = $system_carp['username'];
+				$rs[0]['varsyncpassword'] = $system_carp['password'];
+				$rs[0]['varsyncdestinenable'] = FALSE;
+
+				// XMLRPC sync is currently only supported over connections using the same protocol and port as this system
+				if ($config['system']['webgui']['protocol'] == "http") {
+					$rs[0]['varsyncprotocol'] = "http";
+					$rs[0]['varsyncport'] = $config['system']['webgui']['port'] ?: '80';
+				} else {
+					$rs[0]['varsyncprotocol'] = "https";
+					$rs[0]['varsyncport'] = $config['system']['webgui']['port'] ?: '443';
 				}
-				else{
-					log_error("[FreeRADIUS]: xmlrpc sync is enabled but there is no system backup hosts to push FreeRADIUS config.");
+				if ($system_carp['synchronizetoip'] == "") {
+					log_error("[FreeRADIUS]: XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
 					return;
+				} else {
+					$rs[0]['varsyncdestinenable'] = TRUE;
 				}
+			} else {
+				log_error("[FreeRADIUS]: XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
+				return;
+			}
 			break;		
 		default:
 			return;
-		break;
-		}
-		if (is_array($rs)){
-			log_error("[FreeRADIUS]: xmlrpc sync is starting with timeout {$varsynctimeout} seconds.");
-			foreach($rs as $sh){
-				if($sh['varsyncdestinenable']){
-					$varsyncprotocol 	= $sh['varsyncprotocol'];
-					$sync_to_ip 		= $sh['varsyncipaddress'];
-					$password   		= $sh['varsyncpassword'];
-					$varsyncport 		= $sh['varsyncport'];
-					if($password && $sync_to_ip)
-						freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout);
-					else
-						log_error("[FreeRADIUS]: XMLRPC Sync with {$sh['varsyncipaddress']} has incomplete credentials. No XMLRPC Sync done!");
+			break;
+	}
+	if (is_array($rs)) {
+		log_error("[FreeRADIUS]: XMLRPC sync is starting with timeout {$varsynctimeout} seconds.");
+		foreach ($rs as $sh) {
+			if ($sh['varsyncdestinenable']) {
+				$sync_to_ip = $sh['varsyncipaddress'];
+				$varsyncport = $sh['varsyncport'];
+				$varsyncprotocol = $sh['varsyncprotocol'];
+				$username = $sh['varsyncusername'] ?: 'admin';
+				$password = $sh['varsyncpassword'];
+
+				$error = '';
+				$valid = TRUE;
+
+				if ($password == "") {
+					$error = "Password parameter is empty. ";
+					$valid = FALSE;
 				}
-				else {
+				if (!is_ipaddr($sync_to_ip) && !is_hostname($sync_to_ip) && !is_domain($sync_to_ip)) {
+					$error .= "Misconfigured Replication Target IP Address or Hostname. ";
+					$valid = FALSE;
+				}
+				if (!is_port($varsyncport)) {
+					$error .= "Misconfigured Replication Target Port. ";
+					$valid = FALSE;
+				}
+				if ($valid) {
+					freeradius_do_xmlrpc_sync($sync_to_ip, $username, $password, $varsyncport, $varsyncprotocol, $varsynctimeout);
+				} else {
+					log_error("[FreeRADIUS]: XMLRPC Sync with '{$sync_to_ip}' aborted due to the following error(s): {$error}");
+				}
+			} else {
 				log_error("[FreeRADIUS]: XMLRPC Sync with {$sh['varsyncipaddress']} is disabled");
-				}
 			}
-			log_error("[FreeRADIUS]: xmlrpc sync is ending.");
-			}
+		}
+		log_error("[FreeRADIUS]: XMLRPC sync is ending.");
+	}
 }
 
 /* Do the actual XMLRPC sync */
-function freeradius_do_xmlrpc_sync($sync_to_ip, $password, $varsyncport, $varsyncprotocol,$varsynctimeout) {
+function freeradius_do_xmlrpc_sync($sync_to_ip, $username, $password, $varsyncport, $varsyncprotocol, $varsynctimeout) {
 	global $config, $g;
 
-	if($varsynctimeout == '' || $varsynctimeout == 0)
-		$varsynctimeout = 150;
-
-	if(!$password)
+	/* Detect boot process, do nothing during boot. */
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
+	}
 
-	if(!$sync_to_ip)
+	if ($username == "" || $password == "" || $sync_to_ip == "" || $varsyncport == "" || $varsyncprotocol == "") {
+		log_error("[FreeRADIUS]: A required XMLRPC sync parameter (username, password, replication target, port or protocol) is empty ... aborting pkg sync");
 		return;
-	
-	if(!$varsyncport)
-		return;
+	}
 
-	if(!$varsyncprotocol)
-		return;
-	
-	// Check and choose correct protocol type, port number and IP address
-	$synchronizetoip .= "$varsyncprotocol" . '://';
-	$port = "$varsyncport";
+	/* Take care of IPv6 literal address */
+	if (is_ipaddrv6($sync_to_ip)) {
+		$sync_to_ip = "[{$sync_to_ip}]";
+	}
 
-	$synchronizetoip .= $sync_to_ip;
+	$url = "{$varsyncprotocol}://{$sync_to_ip}";
+	$port = $varsyncport;
 
-	/* xml will hold the sections to sync */
+	/* XML will hold the sections to sync. */
 	$xml = array();
 	$xml['freeradius'] = $config['installedpackages']['freeradius'];
 	$xml['freeradiusauthorizedmacs'] = $config['installedpackages']['freeradiusauthorizedmacs'];
 	$xml['freeradiusclients'] = $config['installedpackages']['freeradiusclients'];
 	
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($xml)
-	);
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($xml));
 
-	/* set a few variables needed for sync code borrowed from filter.inc */
-	$url = $synchronizetoip;
+	/* Set a few variables needed for sync code */
 	log_error("[FreeRADIUS]: Beginning FreeRADIUS XMLRPC sync with {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-		if($g['debug'])
-			$cli->setDebug(1);
-		/* send our XMLRPC message and timeout after $varsynctimeout seconds */
+	$cli->setCredentials($username, $password);
+	if ($g['debug']) {
+		$cli->setDebug(1);
+	}
+	/* Send our XMLRPC message and timeout after defined sync timeout value */
+	$resp = $cli->send($msg, $varsynctimeout);
+	if (!$resp) {
+		$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port}.";
+		log_error("[FreeRADIUS]: {$error}");
+		file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
+	} elseif ($resp->faultCode()) {
+		$cli->setDebug(1);
 		$resp = $cli->send($msg, $varsynctimeout);
-		if(!$resp) {
-			$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port}.";
-			log_error("[FreeRADIUS]: $error");
-			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
-		} elseif($resp->faultCode()) {
-			$cli->setDebug(1);
-			$resp = $cli->send($msg, $varsynctimeout);
-			$error = "An error code was received while FreeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-			log_error("[FreeRADIUS]: $error");
-			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
-		} else {
-			log_error("[FreeRADIUS]: XMLRPC has synced data successfully with {$url}:{$port}.");
-		}
+		$error = "An error code was received while FreeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[FreeRADIUS]: {$error}");
+		file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
+	} else {
+		log_error("[FreeRADIUS]: XMLRPC has synced data successfully with {$url}:{$port}.");
+	}
 	
-	/* tell FreeRADIUS to reload our settings on the destionation sync host. */
+	/* Tell FreeRADIUS to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/freeradius.inc');\n";
-	// pfblocker just needed one fuction to reload after XMLRPC. FreeRADIUS needs more so we point to a fuction below which contains all fuctions
+	/* pfblocker just needed one fuction to reload after XMLRPC. FreeRADIUS needs more so we point to a fuction below which contains all fuctions */
 	$execcmd .= "freeradius_all_after_XMLRPC_resync();";
 	
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($execcmd)
-	);
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($execcmd));
 
 	log_error("[FreeRADIUS]: XMLRPC is reloading data on {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $varsynctimeout);
+	if (!$resp) {
+		$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port} (exec_php).";
+		log_error("[FreeRADIUS]: {$error}");
+		file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
+	} elseif ($resp->faultCode()) {
+		$cli->setDebug(1);
 		$resp = $cli->send($msg, $varsynctimeout);
-		if(!$resp) {
-			$error = "A communications error occurred while FreeRADIUS was attempting XMLRPC sync with {$url}:{$port} (exec_php).";
-			log_error($error);
-			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
-		} elseif($resp->faultCode()) {
-			$cli->setDebug(1);
-			$resp = $cli->send($msg, $varsynctimeout);
-			$error = "An error code was received while FreeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-			log_error($error);
-			file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
-		} else {
-			log_error("[FreeRADIUS]: XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
-		}
-
+		$error = "An error code was received while FreeRADIUS XMLRPC was attempting to sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[FreeRADIUS]: {$error}");
+		file_notice("sync_settings", $error, "FreeRADIUS Settings Sync", "");
+	} else {
+		log_error("[FreeRADIUS]: XMLRPC has reloaded data successfully on {$url}:{$port} (exec_php).");
+	}
 }
 
 // This function restarts all other needed functions after XMLRPC so that the content of .XML + .INC will be written in the files (clients.conf, users)
@@ -2687,9 +2751,9 @@ function freeradius_all_after_XMLRPC_resync() {
 	freeradius_authorizedmacs_resync();
 	freeradius_clients_resync();
 	
-	log_error("FreeRADIUS: Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
+	log_error("[FreeRADIUS]: Finished XMLRPC process. It should be OK. For more information look at the host which started sync.");
 	
-	exec(FREERADIUS_BASE . "/etc/rc.d/radiusd onerestart");
+	exec(FREERADIUS_ETC . "/rc.d/radiusd onerestart");
 }
 
 function freeradius_modulescounter_resync() {
@@ -2812,7 +2876,7 @@ counter forever {
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/modules/counter';
+	$filename = FREERADIUS_ETC . '/raddb/modules/counter';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -2906,7 +2970,7 @@ nt-response=%{%{mschap:NT-Response}:-00}"
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/modules/mschap';
+	$filename = FREERADIUS_ETC . '/raddb/modules/mschap';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -2951,7 +3015,7 @@ realm ntdomain {
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/modules/realm';
+	$filename = FREERADIUS_ETC . '/raddb/modules/realm';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -3004,37 +3068,37 @@ if($arrmodulesldap['varmodulesldapenabletlssupport'] == 'on') {
 		$ca_cert = lookup_ca($arrmodulesldap["ssl_ca_cert1"]);
 		if ($ca_cert != false) {
 			if(base64_decode($ca_cert['prv'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/ca_ldap1_key.pem", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/ca_ldap1_key.pem", 
 					base64_decode($ca_cert['prv']));
-				$conf['ssl_ca_key'] = FREERADIUS_BASE . '/etc/raddb/certs/ca_ldap1_key.pem';
+				$conf['ssl_ca_key'] = FREERADIUS_ETC . '/raddb/certs/ca_ldap1_key.pem';
 			}
 
 
 			if(base64_decode($ca_cert['crt'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/ca_ldap1_cert.pem", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/ca_ldap1_cert.pem", 
 					base64_decode($ca_cert['crt']));
-				$conf['ssl_ca_cert1'] = FREERADIUS_BASE . "/etc/raddb/certs/ca_ldap1_cert.pem";
+				$conf['ssl_ca_cert1'] = FREERADIUS_ETC . "/raddb/certs/ca_ldap1_cert.pem";
 			}
 
 
 			$svr_cert = lookup_cert($arrmodulesldap["ssl_server_cert1"]);
 			if ($svr_cert != false) {
 				if(base64_decode($svr_cert['prv'])) {
-					file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/radius_ldap1_cert.key", 
+					file_put_contents(FREERADIUS_ETC . "/raddb/certs/radius_ldap1_cert.key", 
 						base64_decode($svr_cert['prv']));
-					$conf['ssl_key'] = FREERADIUS_BASE . '/etc/raddb/certs/radius_ldap1_cert.key';
+					$conf['ssl_key'] = FREERADIUS_ETC . '/raddb/certs/radius_ldap1_cert.key';
 				}
 			}
 
 
 			if(base64_decode($svr_cert['crt'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/radius_ldap1_cert.crt", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/radius_ldap1_cert.crt", 
 					base64_decode($svr_cert['crt']));
-				$conf['ssl_server_cert1'] = FREERADIUS_BASE . "/etc/raddb/certs/radius_ldap1_cert.crt";
+				$conf['ssl_server_cert1'] = FREERADIUS_ETC . "/raddb/certs/radius_ldap1_cert.crt";
 			}
 
 
-			$conf['ssl_cert_dir'] = FREERADIUS_BASE . '/etc/raddb/certs';
+			$conf['ssl_cert_dir'] = FREERADIUS_ETC . '/raddb/certs';
 		}
 	$varmodulesldapstarttls = "yes";
 }
@@ -3051,37 +3115,37 @@ if($arrmodulesldap['varmodulesldap2enabletlssupport'] == 'on') {
 		$ca_cert = lookup_ca($arrmodulesldap["ssl_ca_cert2"]);
 		if ($ca_cert != false) {
 			if(base64_decode($ca_cert['prv'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/ca_ldap2_key.pem", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/ca_ldap2_key.pem", 
 					base64_decode($ca_cert['prv']));
-				$conf['ssl_ca_key'] = FREERADIUS_BASE . '/etc/raddb/certs/ca_ldap2_key.pem';
+				$conf['ssl_ca_key'] = FREERADIUS_ETC . '/raddb/certs/ca_ldap2_key.pem';
 			}
 
 
 			if(base64_decode($ca_cert['crt'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/ca_ldap2_cert.pem", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/ca_ldap2_cert.pem", 
 					base64_decode($ca_cert['crt']));
-				$conf['ssl_ca_cert2'] = FREERADIUS_BASE . "/etc/raddb/certs/ca_ldap2_cert.pem";
+				$conf['ssl_ca_cert2'] = FREERADIUS_ETC . "/raddb/certs/ca_ldap2_cert.pem";
 			}
 
 
 			$svr_cert = lookup_cert($arrmodulesldap["ssl_server_cert2"]);
 			if ($svr_cert != false) {
 				if(base64_decode($svr_cert['prv'])) {
-					file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/radius_ldap2_cert.key", 
+					file_put_contents(FREERADIUS_ETC . "/raddb/certs/radius_ldap2_cert.key", 
 						base64_decode($svr_cert['prv']));
-					$conf['ssl_key'] = FREERADIUS_BASE . '/etc/raddb/certs/radius_ldap2_cert.key';
+					$conf['ssl_key'] = FREERADIUS_ETC . '/raddb/certs/radius_ldap2_cert.key';
 				}
 			}
 
 
 			if(base64_decode($svr_cert['crt'])) {
-				file_put_contents(FREERADIUS_BASE . "/etc/raddb/certs/radius_ldap2_cert.crt", 
+				file_put_contents(FREERADIUS_ETC . "/raddb/certs/radius_ldap2_cert.crt", 
 					base64_decode($svr_cert['crt']));
-				$conf['ssl_server_cert2'] = FREERADIUS_BASE . "/etc/raddb/certs/radius_ldap2_cert.crt";
+				$conf['ssl_server_cert2'] = FREERADIUS_ETC . "/raddb/certs/radius_ldap2_cert.crt";
 			}
 
 
-			$conf['ssl_cert_dir'] = FREERADIUS_BASE . '/etc/raddb/certs';
+			$conf['ssl_cert_dir'] = FREERADIUS_ETC . '/raddb/certs';
 		}
 	$varmodulesldap2starttls = "yes";
 }
@@ -3204,7 +3268,7 @@ else {
 	$varmodulesldap2keepaliveidle = ($arrmodulesldap['varmodulesldap2keepaliveidle']?$arrmodulesldap['varmodulesldap2keepaliveidle']:'60');
 	$varmodulesldap2keepaliveprobes = ($arrmodulesldap['varmodulesldap2keepaliveprobes']?$arrmodulesldap['varmodulesldap2keepaliveprobes']:'3');
 	$varmodulesldap2keepaliveinterval = ($arrmodulesldap['varmodulesldap2keepaliveinterval']?$arrmodulesldap['varmodulesldap2keepaliveinterval']:'3');
-$raddb = FREERADIUS_BASE . '/etc/raddb';
+$raddb = FREERADIUS_ETC . '/raddb';
 $conf .= <<<EOD
 # -*- text -*-
 #
@@ -3555,7 +3619,7 @@ ldap ldap2{
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/modules/ldap';
+	$filename = FREERADIUS_ETC . '/raddb/modules/ldap';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -3576,29 +3640,29 @@ function freeradius_plainmacauth_resync() {
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
 	
 	// defining variables with filename path
-	$filepolicyconf = FREERADIUS_BASE . '/etc/raddb/policy.conf';
-	$filepolicyconfbackup = FREERADIUS_BASE . '/etc/raddb/policy.conf.backup';
-	$filemodulesfiles = FREERADIUS_BASE . '/etc/raddb/modules/files';
-	$filemodulesfilesbackup = FREERADIUS_BASE . '/etc/raddb/files.backup';
+	$filepolicyconf = FREERADIUS_ETC . '/raddb/policy.conf';
+	$filepolicyconfbackup = FREERADIUS_ETC . '/raddb/policy.conf.backup';
+	$filemodulesfiles = FREERADIUS_ETC . '/raddb/modules/files';
+	$filemodulesfilesbackup = FREERADIUS_ETC . '/raddb/files.backup';
 	
 	// If unchecked then plain mac auth is disabled and backups of the original files will be restored
 	if ($varsettings['varsettingsenablemacauth'] == '') {
 		// This is a check - only restore files if they aren't already
-		if (file_exists(FREERADIUS_BASE . "/etc/raddb/plain_macauth_enabled")) {
+		if (file_exists(FREERADIUS_ETC . "/raddb/plain_macauth_enabled")) {
 			log_error("FreeRADIUS: Plain-MAC-Auth disabled. Restoring the original file from {$filepolicyconfbackup} and {$filemodulesfilesbackup}");
 			copy($filepolicyconfbackup, $filepolicyconf);
 			copy($filemodulesfilesbackup, $filemodulesfiles);
-			unlink(FREERADIUS_BASE . "/etc/raddb/plain_macauth_enabled");
+			unlink(FREERADIUS_ETC . "/raddb/plain_macauth_enabled");
 			freeradius_serverdefault_resync();
 		}
 	}
 	// If checked then plain mac auth is enabled
 	else {
 		// This is a check - only modify files if they aren't already
-		if (!file_exists(FREERADIUS_BASE . "/etc/raddb/plain_macauth_enabled")) {
+		if (!file_exists(FREERADIUS_ETC . "/raddb/plain_macauth_enabled")) {
 			freeradius_modulesfiles_resync();
 			freeradius_policyconf_resync();
-			exec("cd " . FREERADIUS_BASE . "/etc/raddb && touch " . FREERADIUS_BASE . "/etc/raddb/plain_macauth_enabled");
+			exec("cd " . FREERADIUS_ETC . "/raddb && touch " . FREERADIUS_ETC . "/raddb/plain_macauth_enabled");
 			log_error("FreeRADIUS: Plain-MAC-Auth enabled. Modified {$filepolicyconf} and {$filemodulesfiles}");
 			freeradius_serverdefault_resync();
 		}
@@ -3660,7 +3724,7 @@ files authorized_macs {
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/modules/files';
+	$filename = FREERADIUS_ETC . '/raddb/modules/files';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -3886,7 +3950,7 @@ policy {
 }
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/policy.conf';
+	$filename = FREERADIUS_ETC . '/raddb/policy.conf';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -3895,7 +3959,7 @@ EOD;
 }
 
 function freeradius_motp_resync() {
-	global $config;
+	global $config, $bash_path;
 	$conf = '';
 
 	$varsettings = $config['installedpackages']['freeradiussettings']['config'][0];
@@ -3907,38 +3971,14 @@ function freeradius_motp_resync() {
 	$varsettingsmotpchecksumtype = ($varsettings['varsettingsmotpchecksumtype']?$varsettings['varsettingsmotpchecksumtype']:'md5');
 	$varsettingsmotptokenlength = ($varsettings['varsettingsmotptokenlength']?$varsettings['varsettingsmotptokenlength']:'1-6');
 	
-	// check if disabled then we delete bash und otpverify.sh script
+	// check if disabled then we delete otpverify.sh script
 	if ($varsettings['varsettingsmotpenable'] == '') {
-		if (file_exists(FREERADIUS_BASE . "/etc/raddb/scripts/otpverify.sh")) {
-			unlink(FREERADIUS_BASE . "/etc/raddb/scripts/otpverify.sh");
+		if (file_exists(FREERADIUS_ETC . "/raddb/scripts/otpverify.sh")) {
+			@unlink(FREERADIUS_ETC . "/raddb/scripts/otpverify.sh");
 		}
-		if (exec("cd /var/db/pkg && ls | grep bash") == "bash-4.1.7") {
-			exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
-			log_error('FreeRADIUS: Uninstalling package "bash-4.1.7" which comes with Mobile-One-Time-Password (motp).');
-		}
-		if (exec("cd /var/db/pkg && ls | grep bash") == "bash-4.2.20") {
-			exec("cd /var/db/pkg && pkg_delete `ls | grep bash`");
-			log_error('FreeRADIUS: Uninstalling package "bash-4.2.20" which comes with Mobile-One-Time-Password (motp).');
-		}
-	}
-	
-	// check if enabled then we need to download "bash"
-	else {
-		if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
-			if (exec("cd /var/db/pkg && ls | grep bash") != "bash-4.1.7") {
-				log_error('FreeRADIUS: Downloading and installing package "bash-4.1.7" to use Mobile-One-Time-Password (motp).');
-				exec("pkg_add -r http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/`uname -m`/packages-8.1-release/All/bash-4.1.7.tbz");
-			}
-		} else {
-			if (exec("cd /var/db/pkg && ls | grep bash") != "bash-4.2.20") {
-				log_error('FreeRADIUS: Downloading and installing package "bash-4.2.20" to use Mobile-One-Time-Password (motp).');
-				exec("pkg_add -r http://ftp-archive.freebsd.org/pub/FreeBSD/ports/`uname -m`/packages-8.3-release/All/bash-4.2.20.tbz");
-			}
-		}
-		
-	
-	$conf .= <<<EOD
-#!/bin/bash
+	} else {
+		$conf .= <<<EOD
+#!{$bash_path}
 #
 # Mobile One Time Passwords (Mobile-OTP) for Java 2 Micro Edition, J2ME
 # written by Matthias Straub, Heilbronn, Germany, 2003
@@ -4055,32 +4095,30 @@ exit 11
 
 
 EOD;
-	$filename = FREERADIUS_BASE . '/etc/raddb/scripts/otpverify.sh';
-	conf_mount_rw();
-	file_put_contents($filename, $conf);
-	chmod($filename, 0750);
-	conf_mount_ro();
-	
-	// end of above 'check if enabled then we need to download "bash"'
+		$filename = FREERADIUS_ETC . '/raddb/scripts/otpverify.sh';
+		conf_mount_rw();
+		file_put_contents($filename, $conf);
+		chmod($filename, 0750);
+		conf_mount_ro();
 	}
 
 }
 
 function freeradius_modulesmotp_resync() {
-	global $config;
+	global $config, $bash_path;
 	$conf = '';
 
 	// put the constant to a variable
-	$varFREERADIUS_BASE = FREERADIUS_BASE;
+	$varFREERADIUS_ETC = FREERADIUS_ETC;
 
 	$conf .= <<<EOD
 exec motp {
 		wait = yes
-		program = "/usr/local/bin/bash $varFREERADIUS_BASE/etc/raddb/scripts/otpverify.sh %{request:User-Name} %{request:User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
+		program = "{$bash_path} {$varFREERADIUS_ETC}/raddb/scripts/otpverify.sh %{request:User-Name} %{request:User-Password} %{reply:MOTP-Init-Secret} %{reply:MOTP-PIN} %{reply:MOTP-Offset}"
 	}	
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/modules/motp';
+	$filename = FREERADIUS_ETC . '/raddb/modules/motp';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -4093,28 +4131,28 @@ function freeradius_modulesdatacounter_resync() {
 	$conf = '';
 
 	// put the constant to a variable
-	$varFREERADIUS_BASE = FREERADIUS_BASE;
+	$varFREERADIUS_ETC = FREERADIUS_ETC;
 
 	$conf .= <<<EOD
 exec datacounterdaily {
 		wait = yes
-		program = "/bin/sh $varFREERADIUS_BASE/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} daily %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh {$varFREERADIUS_ETC}/raddb/scripts/datacounter_acct.sh %{request:User-Name} daily %{request:Acct-Input-Octets} %{request:Acct-Output-Octets} %{request:Acct-Status-Type} %{request:Acct-Session-Id}"
 	}
 exec datacounterweekly {
 		wait = yes
-		program = "/bin/sh $varFREERADIUS_BASE/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} weekly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh {$varFREERADIUS_ETC}/raddb/scripts/datacounter_acct.sh %{request:User-Name} weekly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets} %{request:Acct-Status-Type} %{request:Acct-Session-Id}"
 	}
 exec datacountermonthly {
 		wait = yes
-		program = "/bin/sh $varFREERADIUS_BASE/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} monthly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
+		program = "/bin/sh {$varFREERADIUS_ETC}/raddb/scripts/datacounter_acct.sh %{request:User-Name} monthly %{request:Acct-Input-Octets} %{request:Acct-Output-Octets} %{request:Acct-Status-Type} %{request:Acct-Session-Id}"
 	}
 exec datacounterforever {
 		wait = yes
-		program = "/bin/sh $varFREERADIUS_BASE/etc/raddb/scripts/datacounter_acct.sh %{request:User-Name} forever %{request:Acct-Input-Octets} %{request:Acct-Output-Octets}"
-	}	
+		program = "/bin/sh {$varFREERADIUS_ETC}/raddb/scripts/datacounter_acct.sh %{request:User-Name} forever %{request:Acct-Input-Octets} %{request:Acct-Output-Octets} %{request:Acct-Status-Type} %{request:Acct-Session-Id}"
+	}
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/modules/datacounter_acct';
+	$filename = FREERADIUS_ETC . '/raddb/modules/datacounter_acct';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);
@@ -4137,23 +4175,24 @@ TIMERANGE=`echo -n "\\$2" | sed 's/[^a-z]//g' `
 ### This is to make sure there is a used-octets file after the cronjob resetted the counter
 if [ -e "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME" ] && [ ! -e "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME" ]; then
 	echo 0 > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
+	rm "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME-"*
 fi
 
 ### The next two lines are just for getting values for logging output
-MAXOCTETSUSERNAMEMB=$((`cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"`/1024/1024))
-USEDOCTETSUSERNAMEMB=$((`cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"`/1024/1024))
-	
+MAXOCTETSUSERNAMEMB=$((`/bin/cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"`/1024/1024))
+USEDOCTETSUSERNAMEMB=`/bin/cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\${USERNAME}"* | /usr/bin/awk '{ SUM += \$1; } END { print int(SUM/1024/1024); }'`
+
 ### We check if MAX-OCTETS-USERNAME is greater than USED-OCTETS-USERNAME and accept or reject the user
-if [ `cat "/var/log/radacct/datacounter/\$TIMERANGE/max-octets-\$USERNAME"` -gt `cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"` ]; then
-	logger -f /var/log/system.log "FreeRADIUS: Used amount of \$TIMERANGE traffic by \$USERNAME is \$USEDOCTETSUSERNAMEMB MB of \$MAXOCTETSUSERNAMEMB MB! The user was accepted!!!"
+if [ \$MAXOCTETSUSERNAMEMB -gt \$USEDOCTETSUSERNAMEMB ]; then
+	logger -f /var/log/system.log "FreeRADIUS: User \$USERNAME has used \$USEDOCTETSUSERNAMEMB MB of \$MAXOCTETSUSERNAMEMB MB \$TIMERANGE allotted traffic. The login request was accepted."
 	exit 0
 else
-	logger -f /var/log/system.log "FreeRADIUS: Credentials are probably correct but the user \$USERNAME has reached the \$TIMERANGE Amount of Upload and Download Traffic which is \$USEDOCTETSUSERNAMEMB MB of \$MAXOCTETSUSERNAMEMB MB! The user was rejected!!!"
+	logger -f /var/log/system.log "FreeRADIUS: User \$USERNAME has reached the \$TIMERANGE amount of upload and download traffic (\$USEDOCTETSUSERNAMEMB MB of \$MAXOCTETSUSERNAMEMB MB). The login request was denied."
 	exit 99
 fi
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/scripts/datacounter_auth.sh';
+	$filename = FREERADIUS_ETC . '/raddb/scripts/datacounter_auth.sh';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0750);
@@ -4173,6 +4212,8 @@ USERNAME=`echo -n "\\$1" | sed 's/[^0-9a-zA-Z.:_-]/X/g' `
 TIMERANGE=`echo -n "\\$2" | sed 's/[^a-z]//g' `
 ACCTINPUTOCTETS=`echo -n "\\$3" | sed 's/[^0-9]/0/g' `
 ACCTOUTPUTOCTETS=`echo -n "\\$4" | sed 's/[^0-9]/0/g' `
+UPDATETYPE=\$5
+SESSIONID=\$6
 
 ### If we do not get Octets we set some default values
 if [ ! \$ACCTINPUTOCTETS ]; then
@@ -4191,17 +4232,29 @@ else
 	if [ ! -e "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME" ]; then
 		echo 0 > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
 	fi
-### The following two lines (chose the one or the other) are a bad workaround to make accounting accurate with stop/start accounting on pfsense 2.0.1 - it only works if the session will not be interrupted (host disconnects)
-###	USEDOCTETS=\$((\$ACCTINPUTOCTETS+\$ACCTOUTPUTOCTETS))
-	USEDOCTETS=\$((\$ACCTINPUTOCTETS+\$ACCTOUTPUTOCTETS+`cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"`))
-	
-	echo "\$USEDOCTETS" > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
+
+	USEDOCTETS=\$((\$ACCTINPUTOCTETS+\$ACCTOUTPUTOCTETS))
+
+	# If this is an interim update, track it in a separate session file
+	# since the incoming data is a gauge not a counter.
+	if [ \$UPDATETYPE = "Interim-Update" ]; then
+		echo \$USEDOCTETS > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME-\$SESSIONID"
+	else
+		USEDOCTETS=\$((\$USEDOCTETS+`cat "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"`))
+
+		# If there was a session file for this session (from interim updates) clear it since the equivalent
+		# value was just added to the total.
+		if [ -e "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME-\$SESSIONID" ]; then
+			rm "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME-\$SESSIONID"
+		fi
+		echo "\$USEDOCTETS" > "/var/log/radacct/datacounter/\$TIMERANGE/used-octets-\$USERNAME"
+	fi
 	exit 0
 fi
 
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/scripts/datacounter_acct.sh';
+	$filename = FREERADIUS_ETC . '/raddb/scripts/datacounter_acct.sh';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0750);
@@ -4269,7 +4322,7 @@ ATTRIBUTE 		MOTP-Offset 			902 	string
 
 EOD;
 
-	$filename = FREERADIUS_BASE . '/etc/raddb/dictionary';
+	$filename = FREERADIUS_ETC . '/raddb/dictionary';
 	conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0640);

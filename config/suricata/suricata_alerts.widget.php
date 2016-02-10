@@ -42,8 +42,8 @@ if (!is_array($config['installedpackages']['suricata']['rule']))
 $a_instance = &$config['installedpackages']['suricata']['rule'];
 
 /* array sorting */
-function sksort(&$array, $subkey="id", $sort_ascending=false) {
-        /* an empty array causes sksort to fail - this test alleviates the error */
+function suricata_sksort(&$array, $subkey="id", $sort_ascending=false) {
+        /* an empty array causes suricata_sksort to fail - this test alleviates the error */
 	if(empty($array))
 	        return false;
 	if (count($array)){
@@ -81,7 +81,7 @@ if (isset($_GET['getNewAlerts'])) {
 	$counter = 0;
 	foreach ($suri_alerts as $a) {
 		$response .= $a['instanceid'] . " " . $a['dateonly'] . "||" . $a['timeonly'] . "||" . $a['src'] . "||";
-		$response .= $a['dst'] . "||" . $a['priority'] . "||" . $a['category'] . "\n";
+		$response .= $a['dst'] . "||" . $a['msg'] . "\n";
 		$counter++;
 		if($counter >= $suri_nentries)
 			break;
@@ -114,12 +114,65 @@ function suricata_widget_get_alerts() {
 			exec("tail -{$suri_nentries} -r /var/log/suricata/suricata_{$if_real}{$suricata_uuid}/alerts.log > /tmp/surialerts_{$suricata_uuid}");
 			if (file_exists("/tmp/surialerts_{$suricata_uuid}")) {
 
-				/*              0         1      2             3      4       5   6              7        8     9   10      11  12      */
-				/* File format: timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,src,srcport,dst,dstport */
-				$fd = fopen("/tmp/surialerts_{$suricata_uuid}", "r");
-				while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-					if(count($fields) < 13)
-						continue;
+				/*************** FORMAT without CSV patch -- ALERT -- ***********************************************************************************/
+				/* Line format: timestamp  action[**] [gid:sid:rev] msg [**] [Classification: class] [Priority: pri] {proto} src:srcport -> dst:dstport */
+				/*              0          1           2   3   4    5                         6                 7     8      9   10         11  12      */
+				/****************************************************************************************************************************************/
+
+				/**************** FORMAT without CSV patch -- DECODER EVENT -- **************************************************************************/
+				/* Line format: timestamp  action[**] [gid:sid:rev] msg [**] [Classification: class] [Priority: pri] [**] [Raw pkt: ...]                */
+				/*              0          1           2   3   4    5                         6                 7                                       */
+				/************** *************************************************************************************************************************/
+
+				if (!$fd = fopen("/tmp/surialerts_{$suricata_uuid}", "r")) {
+					log_error(gettext("[Suricata Widget] Failed to open file /tmp/surialerts_{$suricata_uuid}"));
+					continue;
+				}
+				$buf = "";
+				while (($buf = fgets($fd)) !== FALSE) {
+					$fields = array();
+					$tmp = array();
+
+					// Parse alert log entry to find the parts we want to display
+					$fields[0] = substr($buf, 0, strpos($buf, '  '));
+
+					// The regular expression match below returns an array as follows:
+					// [2] => GID, [3] => SID, [4] => REV, [5] => MSG, [6] => CLASSIFICATION, [7] = PRIORITY
+					preg_match('/\[\*{2}\]\s\[((\d+):(\d+):(\d+))\]\s(.*)\[\*{2}\]\s\[Classification:\s(.*)\]\s\[Priority:\s(\d+)\]\s/', $buf, $tmp);
+					$fields['gid'] = trim($tmp[2]);
+					$fields['sid'] = trim($tmp[3]);
+					$fields['rev'] = trim($tmp[4]);
+					$fields['msg'] = trim($tmp[5]);
+					$fields['class'] = trim($tmp[6]);
+					$fields['priority'] = trim($tmp[7]);
+
+					// The regular expression match below looks for the PROTO, SRC and DST fields
+					// and returns an array as follows:
+					// [1] = PROTO, [2] => SRC:SPORT [3] => DST:DPORT
+					if (preg_match('/\{(.*)\}\s(.*)\s->\s(.*)/', $buf, $tmp)) {
+						// Get SRC
+						$fields['src'] = trim(substr($tmp[2], 0, strrpos($tmp[2], ':')));
+						if (is_ipaddrv6($fields['src']))
+							$fields['src'] = inet_ntop(inet_pton($fields['src']));
+
+						// Get SPORT
+						$fields['sport'] = trim(substr($tmp[2], strrpos($tmp[2], ':') + 1));
+
+						// Get DST
+						$fields['dst'] = trim(substr($tmp[3], 0, strrpos($tmp[3], ':')));
+						if (is_ipaddrv6($fields['dst']))
+							$fields['dst'] = inet_ntop(inet_pton($fields['dst']));
+
+						// Get DPORT
+						$fields['dport'] = trim(substr($tmp[3], strrpos($tmp[3], ':') + 1));
+					}
+					else {
+						// If no PROTO and IP ADDR, then this is a DECODER EVENT
+						$fields['src'] = gettext("Decoder Event");
+						$fields['sport'] = "";
+						$fields['dst'] = "";
+						$fields['dport'] = "";
+					}
 
 					// Create a DateTime object from the event timestamp that
 					// we can use to easily manipulate output formats.
@@ -127,31 +180,30 @@ function suricata_widget_get_alerts() {
 
 					// Check the 'CATEGORY' field for the text "(null)" and
 					// substitute "No classtype defined".
-					if ($fields[6] == "(null)")
-						$fields[6] = "No classtype assigned";
+					if ($fields['class'] == "(null)")
+						$fields['class'] = "No classtype assigned";
 
-					$suricata_alerts[$counter]['instanceid'] = strtoupper($a_instance[$instanceid]['interface']);
+					$suricata_alerts[$counter]['instanceid'] = strtoupper(convert_friendly_interface_to_friendly_descr($a_instance[$instanceid]['interface']));
 					$suricata_alerts[$counter]['timestamp'] = strval(date_timestamp_get($event_tm));
 					$suricata_alerts[$counter]['timeonly'] = date_format($event_tm, "H:i:s");
 					$suricata_alerts[$counter]['dateonly'] = date_format($event_tm, "M d");
+					$suricata_alerts[$counter]['msg'] = $fields['msg'];
 					// Add square brackets around any IPv6 address
-					if (is_ipaddrv6($fields[9]))
-						$suricata_alerts[$counter]['src'] = "[" . $fields[9] . "]";
+					if (is_ipaddrv6($fields['src']))
+						$suricata_alerts[$counter]['src'] = "[" . $fields['src'] . "]";
 					else
-						$suricata_alerts[$counter]['src'] = $fields[9];
+						$suricata_alerts[$counter]['src'] = $fields['src'];
 					// Add the SRC PORT if not null
-					if (!empty($fields[10]))					
-						$suricata_alerts[$counter]['src'] .= ":" . $fields[10];
+					if (!empty($fields['sport']) || $fields['sport'] == '0')					
+						$suricata_alerts[$counter]['src'] .= ":" . $fields['sport'];
 					// Add square brackets around any IPv6 address
-					if (is_ipaddrv6($fields[11]))
-						$suricata_alerts[$counter]['dst'] = "[" . $fields[11] . "]";
+					if (is_ipaddrv6($fields['dst']))
+						$suricata_alerts[$counter]['dst'] = "[" . $fields['dst'] . "]";
 					else
-						$suricata_alerts[$counter]['dst'] = $fields[11];
-					// Add the SRC PORT if not null
-					if (!empty($fields[12]))
-						$suricata_alerts[$counter]['dst'] .= ":" . $fields[12];
-					$suricata_alerts[$counter]['priority'] = $fields[7];
-					$suricata_alerts[$counter]['category'] = $fields[6];
+						$suricata_alerts[$counter]['dst'] = $fields['dst'];
+					// Add the DST PORT if not null
+					if (!empty($fields['dport']) || $fields['dport'] == '0')
+						$suricata_alerts[$counter]['dst'] .= ":" . $fields['dport'];
 					$counter++;
 				};
 				fclose($fd);
@@ -162,9 +214,9 @@ function suricata_widget_get_alerts() {
 
 	// Sort the alerts array
 	if (isset($config['syslog']['reverse'])) {
-		sksort($suricata_alerts, 'timestamp', false);
+		suricata_sksort($suricata_alerts, 'timestamp', false);
 	} else {
-		sksort($suricata_alerts, 'timestamp', true);
+		suricata_sksort($suricata_alerts, 'timestamp', true);
 	}
 
 	return $suricata_alerts;
@@ -192,7 +244,7 @@ function suricata_widget_get_alerts() {
 		<tr>
 			<th class="listhdrr"><?=gettext("IF/Date");?></th>
 			<th class="listhdrr"><?=gettext("Src/Dst Address");?></th>
-			<th class="listhdrr"><?=gettext("Classification");?></th>
+			<th class="listhdrr"><?=gettext("Description");?></th>
 		</tr>
 	</thead>
 	<tbody id="suricata-alert-entries">
@@ -205,7 +257,7 @@ function suricata_widget_get_alerts() {
 				echo("	<tr class='" . $evenRowClass . "'>
 				<td class='listMRr'>" . $alert['instanceid'] . " " . $alert['dateonly'] . "<br/>" . $alert['timeonly'] . "</td>		
 				<td class='listMRr ellipsis' nowrap><div style='display:inline;' title='" . $alert['src'] . "'>" . $alert['src'] . "</div><br/><div style='display:inline;' title='" . $alert['dst'] . "'>" . $alert['dst'] . "</div></td>
-				<td class='listMRr'>Pri: " . $alert['priority'] . " " . $alert['category'] . "</td></tr>");
+				<td class='listMRr'><div style='display: fixed; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2em; max-height: 2.4em; overflow: hidden; text-overflow: ellipsis;' title='{$alert['msg']}'>" . $alert['msg'] . "</div></td></tr>");
 				$counter++;
 				if($counter >= $suri_nentries)
 					break;

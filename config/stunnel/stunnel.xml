@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	stunnel.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2007-2008 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<name>stunnel</name>
+	<version>5.20.3</version>
+	<title>Services: Secure Tunnel</title>
+	<menu>
+		<name>STunnel</name>
+		<section>Services</section>
+		<configfile>stunnel.xml</configfile>
+	</menu>
+	<include_file>/usr/local/pkg/stunnel.inc</include_file>	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel.priv.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/stunnel/stunnel_certs.xml</item>
+	</additional_files_needed>
+	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
+	<tabs>
+		<tab>
+			<text>Tunnels</text>
+			<url>/pkg.php?xml=stunnel.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Certificates</text>
+			<url>/pkg.php?xml=stunnel_certs.xml</url>
+		</tab>
+	</tabs>
+	<service>
+		<name>stunnel</name>
+		<rcfile>stunnel.sh</rcfile>
+		<executable>stunnel</executable>
+	</service>	
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Listen on IP</fielddescr>
+			<fieldname>localip</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Listen on Port</fielddescr>
+			<fieldname>localport</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Certificate</fielddescr>
+			<fieldname>certificatelink</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Redirects to IP</fielddescr>
+			<fieldname>redirectip</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Redirects to Port</fielddescr>
+			<fieldname>redirectport</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter a description for this redirection.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Client Mode</fielddescr>
+			<fieldname>client</fieldname>
+			<description>Use client mode for this tunnel (i.e. connect to an SSL server, do not act as an SSL server).</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Listen on IP</fielddescr>
+			<fieldname>localip</fieldname>
+			<description>Enter the local IP address to bind this redirection to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Listen on Port</fielddescr>
+			<fieldname>localport</fieldname>
+			<description>Enter the local port to bind this redirection to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Certificate</fielddescr>
+			<fieldname>certificate</fieldname>
+			<description>Select server certificate to use for this tunnel. Certificates are defined on the 'Certificates' page.</description>
+			<type>select</type>
+			<options>
+				<option><name>default</name><value></value></option>
+			</options>
+			<default_value>default</default_value>
+		</field>
+		<field>
+			<fielddescr>Redirects to IP</fielddescr>
+			<fieldname>redirectip</fieldname>
+			<description>Enter the IP address to redirect this to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Redirects to Port</fielddescr>
+			<fieldname>redirectport</fieldname>
+			<description>Enter the port to redirect to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Outgoing Source IP</fielddescr>
+			<fieldname>sourceip</fieldname>
+			<description>Enter the source IP address for outgoing connections.</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_add_php_command_late>
+		stunnel_save($config);
+	</custom_add_php_command_late>
+	<custom_php_install_command>
+		stunnel_install();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		stunnel_deinstall();
+	</custom_php_deinstall_command>
+	<custom_php_after_form_command>
+		stunnel_addcerts($config);
+	</custom_php_after_form_command>
+</packagegui>

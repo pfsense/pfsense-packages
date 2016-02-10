@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	ntopng.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2014-2015 ESF, LLC
+	All rights reserved.
+*/
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	 1. Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
+
+	 2. Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+	]]>
+	</copyright>
+	<name>ntopng</name>
+	<version>0.8.2</version>
+	<title>Diagnostics: ntopng Settings</title>
+	<include_file>/usr/local/pkg/ntopng.inc</include_file>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/ntopng/ntopng.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/ntopng/ntopng.priv.inc</item>
+	</additional_files_needed>
+	<aftersaveredirect>pkg_edit.php?xml=ntopng.xml</aftersaveredirect>
+	<menu>
+		<name>ntopng Settings</name>
+		<tooltiptext>Set ntopng settings such as password and port.</tooltiptext>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=ntopng.xml</url>
+	</menu>
+	<menu>
+		<name>ntopng</name>
+		<tooltiptext>Access ntopng</tooltiptext>
+		<section>Diagnostics</section>
+		<url>http://$myurl:3000</url>
+	</menu>
+	<service>
+		<name>ntopng</name>
+		<rcfile>ntopng.sh</rcfile>
+		<executable>ntopng</executable>
+		<description>ntopng Network Traffic Monitor</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>ntopng Settings</text>
+			<url>/pkg_edit.php?xml=ntopng.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Access ntopng</text>
+			<url>http://$myurl:3000</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Enable ntopng</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Check this to enable ntopng.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Keep Data/Settings</fielddescr>
+			<fieldname>keepdata</fieldname>
+			<description>
+				<![CDATA[
+				Check this to keep ntopng settings, graphs and traffic data. (Default: on)<br />
+				<strong><span class="errmsg">Note:</span> If 'Keep Data/Settings' is disabled, all settings and data will be wiped on package uninstall/reinstall/upgrade!</strong>
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+		<field>
+			<fielddescr>ntopng Admin Password</fielddescr>
+			<fieldname>redis_password</fieldname>
+			<description>Enter the password for the ntopng GUI. Minimum 5 characters.</description>
+			<type>password</type>
+			<required>true</required>
+			<size>20</size>
+		</field>
+		<field>
+			<fielddescr>Confirm ntopng Admin Password</fielddescr>
+			<fieldname>redis_passwordagain</fieldname>
+			<type>password</type>
+			<required>true</required>
+			<size>20</size>
+		</field>
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>interface_array</fieldname>
+			<type>interfaces_selection</type>
+			<size>3</size>
+			<default_value>lan</default_value>
+			<multiple>true</multiple>
+			<hideinterfaceregex>loopback</hideinterfaceregex>
+		</field>
+		<field>
+			<fielddescr>DNS Mode</fielddescr>
+			<fieldname>dns_mode</fieldname>
+			<description>
+				<![CDATA[
+				Configures how name resolution is handled.<br /><br />
+				Additionally, GeoIP Data can provide location information about IP addresses.<br />
+				This product includes GeoLite data created by MaxMind, available from <a href="http://www.maxmind.com">http://www.maxmind.com</a><br /><br />
+				<input type="submit" name="Submit" value="Update GeoIP Data" />
+				]]>
+			</description>
+			<type>select</type>
+			<default_value>0</default_value>
+			<options>
+				<option><value>0</value><name>Decode DNS responses and resolve local numeric IPs only (default)</name></option>
+				<option><value>1</value><name>Decode DNS responses and resolve all numeric IPs</name></option>
+				<option><value>2</value><name>Decode DNS responses and don't resolve numeric IPs</name></option>
+				<option><value>3</value><name>Don't decode DNS responses and don't resolve numeric IPs</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Local Networks</fielddescr>
+			<fieldname>local_networks</fieldname>
+			<description>
+				<![CDATA[
+				Configures how Local Networks are defined.<br />
+				(Default: Consider all RFC1918 networks local)
+				]]>
+			</description>
+			<type>select</type>
+			<default_value>rfc1918</default_value>
+			<options>
+				<option><value>rfc1918</value><name>Consider all RFC1918 networks local</name></option>
+				<option><value>selected</value><name>Consider selected interface networks local</name></option>
+				<option><value>lanonly</value><name>Consider only LAN interface local</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Historical Data Storage</fielddescr>
+			<fieldname>dump_flows</fieldname>
+			<description>
+				<![CDATA[
+				Enable historical data storage.<br />
+				<strong><span class="errmsg">WARNING:</span> This feature consumes HUGE amount of disk space.</strong>
+				Also, browsing the historical data is VERY slow.<br />
+				The historical interface is considered <a href="http://www.gossamer-threads.com/lists/ntop/misc/37506#37506">abandoned by upstream</a>,
+				pending more usable replacement.<br /><br />
+				<input type="submit" name="Delete" value="Delete (Historical) Data" />
+				<strong><span class="errmsg">WARNING:</span> This will delete all ntopng graphs, traffic data and historical dump flows!
+				]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Disable Alerts</fielddescr>
+			<fieldname>disable_alerts</fieldname>
+			<description>Disables all alerts generated by ntopng, such as flooding notifications.</description>
+			<type>checkbox</type>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		ntopng_sync_package();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		ntopng_php_install_command();
+		ntopng_update_geoip();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		ntopng_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		ntopng_validate_input($_POST, $input_errors);
+	</custom_php_validation_command>
+</packagegui>

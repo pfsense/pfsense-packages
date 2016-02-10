@@ -77,7 +77,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache.template</item>
+		<item>https://packages.pfsense.org/packages/config/apache_mod_security-dev/apache24.template</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -257,6 +257,72 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>
+				<![CDATA[Location(s)]]>
+			</fielddescr>
+			<fieldname>locations</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr><![CDATA[Location]]></fielddescr>
+					<fieldname>location</fieldname>
+					<description>Server Location</description>
+					<source><![CDATA[$config['installedpackages']['apachelocation']['config']]]></source>
+					<source_name>name</source_name>
+					<source_value>name</source_value>
+					<show_disable_value>none</show_disable_value>
+					<type>select_source</type>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+		<field>
+			<name>SSL Environment</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>SSL Protocol</fielddescr>
+			<fieldname>ssl_protocol</fieldname>
+			<size>50</size>
+			<description><![CDATA[Enter the SSL protocol versions allowed (default: all -SSLv2)]]></description>
+			<type>input</type>
+			<default_value>all -SSLv2</default_value>
+		</field>
+		<field>
+			<fielddescr>SSL Cipher Suite</fielddescr>
+			<fieldname>ssl_cipher_suite</fieldname>
+			<size>50</size>
+			<description><![CDATA[Configure the Cipher Suite the client is permitted to negotiate in the SSL handshake phase. (default: ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL)]]></description>
+			<type>input</type>
+			<default_value>ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL</default_value>
+		</field>
+		<field>
+			<fielddescr>SSL Honor Cipher Order</fielddescr>
+			<fieldname>ssl_honor_cipher_order</fieldname>
+			<description><![CDATA[Forces the server's preferences to be used in a SSLv3/TLSv1 handshake (default: off)]]></description>
+			<default_value>off</default_value>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>SSL Proxy Engine</fielddescr>
+			<fieldname>ssl_proxy_engine</fieldname>
+			<description><![CDATA[Enables the SSL proxy engine for the current virtualhost (default: on)]]></description>
+			<default_value>on</default_value>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>SSL Proxy Verify</fielddescr>
+			<fieldname>ssl_proxy_verify</fieldname>
+			<description><![CDATA[When a proxy is configured to forward requests to a remote SSL server, this directive can be used to configure certificate verification of the remote server. ]]></description>
+			<type>select</type>
+			<options>
+				<option><name>None</name><value>none</value></option>
+				<option><name>Optional (remote server MAY present a valid certificate)</name><value>optional</value></option>
+				<option><name>Require (remote server HAS to present a valid certificate)</name><value>require</value></option>
+				<option><name>Optional, without CA (remote server may present a valid certificate, but it need not be (successfully) verifiable)</name><value>optional_no_ca</value></option>
+			</options>
+			<default_value>none</default_value>
+		</field>
+		<field>
 			<fielddescr>HTTPS SSL certificate</fielddescr>
 			<fieldname>ssl_cert</fieldname>
 			<description>Choose the SSL Server Certificate here.</description>
@@ -287,25 +353,6 @@
 			<show_disable_value>none</show_disable_value>
 		</field>
 		<field>
-			<fielddescr>
-				<![CDATA[Location(s)]]>
-			</fielddescr>
-			<fieldname>locations</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-				<rowhelperfield>
-					<fielddescr><![CDATA[Location]]></fielddescr>
-					<fieldname>location</fieldname>
-					<description>Server Location</description>
-					<source><![CDATA[$config['installedpackages']['apachelocation']['config']]]></source>
-					<source_name>name</source_name>
-					<source_value>name</source_value>
-					<show_disable_value>none</show_disable_value>
-					<type>select_source</type>
-				</rowhelperfield>
-			</rowhelper>
-		</field>
-		<field>
 			<name>Logging</name>
 			<type>listtopic</type>
 		</field>
@@ -315,7 +362,7 @@
 			<description><![CDATA[When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.]]></description>
 			<type>checkbox</type>
 		</field>
-			<field>
+		<field>
 			<fielddescr>Log file</fielddescr>
 			<fieldname>logfile</fieldname>
 			<description><![CDATA[Enable access and error log for this virtual host.]]></description>

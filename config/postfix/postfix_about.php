@@ -2,7 +2,7 @@
 /*
 	postfix_about.php
 	part of pfSense (https://www.pfsense.org/)
-	Copyright (C) 2011-2013 Marcello Coutinho <marcellocoutinho@gmail.com>
+	Copyright (C) 2011-2014 Marcello Coutinho <marcellocoutinho@gmail.com>
 	based on varnish_view_config.
 	All rights reserved.
 
@@ -48,7 +48,7 @@ include("head.inc");
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <!-- <form action="postfix_view_config.php" method="post"> -->
-	
+
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
@@ -68,7 +68,7 @@ include("head.inc");
 ?>
 		</td></tr>
  		<tr>
- 		
+
     		<td>
 				<div id="mainarea">
 					<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
@@ -86,11 +86,11 @@ include("head.inc");
 								 If you want that your donation goes to this package developer, make a note on donation forwarding it to me.<br><br>");?></td>
                         </tr>
 						</table>
-						
+
 				</div>
 			</td>
 		</tr>
-	
+
 
 	</table>
 	<br>

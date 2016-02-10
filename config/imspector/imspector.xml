@@ -43,7 +43,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>imspector</name>
-	<version>20111108</version>
+	<version>20111108_1 pkg v 0.3.2</version>
 	<title>Services: IMSpector</title>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/imspector.inc</include_file>
@@ -239,7 +239,7 @@
 		</field>
 	</fields>
 	<custom_php_validation_command>
-		validate_form_imspector($_POST, &amp;$input_errors);
+		validate_form_imspector($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_imspector();

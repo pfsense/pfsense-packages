@@ -47,29 +47,31 @@ else
 
 // Retrieve any passed QUERY STRING or POST variables
 if (isset($_POST['type']))
-	$type = $_POST['type'];
+	$type = htmlspecialchars($_POST['type']);
 elseif (isset($_GET['type']))
 	$type = htmlspecialchars($_GET['type']);
 
 if (isset($_POST['varname']))
-	$varname = $_POST['varname'];
+	$varname = htmlspecialchars($_POST['varname']);
 elseif (isset($_GET['varname']))
 	$varname = htmlspecialchars($_GET['varname']);
 
 if (isset($_POST['multi_ip']))
-	$multi_ip = $_POST['multi_ip'];
+	$multi_ip = htmlspecialchars($_POST['multi_ip']);
 elseif (isset($_GET['multi_ip']))
 	$multi_ip = htmlspecialchars($_GET['multi_ip']);
 
-if (isset($_POST['returl']))
+if (isset($_POST['returl']) && substr($_POST['returl'], 0, 1) == '/')
 	$referrer = urldecode($_POST['returl']);
-elseif (isset($_GET['returl']))
+elseif (isset($_GET['returl']) && substr($_GET['returl'], 0, 1) == '/')
 	$referrer = urldecode($_GET['returl']);
+else
+	$referrer = $_SERVER['HTTP_REFERER'];
 
 // Make sure we have a valid VARIABLE name
 // and ALIAS TYPE, or else bail out.
 if (is_null($type) || is_null($varname)) {
-	header("Location: http://{$referrer}?{$querystr}");
+	header("Location: {$referrer}?{$querystr}");
 	exit;
 }
 
@@ -132,8 +134,8 @@ include("head.inc");
 <input type="hidden" name="varname" value="<?=$varname;?>"/>
 <input type="hidden" name="type" value="<?=$type;?>"/>
 <input type="hidden" name="multi_ip" value="<?=$multi_ip;?>"/>
-<input type="hidden" name="returl" value="<?=$referrer;?>"/>
-<input type="hidden" name="org_querystr" value="<?=$querystr;?>"/>
+<input type="hidden" name="returl" value="<?=htmlspecialchars($referrer);?>"/>
+<input type="hidden" name="org_querystr" value="<?=htmlspecialchars($querystr);?>"/>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <div id="boxarea">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -151,8 +153,8 @@ include("head.inc");
 				<col width="35%" align="left" axis="string">
 			</colgroup>
 			<thead>
-			   <tr>
-				<th class="listhdrr"></th>
+			   <tr class="sortableHeaderRowIdentifier">
+				<th class="listhdrr sorttable_nosort"></th>
 				<th class="listhdrr" axis="string"><?=gettext("Alias Name"); ?></th>
 				<th class="listhdrr" axis="string"><?=gettext("Values"); ?></th>
 				<th class="listhdrr" axis="string"><?=gettext("Description"); ?></th>

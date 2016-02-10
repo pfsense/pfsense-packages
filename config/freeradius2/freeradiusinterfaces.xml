@@ -45,7 +45,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiusinterfaces</name>
-	<version>none</version>
+	<version>2.2.0</version>
 	<title>FreeRADIUS: Interfaces</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<tabs>
@@ -120,7 +120,7 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>GENERAL CONFIGURATION</name>
+			<name>General Configuration</name>
 			<type>listtopic</type>
 		</field>	
 		<field>
@@ -175,7 +175,7 @@
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description><![CDATA[Enter any description you like for this interface.]]></description>
+			<description><![CDATA[Optionally enter a description here for your reference.]]></description>
 			<type>input</type>
 		</field>
 	</fields>

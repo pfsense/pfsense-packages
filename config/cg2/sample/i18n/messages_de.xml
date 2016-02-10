@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<po creationdate ="2006-09-20 12:37+0100" translator="me@daniel.stefan.haischt.name">
-  <message msgid="hey, this is only meant for quick and dirty stuff, do NOT implement anything longer than 2 or 3 commands here! Btw, i was clicked."
-           msgstr="Hei, dies eignet sich nur f&#252;r Testzwecke. Benutze nur nur Quellcode der nicht mehr als 2 oder 3 Befehle umfasst! BTW, Ich wurde gedr&#252;ckt." />
-  <message msgid="Hi, don't abuse me, use include_javascript instead!"
-           msgstr="Hallo, missbrauche mich nicht. Nutze stattdessen include_javascript!" />
-</po>

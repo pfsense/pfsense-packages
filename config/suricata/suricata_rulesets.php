@@ -47,7 +47,7 @@ $suricatadir = SURICATADIR;
 $flowbit_rules_file = FLOWBITS_FILENAME;
 
 // Array of default events rules for Suricata
-$default_rules = array( "decoder-events.rules", "files.rules", "http-events.rules", 
+$default_rules = array( "decoder-events.rules", "dns-events.rules", "files.rules", "http-events.rules", 
 			"smtp-events.rules", "stream-events.rules", "tls-events.rules" );
 
 if (!is_array($config['installedpackages']['suricata']['rule'])) {
@@ -63,15 +63,12 @@ if (is_null($id))
 	$id = 0;
 
 if (isset($id) && $a_nat[$id]) {
-	$pconfig['enable'] = $a_nat[$id]['enable'];
-	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
-	$pconfig['autoflowbitrules'] = $a_nat[$id]['autoflowbitrules'];
+	$pconfig['autoflowbits'] = $a_nat[$id]['autoflowbitrules'];
 	$pconfig['ips_policy_enable'] = $a_nat[$id]['ips_policy_enable'];
 	$pconfig['ips_policy'] = $a_nat[$id]['ips_policy'];
 }
 
-$if_real = get_real_interface($pconfig['interface']);
+$if_real = get_real_interface($a_nat[$id]['interface']);
 $suricata_uuid = $a_nat[$id]['uuid'];
 $snortdownload = $config['installedpackages']['suricata']['config'][0]['enable_vrt_rules'] == 'on' ? 'on' : 'off';
 $emergingdownload = $config['installedpackages']['suricata']['config'][0]['enable_etopen_rules'] == 'on' ? 'on' : 'off';
@@ -80,6 +77,8 @@ $snortcommunitydownload = $config['installedpackages']['suricata']['config'][0][
 
 $no_emerging_files = false;
 $no_snort_files = false;
+
+$enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
 
 /* Test rule categories currently downloaded to $SURICATADIR/rules and set appropriate flags */
 if ($emergingdownload == 'on') {
@@ -143,27 +142,33 @@ if ($_POST["save"]) {
 		$a_nat[$id]['autoflowbitrules'] = 'on';
 	else {
 		$a_nat[$id]['autoflowbitrules'] = 'off';
-		if (file_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}"))
-			@unlink("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
+		unlink_if_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}");
 	}
 
-	write_config();
+	write_config("Suricata pkg: save enabled rule categories for {$a_nat[$id]['interface']}.");
 
 	/*************************************************/
 	/* Update the suricata.yaml file and rebuild the */
 	/* rules for this interface.                     */
 	/*************************************************/
 	$rebuild_rules = true;
+	conf_mount_rw();
 	suricata_generate_yaml($a_nat[$id]);
+	conf_mount_ro();
 	$rebuild_rules = false;
 
 	/* Signal Suricata to "live reload" the rules */
 	suricata_reload_config($a_nat[$id]);
+
+	$pconfig = $_POST;
+	$enabled_rulesets_array = explode("||", $enabled_items);
+	if (suricata_is_running($suricata_uuid, $if_real))
+		$savemsg = gettext("Suricata is 'live-loading' the new rule set on this interface.");
+
+	// Sync to configured CARP slaves if any are enabled
+	suricata_sync_on_changes();
 }
 elseif ($_POST['unselectall']) {
-	// Remove all but the default events and files rules
-	$a_nat[$id]['rulesets'] = implode("||", $default_rules);
-
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
 		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
@@ -173,13 +178,21 @@ elseif ($_POST['unselectall']) {
 		unset($a_nat[$id]['ips_policy']);
 	}
 
-	write_config();
-	sync_suricata_package_config();
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+
+	// Remove all but the default events and files rules
+	$enabled_rulesets_array = array();
+	$enabled_rulesets_array = implode("||", $default_rules);
+
+	$savemsg = gettext("All rule categories have been de-selected.  ");
+	if ($_POST['ips_policy_enable'] == "on")
+		$savemsg .= gettext("Only the rules included in the selected IPS Policy will be used.");
+	else
+		$savemsg .= gettext("There currently are no inspection rules enabled for this Suricata instance!");
 }
 elseif ($_POST['selectall']) {
-	// Start with the required default events and files rules
-	$rulesets = $default_rules;
-
 	if ($_POST['ips_policy_enable'] == "on") {
 		$a_nat[$id]['ips_policy_enable'] = 'on';
 		$a_nat[$id]['ips_policy'] = $_POST['ips_policy'];
@@ -188,40 +201,46 @@ elseif ($_POST['selectall']) {
 		$a_nat[$id]['ips_policy_enable'] = 'off';
 		unset($a_nat[$id]['ips_policy']);
 	}
+
+	$pconfig['autoflowbits'] = $_POST['autoflowbits'];
+	$pconfig['ips_policy_enable'] = $_POST['ips_policy_enable'];
+	$pconfig['ips_policy'] = $_POST['ips_policy'];
+
+	// Start with the required default events and files rules
+	$enabled_rulesets_array = $default_rules;
 
 	if ($emergingdownload == 'on') {
 		$files = glob("{$suricatadir}rules/" . ET_OPEN_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
 	elseif ($etpro == 'on') {
 		$files = glob("{$suricatadir}rules/" . ET_PRO_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
 
 	if ($snortcommunitydownload == 'on') {
 		$files = glob("{$suricatadir}rules/" . GPL_FILE_PREFIX . "community.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
 
 	/* Include the Snort VRT rules only if enabled and no IPS policy is set */
-	if ($snortdownload == 'on' && $a_nat[$id]['ips_policy_enable'] == 'off') {
+	if ($snortdownload == 'on' && empty($_POST['ips_policy_enable'])) {
 		$files = glob("{$suricatadir}rules/" . VRT_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
-			$rulesets[] = basename($file);
+			$enabled_rulesets_array[] = basename($file);
 	}
-
-	$a_nat[$id]['rulesets'] = implode("||", $rulesets);
-
-	write_config();
-	sync_suricata_package_config();
 }
+
+// Get any automatic rule category enable/disable modifications
+// if auto-SID Mgmt is enabled.
+$cat_mods = suricata_sid_mgmt_auto_categories($a_nat[$id], FALSE);
 
 // See if we have any Auto-Flowbit rules and enable
 // the VIEW button if we do.
-if ($a_nat[$id]['autoflowbitrules'] == 'on') {
+if ($pconfig['autoflowbits'] == 'on') {
 	if (file_exists("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}") &&
 	    filesize("{$suricatadir}suricata_{$suricata_uuid}_{$if_real}/rules/{$flowbit_rules_file}") > 0) {
 		$btn_view_flowb_rules = " title=\"" . gettext("View flowbit-required rules") . "\"";
@@ -232,9 +251,7 @@ if ($a_nat[$id]['autoflowbitrules'] == 'on') {
 else
 	$btn_view_flowb_rules = " disabled";
 
-$enabled_rulesets_array = explode("||", $a_nat[$id]['rulesets']);
-
-$if_friendly = convert_friendly_interface_to_friendly_descr($pconfig['interface']);
+$if_friendly = convert_friendly_interface_to_friendly_descr($a_nat[$id]['interface']);
 $pgtitle = gettext("Suricata IDS: Interface {$if_friendly} - Categories");
 include_once("head.inc");
 ?>
@@ -243,33 +260,39 @@ include_once("head.inc");
 
 <?php
 include("fbegin.inc"); 
+?>
 
+<form action="suricata_rulesets.php" method="post" name="iform" id="iform">
+<input type="hidden" name="id" id="id" value="<?=$id;?>" />
+
+<?php
 /* Display message */
 if ($input_errors) {
-	print_input_errors($input_errors); // TODO: add checks
+	print_input_errors($input_errors);
 }
 
 if ($savemsg) {
 	print_info_box($savemsg);
 }
-
 ?>
 
-<form action="suricata_rulesets.php" method="post" name="iform" id="iform">
-<input type="hidden" name="id" id="id" value="<?=$id;?>" />
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php    
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -282,6 +305,7 @@ if ($savemsg) {
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -289,6 +313,7 @@ if ($savemsg) {
 	<td>
 	<div id="mainarea">
 	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody>
 <?php 
 	$isrulesfolderempty = glob("{$suricatadir}rules/*.rules");
 	$iscfgdirempty = array();
@@ -307,18 +332,19 @@ if ($savemsg) {
 <?php else: ?>
 		<tr>
 			<td>
-			<table width="100%" border="0"
-				cellpadding="0" cellspacing="0">
+			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tbody>
 			<tr>
 				<td colspan="4" class="listtopic"><?php echo gettext("Automatic flowbit resolution"); ?><br/></td>
 			</tr>
 			<tr>
-				<td colspan="4" valign="center" class="listn">
+				<td colspan="4" style="vertical-align: middle;" class="listn">
 					<table width="100%" border="0" cellpadding="2" cellspacing="0">
+					   <tbody>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Resolve Flowbits"); ?></td>
 						<td width="85%"><input name="autoflowbits" id="autoflowbitrules" type="checkbox" value="on" 
-						<?php if ($a_nat[$id]['autoflowbitrules'] == "on" || empty($a_nat[$id]['autoflowbitrules'])) echo "checked"; ?>/>
+						<?php if ($pconfig['autoflowbits'] == "on" || empty($pconfig['autoflowbits'])) echo "checked"; ?>/>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("If checked, Suricata will auto-enable rules required for checked flowbits.  ");
 						echo gettext("The Default is "); ?><strong><?php echo gettext("Checked."); ?></strong></span></td>
 					   </tr>
@@ -340,6 +366,7 @@ if ($savemsg) {
 						<?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . gettext("Auto-enabled rules generating unwanted alerts should have their GID:SID added to the Suppression List for the interface."); ?>
 						<br/></td>
 					   </tr>
+					   </tbody>
 					</table>
 				</td>
 			</tr>
@@ -349,8 +376,9 @@ if ($savemsg) {
 				<td colspan="4" class="listtopic"><?php echo gettext("Snort IPS Policy selection"); ?><br/></td>
 			</tr>
 			<tr>
-				<td colspan="4" valign="center" class="listn">
+				<td colspan="4" style="vertical-align: middle;" class="listn">
 					<table width="100%" border="0" cellpadding="2" cellspacing="0">
+					   <tbody>
 					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("Use IPS Policy"); ?></td>
 						<td width="85%"><input name="ips_policy_enable" id="ips_policy_enable" type="checkbox" value="on" <?php if ($a_nat[$id]['ips_policy_enable'] == "on") echo "checked"; ?>
@@ -365,7 +393,9 @@ if ($savemsg) {
 						"although Emerging Threats categories may still be selected if enabled on the Global Settings tab.  " .
 						"These will be added to the pre-defined Snort IPS policy rules from the Snort VRT."); ?><br/></td>
 					   </tr>
-					   <tr id="ips_row1">
+					   </tbody>
+					   <tbody id="ips_controls">
+					   <tr>
 						<td width="15%" class="listn"><?php echo gettext("IPS Policy Selection"); ?></td>
 						<td width="85%"><select name="ips_policy" class="formselect" <?=$policy_select_disable?> >
 									<option value="connectivity" <?php if ($pconfig['ips_policy'] == "connected") echo "selected"; ?>><?php echo gettext("Connectivity"); ?></option>
@@ -374,7 +404,7 @@ if ($savemsg) {
 								</select>
 						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Snort IPS policies are:  Connectivity, Balanced or Security."); ?></span></td>
 					   </tr>
-					   <tr id="ips_row2">
+					   <tr>
 						<td width="15%">&nbsp;</td>
 						<td width="85%">
 						<?php echo gettext("Connectivity blocks most major threats with few or no false positives.  " . 
@@ -383,6 +413,7 @@ if ($savemsg) {
 						"Security is a stringent policy.  It contains everything in the first two " .
 						"plus policy-type rules such as Flash in an Excel file."); ?><br/></td>
 					   </tr>
+					   </tbody>
 					</table>
 				</td>
 			</tr>
@@ -392,15 +423,27 @@ if ($savemsg) {
 			</tr>
 			<tr>
 				<td colspan="4">
-					<table width=90% align="center" border="0" cellpadding="2" cellspacing="0">
-						<tr height="45px">
-							<td valign="middle"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all to enforcing rules"); ?>"/></td>
-							<td valign="middle"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove all from enforcing rules"); ?>"/></td>
-							<td valign="middle"><input value=" Save " class="formbtns" type="submit" name="save" id="save" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
-							<td valign="middle"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
+					<table width="95%" style="margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="0">
+						<tbody>
+						<tr height="32px">
+							<td style="vertical-align: middle;"><input value="Select All" class="formbtns" type="submit" name="selectall" id="selectall" title="<?php echo gettext("Add all to enforcing rules"); ?>"/></td>
+							<td style="vertical-align: middle;"><input value="Unselect All" class="formbtns" type="submit" name="unselectall" id="unselectall" title="<?php echo gettext("Remove all from enforcing rules"); ?>"/></td>
+							<td style="vertical-align: middle;"><input value=" Save " class="formbtns" type="submit" name="save" id="save" title="<?php echo gettext("Save changes to enforcing rules and rebuild"); ?>"/></td>
+							<td style="vertical-align: middle;"><span class="vexpl"><?php echo gettext("Click to save changes and auto-resolve flowbit rules (if option is selected above)"); ?></span></td>
 						</tr>
+					<?php if (!empty($cat_mods)): ?>
+						<tr height="20px">
+							<td colspan="4" style="vertical-align: middle;"><img style="vertical-align: text-top;" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" />
+							<?=gettext("- Category is auto-enabled by SID Mgmt conf files");?>&nbsp;&nbsp;&nbsp;
+							<img style="opacity: 0.4; filter: alpha(opacity=40); vertical-align: text-top;" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" />
+							<?=gettext("- Category is auto-disabled by SID Mgmt conf files");?></td>
+						</tr>
+					<?php endif; ?>
+						</tbody>
 					</table>
+				</td>
 			</tr>
+
 			<?php if ($no_community_files)
 				$msg_community = "NOTE: Snort Community Rules have not been downloaded.  Perform a Rules Update to enable them.";
 			      else
@@ -412,15 +455,29 @@ if ($savemsg) {
 				<td width="5%" class="listhdrr"><?php echo gettext("Enabled"); ?></td>
 				<td colspan="5" class="listhdrr"><?php echo gettext('Ruleset: Snort GPLv2 Community Rules');?></td>
 			</tr>
-			<?php if (in_array($community_rules_file, $enabled_rulesets_array)): ?>
+			<?php if (isset($cat_mods[$community_rules_file])): ?>
+				<?php if ($cat_mods[$community_rules_file] == 'enabled') : ?>
+					<tr>
+						<td width="5%" class="listr" style="text-align: center;">
+						<img src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" title="<?=gettext("Auto-managed by settings on SID Mgmt tab");?>" /></td>
+						<td colspan="5" class="listr"><a href='suricata_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?=gettext("{$msg_community}");?></a></td>
+					</tr>
+				<?php else: ?>
+					<tr>
+						<td width="5%" class="listr" style="text-align: center;">
+						<img style="opacity: 0.4; filter: alpha(opacity=40);" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" title="<?=gettext("Auto-managed by settings on SID Mgmt tab");?>" /></td>
+						<td colspan="5" class="listr"><?=gettext("{$msg_community}"); ?></td>
+					</tr>
+				<?php endif; ?>
+			<?php elseif (in_array($community_rules_file, $enabled_rulesets_array)): ?>
 			<tr>
-				<td width="5" class="listr" align="center" valign="top">
+				<td width="5%" class="listr" style="text-align: center;">
 				<input type="checkbox" name="toenable[]" value="<?=$community_rules_file;?>" checked="checked"/></td>
 				<td colspan="5" class="listr"><a href='suricata_rules.php?id=<?=$id;?>&openruleset=<?=$community_rules_file;?>'><?php echo gettext("{$msg_community}"); ?></a></td>
 			</tr>
 			<?php else: ?>
 			<tr>
-				<td width="5" class="listr" align="center" valign="top">
+				<td width="5%" class="listr" style="text-align: center;">
 				<input type="checkbox" name="toenable[]" value="<?=$community_rules_file;?>" <?php if ($snortcommunitydownload == 'off') echo "disabled"; ?>/></td>
 				<td colspan="5" class="listr"><?php echo gettext("{$msg_community}"); ?></td>
 			</tr>
@@ -438,19 +495,19 @@ if ($savemsg) {
 			?>
 			<tr id="frheader">
 				<?php if ($emergingdownload == 'on' && !$no_emerging_files): ?>
-					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
+					<td width="5%" class="listhdrr" style="text-align: center;"><?php echo gettext("Enabled"); ?></td>
 					<td width="45%" class="listhdrr"><?php echo gettext('Ruleset: ET Open Rules');?></td>
 				<?php elseif ($etpro == 'on' && !$no_emerging_files): ?>
-					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
+					<td width="5%" class="listhdrr" style="text-align: center;"><?php echo gettext("Enabled"); ?></td>
 					<td width="45%" class="listhdrr"><?php echo gettext('Ruleset: ET Pro Rules');?></td>
 				<?php else: ?>
-					<td colspan="2" align="center" width="50%" class="listhdrr"><?php echo gettext("{$et_type} rules {$msg_emerging}"); ?></td>
+					<td colspan="2" style="text-align: center;" width="50%" class="listhdrr"><?php echo gettext("{$et_type} rules {$msg_emerging}"); ?></td>
 				<?php endif; ?>
 				<?php if ($snortdownload == 'on' && !$no_snort_files): ?>
-					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
+					<td width="5%" class="listhdrr" style="text-align: center;"><?php echo gettext("Enabled"); ?></td>
 					<td width="45%" class="listhdrr"><?php echo gettext('Ruleset: Snort VRT Rules');?></td>
 				<?php else: ?>
-					<td colspan="2" align="center" width="50%" class="listhdrr"><?php echo gettext("Snort VRT rules {$msg_snort}"); ?></td>
+					<td colspan="2" style="text-align: center;" width="50%" class="listhdrr"><?php echo gettext("Snort VRT rules {$msg_snort}"); ?></td>
 				<?php endif; ?>
 				</tr>
 			<?php
@@ -482,15 +539,28 @@ if ($savemsg) {
 					echo "<tr>\n";
 					if (!empty($emergingrules[$j])) {
 						$file = $emergingrules[$j];
-						echo "<td width='5%' class='listr' align=\"center\" valign=\"top\">";
+						echo "<td width='5%' class='listr' align=\"center\">";
 						if(is_array($enabled_rulesets_array)) {
-							if(in_array($file, $enabled_rulesets_array))
+							if(in_array($file, $enabled_rulesets_array) && !isset($cat_mods[$file]))
 								$CHECKED = " checked=\"checked\"";
 							else
 								$CHECKED = "";
 						} else
 							$CHECKED = "";
-						echo "	\n<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />\n";
+						if (isset($cat_mods[$file])) {
+							if (in_array($file, $enabled_rulesets_array))
+								echo "<input type='hidden' name='toenable[]' value='{$file}' />\n";
+							if ($cat_mods[$file] == 'enabled') {
+								$CHECKED = "enabled";
+								echo "	\n<img src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-enabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+							else {
+								echo "	\n<img style=\"opacity: 0.4; filter: alpha(opacity=40);\" src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-disabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+						}
+						else {
+							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						}
 						echo "</td>\n";
 						echo "<td class='listr' width='45%' >\n";
 						if (empty($CHECKED))
@@ -503,17 +573,30 @@ if ($savemsg) {
 
 					if (!empty($snortrules[$j])) {
 						$file = $snortrules[$j];
-						echo "<td class='listr' width='5%' align=\"center\" valign=\"top\">";
+						echo "<td class='listr' width='5%' align=\"center\">";
 						if(is_array($enabled_rulesets_array)) {
 							if (!empty($disable_vrt_rules))
 								$CHECKED = $disable_vrt_rules;
-							elseif(in_array($file, $enabled_rulesets_array))
+							elseif(in_array($file, $enabled_rulesets_array) && !isset($cat_mods[$file]))
 								$CHECKED = " checked=\"checked\"";
 							else
 								$CHECKED = "";
 						} else
 							$CHECKED = "";
-						echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						if (isset($cat_mods[$file])) {
+							if (in_array($file, $enabled_rulesets_array))
+								echo "<input type='hidden' name='toenable[]' value='{$file}' />\n";
+							if ($cat_mods[$file] == 'enabled') {
+								$CHECKED = "enabled";
+								echo "	\n<img src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-enabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+							else {
+								echo "	\n<img style=\"opacity: 0.4; filter: alpha(opacity=40);\" src=\"../themes/{$g['theme']}/images/icons/icon_advanced.gif\" width=\"11\" height=\"11\" border=\"0\" title=\"" . gettext("Auto-disabled by settings on SID Mgmt tab") . "\" />\n";
+							}
+						}
+						else {
+							echo "	\n<input type='checkbox' name='toenable[]' value='{$file}' {$CHECKED} />\n";
+						}
 						echo "</td>\n";
 						echo "<td class='listr' width='45%' >\n";
 						if (empty($CHECKED) || $CHECKED == "disabled")
@@ -526,21 +609,30 @@ if ($savemsg) {
 				echo "</tr>\n";
 			}
 		?>
-	</table>
+			</tbody>
+			</table>
 	</td>
 </tr>
-<tr>
-<td colspan="4" class="vexpl">&nbsp;<br/></td>
-</tr>
-			<tr>
-				<td colspan="4" align="center" valign="middle">
-				<input value="Save" type="submit" name="save" id="save" class="formbtn" title=" <?php echo gettext("Click to Save changes and rebuild rules"); ?>"/></td>
-			</tr>
+	<?php if (!empty($cat_mods)): ?>
+		<tr>
+			<td colspan="4" style="vertical-align: middle;"><br/>
+			<img style="vertical-align: text-top;" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" />
+			<?=gettext(" - Category auto-enabled by parameters in SID Mgmt conf files");?><br/>
+			<img style="opacity: 0.4; filter: alpha(opacity=40); vertical-align: text-top;" src="../themes/<?=$g['theme'];?>/images/icons/icon_advanced.gif" width="11" height="11" border="0" />
+			<?=gettext(" - Category auto-disabled by parameters in SID Mgmt conf files");?><br/><br/></td>
+		</tr>
+	<?php endif; ?>
+	<tr height="32px">
+		<td colspan="4" style="vertical-align: bottom; text-align: center;">
+		<input value="Save" type="submit" name="save" id="save" class="formbtn" title=" <?php echo gettext("Click to Save changes and rebuild rules"); ?>"/></td>
+	</tr>
 <?php endif; ?>
+</tbody>
 </table>
 </div>
 </td>
 </tr>
+</tbody>
 </table>
 </form>
 <?php
@@ -566,28 +658,29 @@ h += 96;
 
 function enable_change()
 {
- var endis = !(document.iform.ips_policy_enable.checked);
- document.iform.ips_policy.disabled=endis;
 
- if (endis) {
-	document.getElementById("ips_row1").style.display="none";
-	document.getElementById("ips_row2").style.display="none";
-	document.getElementById("ips_col1").className="vexpl";
-	document.getElementById("ips_col2").className="vexpl";
- }
- else {
-	document.getElementById("ips_row1").style.display="table-row";
-	document.getElementById("ips_row2").style.display="table-row";
-	document.getElementById("ips_col1").className="vncell";
-	document.getElementById("ips_col2").className="vtable";
- }
- for (var i = 0; i < document.iform.elements.length; i++) {
-    if (document.iform.elements[i].type == 'checkbox') {
-       var str = document.iform.elements[i].value;
-       if (str.substr(0,6) == "snort_")
-          document.iform.elements[i].disabled = !(endis);
-    }
- }
+	if (document.getElementById("ips_policy_enable")) {
+		var endis = !(document.iform.ips_policy_enable.checked);
+		document.iform.ips_policy.disabled=endis;
+
+		if (endis) {
+			document.getElementById("ips_controls").style.display="none";
+			document.getElementById("ips_col1").className="";
+			document.getElementById("ips_col2").className="";
+		}
+		else {
+			document.getElementById("ips_controls").style.display="";
+			document.getElementById("ips_col1").className="vncell";
+			document.getElementById("ips_col2").className="vtable";
+		}
+	}
+	for (var i = 0; i < document.iform.elements.length; i++) {
+		if (document.iform.elements[i].type == 'checkbox') {
+			var str = document.iform.elements[i].value;
+			if (str.substr(0,6) == "snort_")
+				document.iform.elements[i].disabled = !(endis);
+		}
+	}
 }
 
 // Set initial state of dynamic HTML form controls

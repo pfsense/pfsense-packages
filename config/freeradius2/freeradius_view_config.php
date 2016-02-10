@@ -33,10 +33,13 @@
 require("guiconfig.inc");
 
 // Check to find out on which system the package is running
-if (substr(trim(file_get_contents("/etc/version")),0,3) == "2.0") {
-	define('RADDB', '/usr/local/etc/raddb');
-} else {
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pfs_version == "2.1") {
 	define('RADDB', '/usr/pbi/freeradius-' . php_uname("m") . '/etc/raddb');
+} else if ($pfs_version == "2.1") {
+	define('RADDB', '/usr/pbi/freeradius-' . php_uname("m") . '/local/etc/raddb');
+} else {
+	define('RADDB', '/usr/local/etc/raddb');
 }
 // End of system check
 
@@ -67,20 +70,12 @@ if ($_REQUEST['file']!=""){
 	get_file($_REQUEST['file']);
 	}
 else{
-	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-	if ($pf_version < 2.0)
-		$one_two = true;
-	
 	$pgtitle = "FreeRADIUS: View Configuration";
 	include("head.inc");
 	
 	?>
 	<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 	<?php include("fbegin.inc"); ?>
-	
-	<?php if($one_two): ?>
-	<p class="pgtitle"><?=$pgtitle?></font></p>
-	<?php endif; ?>
 	
 	<?php if ($savemsg) print_info_box($savemsg); ?>
 	
@@ -105,8 +100,8 @@ else{
 		display_top_tabs($tab_array);
 	?>
 			</td></tr>
-	 		<tr>
-	    		<td>
+			<tr>
+				<td>
 					<div id="mainarea">
 						<table class="tabcont" width="100%" border="0" cellpadding="8" cellspacing="0">
 						<tr><td></td></tr>
@@ -131,8 +126,8 @@ else{
 							</td>
 								</tr>
 								<tr>
-	     						<td class="tabcont" >
-	     						<div id="file_div"></div>
+								<td class="tabcont" >
+								<div id="file_div"></div>
 									
 								</td>
 							</tr>

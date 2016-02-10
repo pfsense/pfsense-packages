@@ -33,6 +33,7 @@
 require_once("/usr/local/pkg/snort/snort.inc");
 
 $snortlogdir = SNORTLOGDIR;
+global $g, $config;
 
 function snort_check_dir_size_limit($snortloglimitsize) {
 
@@ -56,9 +57,9 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 		conf_mount_rw();
 
 		// Truncate the Rules Update Log file if it exists
-		if (file_exists(RULES_UPD_LOGFILE)) {
+		if (file_exists(SNORT_RULES_UPD_LOGFILE)) {
 			log_error(gettext("[Snort] Truncating the Rules Update Log file..."));
-			@file_put_contents(RULES_UPD_LOGFILE, "");
+			@file_put_contents(SNORT_RULES_UPD_LOGFILE, "");
 		}
 
 		// Clean-up the logs for each configured Snort instance
@@ -74,6 +75,21 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 				@file_put_contents("{$snort_log_dir}/alert", "");
 			}
 
+			// Cleanup any perfmon stats logs
+			$files = array();
+			$list = glob("{$snort_log_dir}/*");
+			foreach ($list as $file) {
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.\d+]*)/', basename($file), $matches))
+					$files[] = $snort_log_dir . "/" . $matches[1];
+			}
+			foreach ($files as $file)
+				unlink_if_exists($file);
+
+			// Cleanup any AppID stats logs
+			$files = glob("{$snort_log_dir}/appid-stats.log.*");
+			foreach ($files as $file)
+				unlink_if_exists($file);
+
 			// This is needed if snort is run as snort user
 			mwexec('/bin/chmod 660 {$snort_log_dir}/*', true);
 
@@ -88,6 +104,56 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 	}
 }
 
+function snort_check_rotate_log($log_file, $log_limit, $retention) {
+
+	/********************************************************
+	 * This function checks the passed log file against     *
+	 * the passed size limit and rotates the log file if    *
+	 * necessary.  It also checks the age of previously     *
+	 * rotated logs and removes those older than the        *
+	 * rentention  parameter.                               *
+	 *                                                      *
+	 * On Entry: $log_file  -> full pathname/filename of    *
+	 *                         log file to check            *
+	 *           $log_limit -> size of file in bytes to     *
+	 *                         trigger rotation. Zero       *
+	 *                         means no rotation.           *
+	 *           $retention -> retention period in hours    *
+	 *                         for rotated logs. Zero       *
+	 *                         means never remove.          *
+	 ********************************************************/
+
+	// Check the current log to see if it needs rotating.
+	// If it does, rotate it and put the current time
+	// on the end of the filename as UNIX timestamp.
+	if (!file_exists($log_file))
+		return;
+	if (($log_limit > 0) && (filesize($log_file) >= $log_limit)) {
+		$newfile = $log_file . "." . strval(time());
+		try {
+			copy($log_file, $newfile);
+			file_put_contents($log_file, "");
+		} catch (Exception $e) {
+			log_error("[Snort] Failed to rotate file '{$log_file}' -- error was {$e->getMessage()}");
+		}
+	}
+
+	// Check previously rotated logs to see if time to
+	// delete any older than the retention period.
+	// Rotated logs have a UNIX timestamp appended to
+	// filename.
+	if ($retention > 0) {
+		$now = time();
+		$rotated_files = glob("{$log_file}.*");
+		foreach ($rotated_files as $file) {
+			if (($now - filemtime($file)) > ($retention * 3600))
+				unlink_if_exists($file);
+		}
+		unset($rotated_files);
+	}
+}
+
+
 /*************************
  * Start of main code    *
  *************************/
@@ -96,27 +162,93 @@ function snort_check_dir_size_limit($snortloglimitsize) {
 if ($g['booting'] == true)
 	return;
 
+$logs = array ();
+
+// Build an array of files to check and limits to check them against from our saved configuration
+$logs['sid_changes.log']['limit'] = $config['installedpackages']['snortglobal']['sid_changes_log_limit_size'];
+$logs['sid_changes.log']['retention'] = $config['installedpackages']['snortglobal']['sid_changes_log_retention'];
+
 // If no interfaces defined, there is nothing to clean up
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	return;
 
-// Check unified2 archived log retention in the interface logging directories if enabled
-foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
-	$if_real = get_real_interface($value['interface']);
-	$snort_log_dir = SNORTLOGDIR . "/snort_{$if_real}{$value['uuid']}";
-	if (is_dir("{$snort_log_dir}/barnyard2/archive") && $value['u2_archived_log_retention'] > 0) {
-		$now = time();
-		$files = glob("{$snort_log_dir}/barnyard2/archive/snort_{$value['uuid']}_{$if_real}.u2.*");
-		$prune_count = 0;
-		foreach ($files as $f) {
-			if (($now - filemtime($f)) > ($value['u2_archived_log_retention'] * 3600)) {
-				$prune_count++;
-				unlink_if_exists($f);
-			}
+// Check log limits and retention in the interface logging directories if enabled
+if ($config['installedpackages']['snortglobal']['enable_log_mgmt'] == 'on') {
+	foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
+		$if_real = get_real_interface($value['interface']);
+		$snort_log_dir = SNORTLOGDIR . "/snort_{$if_real}{$value['uuid']}";
+		foreach ($logs as $k => $p) {
+			snort_check_rotate_log("{$snort_log_dir}/{$k}", $p['limit']*1024, $p['retention']);
 		}
-		unset($files);
-		if ($prune_count > 0)
-			log_error(gettext("[Snort] Barnyard2 archived logs cleanup job removed {$prune_count} file(s)..."));
+
+		// Prune aged-out event packet capture files if any exist
+		if ($config['installedpackages']['snortglobal']['event_pkts_log_retention'] > 0) {
+			$now = time();
+			$rotated_files = glob("{$snort_log_dir}/snort.log.*");
+			$prune_count = 0;
+			foreach ($rotated_files as $file) {
+				if (($now - filemtime($file)) > ($config['installedpackages']['snortglobal']['event_pkts_log_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($file);
+				}
+			}
+			unset($rotated_files);
+			if ($prune_count > 0)
+				log_error(gettext("[Snort] Alert pcap file cleanup job removed {$prune_count} pcap file(s) from {$snort_log_dir}/..."));
+		}
+
+		// Prune any aged-out Barnyard2 archived logs if any exist
+		if (is_dir("{$snort_log_dir}/barnyard2/archive") && $value['u2_archived_log_retention'] > 0) {
+			$now = time();
+			$files = glob("{$snort_log_dir}/barnyard2/archive/snort_{$value['uuid']}_{$if_real}.u2.*");
+			$prune_count = 0;
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($value['u2_archived_log_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($f);
+				}
+			}
+			unset($files);
+			if ($prune_count > 0)
+				log_error(gettext("[Snort] Barnyard2 archived logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/barnyard2/archive/..."));
+		}
+
+		// Prune aged-out perfmon stats logs if any exist
+		if ($config['installedpackages']['snortglobal']['stats_log_retention'] > 0) {
+			$now = time();
+			$files = array();
+			$list = glob("{$snort_log_dir}/*");
+			foreach ($list as $file) {
+				if (preg_match('/(^\d{4}-\d{2}-\d{2}[\.\d+]*)/', basename($file), $matches))
+					$files[] = $snort_log_dir . "/" . $matches[1];
+			}
+			$prune_count = 0;
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($config['installedpackages']['snortglobal']['stats_log_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($f);
+				}
+			}
+			unset($list, $files);
+			if ($prune_count > 0)
+				log_error(gettext("[Snort] perfmon stats logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/..."));
+		}
+
+		// Prune any aged-out AppID stats logs if any exist
+		if ($value['appid_stats_log_retention'] > 0) {
+			$now = time();
+			$files = glob("{$snort_log_dir}/app-stats.log.*");
+			$prune_count = 0;
+			foreach ($files as $f) {
+				if (($now - filemtime($f)) > ($value['appid_stats_log_retention'] * 3600)) {
+					$prune_count++;
+					unlink_if_exists($f);
+				}
+			}
+			unset($files);
+			if ($prune_count > 0)
+				log_error(gettext("[Snort] AppID stats logs cleanup job removed {$prune_count} file(s) from {$snort_log_dir}/..."));
+		}
 	}
 }
 

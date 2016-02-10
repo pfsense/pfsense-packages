@@ -1,11 +1,10 @@
 <?php
-
-/* $Id$ */
 /*
 	tinydns.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006, 2007, 2008, 2009 Scott Ullrich
-	Parts Copyright (C) 2007 Goffredo Andreone
-	part of pfSense
+	Copyright (C) 2007 Goffredo Andreone
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,12 +28,18 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
-if(!function_exists("filter_configure")) 
+require_once("globals.inc");
+if (!function_exists("filter_configure")) {
 	require_once("filter.inc");
-	
-if(!function_exists("get_real_wan_interface")) 
+}
+if (!function_exists("get_real_wan_interface")) {
 	require_once("interfaces.inc");
+}
+require_once("notices.inc");
+require_once("service-utils.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 	
 function tinydns_validate() {
 	global $input_errors, $config;
@@ -63,6 +68,21 @@ function tinydns_custom_php_install_command() {
 	if($config['installedpackages']['tinydns']['config'][0]['refreshinterval'])
 		$refreshinterval = $config['installedpackages']['tinydns']['config'][0]['refreshinterval'];
 
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version == "2.2") {
+		$svscan_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin/svscan";
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin/svc";
+		$tinydns_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin";
+	} else if ($pf_version == "2.1") {
+		$svscan_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin/svscan";
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin/svc";
+		$tinydns_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin";
+	} else {
+		$svscan_path = "/usr/local/bin/svscan";
+		$svc_path = "/usr/local/bin/svc";
+		$tinydns_path = "/usr/local/bin";
+	}
+
 	$svscan = <<<EOD
 #!/bin/sh
 
@@ -73,8 +93,8 @@ function tinydns_custom_php_install_command() {
 . /etc/rc.subr
 
 name="svscan"
-rcvar=`set_rcvar`
-command="/usr/local/bin/svscan"
+rcvar="\${name}_enable"
+command="{$svscan_path}"
 svscan_enable=\${svscan_enable-"YES"}
 svscan_servicedir=\${svscan_servicedir-"{$g['varrun_path']}/service"}
 logdir="/var/log/svscan"
@@ -90,12 +110,13 @@ svscan_start () {
         echo "Starting svscan."
         mkdir -p \$logdir
         /usr/bin/env \
-        PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        PATH={$tinydns_path}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/multilog t \$logdir" > /dev/null
+
 EOD;
 if ($enableipmonitoring) {
 	$svscan .= <<<EOD
-        minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/etc/ping_hosts.sh; cd {$g['varetc_path']}/tinydns/root && /usr/local/bin/tinydns-data"
+       /usr/local/bin/minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/usr/local/bin/ping_hosts.sh"
 EOD;
 }
 $svscan .= <<<EOD
@@ -104,7 +125,8 @@ $svscan .= <<<EOD
 
 svscan_stop_post () {
         echo "Stopping svscan."
-        find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 /usr/local/bin/svc -dx
+        find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 {$svc_path} -dx
+		/bin/pkill -F /var/run/ping_hosts.pid
 }
 
 run_rc_command "\$1"
@@ -117,11 +139,12 @@ EOD;
 	$filename = "tinydns.sh";
 	$start = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 <?php
+	require_once(\"functions.inc\");
 	require_once(\"/usr/local/pkg/tinydns.inc\");
 	tinydns_custom_php_changeip_command();
 	tinydns_create_zone_file();\n";
 	if ($enableipmonitoring) {
-		$start .= "tinydns_setup_ping_items();\n";
+		$start .= 	"tinydns_setup_ping_items();\n";
 	}
 	$start .= "?>
 ENDPHP\n";
@@ -129,18 +152,17 @@ ENDPHP\n";
 	$stop = "";
 	$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
 	foreach ($interfaces as $dnsidx => $dnsif)
-		$stop .= "\t/usr/local/bin/svc -dx {$g['varrun_path']}/service/dnscache{$dnsidx}\n";
+		$stop .= "\t{$svc_path} -dx {$g['varrun_path']}/service/dnscache{$dnsidx}\n";
 
 	$stop .= <<<ENDSH
-	/usr/local/bin/svc -dx {$g['varrun_path']}/service/tinydns
-	/usr/local/bin/svc -dx {$g['varrun_path']}/service/axfrdns
+	{$svc_path} -dx {$g['varrun_path']}/service/tinydns
+	{$svc_path} -dx {$g['varrun_path']}/service/axfrdns
 	/bin/rm -rf {$g['varrun_path']}/service/tinydns 2>/dev/null
 	/bin/rm -rf {$g['varetc_path']}/tinydns 2>/dev/null
 	/bin/rm -rf {$g['varrun_path']}/dnscache* 2>/dev/null
 	/bin/rm -rf {$g['varetc_path']}/dnscache* 2>/dev/null
 	/bin/rm -rf {$g['varetc_path']}/axfrdns 2>/dev/null
 	/bin/rm -rf {$g['varrun_path']}/axfrdns 2>/dev/null
-	/bin/pkill -F /var/run/ping_hosts.pid
 
 ENDSH;
 
@@ -159,9 +181,19 @@ function tinydns_custom_php_deinstall_command() {
 	global $g, $config;
 
 	conf_mount_rw();
+
+	$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pf_version == "2.2") {
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/local/bin/svc";
+	} else if ($pf_version == "2.1") {
+		$svc_path = "/usr/pbi/djbdns-" . php_uname("m") . "/bin/svc";
+	} else {
+		$svc_path = "/usr/local/bin/svc";
+	}	
+
 	/* destroy all daemontools items */
-	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/tinydns*");
-	exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
+	exec("{$svc_path} -xk {$g['varetc_path']}/tinydns*");
+	exec("{$svc_path} -xk {$g['varetc_path']}/dnscache*");
 	exec("/usr/local/etc/rc.d/tinydns.sh stop");
 	exec("/usr/local/etc/rc.d/svscan.sh stop");
 	exec("/usr/bin/killall supervise");
@@ -179,6 +211,35 @@ function tinydns_custom_php_deinstall_command() {
 	exec("rm -rf {$g['varetc_path']}/dnscache* {$g['varrun_path']}/service/dnscache*");
 	filter_configure();
 	conf_mount_ro();
+}
+
+function tinydns_upgrade_config() {
+	/* Remove obsolete XMLRPC sync configuration */
+	if (is_array($config['installedpackages']['tinydnssync']['config'])) {
+		if (isset($config['installedpackages']['tinydnssync']['config'][0]['ipaddress'])) {
+			unset($config['installedpackages']['tinydnssync']['config'][0]['ipaddress']);
+		}
+		if (isset($config['installedpackages']['tinydnssync']['config'][0]['ipaddress2'])) {
+			unset($config['installedpackages']['tinydnssync']['config'][0]['ipaddress2']);
+		}
+		if (isset($config['installedpackages']['tinydnssync']['config'][0]['ipaddress3'])) {
+			unset($config['installedpackages']['tinydnssync']['config'][0]['ipaddress3']);
+		}
+		if (isset($config['installedpackages']['tinydnssync']['config'][0]['password'])) {
+			unset($config['installedpackages']['tinydnssync']['config'][0]['password']);
+		}
+		if (isset($config['installedpackages']['tinydnssync']['config'][0]['password2'])) {
+			unset($config['installedpackages']['tinydnssync']['config'][0]['password2']);
+		}
+		if (isset($config['installedpackages']['tinydnssync']['config'][0]['password3'])) {
+			unset($config['installedpackages']['tinydnssync']['config'][0]['password3']);
+		}
+	}
+	if (is_array($config['installedpackages']['tinydns']['config'])) {
+		if (isset($config['installedpackages']['tinydns']['config'][0]['syncxmlrpc'])) {
+			unset($config['installedpackages']['tinydns']['config'][0]['syncxmlrpc']);
+		}
+	}
 }
 
 function tinydns_custom_php_changeip_command() {
@@ -205,10 +266,18 @@ function tinydns_custom_php_changeip_command() {
 	if(!is_dir("{$g['varrun_path']}/service"))	
 		exec("/bin/mkdir -p {$g['varrun_path']}/service");
 
-	exec("/usr/sbin/pw useradd Gtinydns");
-	exec("/usr/sbin/pw useradd Gdnslog");
-	exec("/usr/sbin/pw useradd Gdnscache");
-	exec("/usr/sbin/pw useradd Gaxfrdns");
+	if (!exec("/usr/sbin/pw usershow Gtinydns")) {
+		exec("/usr/sbin/pw useradd Gtinydns");
+	}
+	if (!exec("/usr/sbin/pw usershow Gdnslog")) {
+		exec("/usr/sbin/pw useradd Gdnslog");
+	}
+	if (!exec("/usr/sbin/pw usershow Gdnscache")) {
+		exec("/usr/sbin/pw useradd Gdnscache");
+	}
+	if (!exec("/usr/sbin/pw usershow Gaxfrdns")) {
+		exec("/usr/sbin/pw useradd Gaxfrdns");
+	}
 	exec("/bin/rm -r {$g['varetc_path']}/dnscache*");
 	exec("/bin/rm -r {$g['varrun_path']}/service/dnscache*");
 
@@ -223,7 +292,7 @@ function tinydns_custom_php_changeip_command() {
 	}
 
 	exec("echo {$dnsserverip} > {$g['varetc_path']}/tinydns/env/IP");
-	exec("/usr/local/bin/svc -xk {$g['varrun_path']}/service/tinydns");
+	exec("{$svc_path} -xk {$g['varrun_path']}/service/tinydns");
 		
 
 	if(!empty($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])) {
@@ -232,21 +301,14 @@ function tinydns_custom_php_changeip_command() {
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			$dnscacheif = convert_friendly_interface_to_real_interface_name($dnsif);
 			$dnscacheip = find_interface_ip($dnscacheif);
-			if (intval($config['version']) >= 6)
-				$ipmask = find_interface_subnet($dnscacheif);
-			else
-				$ipmask = $config['interfaces'][$dnsif]['subnet'];
+			$ipmask = find_interface_subnet($dnscacheif);
 
-			if (intval($config['version']) <= 8) {
-				if (is_ipaddr($ipaddress))
-					$arr = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
-			} else {
-				if (is_ipaddrv4($ipaddress)) {
-					$arr = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
-				} elseif (is_ipaddrv6($ipaddress)) {
-					$arr = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
-				}
+			if (is_ipaddrv4($ipaddress)) {
+				$arr = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+			} elseif (is_ipaddrv6($ipaddress)) {
+				$arr = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
 			}
+
 			$dnsuserip = $arr[0];
 			//exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
@@ -275,15 +337,15 @@ function tinydns_custom_php_changeip_command() {
 			/* setup symlink to start dnscache */
 			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
 			
-			exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache{$dnsidx}");
+			exec("{$svc_path} -xk {$g['varetc_path']}/dnscache{$dnsidx}");
 		}
 	} else {
-		$interfaces = explode(",", $$config['installedpackages']['tinydns']['config'][0]['interface']);
+		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			if(is_dir("{$g['varetc_path']}/dnscache{$dnsidx}"))
 				dnscache_use_root_servers($dnsidx);
 		}
-		exec("/usr/local/bin/svc -xk {$g['varetc_path']}/dnscache*");
+		exec("{$svc_path} -xk {$g['varetc_path']}/dnscache*");
 	}
 
 	/* a wee bit of magic - something seems to start up a broken dnscache, the below kills it, and svc restarts it correctly. */ 
@@ -359,16 +421,16 @@ function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthresho
 	return "UP";
 }
 
-function tinydns_get_backup_record($record) {
+function tinydns_get_backup_record($record, $recordtype) {
 	global $g, $config;
 	if($config['installedpackages']['tinydnsdomains']) {
 		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-			if($domain['ipaddress'] == $record) {
-				/* if no failover host exists, simply return original record */
+			if($domain['hostname'] == $record && $domain['recordtype'] == $recordtype) {
+				/* if no failover host exists, simply return original ipaddress */
 				if(!$domain['row'])
-					return $record;
+					return $domain['ipaddress'];
 				foreach($domain['row'] as $row) {
-					$status = tinydns_get_record_status($row['failoverip']);
+					$status = tinydns_get_record_status($row['monitorip']);
 					if($status == "UP")
 						return $row['failoverip'];
 				}
@@ -393,50 +455,70 @@ function tinydns_setup_ping_items() {
 		log_error("Could not open {$g['vardb_path']}/pkgpinghosts for writing.");
 		return;
 	}
-	config_lock();
+
 	/*   write out each ip address so ping_hosts.sh can begin monitoring ip
 	 *   status and create a database of the status information that we can use.
 	 */
 	foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-		if(!in_array($domain['ipaddress'], $processed)) {
-			fwrite($fd, $ip . "|" . $domain['ipaddress'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
-			$processed[] = $domain['ipaddress'];
-		}
-		if($domain['monitorip'] <> "")
-			$monitorip = $domain['monitorip'];
+		if(!$domain['monitorip'])
+			continue;
+		if($domain['recordtype'] == "AAAA")
+			$inet = "inet6";
+		else
+			$inet = "";
+		$monitorip = $domain['monitorip'];
+		$interface = $domain['interface'];
 		if($domain['row']) {
 			foreach($domain['row'] as $row) {
 				if($row['pingthreshold'])
 					$pingthreshold = $row['pingthreshold'];
 				else
-					$row['pingthreshold'] = "";
+					$pingthreshold = "";
+				
+				if($row['wanpingthreshold'])
+					$wanpingthreshold = $row['wanpingthreshold'];
+				else
+					$wanpingthreshold = "";
+				
+				$info = get_interface_info($row['interface']);
+				if($domain['recordtype'] == "AAAA")					
+					$ip = $info['ipaddrv6'];
+				else
+					$ip = $info['ipaddr'];
+				
 				if($row['monitorip']) {
 					if(!in_array($row['monitorip'], $processed)) {
-						fwrite($fd, $ip . "|" . $row['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						fwrite($fd, $ip . "|" . $row['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 						$processed[] = $row['monitorip'];
 					}
 				} else {
 					if(!in_array($monitorip, $processed)) {
-						fwrite($fd, $ip . "|" . $monitorip . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						fwrite($fd, $ip . "|" . $monitorip . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 						$processed[] = $monitorip;
 					}
 				}
 			}
 		}
+		
+		$info = get_interface_info($domain['interface']);
+		if($domain['recordtype'] == "AAAA") 			
+			$ip = $info['ipaddrv6'];
+		else
+			$ip = $info['ipaddr'];
+			
 		if($domain['monitorip']) {
 			if(!in_array($domain['monitorip'], $processed)) {
-				fwrite($fd, $ip . "|" . $domain['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				fwrite($fd, $ip . "|" . $domain['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 				$processed[] = $domain['monitorip'];
 			}
 		} else {
 			if(!in_array($row['failoverip'], $processed)) {
-				fwrite($fd, $ip . "|" . $row['failoverip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				fwrite($fd, $ip . "|" . $row['failoverip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}|{$wanpingthreshold}|{$inet}\n");
 				$processed[] = $row['failoverip'];
 			}
 		}
 	}
 	fclose($fd);
-	config_unlock();
 }
 
 function tinydns_create_zone_file() {
@@ -444,7 +526,6 @@ function tinydns_create_zone_file() {
 	conf_mount_rw();
 	if(file_exists("/tmp/config.cache"))
 		unlink("/tmp/config.cache");
-	config_lock();
 	if(file_exists("{$g['varrun_path']}/service/tinydns/root/data"))
 		exec("rm -f {$g['varrun_path']}/service/tinydns/root/data");
 	if(!is_dir("{$g['varrun_path']}/service/tinydns/root"))
@@ -471,10 +552,7 @@ function tinydns_create_zone_file() {
                 		foreach ($interfaces as $dnsif) {
 					$dnsrif = convert_friendly_interface_to_real_interface_name($dnsif);
                         		$dnsrip = find_interface_ip($dnsrif);
-                        		if (intval($config['version']) >= 6)
-                                		$ipmask = find_interface_subnet($dnsrif);
-                        		else
-                                		$ipmask = $config['interfaces'][$dnsif]['subnet'];
+                               		$ipmask = find_interface_subnet($dnsrif);
 					$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
 					tinydns_complete_soa_record($fd, $dnsrip, $ipmask, $dhcpdhostname, $dhcpddomain);
 				}
@@ -498,10 +576,7 @@ function tinydns_create_zone_file() {
 			
 			$dnsrif = convert_friendly_interface_to_real_interface_name($dnsif);
                         $dnsrip = find_interface_ip($dnsrif);
-                        if (intval($config['version']) >= 6)
-                                $ipmask = find_interface_subnet($dnsrif);
-                        else
-                                $ipmask = $config['interfaces'][$dnsif]['subnet'];
+                        $ipmask = find_interface_subnet($dnsrif);
                         $dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
                         tinydns_complete_soa_record($fd, $dnsrip, $ipmask, $dhcpdhostname, $dhcpddomain);
        
@@ -535,7 +610,9 @@ function tinydns_create_zone_file() {
 		for($x=0; $x< count($config['installedpackages']['tinydnsdomains']['config']); $x++) {
 			$domain = $config['installedpackages']['tinydnsdomains']['config'][$x];
 			$record_data = "";
+			$monitorip = "";
 			$hostname = $domain['hostname'];
+			$recordtype = $domain['recordtype'];
 			$ipaddress = $domain['ipaddress'];
 			$ttl = $domain['ttl'];
 			$dist = $domain['dist'];
@@ -549,24 +626,19 @@ function tinydns_create_zone_file() {
 				if($status == "DOWN") {
 					if($debug)
 						log_error("$ipaddress monitor ip $monitorip is offline.");
-					$ipaddress = tinydns_get_backup_record($ipaddress);
+					$ipaddress = tinydns_get_backup_record($hostname, $recordtype);
 					if($debug)
-						log_error("tinydns_get_backup_record returned $ipaddress ");
+						log_error("tinydns_get_backup_record for $hostname returned $ipaddress ");
 				}
 			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns'], $dist, $domain['src_port'], $domain['src_weight'], $domain['src_priority'], $domain['src_timestamp']);
 			if($record_data) {
 				fwrite($fd, $record_data . "\n");
 				if ($domain['rdns'] || ($domain['recordtype'] == 'PTR')) {
-					if (intval($config['version']) <= 8) {
-						if (is_ipaddr($ipaddress))
-							$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
-					} else {
-						if (is_ipaddrv4($ipaddress)) {
-							$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
-						} elseif (is_ipaddrv6($ipaddress)) {
-							$rip = tinydns_get_ip6_subnet_arpa($ipaddress, 128);
-						}
+					if (is_ipaddrv4($ipaddress)) {
+						$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
+					} elseif (is_ipaddrv6($ipaddress)) {
+						$rip = tinydns_get_ip6_subnet_arpa($ipaddress, 128);
 					}
 
 					if($rip)
@@ -598,134 +670,181 @@ function tinydns_create_zone_file() {
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd {$g['varrun_path']}/service/tinydns/root && /usr/local/bin/tinydns-data");
-	config_unlock();
 	conf_mount_ro();
 }
 
 function tinydns_sync_on_changes() {
 	global $g, $config;
-	log_error("[tinydns] tinydns_xmlrpc_sync.php is starting.");
-	$synconchanges = $config['installedpackages']['tinydnssync']['config'][0]['synconchanges'];	
-	if(!$synconchanges) 
-		return;
-	$sync_hosts = $config['installedpackages']['tinydnssync']['config'];
-	$previous_ip = "";
-	$x=0;
-	$sh = $config['installedpackages']['tinydnssync']['config'][0];
-	for($x=1; $x<5; $x++) {
-		if($x > 1) 
-			$counter = $x;
-		else 
-			$counter = "";
-		$sync_to_ip = "";
-		$password = "";
-		if($sh['ipaddress' . $counter]) {
-			$sync_to_ip = $sh['ipaddress' . $counter];
-			$password   = $sh['password'  . $counter];
+
+	/* XMLRPC sync */
+	if (is_array($config['installedpackages']['tinydnssync']['config'])) {
+		$tinydns_sync = $config['installedpackages']['tinydnssync']['config'][0];
+		$synconchanges = $tinydns_sync['synconchanges'];
+		$synctimeout = $tinydns_sync['synctimeout'] ?: '250';
+		switch ($synconchanges) {
+			case "manual":
+				if (is_array($tinydns_sync['row'])) {
+					$rs = $tinydns_sync['row'];
+				} else {
+					log_error("[tinydns] XMLRPC sync is enabled but there are no hosts configured as replication targets.");
+					return;
+				}
+				break;
+			case "auto":
+				if (is_array($config['hasync'])) {
+					$system_carp = $config['hasync'];
+					$rs[0]['ipaddress'] = $system_carp['synchronizetoip'];
+					$rs[0]['username'] = $system_carp['username'];
+					$rs[0]['password'] = $system_carp['password'];
+					$rs[0]['syncdestinenable'] = FALSE;
+
+					// XMLRPC sync is currently only supported over connections using the same protocol and port as this system
+					if ($config['system']['webgui']['protocol'] == "http") {
+						$rs[0]['syncprotocol'] = "http";
+						$rs[0]['syncport'] = $config['system']['webgui']['port'] ?: '80';
+					} else {
+						$rs[0]['syncprotocol'] = "https";
+						$rs[0]['syncport'] = $config['system']['webgui']['port'] ?: '443';
+					}
+					if ($system_carp['synchronizetoip'] == "") {
+						log_error("[tinydns] XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
+						return;
+					} else {
+						$rs[0]['syncdestinenable'] = TRUE;
+					}
+				} else {
+					log_error("[tinydns] XMLRPC CARP/HA sync is enabled but there are no system backup hosts configured as replication targets.");
+					return;
+				}
+				break;
+			default:
+				return;
+				break;
 		}
-		if($password && $sync_to_ip)
-			tinydns_do_xmlrpc_sync($sync_to_ip, $password);
-	}
-	tinydns_create_zone_file();
-	if ($config['installedpackages']['tinydns']['config'][0]['enableipmonitoring']) {
-		tinydns_setup_ping_items();
-	}
-	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
+		if (is_array($rs)) {
+			log_error("[tinydns] XMLRPC sync is starting.");
+			foreach ($rs as $sh) {
+				// Only sync enabled replication targets
+				if ($sh['syncdestinenable']) {
+					$sync_to_ip = $sh['ipaddress'];
+					$port = $sh['syncport'];
+					$username = $sh['username'] ?: 'admin';
+					$password = $sh['password'];
+					$protocol = $sh['syncprotocol'];
+
+					$error = '';
+					$valid = TRUE;
+
+					if ($password == "") {
+						$error = "Password parameter is empty. ";
+						$valid = FALSE;
+					}
+					if (!is_ipaddr($sync_to_ip) && !is_hostname($sync_to_ip) && !is_domain($sync_to_ip)) {
+						$error .= "Misconfigured Replication Target IP Address or Hostname. ";
+						$valid = FALSE;
+					}
+					if (!is_port($port)) {
+						$error .= "Misconfigured Replication Target Port. ";
+						$valid = FALSE;
+					}
+					if ($valid) {
+						tinydns_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $password, $synctimeout);
+					} else {
+						log_error("[tinydns] XMLRPC sync with '{$sync_to_ip}' aborted due to the following error(s): {$error}");
+					}
+				}
+			}
+			log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
+		}
+ 	}
 }
 
-function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
+/* Do the actual XMLRPC sync. */
+function tinydns_do_xmlrpc_sync($sync_to_ip, $port, $protocol, $username, $password, $synctimeout) {
 	global $config, $g;
 
-	if(!$password)
+	/* Detect boot process, do nothing during boot. */
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
 		return;
+	}
 
-	if(!$sync_to_ip)
+	if ($username == "" || $password == "" || $sync_to_ip == "" || $port == "" || $protocol == "") {
+		log_error("[tinydns] A required XMLRPC sync parameter (username, password, replication target, port or protocol) is empty ... aborting pkg sync");
 		return;
+	}
 
-	$xmlrpc_sync_neighbor = $sync_to_ip;
-    if($config['system']['webgui']['protocol'] != "") {
-		$synchronizetoip = $config['system']['webgui']['protocol'];
-		$synchronizetoip .= "://";
-    }
-    $port = $config['system']['webgui']['port'];
-    /* if port is empty lets rely on the protocol selection */
-    if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http") 
-			$port = "80";
-		else 
-			$port = "443";
-    }
-	$synchronizetoip .= $sync_to_ip;
+	// Take care of IPv6 literal address
+	if (is_ipaddrv6($sync_to_ip)) {
+		$sync_to_ip = "[{$sync_to_ip}]";
+	}
 
-	/* xml will hold the sections to sync */
+	$url = "{$protocol}://{$sync_to_ip}";
+
+	/* XML will hold the sections to sync. */
 	$xml = array();
 	$xml['tinydnsdomains'] = $config['installedpackages']['tinydnsdomains'];
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($xml));
 
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($xml)
-	);
-
-	/* set a few variables needed for sync code borrowed from filter.inc */
-	$url = $synchronizetoip;
-	log_error("Beginning TinyDNS XMLRPC sync to {$url}:{$port}.");
+	/* Set a few variables needed for sync code */
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-	if($g['debug'])
+	$cli->setCredentials($username, $password);
+	if ($g['debug']) {
 		$cli->setDebug(1);
-	/* send our XMLRPC message and timeout after 250 seconds */
-	$resp = $cli->send($msg, "250");
-	if(!$resp) {
-		$error = "A communications error occured while attempting tinydns XMLRPC sync with {$url}:{$port}.";
-		log_error($error);
+	}
+	/* Send our XMLRPC message and timeout after defined sync timeout value */
+	$resp = $cli->send($msg, $synctimeout);
+	if (!$resp) {
+		$error = "A communications error occured while attempting XMLRPC sync with {$url}:{$port}.";
+		log_error("[tinydns] {$error}");
 		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
-	} elseif($resp->faultCode()) {
+	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting tinydns XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[tinydns] {$error}");
 		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
 	} else {
-		log_error("tinydns XMLRPC sync successfully completed with {$url}:{$port}.");
+		log_error("[tinydns] XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 	
-	/* tell tinydns to reload our settings on the destionation sync host. */
+	/* Tell tinydns to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
-	$execcmd  = "require_once('/usr/local/pkg/tinydns.inc');\n";
+	$execcmd  = "require_once('functions.inc');\n";
+	$execcmd .= "require_once('/usr/local/pkg/tinydns.inc');\n";
 	$execcmd .= "tinydns_custom_php_changeip_command();\n";
 	$execcmd .= "tinydns_create_zone_file();\n";
 	if ($config['installedpackages']['tinydns']['config'][0]['enableipmonitoring']) {
 		$execcmd .= "tinydns_setup_ping_items();\n";
 	}
 	
-	/* assemble xmlrpc payload */
-	$params = array(
-		XML_RPC_encode($password),
-		XML_RPC_encode($execcmd)
-	);
+	/* Assemble XMLRPC payload. */
+	$params = array(XML_RPC_encode($password), XML_RPC_encode($execcmd));
 
-	log_error("tinydns XMLRPC reload data {$url}:{$port}.");
+	log_error("[tinydns] XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
-	$cli->setCredentials('admin', $password);
-	$resp = $cli->send($msg, "250");
-	if(!$resp) {
-		$error = "A communications error occured while attempting tinydns XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
-		log_error($error);
+	$cli->setCredentials($username, $password);
+	$resp = $cli->send($msg, $synctimeout);
+	if (!$resp) {
+		$error = "A communications error occured while attempting XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error("[tinydns] {$error}");
 		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
-	} elseif($resp->faultCode()) {
+	} elseif ($resp->faultCode()) {
 		$cli->setDebug(1);
-		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting tinydns XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
-		log_error($error);
+		$resp = $cli->send($msg, $synctimeout);
+		$error = "An error code was received while attempting XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error("[tinydns] {$error}");
 		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
 	} else {
-		log_error("tinydns XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("[tinydns] XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
-
 }
 
 /* formats data as a tinydns data row item */
@@ -741,18 +860,15 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 			/* Note that some of these are simplistic versions of TinyDNS record handling.  Uber-users can always do "raw" entries...  */
 			case "SOA":	
 				//     .fqdn:ip:x:ttl:timestamp:lo
-				if (intval($config['version']) <= 8) {
-					$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
+				if (is_ipaddrv6($hostname)) {
+					list($rip, $rmask) = explode("/", $hostname);
+					$rmask = empty($rmask) ? 128 : $rmask;
+					$ip6_arpa = tinydns_get_ip6_subnet_arpa($rip, $rmask);
+					$record_data = ".{$ip6_arpa[1]}::{$recordip}{$ttl_string}";
 				} else {
-					if (is_ipaddrv6($hostname)) {
-						list($rip, $rmask) = explode("/", $hostname);
-						$rmask = empty($rmask) ? 128 : $rmask;
-						$ip6_arpa = tinydns_get_ip6_subnet_arpa($rip, $rmask);
-						$record_data = ".{$ip6_arpa[1]}::{$recordip}{$ttl_string}";
-					} else {
-						$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
-					}
+					$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
 				}
+
 				break;
 			case "NS":
 				//      &serious.panic.mil:1.8.248.6:a
@@ -784,17 +900,11 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 			case "PTR":
 				/* "^" creates "PTR" record only to allow reverse DNS */
 				//		^fqdn:p:ttl:timestamp:lo
-
-				if (intval($config['version']) <= 8) {
-					if (is_ipaddr($recordip))
-						$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
-				} else {
-					if (is_ipaddrv4($recordip)) {
-						$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
-					} elseif (is_ipaddrv6($recordip)) {
-						$ip6_arpa = tinydns_get_ip6_subnet_arpa($recordip, 128);
-						$record_data = "^{$ip6_arpa[1]}:{$hostname}{$ttl_string}";
-					}
+				if (is_ipaddrv4($recordip)) {
+					$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
+				} elseif (is_ipaddrv6($recordip)) {
+					$ip6_arpa = tinydns_get_ip6_subnet_arpa($recordip, 128);
+					$record_data = "^{$ip6_arpa[1]}:{$hostname}{$ttl_string}";
 				}
 				break;
 			case "A":
@@ -968,15 +1078,10 @@ function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain) {
 	global $config;
 	$fqdn = "{$nsname}.{$domain}";
 
-	if (intval($config['version']) <= 8) {
-		if (is_ipaddr($ipaddress))
-			$rip = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
-	} else {
-		if (is_ipaddrv4($ipaddress)) {
-			$rip = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
-		} elseif (is_ipaddrv6($ipaddress)) {
-			$rip = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
-		}
+	if (is_ipaddrv4($ipaddress)) {
+		$rip = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+	} elseif (is_ipaddrv6($ipaddress)) {
+		$rip = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
 	}
 
 	$soa = ".{$domain}::{$fqdn}";
@@ -1099,6 +1204,9 @@ function tinydns_get_dns_record_type($tinydnsrecord) {
 		case($tinydnsrecord[0] == "+"):
 			$rtype = "A";
 			break;
+		case($tinydnsrecord[0] == ":"):
+			$rtype = "AAAA";
+			break;
 		case($tinydnsrecord[0] == "@"):
 			$rtype = "MX";
 			break;
@@ -1130,53 +1238,20 @@ function tinydns_dnscache_forwarding_servers($index) {
 	global $g, $config;
 
 	exec("echo 1 > {$g['varetc_path']}/dnscache{$index}/env/FORWARDONLY");
-	if(is_dir("{$g['varetc_path']}/dnscache{$index}/root/servers/")) 
+	if (is_dir("{$g['varetc_path']}/dnscache{$index}/root/servers/")) {
 		exec("rm -R {$g['varetc_path']}/dnscache/root/servers/");
+	}
 	exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$index}/root/servers/");
-	if (intval($config['version']) >= 6)
-		if (file_exists("{$g['varetc_path']}/nameserver_*")) {
-			exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
-		} else {
-			$fw = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
-			if (! $fw) {
-				printf("Error: cannot open dnscache/root/servers/@ in tinydns_register_forwarding_servers().\n");
-				return 1;
-			}
-			fwrite($fw, $config['system']['dnsserver'][0]);
-			fclose($fw);
-		}
-	else {
-		$fr = fopen("{$g['varetc_path']}/resolv.conf.dnscache", "r");
-		if (! $fr) {
-			printf("Error: cannot open resolv.conf.dnscache in tinydns_register_forwarding_servers().\n");
+	if (!empty(glob("{$g['varetc_path']}/nameserver_*"))) {
+		exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
+	} else {
+		$fw = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
+		if (!$fw) {
+			printf("Error: cannot open dnscache/root/servers/@ in tinydns_register_forwarding_servers().\n");
 			return 1;
 		}
-		$lip = strlen("nameserver") + 1;
-		$j = 0;
-		$iprecords = "";
-		while (!feof($fr)) {
-			$routers = fgets($fr, 4096);
-			$discard = ($routers[0] == "\n"); 
-			if(!$discard) {
-				if ($routerip = strstr($routers,"nameserver")) {
-					$routerip = substr($routerip,$lip);
-					if($routerip) {
-						$j += 1;
-						$routera = "{$routerip}";
-						$iprecords .= $routera;
-					}	
-				}
-			}	
-		}
-		fclose($fr);
-		$fr = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
-		if (! $fr) {
-			printf("Error: cannot write to {$g['varetc_path']}/dnscache{$index}/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
-			return 1;
-		}
-		if($iprecords)
-			fwrite($fr, $iprecords);
-		fclose($fr);
+		fwrite($fw, $config['system']['dnsserver'][0]);
+		fclose($fw);
 	}
 }
 

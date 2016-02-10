@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    bind_sync.xml
-    part of the Bind package for pfSense
-    Copyright (C) 2013 Marcello Coutinho
-    All rights reserved.            
-                                                                  */
-/* ========================================================================== */
+	bind_sync.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2013 Juliano Oliveira
+	Copyright (C) 2013 Adriano Brancher
+	Copyright (C) 2013 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code MUST retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 	]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bindsync</name>
-	<version>1.0</version>
-	<title>Bind: XMLRPC Sync</title>
+	<version>0.4.0</version>
+	<title>BIND: XMLRPC Sync</title>
 	<include_file>/usr/local/pkg/bind.inc</include_file>
 	<tabs>
 		<tab>
@@ -74,9 +75,9 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Automatically sync bind configuration changes</fielddescr>
+			<fielddescr>Automatically Sync BIND Configuration Changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
-			<description>Select a sync method for bind.</description>
+			<description>Select a sync method for BIND.</description>
 			<type>select</type>
 			<required/>
 			<default_value>auto</default_value>
@@ -87,7 +88,7 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Sync timeout</fielddescr>
+			<fielddescr>Sync Timeout</fielddescr>
 			<fieldname>synctimeout</fieldname>
 			<description>Select sync max wait time</description>
 			<type>select</type>
@@ -104,8 +105,12 @@
 		<field>
 			<fielddescr>Zone Master IP</fielddescr>
 			<fieldname>masterip</fieldname>
-			<description><![CDATA[Set master zone ip you want to use to sync backup server zones with master.<br>
-							<b>All master zones will be configured as backup on slave servers.<b>]]></description>
+			<description>
+				<![CDATA[
+				Set master zone ip you want to use to sync backup server zones with master.<br />
+				<strong>Note: All master zones will be configured as backup on slave servers.</strong>
+				]]>
+			</description>
 			<type>input</type>
 			<size>20</size>
 			<required/>
@@ -114,30 +119,29 @@
 			<fielddescr>Remote Server</fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
-			<description><![CDATA[<b>Do not forget to:</b><br>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create firewall rules to allow zone transfer between master and slave servers.<br>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a acls with these slave servers.<br>
-							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Include created acl on allow-transfer option on zone config.]]></description>
+			<description><![CDATA[
+				<strong>Do not forget to:</strong><br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create firewall rules to allow zone transfer between master and slave servers.<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create ACLs with these slave servers.<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Include created ACLs on allow-transfer option on zone config.
+				]]>
+			</description>
 			<rowhelper>
-			<rowhelperfield>
-				<fielddescr>IP Address</fielddescr>
-				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
-				<type>input</type>
-				<size>20</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Password</fielddescr>
-				<fieldname>password</fieldname>
-				<description>Password for remote server.</description>
-				<type>password</type>
-				<size>20</size>
-			</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>IP Address</fielddescr>
+					<fieldname>ipaddress</fieldname>
+					<description>IP Address of remote server.</description>
+					<type>input</type>
+					<size>20</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Password</fielddescr>
+					<fieldname>password</fieldname>
+					<description>Password for remote server.</description>
+					<type>password</type>
+					<size>20</size>
+				</rowhelperfield>
 			</rowhelper>
 		</field>
 	</fields>
-	<custom_php_validation_command>
-	</custom_php_validation_command>
-	<custom_php_resync_config_command>
-	</custom_php_resync_config_command>
 </packagegui>

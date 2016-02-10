@@ -2,76 +2,71 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
-/* ========================================================================== */
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
 /*
-    asterisk.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcello Coutinho
-    All rights reserved.                                                      
+	asterisk.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Asterisk status pacakge</description>
-    <requirements>Asterisk 1.8.x</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>asterisk</name>
-	<version>0.3.1</version>
+	<version>0.3.3</version>
 	<title>asterisk</title>
 	<include_file>/usr/local/pkg/asterisk.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/asterisk/asterisk.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/asterisk/asterisk_calls.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/asterisk/asterisk_edit_file.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/asterisk/asterisk_log.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/asterisk/asterisk_cmd.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/shortcuts/</prefix>
-		<chmod>0755</chmod>
 		<item>https://packages.pfsense.org/packages/config/asterisk/pkg_asterisk.inc</item>
 	</additional_files_needed>
 	<menu>
@@ -82,26 +77,13 @@
 	</menu>
 	<service>
 		<name>asterisk</name>
-		<rcfile>asterisk</rcfile>
+		<rcfile>asterisk.sh</rcfile>
 		<executable>asterisk</executable>
-		<description><![CDATA[Asterisk VoIP telephony]]></description>
+		<description>Asterisk VoIP Telephony</description>
 	</service>
-	<tabs>
-	</tabs>
-	<fields>
-	</fields>
 	<custom_php_install_command>
 		asterisk_install();
 	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		asterisk_deinstall();
-	</custom_php_deinstall_command>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
-	<custom_php_validation_command>
-	</custom_php_validation_command>
-	<custom_delete_php_command>
-	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
 		sync_package_asterisk();
 	</custom_php_resync_config_command>

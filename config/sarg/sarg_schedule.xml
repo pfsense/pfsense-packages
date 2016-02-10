@@ -1,65 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
-/* ========================================================================== */
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
 /*
-    sarg_schedule.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2012 Marcello Coutinho
-    All rights reserved.                                                      
+	sarg_schedule.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
 */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>sargschedule</name>
-	<version>0.5</version>
+	<version>0.6.6</version>
 	<title>Status: Sarg Schedules</title>
 	<include_file>/usr/local/pkg/sarg.inc</include_file>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>https://packages.pfsense.org/packages/config/sarg/sarg.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>https://packages.pfsense.org/packages/config/sarg/sarg_sync.xml</item>
-	</additional_files_needed>
-	<menu>
-		<name>sarg</name>
-		<tooltiptext>sarg</tooltiptext>
-		<section>Diagnostics</section>
-		<configfile>sarg.xml</configfile>
-	</menu>
 	<tabs>
 		<tab>
 			<text>General</text>
@@ -101,7 +86,7 @@
 			<fieldname>frequency</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Aditional Args</fielddescr>
+			<fielddescr>Additional Args</fielddescr>
 			<fieldname>args</fieldname>
 		</columnitem>
 		<columnitem>
@@ -109,84 +94,75 @@
 			<fieldname>gzip</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Post Action</fielddescr>
-			<fieldname>action</fieldname>
-		</columnitem>
-		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
-		<movable>arrow</movable>	
+		<movable>on</movable>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<type>listtopic</type>
-			<fieldname>temp</fieldname>
 			<name>Schedule Options</name>
 		</field>
 		<field>
 			<fielddescr>Enable</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-			<description>Enable this schedule</description>
-		</field>	
+			<description>Enable this schedule.</description>
+		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Enter a description for this file.</description>
+			<description>Enter a description for this schedule.</description>
 			<type>input</type>
 			<size>50</size>
 		</field>
 		<field>
-			<fielddescr>Sarg args</fielddescr>
+			<fielddescr>Sarg Args</fielddescr>
 			<fieldname>args</fieldname>
-			<description><![CDATA[Enter sarg extra args to run on this schedule.<br>
-						To force sarg to create a report only for specific days, use:<br>
-						<b>TODAY:</b>&nbsp;&nbsp;-d `date +%d/%m/%Y`<br>
-						<b>YESTERDAY:</b>&nbsp;&nbsp;-d `date -v-1d +%d/%m/%Y`<br>
-						<b>WEEKAGO:</b>&nbsp;&nbsp;-d `date -v-1w +%d/%m/%Y`- `date -v-1d +%d/%m/%Y`<br>
-						<b>MONTHAGO:</b>&nbsp;&nbsp;-d `date -v-1m +01/%m/%Y`-`date -v-1m +31/%m/%Y`]]></description>
+			<description>
+				<![CDATA[
+				Enter Sarg extra arguments to run on this schedule.<br />
+				To force Sarg to create a report only for specific days, use:<br /><br />
+				<strong>TODAY:</strong>&nbsp;&nbsp;-d `date +%d/%m/%Y`<br />
+				<strong>YESTERDAY:</strong>&nbsp;&nbsp;-d `date -v-1d +%d/%m/%Y`<br />
+				<strong>WEEKAGO:</strong>&nbsp;&nbsp;-d `date -v-1w +%d/%m/%Y`-`date -v-1d +%d/%m/%Y`<br />
+				<strong>MONTHAGO:</strong>&nbsp;&nbsp;-d `date -v-1m +01/%m/%Y`-`date -v-1m +31/%m/%Y`
+				]]>
+			</description>
 			<type>input</type>
 			<size>50</size>
 		</field>
 		<field>
-			<fielddescr>frequency</fielddescr>
+			<fielddescr>Frequency</fielddescr>
 			<fieldname>frequency</fieldname>
 			<type>input</type>
 			<size>5</size>
-			<description><![CDATA[How often extract users from active directory and verify changes<br>
-							Valid options are minutes(m), hours(h), days(d)<br>
-							Sample: To update every hour, use 1h<br><br>]]>&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Force update now&quot;&gt;&lt;br&gt;</description>
+			<description>
+				<![CDATA[
+				How often should this report be updated.<br />
+				Valid options are: minutes(m), hours(h), days(d)<br />
+				<strong>Example:</strong> To update every hour, use 1h<br /><br />
+				<input type="submit" name="Submit" value="Force update now" /><br />
+				]]>
+			</description>
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Action after sarg</fielddescr>
-			<fieldname>action</fieldname>
-			<type>select</type>
- 				<options>
- 				<option><name>None(default)</name><value>none</value></option>
-				<option><name>rotate logs</name><value>rotate</value></option>
-				<option><name>Restart proxy daemon</name><value>restart</value></option>
-				<option><name>Rotate log and restart proxy daemon</name><value>both</value></option>
-				</options>
-			<description>Choose an action after sarg finishes</description>
-		</field>
-		<field>
 			<type>listtopic</type>
-			<fieldname>temp</fieldname>
 			<name>Compress Options</name>
 		</field>
 		<field>
 			<fielddescr>Enable Compression</fielddescr>
 			<fieldname>gzip</fieldname>
-			<description><![CDATA[Enable this option to compress sarg report html files using gzip and reduce 4 times sarg reports data.]]></description>
+			<description>Enable this option to compress Sarg HTML report files using gzip. Reduces reports size.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Compression level</fielddescr>
+			<fielddescr>Compression Level</fielddescr>
 			<fieldname>gziplevel</fieldname>
 			<type>select</type>
- 				<options>
+ 			<options>
  				<option><name>Default gzip compression (Recommended)</name><value></value></option>
 				<option><name>1 (fast)</name><value>--fast</value></option>
 				<option><name>2</name><value>-2</value></option>
@@ -197,7 +173,7 @@
 				<option><name>7</name><value>-7</value></option>
 				<option><name>8</name><value>-8</value></option>
 				<option><name>9 (best)</name><value>--best</value></option>
-				</options>
+			</options>
 			<description>Choose gzip compression level.</description>
 		</field>
 		<field>
@@ -206,21 +182,21 @@
 			<type>input</type>
 			<default_value>60</default_value>
 			<size>5</size>
-			<description><![CDATA[To speed up find process, restrict find search to report files created/changed n minutes ago.<br>
-							Default is to 60 minutes. If your reports take longer to be created, increase this value.]]></description>
+			<description>
+				<![CDATA[
+				To speed up find process, restrict search to report files created/changed specified number of minutes ago.<br />
+				If your reports take long time to be created, increase this value.<br />
+				Default: 60 (minutes).
+				]]>
+			</description>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		sarg_php_install_command();
-	</custom_php_install_command>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		sarg_validate_input($_POST, &amp;$input_errors);
+		sarg_validate_input($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_delete_php_command>
 		sync_package_sarg();
-	</custom_delete_php_command>	
+	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		sarg_resync();
 	</custom_php_resync_config_command>

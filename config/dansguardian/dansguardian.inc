@@ -27,10 +27,12 @@
 	POSSIBILITY OF SUCH DAMAGE.
 
 */
-
-require_once("util.inc");
+require_once("config.inc");
 require_once("globals.inc");
-#require("guiconfig.inc");
+require_once("notices.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 
 $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 if ($pf_version > 2.0)
@@ -164,7 +166,7 @@ function sync_package_dansguardian($via_rpc="no",$install_process=false) {
 	$maxips=($dansguardian['maxips']?$dansguardian['maxips']:"0");
 	$preforkchildren=($dansguardian['preforkchildren']?$dansguardian['preforkchildren']:"10");
 	$proxyip=($dansguardian['proxyip']?$dansguardian['proxyip']:"127.0.0.1");
-	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"127.0.0.1");
+	$proxyport=($dansguardian['proxyport']?$dansguardian['proxyport']:"3128");
 	$proxytimeout=($dansguardian['proxytimeout']?$dansguardian['proxytimeout']:"30");
 	
 	#general options

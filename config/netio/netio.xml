@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	netio.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 Bill Marquette
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+        </copyright>
+	<name>netio</name>
+	<version>1.28</version>
+	<title>Diagnostics: netio: Client</title>
+	<savetext>Run netio client</savetext>
+	<preoutput>yes</preoutput>
+	<donotsave>true</donotsave>
+	<menu>
+		<name>netio</name>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=netio.xml</url>
+	</menu>
+	<service>
+		<name>netio</name>
+		<executable>netio</executable>
+		<description>netio Network Throughput Benchmark Server/Client</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>Client</text>
+			<url>/pkg_edit.php?xml=netio.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Server</text>
+			<url>/pkg_edit.php?xml=netioserver.xml</url>
+		</tab>
+	</tabs>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/netio/netio.priv.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/netio/netioserver.xml</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Server</fielddescr>
+			<fieldname>hostname</fieldname>
+			<description>Enter the IP address or hostname that netio will connect to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the port that netio will connect to. (Default: 18767)</description>
+			<type>input</type>
+			<default_value>18767</default_value>
+		</field>
+	</fields>
+	<custom_add_php_command>
+		<![CDATA[
+		mwexec("/usr/bin/killall netio");
+		if ($_POST['port'] != "" && $_POST['hostname'] != "") {
+			$port = escapeshellarg($_POST['port']);
+			$hostname = escapeshellarg($_POST['hostname']);
+			$netio_options = "-p {$port} {$hostname}";
+			system("/usr/local/bin/netio {$netio_options}");
+		}
+		]]>
+	</custom_add_php_command>
+</packagegui>
