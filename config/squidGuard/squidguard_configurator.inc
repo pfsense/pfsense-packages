@@ -919,7 +919,7 @@ function sg_create_config()
                         elseif (is_domain_valid($sr)) $sg_tag->items[] = "domain $sr";
                         elseif (is_username($sr))     $sg_tag->items[] = "user   " . str_replace("'", "", $sr);
                 		elseif (is_group($sr) && $sr_group == 0) {
-							$sg_tag->items[] = "userlist ldap/{$src[F_NAME]}";
+							$sg_tag->items[] = "userlist " . SQUIDGUARD_DBHOME . ".ldap/{$src[F_NAME]}";
 							$sr_group ++;
 						}
 

@@ -174,7 +174,7 @@ if (is_array($config['installedpackages']['squidguardacl']['config'])) {
 		 	}
 		}
 		if (!empty($members)) {
-			$dir="/var/db/squidGuard/ldap";
+			$dir="/var/db/squidGuard.ldap";
 			if (!is_dir($dir)) {
 				mkdir("$dir",0775,true);
 				chown($dir, "proxy");
