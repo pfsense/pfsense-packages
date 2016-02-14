@@ -920,6 +920,7 @@ function sg_create_config()
                         elseif (is_username($sr))     $sg_tag->items[] = "user   " . str_replace("'", "", $sr);
                 		elseif (is_group($sr) && $sr_group == 0) {
 							$sg_tag->items[] = "userlist " . SQUIDGUARD_DBHOME . ".ldap/{$src[F_NAME]}";
+                                                        file_put_contents(SQUIDGUARD_DBHOME . ".ldap/{$src[F_NAME]}","",LOCK_EX);
 							$sr_group ++;
 						}
 
