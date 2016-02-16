@@ -585,7 +585,7 @@ EOD;
 							} else {
 								$zonesuffix = '';
 							}
-							$master_ddns_zones .= $zonename.$zonesuffix.':'.CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB\n";
+							$master_ddns_zones .= $zonename.$zonesuffix.','.CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB\n";
 						}
 
 						$config['installedpackages']['bindzone']['config'][$x]['resultconfig'] = base64_encode($zone_conf);
@@ -877,7 +877,7 @@ function bind_write_rcfile() {
 		fi
 		# Validate that all dynamic zones loaded.  If not, archive the zone's journal and reload.
 		if [ -s {$CHROOT_LOCALBASE}/etc/namedb/master-ddns.lst ]; then
-			IFS=":"$'\\n'
+			IFS=","$'\\n'
 			{$BIND_LOCALBASE}/sbin/rndc -c {$CHROOT_LOCALBASE}/etc/namedb/rndc.conf sync >/dev/null 2>&1
 			if [ "$?" -ne 0 ]; then
 				echo "[bind] Failure communicating with named.  Check logs."
