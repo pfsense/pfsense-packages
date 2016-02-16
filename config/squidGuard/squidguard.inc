@@ -344,9 +344,9 @@ function squidguard_resync() {
     //}
 
     squidguard_cron_install();
-    
+
     //Sync only with apply button to avoid multiples reloads on backup server while editing master config
-    if ($submit == APPLY_BTN) 
+    if ($submit == APPLY_BTN)
 		squidguard_sync_on_changes();
 }
 
@@ -894,7 +894,7 @@ function squidguard_install_command() {
 #        conf_mount_rw();
         $blklist_file = SQUIDGUARD_BLK_FILELISTPATH;
 
-     
+
         if (!file_exists($blklist_file)) {
         	# if blacklist not exists, then copy default db from samples
 #            $entries = array("ads", "aggressive", "audio-video", "drugs", "gambling", "hacking", "mail", "porn", "proxy", "violence", "warez");
@@ -999,6 +999,7 @@ function convert_pfxml_to_sgxml() {
     $sgxml[F_LDAPVERSION]      = $pfxml['ldapversion'];
     $sgxml[F_STRIPNTDOMAIN]    = $pfxml['stripntdomain'];
     $sgxml[F_STRIPREALM]       = $pfxml['striprealm'];
+    $sgxml[F_LDAPFETCH]        = $pfxml['ldapfetch'];
     $sgxml[F_BINPATH]          = SQUIDGUARD_BINPATH;
     $sgxml[F_WORKDIR]          = SQUIDGUARD_WORKDIR;
     $sgxml[F_SGCONF_XML]       = SQUIDGUARD_WORKDIR . SQUIDGUARD_CONFXML;
@@ -1019,7 +1020,7 @@ function convert_pfxml_to_sgxml() {
 
     #Clean adversiting
     $sgxml[F_ADV_BLANKIMG] = $pfxml['adv_blankimg']  == 'on' ? 'on' : 'off';
-	
+
 
     # other
     $lanip = $config['interfaces']['lan']['ipaddr'];
