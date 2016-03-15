@@ -868,6 +868,9 @@ function sg_create_config()
     $sgconf[] = "logdir {$squidguard_config[F_LOGDIR]}";
     $sgconf[] = "dbhome {$squidguard_config[F_DBHOME]}";
     if ( $squidguard_config[F_LDAPENABLE] == 'on' ) {
+    	# libldap needed
+    	if( is_pkg_installed("openldap-client") )
+            log_error("Warning! Package 'openldap-client' doesn't seems to be installed.");
         $sgconf[] = "ldapbinddn {$squidguard_config[F_LDAPBINDDN]}";
         $sgconf[] = "ldapbindpass {$squidguard_config[F_LDAPBINDPASS]}";
         $sgconf[] = "ldapprotover {$squidguard_config[F_LDAPVERSION]}";
@@ -1205,6 +1208,9 @@ function sg_create_simple_config($blk_dbhome, $blk_destlist, $redirect_to = "404
     $sgconf[] = "logdir $logdir";
     $sgconf[] = "dbhome $dbhome";
     if ( $squidguard_config[F_LDAPENABLE] == 'on' ) {
+    	# libldap needed
+    	if( is_pkg_installed("openldap-client") )
+            log_error("Warning! Package 'openldap-client' doesn't seems to be installed.");
         $sgconf[] = "ldapbinddn {$squidguard_config[F_LDAPBINDDN]}";
         $sgconf[] = "ldapbindpass {$squidguard_config[F_LDAPBINDPASS]}";
         $sgconf[] = "ldapprotover {$squidguard_config[F_LDAPVERSION]}";
