@@ -779,7 +779,7 @@ processet() {
 				*)  echo "${i}" >> "${etdir}/ET_Unknown.txt";;
 			esac
 		done < "${pfborig}${alias}.orig"
-		data="$(ls ${etdir})"
+		data="$(ls ${etdir} | sed 's/\.txt//')"
 		printf "%-10s %-25s\n" '  Action' 'Category'
 		echo '-------------------------------------------'
 
@@ -787,13 +787,13 @@ processet() {
 			case "${etblock}" in
 				*$list*)
 					printf "%-10s %-25s\n" '  Block: ' "${list}"
-					cat "${etdir}/${list}" >> "${tempfile}"
+					cat "${etdir}/${list}.txt" >> "${tempfile}"
 					;;
 			esac
 			case "${etmatch}" in
 				*$list*)
 					printf "%-10s %-25s\n" '  Match: ' "${list}"
-					cat "${etdir}/${list}" >> "${tempfile2}"
+					cat "${etdir}/${list}.txt" >> "${tempfile2}"
 					;;
 			esac
 		done
