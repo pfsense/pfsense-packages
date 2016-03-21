@@ -80,6 +80,18 @@ foreach ($aglobal_array as $type => $value) {
 	${"$type"} = $pfb['aglobal'][$type] != '' ? $pfb['aglobal'][$type] : $value;
 }
 
+// Collect DNSBL suppression list
+$pfb['dsupp'] = &$config['installedpackages']['pfblockerngdnsblsettings']['config'][0]['suppression'];
+$dnssupp_ex = array();
+$suppression = pfbng_text_area_decode($pfb['dnsblconfig']['suppression'], TRUE);
+if (isset($suppression)) {
+	foreach ($suppression as $dnssupp) {
+		// Create 1) array for the suppressed domains 2) A string with the domain and comment text
+		$dnssupp_ex[] = $dnssupp[0];
+		$dnssupp_dat .= "{$dnssupp[0]}{$dnssupp[1]}\r\n";
+	}
+}
+
 // Save Alerts tab customizations
 if (isset($_POST['save'])) {
 	$pfb['aglobal']['alertrefresh']	= htmlspecialchars($_POST['alertrefresh']) ?: 'off';
@@ -250,21 +262,46 @@ if (isset($_POST['addsuppress'])) {
 if (isset($_POST['addsuppressdom'])) {
 	$domain		= htmlspecialchars($_POST['domain']);
 	$domainparse	= str_replace('.', '\.', $domain);
-	$pfb['dsupp']	= &$config['installedpackages']['pfblockerngdnsblsettings']['config'][0]['suppression'];
 
-	// Collect existing suppression list
-	$dnssupp_ex = collectsuppression();
+	// Query for Domain in Unbound DNSBL file.
+	$dnsbl_query = exec("/usr/bin/grep -Hm1 ' \"{$domainparse} 60 IN A' {$pfb['dnsbl_file']}.conf");
 
-	// Query for domain in Unbound DNSBL file.
-	$dnsbl_query = exec("/usr/bin/grep -Hm1 ' \"{$domain} 60 IN A' {$pfb['dnsbl_file']}.conf");
+	// Query Domain for CNAME(s)
+	exec("/usr/bin/drill {$domain} @8.8.8.8 | /usr/bin/awk '/CNAME/ {sub(\"\.$\", \"\", $5); print $5;}'", $cname_list);
+	if (!empty($cname_list)) {
+		$cname = array();
+		$dnsbl_query = 'Found';
+
+		foreach ($cname_list as $query) {
+			$cname[] = $query;
+		}
+	}
 
 	// Save new suppress domain to suppress list.
 	if (empty($dnsbl_query)) {
-		$savemsg = gettext("Domain: [ {$domain} ] does not exist in the Unbound Resolver DNSBL");
+		$savemsg = gettext("Domain: [ ") . "{$domain}" . gettext(" ] does not exist in the Unbound Resolver DNSBL");
 		exec("/usr/local/sbin/unbound-control -c {$pfb['dnsbldir']}/unbound.conf flush {$domain}.");
-	} else {
-		// Remove domain from Unbound resolver pfb_dnsbl.conf file
-		exec("{$pfb['sed']} -i '' '/ \"{$domain} 60 IN A/d' {$pfb['dnsbl_file']}.conf");
+	}
+	else {
+		if (is_array($cname)) {
+			// Remove Domain and CNAME(s) in Unbound resolver pfb_dnsbl.conf file
+			$removed	= "{$domain} | ";
+			$supp_string	= "{$domain}\r\n";
+			exec("{$pfb['sed']} -i '' '/ \"{$domain} 60 IN A/d' {$pfb['dnsbl_file']}.conf");
+
+			foreach ($cname as $name) {
+				$removed	.= "{$name} | ";
+				$supp_string	.= "{$name} # CNAME for ({$domain})\r\n";
+				exec("{$pfb['sed']} -i '' '/ \"{$name} 60 IN A/d' {$pfb['dnsbl_file']}.conf");
+			}
+			$savemsg = gettext("Removed - Domain|CNAME(s) | ") . "{$removed}"
+				. gettext("from Unbound Resolver DNSBL. You may need to flush your browsers DNS Cache");
+		}
+		else {
+			// Remove domain from Unbound resolver pfb_dnsbl.conf file
+			exec("{$pfb['sed']} -i '' '/ \"{$domain} 60 IN A/d' {$pfb['dnsbl_file']}.conf");
+			$savemsg = gettext("Removed Domain: [ ") . "{$domain}" . gettext(" ] from Resolver DNSBL. You may need to flush your browsers DNS Cache");
+		}
 
 		$cache_dumpfile = '/var/tmp/unbound_cache';
 		unlink_if_exists("{$cache_dumpfile}");
@@ -278,14 +315,21 @@ if (isset($_POST['addsuppressdom'])) {
 		}
 
 		exec("/usr/local/sbin/unbound-control -c {$pfb['dnsbldir']}/unbound.conf flush {$domain}");
+		if (is_array($cname)) {
+			foreach ($cname as $name) {
+				exec("/usr/local/sbin/unbound-control -c {$pfb['dnsbldir']}/unbound.conf flush {$name}");
+			}
+		}
 
 		if (!in_array($domain, $dnssupp_ex)) {
-			$dnssupp_ex[]	= $domain;
-			$dnssupp_new	= base64_encode(implode("\n", $dnssupp_ex));
-			$pfb['dsupp']	= "{$dnssupp_new}";
+			if (is_array($cname)) {
+				$dnssupp_dat .= "{$supp_string}";
+			} else {
+				$dnssupp_dat .= "{$domain}";
+			}
+			$pfb['dsupp'] = base64_encode($dnssupp_dat);
 			write_config("pfBlockerNG: Added {$domain} to DNSBL suppress list");
 		}
-		$savemsg = gettext("Removed Domain: [ {$domain} ] from Unbound Resolver DNSBL. You may need to flush your browsers DNS Cache");
 	}
 }
 
@@ -387,7 +431,7 @@ if (isset($config['interfaces'])) {
 				}
 
 				// Collect DNSBL Interfaces
-				$dnsbl_int[] = array("{$int['ipaddr']}/{$int['subnet']}",  "{$int['descr']}");
+				$dnsbl_int[] = array("{$int['ipaddr']}/{$int['subnet']}", "{$int['descr']}");
 
 			}
 		}
@@ -458,20 +502,8 @@ if (isset($pf_int)) {
 	$local_hosts = array_merge($local_hosts, array_flip(array_filter($pf_int)));
 }
 
+
 // FUNCTION DEFINITIONS
-
-
-// Collect existing suppression list
-function collectsuppression() {
-	global $pfb;
-	$dnssupp_ex = array();
-
-	$custom_list = pfbng_text_area_decode($pfb['dnsblconfig']['suppression']);
-	if (!empty($custom_list)) {
-		$dnssupp_ex = array_filter( explode("\n", pfbng_text_area_decode($pfb['dnsblconfig']['suppression'])));
-	}
-	return ($dnssupp_ex);
-}
 
 
 // Host resolve function lookup
@@ -1000,8 +1032,6 @@ if ($pfb['dnsbl'] == 'on' && $type == 'DNSBL') {
 			$alert_dom .= "\"> <img src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" width='11' height='11' border='0' ";
 			$alert_dom .= "alt=\"Icon Reverse Resolve with DNS\" style=\"cursor: pointer;\" /></a>";
 
-			// Collect existing suppression list
-			$dnssupp_ex = collectsuppression();
 			if (!in_array($pfbalertdnsbl[8], $dnssupp_ex)) {
 				$supp_dom  = "<input type='image' name='addsuppressdom[]' onclick=\"domainlistid('{$domain}');\" ";
 				$supp_dom .= "src=\"../themes/{$g['theme']}/images/icons/icon_pass_add.gif\" alt='' title=\"";
@@ -1158,12 +1188,18 @@ if (!empty($fields_array[$type]) && !empty($rule_list) && $type != 'DNSBL') {
 					$pfb_match[2] = '';
 				}
 				else {
-					// Report specific ET IQRisk details
-					if ($pfb['et_header'] && strpos($pfb_query, "{$et_header}") !== FALSE) {
-						$pfbfolder = "{$pfb['etdir']}/*";
-					}
-
 					$pfb_query = find_reported_header($host, $pfbfolder, FALSE);
+
+					// Report specific ET IQRisk details
+					if ($pfb['et_header'] && strpos($pfb_query[1], "{$et_header}") !== FALSE) {
+						$ET_orig = $pfb_query;
+						$pfb_query = find_reported_header($host, "{$pfb['etdir']}/*", FALSE);
+
+						// On 'no match', ET IQRisk category is unknown.
+						if ($pfb_query[1] == 'no match') {
+							$pfb_query = $ET_orig;
+						}
+					}
 
 					// Split list column into two lines.
 					$pfb_match[1] = "{$pfb_query[1]}";
@@ -1276,6 +1312,7 @@ function domainlistid(domain,domainlist) {
 
 // Auto-resolve of alerted hostnames
 function findhostnames(counter) {
+
 	getip = jQuery('#gethostname_' + counter).attr('name');
 	geturl = "/pfblockerng/pfblockerng_alerts_ar.php";
 	jQuery.get( geturl, { "getpfhostname": getip } )
