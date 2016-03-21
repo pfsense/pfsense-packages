@@ -122,13 +122,16 @@ include('fbegin.inc');
 					<?=gettext("Alexa");?></a><br />
 				<a target="_blank" href="https://www.c-sirt.org/en/incidents-on-domain/<?php echo $domain; ?>">
 					<?=gettext("C-SIRT");?></a><br />
+				<a target="_blank" href="https://safeweb.norton.com/report/show_mobile?name=<?php echo $domain; ?>">
+					<?=gettext("Norton Safe Web");?></a><br />
 				<a target="_blank" href="https://www.herdprotect.com/domain-<?php echo $domain; ?>.aspx">
 					<?=gettext("HerdProtect");?></a><br />
 				<a target="_blank" href="https://sitecheck.sucuri.net/results/<?php echo $domain; ?>">
 					<?=gettext("Sucuri");?></a><br />
 				<a target="_blank" href="http://www.tcpiputils.com/browse/domain/<?php echo $domain; ?>/">
 					<?=gettext("TCPUtils");?></a></td>
-
+				<a target="_blank" href="https://www.google.com/safebrowsing/diagnostic?site=<?php echo $domain; ?>/">
+					<?=gettext("Google SafeBrowsing");?></a></td>
 				<?php } ?>
 
 			</td>
