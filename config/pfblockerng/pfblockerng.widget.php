@@ -300,8 +300,8 @@ function pfBlockerNG_get_table($mode='') {
 						$aentries = $values['packets'];
 					}
 
-					$packets  = "<a target='_blank' href='/pfblockerng/pfblockerng_alerts.php?rule={$rules}&entries={$aentries}' ";
-					$packets .= "title='Click to view these packets in Alerts tab' >{$values['packets']}</a>";
+					$packets  = "<a target=\"_blank\" href=\"/pfblockerng/pfblockerng_alerts.php?rule={$rules}&entries={$aentries}\" ";
+					$packets .= "title=\"Click to view these packets in Alerts tab\" >{$values['packets']}</a>";
 				}
 				else {
 					$packets = $values['packets'];
