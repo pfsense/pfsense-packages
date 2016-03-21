@@ -101,7 +101,7 @@ if (!file_exists("{$pfb['geoipshare']}/{$pfb['maxmind'][0]['file']}") ||
 			}
 
 			curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 Chrome/43.0.2357.65 Safari/537.36');
-			curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'TLSv1.2, TLSv1');
+			curl_setopt($ch, CURLOPT_SSL_CIPHER_LIST, 'TLSv1.2, TLSv1.1, TLSv1');
 			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
@@ -277,6 +277,59 @@ EOF;
 	update_static_output("Starting DNSBL Service...");
 	restart_service('dnsbl');
 	update_static_output(" done.\n");
+}
+
+
+// Upgrade - Adv. Inbound settings to new variable names. 
+update_static_output("Upgrading Adv. Inbound firewall rule settings ...");
+$ufound = FALSE;
+$upgrade_type = array('pfblockernglistsv4', 'pfblockernglistsv6', 'pfblockerngdnsblsettings', 'pfblockerngafrica', 'pfblockerngantartica',
+		    'pfblockerngasia', 'pfblockerngeurope', 'pfblockerngnorthamerica', 'pfblockerngoceania', 'pfblockerngsouthamerica',
+		    'pfblockerngtopspammers', 'pfblockerngproxyandsatellite');
+
+foreach ($upgrade_type as $type) {
+	$conf_config = &$config['installedpackages'][$type]['config'];
+	if (isset($conf_config)) {
+		foreach ($conf_config as $key => $utype) {
+			if (isset($utype['autoports'])) {
+				$ufound = TRUE;
+				if ($utype['autoports'] == 'on' && !empty($utype['aliasports']) && !isset($conf_config[$key]['autoports_in'])) {
+					$conf_config[$key]['autoports_in'] = 'on';
+					$conf_config[$key]['aliasports_in'] = $utype['aliasports'];
+				}
+				unset($conf_config[$key]['autoports']);
+				unset($conf_config[$key]['aliasports']);
+			}
+			if (isset($utype['autodest'])) {
+				$ufound = TRUE;
+				if ($utype['autodest'] == 'on' && !empty($utype['aliasdest']) && !isset($conf_config[$key]['autoaddr_in'])) {
+					$conf_config[$key]['autoaddr_in'] = 'on';
+					$conf_config[$key]['aliasaddr_in'] = $utype['aliasdest'];
+				}
+				unset($conf_config[$key]['autodest']);
+				unset($conf_config[$key]['aliasdest']);
+			}
+			if (isset($utype['autonot'])) {
+				$ufound = TRUE;
+				if ($utype['autonot'] == 'on' && !isset($conf_config[$key]['autonot_in'])) {
+					$conf_config[$key]['autonot_in'] = $utype['autonot'];
+				}
+				unset($conf_config[$key]['autonot']);
+			}
+			if (isset($utype['autoproto'])) {
+				$ufound = TRUE;
+				$conf_config[$key]['autoproto_in'] = $utype['autoproto'];
+				unset($conf_config[$key]['autoproto']);
+			}
+		}
+	}
+}
+
+if ($ufound) {
+	write_config('pfBlockerNG: Upgrade Adv. Inbound Settings.');
+	update_static_output(" saving new changes ... done.\n");
+} else {
+	update_static_output(" no changes required ... done.\n");
 }
 
 unset($g['pfblockerng_install']);	// Remove 'Install flag'
