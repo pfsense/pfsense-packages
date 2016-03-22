@@ -28,11 +28,18 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-if(!function_exists("filter_configure")) 
+require_once("globals.inc");
+if (!function_exists("filter_configure")) {
 	require_once("filter.inc");
-	
-if(!function_exists("get_real_wan_interface")) 
+}
+if (!function_exists("get_real_wan_interface")) {
 	require_once("interfaces.inc");
+}
+require_once("notices.inc");
+require_once("service-utils.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 	
 function tinydns_validate() {
 	global $input_errors, $config;

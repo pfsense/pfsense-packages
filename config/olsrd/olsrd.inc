@@ -2,7 +2,7 @@
 /*
 	olsrd.inc
 	part of pfSense (https://www.pfSense.org/)
-	Copyright (C) 2012 Ermal Luçi
+	Copyright (C) 2006 Scott Ullrich
 	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
@@ -28,27 +28,36 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 require_once("config.inc");
+require_once("service-utils.inc");
+require_once("util.inc");
+
+$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+	define('OLSRD_LOCALBASE', '/usr/pbi/olsrd-' . php_uname("m") . '/local');
+} else {
+	define('OLSRD_LOCALBASE', '/usr/local');
+}
 
 function setup_wireless_olsr() {
 	global $config, $g;
 
-	if ($g['platform'] == 'jail' || !$config['installedpackages']['olsrd'] || !$config['installedpackages']) {
-		return;
-	}
-	if (isset($config['system']['developerspew'])) {
-		$mt = microtime();
-		echo "setup_wireless_olsr($interface) being called $mt\n";
-	}
 	conf_mount_rw();
 
-	foreach ($config['installedpackages']['olsrd']['config'] as $olsrd) {
-		$olsr_enable = $olsrd['enable'];
-		if ($olsr_enable <> "on") {
-			if (is_process_running("olsrd")) {
-				mwexec("/usr/bin/killall olsrd", true);
-			}
-			return;
+	if (is_array($config['installedpackages']['olsrd'])) {
+		$olsrd_config = $config['installedpackages']['olsrd']['config'][0];
+	} else {
+		$olsrd_config = array();
+	}
+
+	/* If disabled, stop service if needed, unlink the rc script and do nothing else */
+	if ($olsrd_config['enable'] != "on") {
+		if (is_service_running("olsrd")) {
+			stop_service("olsrd");
 		}
+		unlink_if_exists("/usr/local/etc/rc.d/olsrd.sh");
+		return;
+	} else {
+		/* parse package config and create configuration file */
 		$fd = fopen("{$g['varetc_path']}/olsr.conf", "w");
 
 		if ($olsrd['announcedynamicroute'] or $olsrd['enableannounce'] == "on") {
@@ -64,7 +73,8 @@ function setup_wireless_olsr() {
 		} else {
 			$enableannounce = "";
 		}
-
+		
+		$pluginpath = OLSRD_LOCALBASE . '/lib';
 		$olsr .= <<<EODA
 #
 # olsr.org OLSR daemon config file
@@ -201,10 +211,10 @@ MprCoverage	3
 
 EODA;
 
-	if ($olsrd['enablehttpinfo'] == "on") {
-		$olsr .= <<<EODB
+		if ($olsrd['enablehttpinfo'] == "on") {
+			$olsr .= <<<EODB
 
-LoadPlugin "/usr/local/lib/olsrd_httpinfo.so.0.1"
+LoadPlugin "{$pluginpath}/olsrd_httpinfo.so.0.1"
 {
     PlParam     "port"   "{$olsrd['port']}"
     PlParam     "Net"    "{$olsrd['allowedhttpinfohost']} {$olsrd['allowedhttpinfosubnet']}"
@@ -212,29 +222,29 @@ LoadPlugin "/usr/local/lib/olsrd_httpinfo.so.0.1"
 
 EODB;
 
-	}
+		}
 
-	if ($olsrd['enabledsecure'] == "on") {
-		@file_put_contents("{$g['tmp_path']}/olsrkey.txt", $olsrd['securekey']);
-		$olsr .= <<<EODC
+		if ($olsrd['enabledsecure'] == "on") {
+			@file_put_contents("{$g['tmp_path']}/olsrkey.txt", $olsrd['securekey']);
+			$olsr .= <<<EODC
 
-LoadPlugin "/usr/local/lib/olsrd_secure.so.0.5"
+LoadPlugin "{$pluginpath}/olsrd_secure.so.0.6"
 {
     PlParam     "Keyfile"   "{$g['tmp_path']}/olsrkey.txt"
 }
 
 EODC;
 
-	}
+		}
 
-	if ($olsrd['enabledyngw'] == "on") {
+		if ($olsrd['enabledyngw'] == "on") {
 
-	/* unset default route, olsr auto negotiates */
-	mwexec("/sbin/route delete default");
+		/* unset default route, olsr auto negotiates */
+		mwexec("/sbin/route delete default");
 
-	$olsr .= <<<EODE
+		$olsr .= <<<EODE
 
-LoadPlugin "/usr/local/lib/olsrd_dyn_gw.so.0.4"
+LoadPlugin "{$pluginpath}/olsrd_dyn_gw.so.0.4"
 {
     # how often to look for a inet gw, in seconds
     # defaults to 5 secs, if commented out
@@ -252,13 +262,13 @@ LoadPlugin "/usr/local/lib/olsrd_dyn_gw.so.0.4"
 
 EODE;
 
-	}
+		}
 
-	foreach ($config['installedpackages']['olsrd']['config'] as $conf) {
-		$interfaces = explode(',', $conf['iface_array']);
-		foreach ($interfaces as $interface) {
-			$realinterface = convert_friendly_interface_to_real_interface_name($interface);
-			$olsr .= <<<EODAD
+		foreach ($config['installedpackages']['olsrd']['config'] as $conf) {
+			$interfaces = explode(',', $conf['iface_array']);
+			foreach ($interfaces as $interface) {
+				$realinterface = convert_friendly_interface_to_real_interface_name($interface);
+				$olsr .= <<<EODAD
 Interface "{$realinterface}"
 {
 
@@ -301,22 +311,78 @@ Interface "{$realinterface}"
 
 EODAD;
 
+			}
+			break;
 		}
-		break;
+
+		fwrite($fd, $olsr);
+		fclose($fd);
+
+
+
+		/* create rc script and (re)start service */
+		$olsrd_start = "/usr/local/sbin/olsrd -f {$g['varetc_path']}/olsr.conf";
+		$olsrd_stop = "/usr/bin/killall olsrd; sleep 3";
+		write_rcfile(array(
+			"file" => "olsrd.sh",
+			"start" => $olsrd_start,
+			"stop" => $olsrd_stop
+			)
+		);
+		if (is_service_running("olsrd")) {
+			restart_service("olsrd");
+		} else {
+			start_service("olsrd");
+		}
 	}
 
-	fwrite($fd, $olsr);
-	fclose($fd);
-
+	conf_mount_ro();
 }
 
-	if (is_process_running("olsrd")) {
-		mwexec("/usr/bin/killall olsrd", true);
+function validate_form_olsrd($post, &$input_errors) {
+	/*
+	if ($post['iface_array'] == "") {
+		$input_errors[] = 'You must select at least one interface for OSLRD.';
 	}
+	*/
+	if ($post['enablehttpinfo']) {
+		if (!$post['port'] || !$post['allowedhttpinfohost'] || !$post['allowedhttpinfosubnet']) {
+			$input_errors[] = "'HTTPInfo Port', 'Allowed Host(s) IP Address/Subnet' and 'Allowed Host(s) Netmask' must be filled in when HTTPInfo Plugin is enabled.";
+		}
+		if ($post['port'] && !is_port($post['port'])) {
+			$input_errors[] = "Invalid port entered for 'HTTPInfo Port'.";
+		}
+		if ($post['allowedhttpinfohost'] && !is_ipaddrv4($post['allowedhttpinfohost'])) {
+			$input_errors[] = "Invalid IPv4 address entered for 'Allowed Host(s) IP Address/Subnet'.";
+		}
+		if ($post['allowedhttpinfosubnet'] && !is_ipaddrv4($post['allowedhttpinfosubnet'])) {
+			$input_errors[] = "Invalid IPv4 address entered for 'Allowed Host(s) Netmask'.";
+		}
+		if ($post['allowedhttpinfohost'] && is_ipaddrv4($post['allowedhttpinfohost']) && $post['allowedhttpinfosubnet'] && is_ipaddrv4($post['allowedhttpinfosubnet'])) {
+			$cidr = 32 - log((ip2long($post['allowedhttpinfosubnet']) ^ ip2long('255.255.255.255')) + 1, 2);
+			$acl = "{$post['allowedhttpinfohost']}/{$cidr}";
+			if (!is_subnetv4($acl)) {
+				$input_errors[] = "'{$post['allowedhttpinfohost']}/{$post['allowedhttpinfosubnet']}' is not a valid IPv4 subnet.";
+			}
+		}
+	}
+	if ($post['enabledyngw']) {
+		if (!$post['ping'] || !$post['polling']) {
+			$input_errors[] = "'Ping IP Address' and 'Poll Interval' must be filled in when 'Enable Dynamic Gateway' is checked.";
+		}
+		if ($post['ping'] && !is_ipaddrv4($post['ping'])) {
+			$input_errors[] = "Invalid IPv4 address entered for 'Ping IP Address'.";
+		}
+		if ($post['polling'] && (!is_numericint($post['polling']) || ($post['polling'] < 1))) {
+			$input_errors[] = "'Poll Interval' must be numeric integer greater than 0.";
+		}
+	}
+}
 
-	sleep(2);
-	mwexec_bg("/usr/local/sbin/olsrd -f {$g['varetc_path']}/olsr.conf");
-	conf_mount_ro();
+function php_deinstall_olsrd() {
+	global $g;
+	unlink_if_exists("{$g['varetc_path']}/olsr.conf");
+	unlink_if_exists("{$g['tmp_path']}/olsrkey.txt");
 }
 
 ?>

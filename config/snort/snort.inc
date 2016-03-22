@@ -33,10 +33,15 @@
 
 require_once("pfsense-utils.inc");
 require_once("config.inc");
+require_once("globals.inc");
 require_once("functions.inc");
 require_once("service-utils.inc");
 require_once("pkg-utils.inc");
 require_once("filter.inc");
+require_once("notices.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
 require("/usr/local/pkg/snort/snort_defs.inc");
 
 // Snort GUI needs some extra PHP memory space to manipulate large rules arrays
@@ -2934,6 +2939,7 @@ rc_start() {
 
 	### Remove the lock since we have started all interfaces
 	if [ -f {$g['varrun_path']}/snort_pkg_starting.lck ]; then
+		sleep 2
 		/bin/rm {$g['varrun_path']}/snort_pkg_starting.lck
 	fi
 }
@@ -2954,8 +2960,12 @@ case $1 in
 		rc_stop
 		;;
 	restart)
-		rc_stop
-		rc_start
+		if [ ! -f {$g['varrun_path']}/snort_pkg_starting.lck ]; then
+			rc_stop
+			rc_start
+		else
+			/usr/bin/logger -p daemon.info -i -t SnortRestart "Ignoring RESTART command since Snort is already starting..."
+		fi
 		;;
 esac
 

@@ -28,6 +28,10 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("config.inc");
+require_once("service-utils.inc");
+require_once("util.inc");
+
 define('ASTERISK_CONF_DIR', '/conf/asterisk');
 $pf_version=substr(trim(file_get_contents("/etc/version")), 0, 3);
 if ($pf_version == "2.1" || $pf_version == "2.2") {
@@ -43,6 +47,7 @@ function asterisk_install() {
 }
 
 function sync_package_asterisk() {
+	global $g;
 	conf_mount_rw();
 
 	// For NanoBSD compatibility, move the /etc/asterisk configuration directory to /conf, and symlink it back
@@ -401,11 +406,24 @@ EOF;
 		'start' => $start,
 		'stop' => $stop	));
 
-	restart_service("asterisk");
-
 	// Prepare backup for factory defaults restoring feature
 	if (!file_exists("/conf.default/asterisk_factory_defaults_config.tgz")) {
 		system("cd /conf/asterisk/ && /usr/bin/tar czf /conf.default/asterisk_factory_defaults_config.tgz *");
+	}
+
+	/* Do not (re)start the service on boot */
+	if (function_exists("platform_booting")) {
+		if (platform_booting()) {
+			return;
+		}
+	} elseif ($g['booting']) {
+		return;
+	} else {
+		if (is_service_running("asterisk")) {
+			restart_service("asterisk");
+		} else {
+			start_service("asterisk");
+		}
 	}
 
 	conf_mount_ro();

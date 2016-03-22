@@ -28,6 +28,14 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("config.inc");
+require_once("globals.inc");
+require_once("notices.inc");
+require_once("services.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
+
 $pf_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 if ($pf_version == "2.1" || $pf_version == "2.2") {
 	// Function to get squidGuard directory
@@ -69,6 +77,106 @@ function sarg_text_area_decode($text) {
 	return preg_replace('/\r\n/', "\n", base64_decode($text));
 }
 
+function sarg_check_dirs() {
+	// move old reports
+	if (is_dir("/usr/local/www/sarg-reports") && !is_dir("/usr/local/sarg-reports")) {
+		rename("/usr/local/www/sarg-reports", "/usr/local/sarg-reports");
+	}
+
+	// check dirs
+	$dirs = array("/usr/local/sarg-reports", "/usr/local/www/sarg-images", "/usr/local/www/sarg-images/temp");
+	foreach ($dirs as $dir) {
+		safe_mkdir($dir, 0755, true);
+	}
+	// PBI hack
+	if (SARG_DIR != "/usr/local") {
+		$pbidir = SARG_DIR . "/local/sarg-reports";
+		if (is_dir($pbidir) && !is_link($pbidir)) {
+			rmdir_recursive($pbidir);
+		}
+		if (!is_link($pbidir)) {
+			symlink("/usr/local/sarg-reports", "{$pbidir}");
+		}
+	}
+
+	// images
+	$simages = array("datetime.png", "graph.png", "sarg-squidguard-block.png", "sarg.png");
+	$simgdir1 = "/usr/local/www/sarg-images";
+	$simgdir2 = SARG_DIR . "/etc/sarg/images";
+	foreach ($simages as $simage) {
+		if (!file_exists("{$simgdir1}/{$simage}")) {
+			copy("{$simgdir2}/{$simage}","{$simgdir1}/{$simage}");
+		}
+	}
+}
+
+function sarg_configure_cron() {
+	global $config;
+	// TODO: Redo this mess to use install_cron_job() instead
+	$new_cron = array();
+	$cron_found = 0;
+	if (is_array($config['cron']['item'])) {
+		foreach($config['cron']['item'] as $cron) {
+			if (preg_match("/usr.local.www.sarg.php/", $cron["command"])) {
+				$cron_found++;
+			} else {
+				$new_cron['item'][] = $cron;
+			}
+		}
+		$cron_cmd="/usr/local/bin/php --no-header /usr/local/www/sarg.php";
+		$sarg_schedule_id = 0;
+		if (is_array($config['installedpackages']['sargschedule']['config'])) {
+			foreach ($config['installedpackages']['sargschedule']['config'] as $sarg_schedule) {
+	 			if (preg_match('/(\d+)m/', $sarg_schedule['frequency'], $matches) && $sarg_schedule['enable']) {
+					$new_cron['item'][] = array("minute" => "*/" . $matches[1],
+									"hour" => "*",
+									"mday" => "*",
+									"month" => "*",
+									"wday" => "*",
+									"who" => "root",
+									"command" => $cron_cmd . " " . $sarg_schedule_id);
+					$config['cron'] = $new_cron;
+					$cron_found++;
+				}
+				if (preg_match('/(\d+)h/', $sarg_schedule['frequency'], $matches) && $sarg_schedule['enable']) {
+					$new_cron['item'][] = array("minute" => "0",
+									"hour" => "*/" . $matches[1],
+									"mday" => "*",
+									"month" => "*",
+									"wday" => "*",
+									"who" => "root",
+									"command" => $cron_cmd . " " . $sarg_schedule_id);
+					$config['cron'] = $new_cron;
+					$cron_found++;
+				}
+				if (preg_match('/(\d+)d/', $sarg_schedule['frequency'], $matches) && $sarg_schedule['enable']) {
+					$new_cron['item'][] = array("minute" =>	"0",
+									"hour" => "0",
+									"mday" => "*/" . $matches[1],
+									"month" => "*",
+									"wday" => "*",
+									"who" => "root",
+									"command"=>	$cron_cmd . " " . $sarg_schedule_id);
+					$config['cron']=$new_cron;
+					$cron_found++;
+				}
+				$sarg_schedule_id++;
+			}
+		}
+
+		// update cron
+		if ($cron_found > 0) {
+			$config['cron'] = $new_cron;
+			write_config();
+			configure_cron();
+		}
+	}
+}
+
+function sarg_package_install() {
+	sarg_check_dirs();
+}
+
 function sarg_resync() {
 	global $config;
 	if (($_POST['Submit'] == 'Save') || !isset($_POST['Submit'])) {
@@ -79,25 +187,6 @@ function sarg_resync() {
 	}
 }
 
-function log_rotate($log_file) {
-	global $config, $g;
-
-	// remove .10 rotate log file
-	unlink_if_exists("{$log_file}.10");
-	// rotate logs from 9 to 0
-	$i = 9;
-	while ($i >= 0) {
-		if (file_exists("{$log_file}.{$i}")) {
-			rename("{$log_file}.{$i}", "{$log_file}" . ($i + 1));
-		}
-		$i = $i - 1;
-	}
-	// rotate current log
-	if (file_exists("$log_file")) {
-		rename("{$log_file}", "{$log_file}.0");
-	}
-}
-
 function run_sarg($id = -1) {
 	global $config, $g, $sarg_proxy;
 	// mount filesystem writeable
@@ -105,21 +194,19 @@ function run_sarg($id = -1) {
 	$cmd = SARG_DIR . "/bin/sarg";
 	if ($id >= 0 && is_array($config['installedpackages']['sargschedule']['config'])) {
 		$args = $config['installedpackages']['sargschedule']['config'][$id]['args'];
-		$action = $config['installedpackages']['sargschedule']['config'][$id]['action'];
 		$gzip = $config['installedpackages']['sargschedule']['config'][$id]['gzip'];
 		$find = $config['installedpackages']['sargschedule']['config'][$id]['find'];
 		$gziplevel = $config['installedpackages']['sargschedule']['config'][$id]['gziplevel'];
 		$daylimit = $config['installedpackages']['sargschedule']['config'][$id]['daylimit'];
 	} else {
 		$args = $_POST['args'];
-		$action = $_POST['action'];
 		$gzip = $_POST['gzip'];
 		$find = $_POST['find'];
 		$gziplevel = $_POST['gziplevel'];
 		$daylimit = "";
 	}
 	$find = (preg_match("/(\d+)/", $find, $find_matches) ? $find_matches[1] : "60");
-	log_error("Sarg: force refresh now with {$args} args, compress({$gzip}) and {$action} action after sarg finish.");
+	log_error("[sarg] Force refresh now with {$args} args, compress({$gzip}).");
 	$gzip_script = "#!/bin/sh\n";
 	if ($gzip == "on") {
 		// remove old file if exists
@@ -147,39 +234,7 @@ EOF;
 	// create a new file to speedup find search
 	file_put_contents("/root/sarg_run_{$id}.sh", $gzip_script, LOCK_EX);
 	mwexec("export LC_ALL=C && " . $cmd . " " . $args);
-	// check if there is a script to run after file save
-	if (is_array($config['installedpackages']['sarg'])) {
-		switch ($config['installedpackages']['sarg']['config'][0]['proxy_server']) {
-			case "squidguard":
-				if ($action == "both" || $action == "rotate") {
-					log_error('Executing squidguard log rotate after sarg.');
-					log_rotate($sarg_proxy['squidguard_block_log']);
-					file_put_contents($sarg_proxy['squidguard_block_log'], "", LOCK_EX);
-					chown($sarg_proxy['squidguard_block_log'], 'proxy');
-					chgrp($sarg_proxy['squidguard_block_log'], 'proxy');
-					mwexec(SQUID_DIR . '/sbin/squid -k reconfigure');
-				}
-			// leave this case without break to run squid rotate too.
-			case "squid":
-				if ($action == "both" || $action == "rotate") {
-					log_error('Executing squid log rotate after sarg.');
-					mwexec(SQUID_DIR . '/sbin/squid -k rotate');
-				}
-				if ($action == "both" || $action=="restart") {
-					if (file_exists($sarg_proxy['squid_rc'])) {
-						mwexec_bg($sarg_proxy['squid_rc'] . ' restart');
-					}
-				}
-			break;
-			case "dansguardian":
-				if (preg_match('/\w+/', $action) && $action != "none") {
-					log_rotate($sarg_proxy['dansguardian_log']);
-					log_error('Restarting dansguardian after sarg and log rotate.');
-					mwexec('/usr/bin/killall -HUP dansguardian');
-				}
-			break;
-		}
-	}
+
 	// check compress option
 	if ($gzip == "on") {
 		mwexec_bg("/bin/sh /root/sarg_run_{$id}.sh");
@@ -249,8 +304,8 @@ function sync_package_sarg() {
 			}
 			break;
 	}
-	if (!file_exists($access_log) && $access_log !="") {
-		$error = "Sarg config error: " . $sarg['proxy_server'] . " log file ($access_log) does not exists";
+	if (!file_exists($access_log) && $access_log != "") {
+		$error = "[sarg] Config error: " . $sarg['proxy_server'] . " log file ($access_log) does not exists";
 		log_error($error);
 		file_notice("Sarg", $error, "Sarg Settings", "");
 	}
@@ -315,28 +370,8 @@ function sync_package_sarg() {
 		$LDAPFilterSearch = (empty($sarguser['ldap_filter_search']) ? "" : "LDAPFilterSearch " . $sarguser['ldap_filter_search']);
 	}
 
-	// move old reports
-	if (is_dir("/usr/local/www/sarg-reports") && !is_dir("/usr/local/sarg-reports")) {
-		rename("/usr/local/www/sarg-reports","/usr/local/sarg-reports");
-	}
-
-	// check dirs
-	$dirs = array("/usr/local/sarg-reports", "/usr/local/www/sarg-images", "/usr/local/www/sarg-images/temp");
-	foreach ($dirs as $dir) {
-		if (!is_dir($dir)) {
-			mkdir($dir, 0755, true);
-		}
-	}
-
-	// images
-	$simages = array("datetime.png", "graph.png", "sarg-squidguard-block.png", "sarg.png");
-	$simgdir1 = "/usr/local/www/sarg-images";
-	$simgdir2 = SARG_DIR . "/etc/sarg/images";
-	foreach ($simages as $simage) {
-		if (!file_exists("{$simgdir1}/{$simage}")) {
-			copy("{$simgdir2}/{$simage}","{$simgdir1}/{$simage}");
-		}
-	}
+	// check dirs and images
+	sarg_check_dirs();
 
 	// create sarg config files
 	$sarg_dir = SARG_DIR;
@@ -348,65 +383,7 @@ function sync_package_sarg() {
 	file_put_contents(SARG_DIR . '/etc/sarg/exclude_users.conf', sarg_text_area_decode($sarguser['exclude_userlist']), LOCK_EX);
 
 	// check cron_tab
-	// TODO: Redo this mess to use install_cron_job() instead
-	$new_cron = array();
-	$cron_found = 0;
-	if (is_array($config['cron']['item'])) {
-		foreach($config['cron']['item'] as $cron) {
-			if (preg_match("/usr.local.www.sarg.php/", $cron["command"])) {
-				$cron_found++;
-			} else {
-				$new_cron['item'][] = $cron;
-			}
-		}
-		$cron_cmd="/usr/local/bin/php --no-header /usr/local/www/sarg.php";
-		$sarg_schedule_id = 0;
-		if (is_array($config['installedpackages']['sargschedule']['config'])) {
-			foreach ($config['installedpackages']['sargschedule']['config'] as $sarg_schedule) {
-	 			if (preg_match('/(\d+)m/', $sarg_schedule['frequency'], $matches) && $sarg_schedule['enable']) {
-					$new_cron['item'][] = array("minute" => "*/" . $matches[1],
-									"hour" => "*",
-									"mday" => "*",
-									"month" => "*",
-									"wday" => "*",
-									"who" => "root",
-									"command" => $cron_cmd . " " . $sarg_schedule_id);
-					$config['cron'] = $new_cron;
-					$cron_found++;
-				}
-				if (preg_match('/(\d+)h/', $sarg_schedule['frequency'], $matches) && $sarg_schedule['enable']) {
-					$new_cron['item'][] = array("minute" => "0",
-									"hour" => "*/" . $matches[1],
-									"mday" => "*",
-									"month" => "*",
-									"wday" => "*",
-									"who" => "root",
-									"command" => $cron_cmd . " " . $sarg_schedule_id);
-					$config['cron'] = $new_cron;
-					$cron_found++;
-				}
-				if (preg_match('/(\d+)d/', $sarg_schedule['frequency'], $matches) && $sarg_schedule['enable']) {
-					$new_cron['item'][] = array("minute" =>	"0",
-									"hour" => "0",
-									"mday" => "*/" . $matches[1],
-									"month" => "*",
-									"wday" => "*",
-									"who" => "root",
-									"command"=>	$cron_cmd . " " . $sarg_schedule_id);
-					$config['cron']=$new_cron;
-					$cron_found++;
-				}
-				$sarg_schedule_id++;
-			}
-		}
-
-		// update cron
-		if ($cron_found > 0) {
-			$config['cron'] = $new_cron;
-			write_config();
-			configure_cron();
-		}
-	}
+	sarg_configure_cron();
 
 	// write config if any file from filesystem was loaded
 	if ($update_conf > 0) {
@@ -433,25 +410,23 @@ function sarg_validate_input($post, &$input_errors) {
 					$input_errors[] = 'Please change it on Services -> Dansguardian -> Report and log -> Log file format';
 				}
 			} else {
-				$input_errors[]='dansguardian package not detected';
+				$input_errors[]='DansGuardian package is not installed';
 			}
 		}
 
 		# check squidguard
-		if (substr($key, 0, 10) == "proxy_server" && $value == "squidguard") {
-			if (!is_array($config['installedpackages']['squidguardgeneral'])) {
-				$input_errors[]='squidguard package not detected';
-			}
-		}
+		if (substr($key, 0, 10) == "proxy_server" && $value == "squidguard")
+			if (!is_array($config['installedpackages']['squidguardgeneral']))
+				$input_errors[]='SquidGuard package is not installed';
 
 		# check squid
 		if (substr($key, 0, 5) == "proxy_server" && $value == "squid") {
 			if (is_array($config['installedpackages']['squid'])) {
 				if (!$config['installedpackages']['squid']['log_enabled']) {
-					$input_errors[] = 'Squid logging not enabled';
+					$input_errors[]='Squid logging is not enabled';
 				}
 			} else {
-				$input_errors[] = 'Squid package not installed';
+				$input_errors[]='Squid package is not installed';
 			}
 		}
 

@@ -14,11 +14,6 @@
 #
 # dansguardian_enable="YES"
 # dansguardian_flags="<set as needed>"
-sysctl kern.ipc.somaxconn=16384
-sysctl kern.maxfiles=131072
-sysctl kern.maxfilesperproc=104856
-sysctl kern.threads.max_threads_per_proc=4096
-
 dansguardian_enable=${dansguardian_enable:-"YES"}
 dansguardian_pidfile=${dansguardian_pidfile:-"/var/run/dansguardian.pid"}
 
@@ -27,6 +22,22 @@ dansguardian_pidfile=${dansguardian_pidfile:-"/var/run/dansguardian.pid"}
 name="dansguardian"
 rcvar=dansguardian_enable
 command="/usr/local/sbin/${name}"
+start_precmd="${name}_prestart"
+
+dansguardian_prestart()
+{
+	/sbin/sysctl kern.ipc.somaxconn=16384
+	/sbin/sysctl kern.maxfiles=131072
+	/sbin/sysctl kern.maxfilesperproc=104856
+	/sbin/sysctl kern.threads.max_threads_per_proc=4096
+
+	for i in dguardianipc dguardianipipc dguardianurlipc; do
+		if [ -f "/tmp/.${i}" ]; then
+			/bin/rm -f "/tmp/.${i}"
+		fi
+	done
+	return 0
+}
 
 load_rc_config $name
 

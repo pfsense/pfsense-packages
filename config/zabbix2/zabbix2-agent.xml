@@ -45,13 +45,13 @@
 	<name>zabbixagent</name>
 	<title>Services: Zabbix-2 Agent</title>
 	<category>Monitoring</category>
-	<version>0.8.4</version>
-	<include_file>/usr/local/pkg/zabbix2.inc</include_file>
-	<addedit_string>Zabbix Agent has been created/modified.</addedit_string>
-	<delete_string>Zabbix Agent has been deleted.</delete_string>
+	<version>0.8.5</version>
+	<include_file>/usr/local/pkg/zabbix2-agent.inc</include_file>
+	<addedit_string>Zabbix Agent configuration has been created/modified.</addedit_string>
+	<delete_string>Zabbix Agent configuration has been deleted.</delete_string>
 	<restart_command>/usr/local/etc/rc.d/zabbix2_agentd.sh restart</restart_command>
 	<additional_files_needed>
-		<item>https://packages.pfsense.org/packages/config/zabbix2/zabbix2.inc</item>
+		<item>https://packages.pfsense.org/packages/config/zabbix2/zabbix2-agent.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -204,14 +204,11 @@
 			<advancedfield/>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		sync_package_zabbix2();
-	</custom_php_install_command>
 	<custom_php_validation_command>
-		validate_input_zabbix2($_POST, $input_errors);
+		validate_input_zabbix2_agent($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
-		sync_package_zabbix2();
+		sync_package_zabbix2_agent();
 	</custom_php_resync_config_command>
 	<custom_php_deinstall_command>
 		php_deinstall_zabbix2_agent();

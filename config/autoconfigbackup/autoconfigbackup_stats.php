@@ -71,7 +71,12 @@ if ($_REQUEST['delhostname']) {
 	curl_setopt($curl_session, CURLOPT_URL, $del_url);
 	curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 	curl_setopt($curl_session, CURLOPT_POST, 2);
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+	if ($pf_version < 2.2) {
+		// pre-2.2 doesn't have ca-root-nss
+		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+	} else {
+		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+	}
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=deletehostname&delhostname=" . urlencode($_REQUEST['delhostname']));
 	curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));

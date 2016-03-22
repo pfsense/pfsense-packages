@@ -42,10 +42,9 @@
 /* ====================================================================================== */
 	]]>
 	</copyright>
-	<description>Nagios NRPEv2</description>
 	<name>nrpe2</name>
-	<version>2.2.1</version>
-	<title>NRPEv2</title>
+	<version>2.2.2</version>
+	<title>Services: NRPEv2</title>
 	<aftersaveredirect>/pkg_edit.php?xml=nrpe2.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/nrpe2.inc</include_file>
 	<menu>
@@ -58,35 +57,39 @@
 		<name>nrpe2</name>
 		<rcfile>nrpe2.sh</rcfile>
 		<executable>nrpe2</executable>
-		<description>Nagios NRPE Daemon</description>
+		<description>Nagios NRPEv2 Daemon</description>
 	</service>
 	<configpath>installedpackages->package->nrpe2</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.inc</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nrpe2/nrpe2.priv.inc</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<type>listtopic</type>
-			<name>NRPE Options</name>
-			<fieldname>temp</fieldname>
+			<name>Service Options</name>
 		</field>
 		<field>
-			<fielddescr>Enabled</fielddescr>
+			<fielddescr>Enable NRPE</fielddescr>
 			<fieldname>enabled</fieldname>
 			<description>Check this to enable NRPE daemon.</description>
 			<type>checkbox</type>
+			<default_value>on</default_value>
 		</field>
 		<field>
 			<type>listtopic</type>
 			<name>Configuration Options</name>
-			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>Port Number</fielddescr>
 			<fieldname>server_port</fieldname>
 			<description>Port number we should wait for connections on. (Default: 5666)</description>
 			<type>input</type>
+			<default_value>5666</default_value>
 			<required/>
 		</field>
 		<field>
@@ -107,12 +110,12 @@
 			<fieldname>dont_blame_nrpe</fieldname>
 			<description>Check this to enable accept NRPE arguments. (Default: 0)</description>
 			<type>checkbox</type>
+			<default_value>on</default_value>
 		</field>
 
 		<field>
 			<type>listtopic</type>
 			<name>Commands</name>
-			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>Command Definitions that the Nagios server can call via the NRPE daemon.</fielddescr>
@@ -158,34 +161,29 @@
 				<rowhelperfield>
 					<fielddescr>Extra Options (Example: -s Z \$ARG1\$ \$ARG2\$)</fielddescr>
 					<fieldname>extra</fieldname>
-					<description><![CDATA[<strong>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</strong>]]></description>
+					<description>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</description>
 					<type>input</type>
 					<size>25</size>
 				</rowhelperfield>
 			</rowhelper>
 		</field>
 	</fields>
-	<custom_delete_php_command>
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
-	</custom_delete_php_command>
-	<custom_add_php_command>
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
-	</custom_add_php_command>
 	<custom_php_install_command>
 		nrpe2_custom_php_install_command();
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		nrpe2_custom_php_write_config();
+		nrpe2_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
+	<custom_add_php_command>
+		nrpe2_resync_package();
+	</custom_add_php_command>
+	<custom_delete_php_command>
+		nrpe2_resync_package();
+	</custom_delete_php_command>
 	<custom_php_resync_config_command>
-		nrpe2_custom_php_write_config();
-		nrpe2_custom_php_service();
+		nrpe2_resync_package();
 	</custom_php_resync_config_command>
-	<custom_php_command_before_form>
-		unset($_POST['temp']);
-	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		nrpe2_custom_php_validation_command($_POST, $input_errors);
+	</custom_php_validation_command>
 </packagegui>

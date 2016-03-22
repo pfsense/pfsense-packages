@@ -1,6 +1,6 @@
 <?php
 /*
-	zabbix2.inc
+	zabbix2-agent.inc
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2013 Danilo G. Baio
 	Copyright (C) 2013 Marcello Coutinho
@@ -33,33 +33,19 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
 
-function php_zabbix2_pfs_version() {
-	$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
-	return $pfs_version;
+global $zabbix2_pkg_base;
+$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
+if ($pfs_version == "2.2") {
+	// pfSense 2.2 with zabbix 2.4
+	$zabbix2_pkg_base = "zabbix24";
+} else {
+	// pfSense 2.1 with zabbix 2.2
+	$zabbix2_pkg_base = "zabbix22";
 }
-
-function php_zabbix2_pkg_base($pfs_version) {
-	if ($pfs_version >= 2.2) {
-		// pfSense 2.2 with zabbix 2.4
-		$zabbix2_pkg_base = "zabbix24";
-	} else {
-		// pfSense 2.1 with zabbix 2.2
-		$zabbix2_pkg_base = "zabbix22";
-	}
-	return $zabbix2_pkg_base;
-}
+define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
 
 function php_deinstall_zabbix2_agent() {
-	global $config, $g;
-
-	$pfs_version = php_zabbix2_pfs_version();
-	$zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
-
-	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
-		define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
-	} else {
-		define('ZABBIX_AGENT_BASE', '/usr/local');
-	}
+	global $config, $g, $zabbix2_pkg_base;
 
 	mwexec("/usr/bin/killall zabbix_agentd");
 
@@ -77,50 +63,7 @@ function php_deinstall_zabbix2_agent() {
 	}
 }
 
-function php_deinstall_zabbix2_proxy() {
-	global $config, $g;
-
-	$pfs_version = php_zabbix2_pfs_version();
-	$zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
-
-	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
-		define('ZABBIX_PROXY_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-proxy-' . php_uname("m"));
-	} else {
-		define('ZABBIX_PROXY_BASE', '/usr/local');
-	}
-
-	exec("/usr/bin/killall zabbix_proxy");
-	unlink_if_exists(ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base . "/zabbix_proxy.conf");
-	unlink_if_exists("/var/log/zabbix2/zabbix_proxy.log");
-	unlink_if_exists("/var/run/zabbix2/zabbix2_proxy.pid");
-
-	if (!is_array($config['installedpackages']['zabbixagent'])) {
-		if (is_dir("/var/log/zabbix2")) {
-			exec("/bin/rm -r /var/log/zabbix2/");
-		}
-		if (is_dir("/var/run/zabbix2")) {
-			exec("/bin/rm -r /var/run/zabbix2/");
-		}
-	}
-
-	if (is_dir("/var/db/zabbix2")) {
-		exec("/bin/rm -r /var/db/zabbix2/");
-	}
-}
-
-function validate_input_zabbix2($post, &$input_errors) {
-	if  (isset($post['proxyenabled'])) {
-		if (!is_numericint($post['serverport'])) {
-			$input_errors[] = "'Server Port' value is not numeric.";
-   		} elseif ($post['serverport'] < 1 || $post['serverport'] > 65535) {
-			$input_errors[] = "You must enter a valid value for 'Server Port'.";
-		}
-
-		if (!is_numericint($post['configfrequency'])) {
-			$input_errors[] = "'Config Frequency' value is not numeric.";
-		}
-	}
-
+function validate_input_zabbix2_agent($post, &$input_errors) {
 	if (isset($post['agentenabled'])) {
 		if (!preg_match("/\w+/", $post['server'])) {
 			$input_errors[] = "Server field is required.";
@@ -186,47 +129,11 @@ function validate_input_zabbix2($post, &$input_errors) {
 	}
 }
 
-function sync_package_zabbix2() {
-	global $config, $g;
+function sync_package_zabbix2_agent() {
+	global $config, $g, $zabbix2_pkg_base;
 
 	conf_mount_rw();
-	$pfs_version = php_zabbix2_pfs_version();
-	$zabbix2_pkg_base = php_zabbix2_pkg_base($pfs_version);
 
-	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
-		define('ZABBIX_AGENT_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-agent-' . php_uname("m"));
-		define('ZABBIX_PROXY_BASE', '/usr/pbi/' . $zabbix2_pkg_base . '-proxy-' . php_uname("m"));
-	} else {
-		define('ZABBIX_AGENT_BASE', '/usr/local');
-		define('ZABBIX_PROXY_BASE', '/usr/local');
-	}
-
-	// Check zabbix proxy config
-	if (is_array($config['installedpackages']['zabbixproxy'])) {
-		$zbproxy_config = $config['installedpackages']['zabbixproxy']['config'][0];
-		if ($zbproxy_config['proxyenabled'] == "on") {
-			$Mode = (is_numericint($zbproxy_config['proxymode']) ? $zbproxy_config['proxymode'] : 0);
-			$AdvancedParams = base64_decode($zbproxy_config['advancedparams']);
-
-			$zbproxy_conf_file = <<< EOF
-Server={$zbproxy_config['server']}
-ServerPort={$zbproxy_config['serverport']}
-Hostname={$zbproxy_config['hostname']}
-PidFile=/var/run/zabbix2/zabbix2_proxy.pid
-DBName=/var/db/zabbix2/proxy.db
-LogFile=/var/log/zabbix2/zabbix_proxy.log
-ConfigFrequency={$zbproxy_config['configfrequency']}
-FpingLocation=/usr/local/sbin/fping
-# There's currently no fping6 (IPv6) dependency in the package,
-# but if there was, the binary would likely also be in /usr/local/sbin.
-Fping6Location=/usr/local/sbin/fping6
-ProxyMode={$Mode}
-{$AdvancedParams}
-
-EOF;
-			file_put_contents(ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base . "/zabbix_proxy.conf", strtr($zbproxy_conf_file, array("\r" => "")));
-		}
-	}
 	// Check zabbix agent settings
 	if (is_array($config['installedpackages']['zabbixagent'])) {
 		$zbagent_config = $config['installedpackages']['zabbixagent']['config'][0];
@@ -310,8 +217,8 @@ EOF;
 
 	// Check startup script files
 	// Create a few directories and ensure the sample files are in place
-	if (!is_dir(ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base)) {
-		mwexec("/bin/mkdir -p " . ZABBIX_PROXY_BASE . "/etc/" . $zabbix2_pkg_base);
+	if (!is_dir(ZABBIX_AGENT_BASE . "/etc/" . $zabbix2_pkg_base)) {
+		mwexec("/bin/mkdir -p " . ZABBIX_AGENT_BASE . "/etc/" . $zabbix2_pkg_base);
 	}
 
 	$dir_checks = <<< EOF
@@ -336,29 +243,6 @@ EOF;
 
 EOF;
 
-	$zproxy_rcfile = "/usr/local/etc/rc.d/zabbix2_proxy.sh";
-	if (is_array($zbproxy_config) && $zbproxy_config['proxyenabled'] == "on") {
-		$zproxy_start = strtr($dir_checks, array("\r" => "")). "\necho \"Starting Zabbix Proxy\"...\n";
-		$zproxy_start .= ZABBIX_PROXY_BASE . "/sbin/zabbix_proxy\n";
-
-		$zproxy_stop  = "echo \"Stopping Zabbix Proxy\"\n";
-		$zproxy_stop .= "/usr/bin/killall zabbix_proxy\n";
-		$zproxy_stop .= "/bin/sleep 5\n";
-
-		write_rcfile(array(
-			"file" => "zabbix2_proxy.sh",
-			"start" => $zproxy_start,
-			"stop" => $zproxy_stop
-			)
-		);
-		restart_service("zabbix_proxy");
-	} else {
-		if (is_service_running("zabbix_proxy")) {
-			stop_service("zabbix_proxy");
-		}
-		unlink_if_exists($zproxy_rcfile);
-	}
-
 	$zagent_rcfile="/usr/local/etc/rc.d/zabbix2_agentd.sh";
 	if (is_array($zbagent_config) && $zbagent_config['agentenabled']=="on") {
 		$zagent_start .= strtr($dir_checks, array("\r" => "")). "\necho \"Starting Zabbix Agent...\"\n";
@@ -374,7 +258,11 @@ EOF;
 			"stop" => $zagent_stop
 			)
 		);
-		restart_service("zabbix_agentd");
+		if (is_service_running("zabbix_agentd")) {
+			restart_service("zabbix_agentd");
+		} else {
+			start_service("zabbix_agentd");
+		}
 	} else {
 		if (is_service_running("zabbix_agentd")) {
 			stop_service("zabbix_agentd");

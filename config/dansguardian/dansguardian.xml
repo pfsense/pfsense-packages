@@ -1,72 +1,68 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
 	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    dansguardian.xml
-    part of the dansguardian for pfSense
-    Copyright (C) 2012-2013 Marcello Coutinho
-
-    All rights reserved.            
-			                                                                  */
-/* ========================================================================== */
+	dansguardian.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2012-2013 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code MUST retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
 	]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>dansguardian</name>
-	<version>1.0</version>
+	<version>0.1.13</version>
 	<title>Services: Dansguardian</title>
 	<include_file>/usr/local/pkg/dansguardian.inc</include_file>
 	<menu>
 		<name>Dansguardian</name>
-		<tooltiptext>Configure dansguardian</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=dansguardian.xml</url>
 	</menu>
 	<service>
 		<name>dansguardian</name>
-		<rcfile>dansguardian</rcfile>
+		<rcfile>dansguardian.sh</rcfile>
 		<executable>dansguardian</executable>
-		<description><![CDATA[Award winning Open Source web content filter]]></description>
+		<description>Web Content Filter</description>
 	</service>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.php</item>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_ldap.php</item>
@@ -76,122 +72,98 @@
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_ldap.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_limits.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_ips_header.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_users_header.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_users_footer.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_about.php</item>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_config.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardianfx.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_url_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_site_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_search_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_pics_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_phrase_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_log.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_header_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_groups.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_file_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_content_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_blacklist.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_antivirus_acl.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/icapscan.conf.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>https://packages.pfsense.org/packages/config/dansguardian/dansguardian_rc.template</item>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
 	</additional_files_needed>
 	<tabs>
 		<tab>
@@ -253,13 +225,21 @@
 			<fielddescr>Enable dansguardian</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-			<description><![CDATA[<a target=_new href='http://dansguardian.org/?page=copyright2'>I agree with dansguardian Terms and Conditions.</a>]]></description>
+			<description>
+				<![CDATA[
+				<a target=_new href='http://dansguardian.org/?page=copyright2'>I agree with dansguardian Terms and Conditions.</a>
+				]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Listen Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
-			<description><![CDATA[Default: <strong>LAN/loopback</strong><br>Select interface(s) that you want to dansguardian listen on.<br>
-						<strong>Note: Do NOT select more then one interface if you plan to use more then one authentication plugin.</strong>]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>LAN/loopback</strong><br/>Select interface(s) that you want to dansguardian listen on.<br/>
+				<strong>Note: Do NOT select more then one interface if you plan to use more then one authentication plugin.</strong>
+				]]>
+			</description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
@@ -269,66 +249,90 @@
 			<fieldname>filterports</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>8080</strong><br>The port(s) that DansGuardian listens to.]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>8080</strong><br>The port(s) that DansGuardian listens to.
+				]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Daemon Options</fielddescr>
 			<fieldname>daemon_options</fieldname>
 			<description><![CDATA[Daemon Options. Default values are in ( )]]></description>
-	    	<type>select</type>
- 				<options>
+			<type>select</type>
+ 			<options>
  				<option><name>nodaemon (off)</name><value>nodaemon</value></option>
  				<option><name>softrestart (on)</name><value>softrestart</value></option>
- 				</options>
- 				<multiple/>
- 				<size>3</size>
+ 			</options>
+ 			<multiple/>
+ 			<size>3</size>
 		</field>
 		<field>
 			<fielddescr>Min/Max Children</fielddescr>
 			<fieldname>children</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>8/120</strong><br>
-			 				Sets the minimun and maximum number of processes to spawn to handle the incoming connections.<br>
-			 				Max value usually 250 depending on OS.<br>
-							On large sites you might want to try 32/180.]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>8/120</strong><br>
+			 	Sets the minimun and maximum number of processes to spawn to handle the incoming connections.<br/>
+			 	Max value usually 250 depending on OS.<br>
+				On large sites you might want to try 32/180.
+				]]>
+			</description>
 		</field>
 			<field>
 			<fielddescr>Min/Max Spare Children</fielddescr>
 			<fieldname>sparechildren</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>4/32</strong><br>
-			 				 Sets the minimum and maximun number of processes to be kept ready to handle connections.<br>
-							 On large sites you might want to try 8/64.]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>4/32</strong><br>
+			 	 Sets the minimum and maximun number of processes to be kept ready to handle connections.<br/>
+				 On large sites you might want to try 8/64.
+				 ]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Prefork Children</fielddescr>
 			<fieldname>preforkchildren</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[sets the minimum number of processes to spawn when it runs out<br>
-						On large sites you might want to try 10]]></description>
+			<description>
+				<![CDATA[
+				sets the minimum number of processes to spawn when it runs out<br/>
+				On large sites you might want to try 10
+				]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Max Age Children</fielddescr>
 			<fieldname>maxagechildren</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>500</strong><br>
-			 				Sets the maximum age of a child process before it croaks it.<br>
-							This is the number of connections they handle before exiting.<br>
-							On large sites you might want to try 10000.]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>500</strong><br>
+			 	Sets the maximum age of a child process before it croaks it.<br/>
+				This is the number of connections they handle before exiting.<br/>
+				On large sites you might want to try 10000.
+				]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Max Ips</fielddescr>
 			<fieldname>maxips</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>0</strong><br>
-			 				Sets the maximum number client IP addresses allowed to connect at once.<br>
-							Use this to set a hard limit on the number of users allowed to concurrently<br>
-							browse the web. Set to 0 for no limit, and to disable the IP cache process.]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>0</strong><br>
+			 	Sets the maximum number client IP addresses allowed to connect at once.<br/>
+				Use this to set a hard limit on the number of users allowed to concurrently<br/>
+				browse the web. Set to 0 for no limit, and to disable the IP cache process.
+				]]>
+			</description>
 		</field>
 		<field>
 			<name>Parent proxy Settings</name>
@@ -339,23 +343,31 @@
 			<fieldname>proxyip</fieldname>
 			<type>input</type>
 			<size>20</size>
-			<description><![CDATA[Default: <strong>127.0.0.1</strong><br>
-			 				Sets ip address for proxy server(usually squid).]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>127.0.0.1</strong><br/>
+			 	Sets ip address for proxy server(usually squid).
+				]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Proxy Port</fielddescr>
 			<fieldname>proxyport</fieldname>
 			<type>input</type>
 			<size>10</size>
-			<description><![CDATA[Default: <strong>3128</strong><br>
-			 				Sets port number for proxy server.]]></description>
+			<description>
+				<![CDATA[
+				Default: <strong>3128</strong><br>
+			 	Sets port number for proxy server.
+				]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>Proxy Time out</fielddescr>
 			<fieldname>proxytimeout</fieldname>
 			<description><![CDATA[This option handle max time to wait for proxy server.]]></description>
-	    	<type>select</type>
- 				<options>
+			<type>select</type>
+ 			<options>
  				<option><name>30 seconds (default)</name><value>30</value></option>
  				<option><name>20 seconds</name><value>20</value></option>
  				<option><name>40 seconds</name><value>40</value></option>
@@ -365,7 +377,7 @@
  				<option><name>80 seconds</name><value>80</value></option>
  				<option><name>90 seconds</name><value>90</value></option>
  				<default_value>30</default_value>
- 				</options>
+ 			</options>
 		</field>
 	</fields>
 	<custom_php_install_command>
@@ -378,7 +390,7 @@
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
 		dansguardian_validate_input($_POST, $input_errors);
-	</custom_php_validation_command>	
+	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_dansguardian();
 	</custom_php_resync_config_command>

@@ -41,10 +41,9 @@
 	]]>
 	</copyright>
 	<name>tinchosts</name>
-	<version>1.2.4</version>
+	<version>1.2.5</version>
 	<title>VPN: Tinc: Hosts</title>
 	<include_file>/usr/local/pkg/tinc.inc</include_file>
-	<configpath>['installedpackages']['package']['$packagename']['config']</configpath>
 	<tabs>
 		<tab>
 			<text>Settings</text>

@@ -42,23 +42,21 @@
 /* ====================================================================================== */
 	]]>
 	</copyright>
-	<name>tftp Settings</name>
-	<version>2.2.2</version>
+	<name>tftpsettings</name>
+	<version>2.2.4</version>
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
 		<name>TFTP</name>
-		<tooltiptext>Add or Remove files for TFTP.</tooltiptext>
 		<section>Services</section>
 		<configfile>tftp.xml</configfile>
-		<url>tftp_files.php</url>
+		<url>/tftp_files.php</url>
 	</menu>
 	<service>
 		<name>tftp</name>
 		<executable>inetd</executable>
 		<description>TFTP Daemon</description>
 	</service>
-	<configpath>installedpackages->$packagename</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/tftp2/tftp.inc</item>

@@ -28,6 +28,11 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once('config.inc');
+require_once('interfaces.inc');
+require_once('service-utils.inc');
+require_once('util.inc');
+
 $pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 if ($pfs_version == "2.1" || $pfs_version == "2.2") {
 	define('AVAHI_BASE', '/usr/pbi/avahi-' . php_uname("m"));
@@ -63,8 +68,7 @@ function avahi_deinstall() {
 }
 
 function avahi_write_config() {
-	global $config, $avahi_config;
-	conf_mount_rw();
+	global $config;
 
 	// Pull some various values out of config.xml
 	if (isset($config['installedpackages']['avahi']['config'][0])) {
@@ -173,8 +177,16 @@ EOF;
 	$fd = fopen(AVAHI_BASE . "/etc/avahi/avahi-daemon.conf", "w");
 	fwrite($fd, $avahiconfig);
 	fclose($fd);
+}
 
-	/* Write out rc.d startup file */
+function avahi_write_rcfile() {
+	global $config;
+	if (isset($config['installedpackages']['avahi']['config'][0])) {
+		$avahi_config = $config['installedpackages']['avahi']['config'][0];
+	} else {
+		$avahi_config = array();
+	}
+
 	$start = "/etc/rc.conf_mount_rw\n";
 	$start .= "if [ ! -d /proc/0 ]; then\n";
 	$start .= "	/bin/mkdir -p /proc\n";
@@ -214,20 +226,26 @@ EOF;
 		)
 	);
 
-	conf_mount_ro();
 }
 
 function avahi_sync() {
 	global $config;
+	conf_mount_rw();
 
 	if (is_service_running("avahi")) {
 		stop_service("avahi");
 	}
 	avahi_write_config();
+
 	// Is package enabled?
 	if ($config['installedpackages']['avahi']['config'][0]['enable']) {
+		avahi_write_rcfile();
 		start_service("avahi");
+	} else {
+		unlink_if_exists("/usr/local/etc/rc.d/avahi-daemon.sh");
 	}
+
+	conf_mount_ro();
 }
 
 function avahi_upgrade_config() {

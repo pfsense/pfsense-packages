@@ -42,16 +42,21 @@
 	]]>
         </copyright>
 	<name>netio</name>
-	<version>1.27</version>
-	<title>netio: Client</title>
+	<version>1.28</version>
+	<title>Diagnostics: netio: Client</title>
+	<savetext>Run netio client</savetext>
 	<preoutput>yes</preoutput>
 	<donotsave>true</donotsave>
 	<menu>
 		<name>netio</name>
-		<tooltiptext>Run netio in client or server mode.</tooltiptext>
 		<section>Diagnostics</section>
-		<configfile>netio.xml</configfile>
+		<url>/pkg_edit.php?xml=netio.xml</url>
 	</menu>
+	<service>
+		<name>netio</name>
+		<executable>netio</executable>
+		<description>netio Network Throughput Benchmark Server/Client</description>
+	</service>
 	<tabs>
 		<tab>
 			<text>Client</text>
@@ -64,6 +69,11 @@
 		</tab>
 	</tabs>
 	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/netio/netio.priv.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/netio/netioserver.xml</item>
 	</additional_files_needed>
 	<fields>
@@ -78,16 +88,17 @@
 			<fieldname>port</fieldname>
 			<description>Enter the port that netio will connect to. (Default: 18767)</description>
 			<type>input</type>
+			<default_value>18767</default_value>
 		</field>
 	</fields>
 	<custom_add_php_command>
 		<![CDATA[
 		mwexec("/usr/bin/killall netio");
-		$netio_options = "";
-		if ($_POST['port'] != "") {
-			$netio_options .= " -p {$_POST['port']}";
-			$netio_options .= $_POST['hostname'];
-			system("/usr/local/bin/netio " . $netio_options);
+		if ($_POST['port'] != "" && $_POST['hostname'] != "") {
+			$port = escapeshellarg($_POST['port']);
+			$hostname = escapeshellarg($_POST['hostname']);
+			$netio_options = "-p {$port} {$hostname}";
+			system("/usr/local/bin/netio {$netio_options}");
 		}
 		]]>
 	</custom_add_php_command>

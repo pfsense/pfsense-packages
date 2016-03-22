@@ -44,18 +44,18 @@
 	]]>
 	</copyright>
 	<title>Services: LCDproc: Screens</title>
-	<name>lcdproc_screens</name>
-	<version>0.9.13</version>
+	<name>lcdprocscreens</name>
+	<version>0.9.15</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
 		<tab>
 			<text>Server</text>
-			<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=lcdproc.xml</url>
 		</tab>
 		<tab>
 			<text>Screens</text>
-			<url>/pkg_edit.php?xml=lcdproc_screens.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=lcdproc_screens.xml</url>
 			<active/>
 		</tab>
 	</tabs>
@@ -63,7 +63,7 @@
 		<name>LCDproc</name>
 		<tooltiptext>Set LCDproc settings such as display driver and COM port.</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=lcdproc.xml</url>
 	</menu>
 	<fields>
 		<field>

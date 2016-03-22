@@ -27,22 +27,30 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("pfsense-utils.inc");
 require_once("services.inc");
+require_once("util.inc");
 
 function cron_sync_package() {
 	configure_cron();
 	// Previous package versions were "helpfully" killing cron on uninstall.
 	// Also, need to make sure cron is running, otherwise the package is useless.
-	// TODO: Something like this needs to be eventually done in configure_cron() in services.inc.
-	if (!is_process_running("cron")) {
-		exec("cd /tmp && /usr/sbin/cron -s 2>/dev/null");
+	// configure_cron() function in services.inc already does this check on pfSense >=2.2.5
+	$pfs_version = str_replace(".", "", substr(trim(file_get_contents("/etc/version")), 0, 5));
+	if ($pfs_version < 225) {
+		if (!is_process_running("cron")) {
+			exec("cd /tmp && /usr/sbin/cron -s 2>/dev/null");
+		}
 	}
 }
 
 function cron_install_command() {
 	// Clean up possible lingering garbage after previous package versions
 	unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
-	cron_sync_package();
+}
+
+function cron_deinstall_command() {
+	rmdir_recursive("/usr/local/www/packages/cron");
 }
 
 ?>

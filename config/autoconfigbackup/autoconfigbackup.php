@@ -82,6 +82,10 @@ if ($_REQUEST['download']) {
 	$pgtitle = "Diagnostics: Auto Configuration Backup";
 }
 
+/* Set up time zones for conversion. See #5250 */
+$acbtz = new DateTimeZone('America/Chicago');
+$mytz = new DateTimeZone(date_default_timezone_get());
+
 include("head.inc");
 
 function get_hostnames() {
@@ -90,7 +94,12 @@ function get_hostnames() {
 	$curl_session = curl_init();
 	curl_setopt($curl_session, CURLOPT_URL, $stats_url);
 	curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+	if ($pf_version < 2.2) {
+		// pre-2.2 doesn't have ca-root-nss
+		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+	} else {
+		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+	}
 	curl_setopt($curl_session, CURLOPT_POST, 1);
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showstats");
@@ -176,7 +185,12 @@ function get_hostnames() {
 					curl_setopt($curl_session, CURLOPT_URL, $del_url);
 					curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 					curl_setopt($curl_session, CURLOPT_POST, 3);
-					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					if ($pf_version < 2.2) {
+						// pre-2.2 doesn't have ca-root-nss
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					} else {
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+					}
 					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=delete" . "&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['rmver']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
@@ -193,7 +207,9 @@ function get_hostnames() {
 						$savemsg = "An error occurred while trying to remove the item from portal.pfsense.org.";
 					} else {
 						curl_close($curl_session);
-						$savemsg = "Backup revision {$_REQUEST['rmver']} has been removed.";
+						$budate = new DateTime($_REQUEST['rmver'], $acbtz);
+						$budate->setTimezone($mytz);
+						$savemsg = "Backup revision " . htmlspecialchars($budate->format(DATE_RFC2822)) . " has been removed.";
 					}
 					print_info_box($savemsg);
 				}
@@ -203,7 +219,12 @@ function get_hostnames() {
 					curl_setopt($curl_session, CURLOPT_URL, $get_url);
 					curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 					curl_setopt($curl_session, CURLOPT_POST, 3);
-					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					if ($pf_version < 2.2) {
+						// pre-2.2 doesn't have ca-root-nss
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					} else {
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+					}
 					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . "&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['newver']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
@@ -273,7 +294,12 @@ EOF;
 					curl_setopt($curl_session, CURLOPT_URL, $get_url);
 					curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
 					curl_setopt($curl_session, CURLOPT_POST, 3);
-					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					if ($pf_version < 2.2) {
+						// pre-2.2 doesn't have ca-root-nss
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+					} else {
+						curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+					}
 					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . "&hostname=" . urlencode($hostname) . "&revision=" . urlencode($_REQUEST['download']));
 					curl_setopt($curl_session, CURLOPT_USERAGENT, $g['product_name'] . '/' . rtrim(file_get_contents("/etc/version")));
@@ -329,7 +355,12 @@ EOF;
 				$curl_session = curl_init();
 				curl_setopt($curl_session, CURLOPT_URL, $get_url);
 				curl_setopt($curl_session, CURLOPT_HTTPHEADER, array("Authorization: Basic " . base64_encode("{$username}:{$password}")));
-				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+				if ($pf_version < 2.2) {
+					// pre-2.2 doesn't have ca-root-nss
+					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+				} else {
+					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 1);
+				}
 				curl_setopt($curl_session, CURLOPT_POST, 1);
 				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
@@ -350,12 +381,19 @@ EOF;
 				// Loop through and create new confvers
 				$data_split = split("\n", $data);
 				$confvers = array();
+
 				foreach ($data_split as $ds) {
 					$ds_split = split($oper_sep, $ds);
 					$tmp_array = array();
 					$tmp_array['username'] = $ds_split[0];
 					$tmp_array['reason'] = $ds_split[1];
 					$tmp_array['time'] = $ds_split[2];
+
+					/* Convert the time from server time to local. See #5250 */
+					$budate = new DateTime($tmp_array['time'], $acbtz);
+					$budate->setTimezone($mytz);
+					$tmp_array['localtime'] = $budate->format(DATE_RFC2822);
+
 					if ($ds_split[2] && $ds_split[0]) {
 						$confvers[] = $tmp_array;
 					}
@@ -398,16 +436,16 @@ EOF;
 	foreach ($confvers as $cv):
 ?>
 		<tr valign="top">
-			<td class="listlr"> <?= $cv['time']; ?></td>
+			<td class="listlr"> <?= $cv['localtime']; ?></td>
 			<td class="listbg"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap="nowrap">
-				<a title="Restore this revision" onclick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&newver=<?=urlencode($cv['time']);?>">
+				<a title="Restore this revision" onclick="return confirm('Are you sure you want to restore <?= $cv['localtime']; ?>?')" href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&newver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" alt="" />
 				</a>
 				<a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>&hostname=<?=urlencode($hostname)?>&reason=<?php echo urlencode($cv['reason']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0" alt="" />
 				</a>
-				<a title="Delete" onclick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&rmver=<?=urlencode($cv['time']);?>">
+				<a title="Delete" onclick="return confirm('Are you sure you want to delete <?= $cv['localtime']; ?>?')"href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&rmver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" alt="" />
 				</a>
 			</td>
