@@ -1,9 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	sudo.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2013 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<description>Sudo Command Control</description>
 	<requirements>None</requirements>
 	<name>sudo</name>
-	<version>0.2.1</version>
+	<version>0.2.8</version>
 	<title>Sudo - Shell Command Privilege Delegation Utility</title>
 	<include_file>/usr/local/pkg/sudo.inc</include_file>
 	<menu>
@@ -15,8 +56,11 @@
 	<configpath>installedpackages->package->sudo</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/sudo/sudo.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/sudo/sudo.priv.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -25,11 +69,14 @@
 		</field>
 		<field>
 			<type>info</type>
-			<description><![CDATA[
-User permission definitions for allowing the use of sudo by shell users to run commands as other users, such as root.
-<br /><br />More information on the full command options may be found in the <a href="http://www.sudo.ws/sudoers.man.html">sudoers manual</a>.
-<br /><br />By default the command is "ALL" meaning the user can run any commands. Leaving the commands field blank assumes "ALL". A comma-separated list of commands can be supplied to limit the user to individual binaries. Full paths to binaries must be used.
-			]]></description>
+			<description>
+			<![CDATA[
+				User permission definitions for allowing the use of sudo by shell users to run commands as other users, such as root.<br /><br />
+				More information on the full command options may be found in the <a href="http://www.sudo.ws/sudoers.man.html">sudoers manual</a>.<br /><br />
+				By default the command is "ALL" meaning the user can run any commands. Leaving the commands field blank assumes "ALL".<br /><br />
+				A comma-separated list of commands can be supplied to limit the user to individual binaries. <strong>Full paths to binaries must be used.</strong>
+			]]>
+			</description>
 		</field>
 		<field>
 			<fielddescr>User Permissions</fielddescr>
@@ -62,7 +109,7 @@ User permission definitions for allowing the use of sudo by shell users to run c
 				<rowhelperfield>
 					<fielddescr>Command List</fielddescr>
 					<fieldname>cmdlist</fieldname>
-					<description>Commands the user may run. Comma-separated list, full paths preferred. Default: ALL</description>
+					<description>Commands the user may run. Comma-separated list, full paths required. Default: ALL</description>
 					<type>input</type>
 					<size>30</size>
 					<value>ALL</value>

@@ -200,7 +200,7 @@
 		</field>        		
 	</fields>
 	<custom_php_validation_command>
-		squid_validate_traffic($_POST, &amp;$input_errors);
+		squid_validate_traffic($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();

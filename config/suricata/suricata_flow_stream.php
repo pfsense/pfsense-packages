@@ -14,7 +14,7 @@
  * All rights reserved.
  *
  * Adapted for Suricata by:
- * Copyright (C) 2014 Bill Meeks
+ * Copyright (C) 2015 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -250,9 +250,11 @@ elseif ($_POST['ResetAll']) {
 	$pconfig['flow_icmp_emerg_new_timeout'] = '10';
 	$pconfig['flow_icmp_emerg_established_timeout'] = '100';
 
-	$pconfig['stream_memcap'] = '33554432';
-	$pconfig['stream_max_sessions'] = '262144';
+	// The default 'stream_memcap' value must be calculated as follows:
+	// 216 * prealloc_sessions * number of threads = memory use in bytes
+	// 64 MB is a decent all-around default, but some setups need more. 
 	$pconfig['stream_prealloc_sessions'] = '32768';
+	$pconfig['stream_memcap'] = '67108864';
 	$pconfig['reassembly_memcap'] = '67108864';
 	$pconfig['reassembly_depth'] = '1048576';
 	$pconfig['reassembly_to_server_chunk'] = '2560';
@@ -261,9 +263,9 @@ elseif ($_POST['ResetAll']) {
 	$pconfig['enable_async_sessions'] = 'off';
 
 	/* Log a message at the top of the page to inform the user */
-	$savemsg = gettext("All flow and stream settings have been reset to their defaults.");
+	$savemsg = gettext("All flow and stream settings have been reset to their defaults.  Click APPLY to save the changes.");
 }
-elseif ($_POST['save']) {
+elseif ($_POST['save'] || $_POST['apply']) {
 	$natent = array();
 	$natent = $pconfig;
 
@@ -299,8 +301,7 @@ elseif ($_POST['save']) {
 		if ($_POST['flow_icmp_emerg_new_timeout'] != "") { $natent['flow_icmp_emerg_new_timeout'] = $_POST['flow_icmp_emerg_new_timeout']; }else{ $natent['flow_icmp_emerg_new_timeout'] = "10"; }
 		if ($_POST['flow_icmp_emerg_established_timeout'] != "") { $natent['flow_icmp_emerg_established_timeout'] = $_POST['flow_icmp_emerg_established_timeout']; }else{ $natent['flow_icmp_emerg_established_timeout'] = "100"; }
 
-		if ($_POST['stream_memcap'] != "") { $natent['stream_memcap'] = $_POST['stream_memcap']; }else{ $natent['stream_memcap'] = "33554432"; }
-		if ($_POST['stream_max_sessions'] != "") { $natent['stream_max_sessions'] = $_POST['stream_max_sessions']; }else{ $natent['stream_max_sessions'] = "262144"; }
+		if ($_POST['stream_memcap'] != "") { $natent['stream_memcap'] = $_POST['stream_memcap']; }else{ $natent['stream_memcap'] = "67108864"; }
 		if ($_POST['stream_prealloc_sessions'] != "") { $natent['stream_prealloc_sessions'] = $_POST['stream_prealloc_sessions']; }else{ $natent['stream_prealloc_sessions'] = "32768"; }
 		if ($_POST['enable_midstream_sessions'] == "on") { $natent['enable_midstream_sessions'] = 'on'; }else{ $natent['enable_midstream_sessions'] = 'off'; }
 		if ($_POST['enable_async_sessions'] == "on") { $natent['enable_async_sessions'] = 'on'; }else{ $natent['enable_async_sessions'] = 'off'; }
@@ -318,7 +319,12 @@ elseif ($_POST['save']) {
 			$a_nat[$id] = $natent;
 			write_config();
 			$rebuild_rules = false;
+			conf_mount_rw();
 			suricata_generate_yaml($natent);
+			conf_mount_ro();
+
+			// Sync to configured CARP slaves if any are enabled
+			suricata_sync_on_changes();
 		}
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -431,32 +437,40 @@ include_once("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php include("fbegin.inc");
-
-	/* Display error or save message */
-	if ($input_errors) {
-		print_input_errors($input_errors); // TODO: add checks
-	}
-	if ($savemsg) {
-		print_info_box($savemsg);
-	}
+/* Display error message */
+if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+}
 ?>
 
 <form action="suricata_flow_stream.php" method="post" name="iform" id="iform">
 <input type="hidden" name="eng_id" id="eng_id" value="<?=$eng_id;?>"/>
 <input type="hidden" name="id" id="id" value="<?=$id;?>"/>
 
+<?php
+if ($savemsg) {
+	/* Display save message */
+	print_info_box($savemsg);
+}
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), true, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$id}");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$id}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td>';
@@ -469,6 +483,7 @@ include_once("head.inc");
 	$tab_array[] = array($menu_iface . gettext("App Parsers"), false, "/suricata/suricata_app_parsers.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Variables"), false, "/suricata/suricata_define_vars.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/suricata/suricata_barnyard.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/suricata/suricata_ip_reputation.php?id={$id}");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -489,6 +504,7 @@ include_once("head.inc");
 <?php else: ?>
 
 <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+	<tbody>
 	<tr>
 		<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Host-Specific Defrag and Stream Settings"); ?></td>
 	</tr>
@@ -511,6 +527,7 @@ include_once("head.inc");
 					height="17" border="0" title="<?php echo gettext("Add a new policy configuration");?>"/></th>
 				</tr>
 			   </thead>
+				<tbody>
 			<?php foreach ($pconfig['host_os_policy']['item'] as $f => $v): ?>
 				<tr>
 					<td class="listlr" align="left"><?=gettext($v['name']);?></td>
@@ -529,6 +546,7 @@ include_once("head.inc");
 					</td>
 				</tr>
 			<?php endforeach; ?>
+				</tbody>
 			</table>
 		</td>
 	</tr>
@@ -633,6 +651,7 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("TCP Connections"); ?></td>
 		<td width="78%" class="vtable">
 			<table width="100%" cellspacing="4" cellpadding="0" border="0">
+				<tbody>
 				<tr>
 					<td class="vexpl"><input name="flow_tcp_new_timeout" type="text" class="formfld unknown" id="flow_tcp_new_timeout" 
 					size="9" value="<?=htmlspecialchars($pconfig['flow_tcp_new_timeout']);?>">&nbsp;
@@ -669,6 +688,7 @@ include_once("head.inc");
 					<?php echo gettext("Emergency Closed TCP connection timeout in seconds.  Default is ") . "<strong>" . gettext("20") . "</strong>."; ?>
 					</td>
 				</tr>
+				</tbody>
 			</table>
 		</td>
 	</tr>
@@ -676,6 +696,7 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("UDP Connections"); ?></td>
 		<td width="78%" class="vtable">
 			<table width="100%" cellspacing="4" cellpadding="0" border="0">
+				<tbody>
 				<tr>
 					<td class="vexpl"><input name="flow_udp_new_timeout" type="text" class="formfld unknown" id="flow_udp_new_timeout" 
 					size="9" value="<?=htmlspecialchars($pconfig['flow_udp_new_timeout']);?>">&nbsp;
@@ -700,6 +721,7 @@ include_once("head.inc");
 					<?php echo gettext("Emergency Established UDP connection timeout in seconds.  Default is ") . "<strong>" . gettext("100") . "</strong>."; ?>
 					</td>
 				</tr>
+				</tbody>
 			</table>
 		</td>
 	</tr>
@@ -707,6 +729,7 @@ include_once("head.inc");
 		<td width="22%" valign="top" class="vncell"><?php echo gettext("ICMP Connections"); ?></td>
 		<td width="78%" class="vtable">
 			<table width="100%" cellspacing="4" cellpadding="0" border="0">
+				<tbody>
 				<tr>
 					<td class="vexpl"><input name="flow_icmp_new_timeout" type="text" class="formfld unknown" id="flow_icmp_new_timeout" 
 					size="9" value="<?=htmlspecialchars($pconfig['flow_icmp_new_timeout']);?>">&nbsp;
@@ -731,6 +754,7 @@ include_once("head.inc");
 					<?php echo gettext("Emergency Established ICMP connection timeout in seconds.  Default is ") . "<strong>" . gettext("100") . "</strong>."; ?>
 					</td>
 				</tr>
+				</tbody>
 			</table>
 		</td>
 	</tr>
@@ -743,18 +767,11 @@ include_once("head.inc");
 			<input name="stream_memcap" type="text" class="formfld unknown" id="stream_memcap" size="9"
 			value="<?=htmlspecialchars($pconfig['stream_memcap']);?>">&nbsp;
 			<?php echo gettext("Max memory to be used by stream engine.  Default is ") . 
-			"<strong>" . gettext("33,554,432") . "</strong>" . gettext(" bytes (32MB)"); ?><br/><br/>
-			<?php echo gettext("Sets the maximum amount of memory, in bytes, to be used by the stream engine."); ?>
-		</td>
-	</tr>
-	<tr>
-		<td width="22%" valign="top" class="vncell"><?php echo gettext("Max Sessions"); ?></td>
-		<td width="78%" class="vtable">
-			<input name="stream_max_sessions" type="text" class="formfld unknown" id="stream_max_sessions" size="9"
-			value="<?=htmlspecialchars($pconfig['stream_max_sessions']);?>">&nbsp;
-			<?php echo gettext("Max concurrent stream engine sessions.  Default is ") . 
-			"<strong>" . gettext("262,144") . "</strong>" . gettext(" sessions."); ?><br/><br/>
-			<?php echo gettext("Sets the maximum number of concurrent sessions to be used by the stream engine."); ?>
+			"<strong>" . gettext("67,108,864") . "</strong>" . gettext(" bytes (64MB)"); ?><br/><br/>
+			<?php echo gettext("Sets the maximum amount of memory, in bytes, to be used by the stream engine.  ");?><br/>
+			<span class="red"><strong><?php echo gettext("Note: ") . "</strong></span>" . 
+			gettext("This number will likely need to be increased beyond the default value in systems with more than 4 processor cores.  " . 
+			"If Suricata fails to start and logs a memory allocation error, increase this value in 4 MB chunks until Suricata starts successfully."); ?>
 		</td>
 	</tr>
 	<tr>
@@ -835,12 +852,13 @@ include_once("head.inc");
 			<?php echo gettext("Please save your settings before you exit.  Changes will rebuild the rules file.  This "); ?>
 			<?php echo gettext("may take several seconds.  Suricata must also be restarted to activate any changes made on this screen."); ?></td>
 	</tr>
+	</tbody>
 </table>
 
 <?php endif; ?>
 
 </div>
-</td></tr></table>
+</td></tr></tbody></table>
 </form>
 <?php include("fend.inc"); ?>
 </body>

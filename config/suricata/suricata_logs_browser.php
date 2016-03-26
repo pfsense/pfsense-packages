@@ -55,21 +55,22 @@ $suricata_uuid = $a_instance[$instanceid]['uuid'];
 $if_real = get_real_interface($a_instance[$instanceid]['interface']);
 
 // Construct a pointer to the instance's logging subdirectory
-$suricatalogdir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}";
+$suricatalogdir = SURICATALOGDIR . "suricata_{$if_real}{$suricata_uuid}/";
 
-$logfile = $_POST['file'];
+// Limit all file access to just the currently selected interface's logging subdirectory
+$logfile = htmlspecialchars($suricatalogdir . basename($_POST['file']));
 
 if ($_POST['action'] == 'load') {
-	if(!is_file($_POST['file'])) {
+	if(!is_file($logfile)) {
 		echo "|3|" . gettext("Log file does not exist or that logging feature is not enabled") . ".|";
 	}
 	else {
-		$data = file_get_contents($_POST['file']);
+		$data = file_get_contents($logfile);
 		if($data === false) {
 			echo "|1|" . gettext("Failed to read log file") . ".|";
 		} else {
 			$data = base64_encode($data);
-			echo "|0|{$_POST['file']}|{$data}|";	
+			echo "|0|{$logfile}|{$data}|";	
 		}
 	}
 	exit;
@@ -84,7 +85,6 @@ include_once("head.inc");
 
 <?php
 include_once("fbegin.inc");
-if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 if ($input_errors) {
 	print_input_errors($input_errors);
 }
@@ -94,21 +94,21 @@ if ($input_errors) {
 <script type="text/javascript">	
 	function loadFile() {
 		jQuery("#fileStatus").html("<?=gettext("Loading file"); ?> ...");
-		jQuery("#fileStatusBox").show(500);
-		jQuery("#filePathBox").show(500);
+		jQuery("#fileStatusBox").show(250);
+		jQuery("#filePathBox").show(250);
 		jQuery("#fbTarget").html("");
 
 		jQuery.ajax(
 			"<?=$_SERVER['SCRIPT_NAME'];?>", {
 				type: 'POST',
-				data: "action=load&file=" + jQuery("#logFile").val(),
+				data: "instance=" + jQuery("#instance").val() + "&action=load&file=" + jQuery("#logFile").val(),
 				complete: loadComplete
 			}
 		);
 	}
 
 	function loadComplete(req) {
-		jQuery("#fileContent").show(1000);
+		jQuery("#fileContent").show(250);
 		var values = req.responseText.split("|");
 		values.shift(); values.pop();
 
@@ -117,14 +117,17 @@ if ($input_errors) {
 			var fileContent = Base64.decode(values.join("|"));
 			jQuery("#fileStatus").html("<?=gettext("File successfully loaded"); ?>.");
 			jQuery("#fbTarget").html(file);
+			jQuery("#fileRefreshBtn").show();
+			jQuery("#fileContent").prop("disabled", false);
 			jQuery("#fileContent").val(fileContent);
 		}
 		else {
 			jQuery("#fileStatus").html(values[0]);
 			jQuery("#fbTarget").html("");
+			jQuery("#fileRefreshBtn").hide();
 			jQuery("#fileContent").val("");
+			jQuery("#fileContent").prop("disabled", true);
 		}
-		jQuery("#fileContent").show(1000);
 	}
 
 </script>
@@ -133,18 +136,22 @@ if ($input_errors) {
 <input type="hidden" id="instance" value="<?=$instanceid;?>"/>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody>
 	<tr><td>
 	<?php
         	$tab_array = array();
-		$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+		$tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
 		$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-		$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+		$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 		$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php?instance={$instanceid}");
-		$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+		$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 		$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 		$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-		$tab_array[] = array(gettext("Logs Browser"), true, "/suricata/suricata_logs_browser.php");
+		$tab_array[] = array(gettext("Logs View"), true, "/suricata/suricata_logs_browser.php");
 		$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+		$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+		$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+		$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 		display_top_tabs($tab_array, true);
 	?>
 	</td>
@@ -152,6 +159,7 @@ if ($input_errors) {
 	<tr>
 	<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="6">
+			<tbody>
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Logs Browser Selections"); ?></td>
 			</tr>
@@ -175,12 +183,12 @@ if ($input_errors) {
 				<td width="78%" class="vtable">
 					<select name="logFile" id="logFile" class="formselect" onChange="loadFile();">
 			<?php
-				$logs = array( "alerts.log", "block.log", "files-json.log", "http.log", "stats.log", "suricata.log", "tls.log" );
+				$logs = array( "alerts.log", "block.log", "dns.log", "eve.json", "files-json.log", "http.log", "sid_changes.log", "stats.log", "suricata.log", "tls.log" );
 				foreach ($logs as $log) {
 					$selected = "";
 					if ($log == basename($logfile))
 						$selected = "selected";
-					echo "<option value='{$suricatalogdir}/{$log}' {$selected}>" . $log . "</option>\n";
+					echo "<option value='{$suricatalogdir}{$log}' {$selected}>" . $log . "</option>\n";
 				}
 			?>
 					</select>&nbsp;&nbsp;<?php echo gettext('Choose which log you want to view.'); ?>
@@ -191,38 +199,55 @@ if ($input_errors) {
 			</tr>
 			<tr>
 				<td colspan="2">
-					<div style="display:none; " id="fileStatusBox">
-						<div class="list" style="padding-left:15px;">
-							<strong id="fileStatus"></strong>
-						</div>
-					</div>
-					<div style="padding-left:15px; display:none;" id="filePathBox">
-						<strong><?=gettext("Log File Path"); ?>:</strong>
-						<div class="list" style="display:inline;" id="fbTarget"></div>
-					</div>
+					<table width="100%">
+						<tbody>
+						<tr>
+							<td width="75%">
+								<div style="display:none; " id="fileStatusBox">
+									<div class="list" style="padding-left:15px;">
+									<strong id="fileStatus"></strong>
+									</div>
+								</div>
+								<div style="padding-left:15px; display:none;" id="filePathBox">
+									<strong><?=gettext("Log File Path"); ?>:</strong>
+									<div class="list" style="display:inline;" id="fbTarget"></div>
+								</div>
+							</td>
+							<td align="right">
+								<div style="padding-right:15px; display:none;" id="fileRefreshBtn">
+									<input type="button" name="refresh" id="refresh" value="Refresh" class="formbtn" onclick="loadFile();" title="<?=gettext("Refresh current display");?>" />
+								</div>
+							</td>
+						</tr>
+						</tbody>
+					</table>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
 					<table width="100%">
+						<tbody>
 						<tr>
 							<td valign="top" class="label">
 							<div style="background:#eeeeee;" id="fileOutput">
-							<textarea id="fileContent" name="fileContent" style="width:100%;" rows="30" wrap="off"></textarea>
+							<textarea id="fileContent" name="fileContent" style="width:100%;" rows="30" wrap="off" disabled></textarea>
 							</div>
 							</td>
 						</tr>
+						</tbody>
 					</table>
 				</td>
 			</tr>
+			</tbody>
 		</table>
 	</div>
 	</td>
 	</tr>
+	</tbody>
 </table>
 </form>
 
-<?php if(empty($logfile)): ?>
+<?php if(empty($_POST['file'])): ?>
 <script type="text/javascript">
 	document.getElementById("logFile").selectedIndex=-1;
 </script>

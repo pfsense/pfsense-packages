@@ -2,7 +2,7 @@
 <?php
 /* $Id$ */
 /*
-	mail_reports.inc
+	mail_reports_generate.php
 	Part of pfSense
 	Copyright (C) 2011 Jim Pingle <jimp@pfsense.org>
 	Portions Copyright (C) 2007-2011 Seth Mos <seth.mos@dds.nl>

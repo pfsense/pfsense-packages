@@ -149,7 +149,7 @@
 			<fieldname>reverse_https</fieldname>
 			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode. &lt;br&gt;(You have to add a rule with destination "WAN-address")</description>
 			<type>checkbox</type>
-			<enablefields>reverse_https_port,reverse_https_defsite,reverse_ssl_cert,reverse_int_ca,reverse_ignore_ssl_valid,reverse_owa,reverse_owa_ip,reverse_owa_webservice,reverse_owa_activesync,reverse_owa_rpchttp,reverse_owa_autodiscover,reverse_ssl_chain</enablefields>
+			<enablefields>reverse_https_port,reverse_https_defsite,reverse_ssl_cert,reverse_int_ca,reverse_ignore_ssl_valid,reverse_owa,reverse_owa_ip,reverse_owa_webservice,reverse_owa_activesync,reverse_owa_rpchttp,reverse_owa_mapihttp,reverse_owa_autodiscover,reverse_ssl_chain</enablefields>
 			<required/>
 			<default_value>off</default_value>
 		</field> 
@@ -193,6 +193,33 @@
 			<type>checkbox</type>  
 			<default_value>on</default_value>
 		</field>
+                <field>
+			<fielddescr>Check Client certificate</fielddescr>
+			<fieldname>reverse_check_clientca</fieldname>
+			<description>If this field is checked, Client certificate will be checked.</description>
+			<type>checkbox</type>  
+			<default_value>off</default_value>
+		</field>
+
+                <field>
+			<fielddescr>CA Client certificate</fielddescr>
+			<fieldname>reverse_ssl_clientca</fieldname>
+			<description>Choose CA certificate to authenticate clients.</description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['ca']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+                <field>
+			<fielddescr>Revocation List</fielddescr>
+			<fieldname>reverse_ssl_clientcrl</fieldname>
+			<description>Choose CRL.</description>
+	    	<type>select_source</type>
+			<source><![CDATA[$config['crl']]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+
 		<field>
 			<name>OWA Reverse proxy General Settings</name>
 			<type>listtopic</type>
@@ -200,19 +227,16 @@
 		<field>
 			<fielddescr>Enable OWA reverse proxy</fielddescr>
 			<fieldname>reverse_owa</fieldname>
-			<description><![CDATA[If this field is checked, squid will act as an accelerator/ SSL offloader for Outlook Web App.<br><br>
-			See also:<br>
-			<a target=_new href='http://support.microsoft.com/?scid=kb%3Ben-us%3B327800&x=17&y=16'>How to configure SSL Offloading for Outlook Web Access in Exchange 2000 Server and in Exchange Server 2003</a>
-			]]></description>
+			<description>If this field is checked, squid will act as an accelerator/ SSL offloader for Outlook Web App.</description>
 			<type>checkbox</type>
-			<enablefields>reverse_owa_ip,reverse_owa_activesync,reverse_owa_rpchttp,reverse_owa_webservice,reverse_owa_autodiscover</enablefields>		
+			<enablefields>reverse_owa_ip,reverse_owa_activesync,reverse_owa_rpchttp,reverse_owa_mapihttp,reverse_owa_webservice,reverse_owa_autodiscover</enablefields>		
 		</field>
 		<field>
-			<fielddescr>OWA frontend IP address</fielddescr>
+			<fielddescr>CAS-Array / OWA frontend IP address</fielddescr>
 			<fieldname>reverse_owa_ip</fieldname>
-			<description>This is the internal IP Address of the OWA frontend server.</description>
+			<description>These are the internal IPs of the CAS-Array (OWA frontend servers). Separate by semi-colons (;). </description>
 			<type>input</type>
-			<size>15</size>
+			<size>70</size>
 		</field>		
 		<field>
 			<fielddescr>Enable ActiveSync</fielddescr>
@@ -227,6 +251,13 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Enable MAPI HTTP</fielddescr>
+			<fieldname>reverse_owa_mapihttp</fieldname>
+			<description><![CDATA[If this field is checked, MAPI over HTTP will be enabled.<br>
+								<strong>This feature is only available with at least Exchange 2013 SP1</strong>]]></description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Enable Exchange WebServices</fielddescr>
 			<fieldname>reverse_owa_webservice</fieldname>
 			<description><![CDATA[If this field is checked, Exchange WebServices will be enabled.<br>
@@ -236,15 +267,16 @@
 		<field>
 			<fielddescr>Enable AutoDiscover</fielddescr>
 			<fieldname>reverse_owa_autodiscover</fieldname>
-			<description>If this field is checked, AutoDiscover will be enabled.</description>
+			<description><![CDATA[If this field is checked, AutoDiscover will be enabled.<br>
+								<strong>You also should set up the autodiscover DNS-record to point to you WAN-IP.</strong>]]></description>
 			<type>checkbox</type>
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-		squid_before_form_general(&amp;$pkg);
+		squid_before_form_general($pkg);
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		squid_validate_reverse($_POST, &amp;$input_errors);
+		squid_validate_reverse($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();

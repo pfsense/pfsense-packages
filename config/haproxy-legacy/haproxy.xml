@@ -109,7 +109,6 @@
 		/*
 		included in package install
 		$freebsdv=trim(`uname -r | cut -d'.' -f1`);
-		conf_mount_rw();
 		`fetch -q -o /usr/local/sbin/ https://packages.pfsense.org/packages/config/haproxy-legacy/binaries{$freebsdv}/haproxy`;
 		exec("chmod a+rx /usr/local/sbin/haproxy");
 		*/

@@ -1,6 +1,7 @@
 <?php
 /*
 	openvpn-client-export.inc
+	part of pfSense (http://www.pfSense.org/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>
 	Copyright (C) 2008 Shrew Soft Inc
 	Copyright (C) 2010 Ermal Luci
@@ -38,31 +39,30 @@ require_once("shaper.inc");
 require_once("util.inc");
 require_once("pfsense-utils.inc");
 
+global $current_openvpn_version, $current_openvpn_version_rev;
+$current_openvpn_version = "2.3.8";
+$current_openvpn_version_rev = "01";
+
 function openvpn_client_export_install() {
-	conf_mount_rw();
-	$tarpath = "/usr/local/pkg/openvpn-client-export.tgz";
-	$phpfile = "vpn_openvpn_export.php";
-	$ovpndir = "/usr/local/share/openvpn";
-	$workdir = "{$ovpndir}/client-export";
+	global $current_openvpn_version;
 
-	if (!is_dir($workdir))
-		mkdir($workdir, 0777, true);
+	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		conf_mount_rw();
+		$tarpath = "/usr/local/pkg/openvpn-client-export-{$current_openvpn_version}.tgz";
+		$ovpndir = "/usr/local/share/openvpn";
+		$workdir = "{$ovpndir}/client-export";
 
-	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
-	conf_mount_ro();
+		if (!is_dir($workdir)) {
+			mkdir($workdir, 0777, true);
+		}
+		exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
+		conf_mount_ro();
+	}
 }
 
 function openvpn_client_export_deinstall() {
-	conf_mount_rw();
-	$phpfile = "vpn_openvpn_export.php";
-	$phpfile2 = "vpn_openvpn_export_shared.php";
-	$ovpndir = "/usr/local/share/openvpn";
-	$workdir = "{$ovpndir}/client-export";
-
-	unlink_if_exists("/usr/local/www/{$phpfile}");
-	unlink_if_exists("/usr/local/www/{$phpfile2}");
-	exec("/bin/rm -r {$workdir}");
-	conf_mount_ro();
+	exec("/bin/rm -r /usr/local/share/openvpn/client-export");
 }
 
 function openvpn_client_export_prefix($srvid, $usrid = null, $crtid = null) {
@@ -70,21 +70,22 @@ function openvpn_client_export_prefix($srvid, $usrid = null, $crtid = null) {
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
-	if (empty($settings))
+	if (empty($settings)) {
 		return false;
-	if ($settings['disable'])
+	}
+	if ($settings['disable']) {
 		return false;
-
+	}
 	$host = empty($config['system']['hostname']) ? "openvpn" : $config['system']['hostname'];
 	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : $settings['protocol']);
 	$port = $settings['local_port'];
-	
-	$filename_addition = "";
-	if ($usrid && is_numeric($usrid))
-		$filename_addition = "-".$config['system']['user'][$usrid]['name'];
-	elseif ($crtid && is_numeric($crtid) && function_exists("cert_get_cn"))
-		$filename_addition = "-" . str_replace(' ', '_', cert_get_cn($config['cert'][$crtid]['crt']));
 
+	$filename_addition = "";
+	if ($usrid && is_numeric($usrid)) {
+		$filename_addition = "-" . $config['system']['user'][$usrid]['name'];
+	} elseif ($crtid && is_numeric($crtid) && function_exists("cert_get_cn")) {
+		$filename_addition = "-" . str_replace(' ', '_', cert_get_cn($config['cert'][$crtid]['crt']));
+	}
 	return "{$host}-{$prot}-{$port}{$filename_addition}";
 }
 
@@ -96,13 +97,15 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 	if ($capath) {
 		$ecapath = escapeshellarg($capath);
 		exec("/usr/bin/openssl pkcs12 -export -in {$ecrtpath} -inkey {$ekeypath} -certfile {$ecapath} -out {$eoutpath} -passout pass:{$eoutpass}");
-	} else
+	} else {
 		exec("/usr/bin/openssl pkcs12 -export -in {$ecrtpath} -inkey {$ekeypath} -out {$eoutpath} -passout pass:{$eoutpass}");
+	}
 
 	unlink($crtpath);
 	unlink($keypath);
-	if ($capath)
+	if ($capath) {
 		unlink($capath);
+	}
 }
 
 function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
@@ -121,11 +124,10 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 
 	// lookup server certificate info
 	$server_cert = lookup_cert($settings['certref']);
-	if (!$server_cert) 
-	{
+	if (!$server_cert) {
 		$input_errors[] = "Could not locate server certificate.";
 	} else {
-		$server_ca = lookup_ca($server_cert['caref']);
+		$server_ca = ca_chain($server_cert);
 		if (!$server_ca) {
 			$input_errors[] = "Could not locate the CA reference for the server certificate.";
 		}
@@ -149,33 +151,47 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 		} else {
 			$cert = $config['cert'][$crtid];
 		}
-		if (!$cert)
-		{
+		if (!$cert) {
 			$input_errors[] = "Could not find client certificate.";
 		} else {
 			// If $cert is not an array, it's a certref not a cert.
-			if (!is_array($cert))
+			if (!is_array($cert)) {
 				$cert = lookup_cert($cert);
+			}
 		}
 	} elseif (($settings['mode'] == "server_tls") || (($settings['mode'] == "server_tls_user") && ($settings['authmode'] != "Local Database"))) {
 		$cert = $config['cert'][$crtid];
-		if (!$cert)
+		if (!$cert) {
 			$input_errors[] = "Could not find client certificate.";
-	} else
+		}
+	} else {
 		$nokeys = true;
+	}
 
-	if ($input_errors)
+	if ($input_errors) {
 		return false;
-		
+	}
 	return array($settings, $server_cert, $server_ca, $servercn, $user, $cert, $nokeys);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls=false, $doslines=false, $openvpnmanager, $advancedoptions = "") {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys = false, $proxy, $expformat = "baseconf", $outpass = "", $skiptls = false, $doslines = false, $openvpnmanager, $advancedoptions = "") {
 	global $config, $input_errors, $g;
-	$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+	$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 
 	$nl = ($doslines) ? "\r\n" : "\n";
 	$conf = "";
+
+	if ($expformat == "inlinevisc") {
+		$conf .= <<<EOF
+#-- Config Auto Generated By pfSense for Viscosity --#
+
+#viscosity startonopen false
+#viscosity dhcp true
+#viscosity dnssupport true
+#viscosity name {$friendly_name}
+
+EOF;
+	}
 
 	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
 	if ($validconfig) {
@@ -192,9 +208,10 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 
 	// add basic settings
 	$devmode = empty($settings['dev_mode']) ? "tun" : $settings['dev_mode'];
-	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
+	if (($expformat != "inlinedroid") && ($expformat != "inlineios")) {
 		$conf .= "dev {$devmode}{$nl}";
-	if(!empty($settings['tunnel_networkv6']) && ($expformat != "inlinedroid") && ($expformat != "inlineios")) {
+	}
+	if (!empty($settings['tunnel_networkv6']) && ($expformat != "inlinedroid") && ($expformat != "inlineios")) {
 		$conf .= "tun-ipv6{$nl}";
 	}
 	$conf .= "persist-tun{$nl}";
@@ -206,14 +223,16 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 	$conf .= "auth {$digest}{$nl}";
 	$conf .= "tls-client{$nl}";
 	$conf .= "client{$nl}";
-	if (($expformat != "inlinedroid") && ($expformat != "inlineios"))
+	if (($expformat != "inlinedroid") && ($expformat != "inlineios")) {
 		$conf .= "resolv-retry infinite{$nl}";
+	}
 	$conf .= "$remotes{$nl}";
 
 	/* Use a random local port, otherwise two clients will conflict if they run at the same time.
 		May not be supported on older clients (Released before May 2010) */
-	if (($randomlocalport != 0) && (substr($expformat, 0, 7) != "yealink") && ($expformat != "snom"))
+	if (($randomlocalport != 0) && (substr($expformat, 0, 7) != "yealink") && ($expformat != "snom")) {
 		$conf .= "lport 0{$nl}";
+	}
 
 	/* This line can cause problems with auth-only setups and also with Yealink/Snom phones
 		since they are stuck on an older OpenVPN version that does not support this feature. */
@@ -236,19 +255,20 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 
 	if (!empty($proxy)) {
 		if ($proxy['proxy_type'] == "http") {
-
 			if (strtoupper(substr($settings['protocol'], 0, 3)) == "UDP") {
 				$input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
 				return;
 			}
 			$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
 		}
-		if ($proxy['proxy_type'] == "socks") 
+		if ($proxy['proxy_type'] == "socks") {
 			$conf .= "socks-proxy {$proxy['ip']} {$proxy['port']} ";
+		}
 		if ($proxy['proxy_authtype'] != "none") {
-			if (!isset($proxy['passwdfile']))
+			if (!isset($proxy['passwdfile'])) {
 				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid, $usrid, $crtid) . "-proxy";
-			$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
+				$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
+			}
 		}
 		$conf .= "{$nl}";
 	}
@@ -264,7 +284,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 	// add key settings
 	$prefix = openvpn_client_export_prefix($srvid, $usrid, $crtid);
 	$cafile = "{$prefix}-ca.crt";
-	if($nokeys == false) {
+	if ($nokeys == false) {
 		if ($expformat == "yealink_t28") {
 			$conf .= "ca /yealink/config/openvpn/keys/ca.crt{$nl}";
 			$conf .= "cert /yealink/config/openvpn/keys/client1.crt{$nl}";
@@ -287,22 +307,24 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		} elseif (substr($expformat, 0, 6) != "inline") {
 			$conf .= "pkcs12 {$prefix}.p12{$nl}";
 		}
-	} else if ($settings['mode'] == "server_user") {
-		if (substr($expformat, 0, 6) != "inline")
+	} elseif ($settings['mode'] == "server_user") {
+		if (substr($expformat, 0, 6) != "inline") {
 			$conf .= "ca {$cafile}{$nl}";
+		}
 	}
 
 	if ($settings['tls'] && !$skiptls) {
-		if ($expformat == "yealink_t28")
+		if ($expformat == "yealink_t28") {
 			$conf .= "tls-auth /yealink/config/openvpn/keys/ta.key 1{$nl}";
-		elseif ($expformat == "yealink_t38g")
+		} elseif ($expformat == "yealink_t38g") {
 			$conf .= "tls-auth /phone/config/openvpn/keys/ta.key 1{$nl}";
-		elseif ($expformat == "yealink_t38g2")
+		} elseif ($expformat == "yealink_t38g2") {
 			$conf .= "tls-auth /config/openvpn/keys/ta.key 1{$nl}";
-		elseif ($expformat == "snom")
+		} elseif ($expformat == "snom") {
 			$conf .= "tls-auth /openvpn/ta.key 1{$nl}";
-		elseif (substr($expformat, 0, 6) != "inline")
+		} elseif (substr($expformat, 0, 6) != "inline") {
 			$conf .= "tls-auth {$prefix}-tls.key 1{$nl}";
+		}
 	}
 
 	// Prevent MITM attacks by verifying the server certificate.
@@ -313,24 +335,26 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 	if (function_exists("cert_get_purpose")) {
 		if (is_array($server_cert) && ($server_cert['crt'])) {
 			$purpose = cert_get_purpose($server_cert['crt'], true);
-			if ($purpose['server'] == 'Yes')
+			if ($purpose['server'] == 'Yes') {
 				$conf .= "ns-cert-type server{$nl}";
+			}
 		}
 	}
 
 	// add optional settings
 	if (!empty($settings['compression'])) {
-		if ($pfs_version > 2.1)
+		if ($pfs_version > 2.1) {
 			$conf .= "comp-lzo {$settings['compression']}{$nl}";
-		else
+		} else {
 			$conf .= "comp-lzo{$nl}";
+		}
 	}
 
-	if ($settings['passtos'])
+	if ($settings['passtos']) {
 		$conf .= "passtos{$nl}";
+	}
 
-	if ($openvpnmanager)
-	{
+	if ($openvpnmanager) {
 		if (!empty($settings['client_mgmt_port'])) {
 			$client_mgmt_port = $settings['client_mgmt_port'];
 		} else {
@@ -351,7 +375,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		$conf .= "management-forget-disconnect{$nl}";
 		$conf .= $nl;
 	};
-		
+
 	// add advanced options
 	$advancedoptions = str_replace("\r\n", "\n", $advancedoptions);
 	$advancedoptions = str_replace("\n", $nl, $advancedoptions);
@@ -368,7 +392,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 			file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
 
 			$cafile = "{$tempdir}/{$cafile}";
-			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
+			file_put_contents("{$cafile}", $server_ca);
 			if ($settings['tls']) {
 				$tlsfile = "{$tempdir}/{$prefix}-tls.key";
 				file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -383,10 +407,11 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 
 				// convert to pkcs12 format
 				$p12file = "{$tempdir}/{$prefix}.p12";
-				if ($usetoken)
+				if ($usetoken) {
 					openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-				else
+				} else {
 					openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+				}
 			}
 			$command = "cd " . escapeshellarg("{$tempdir}/..")
 					. " && /usr/local/bin/zip -r "
@@ -400,8 +425,9 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		case "inline":
 		case "inlinedroid":
 		case "inlineios":
+		case "inlinevisc":
 			// Inline CA
-			$conf .= "<ca>{$nl}" . trim(base64_decode($server_ca['crt'])) . "{$nl}</ca>{$nl}";
+			$conf .= "<ca>{$nl}" . trim($server_ca) . "{$nl}</ca>{$nl}";
 			if ($settings['mode'] != "server_user") {
 				// Inline Cert
 				$conf .= "<cert>{$nl}" . trim(base64_decode($cert['crt'])) . "{$nl}</cert>{$nl}";
@@ -422,14 +448,14 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 		case "yealink_t38g2":
 			// create template directory
 			$tempdir = "{$g['tmp_path']}/{$prefix}";
-			$keydir  = "{$tempdir}/keys";
+			$keydir = "{$tempdir}/keys";
 			mkdir($tempdir, 0700, true);
 			mkdir($keydir, 0700, true);
 
 			file_put_contents("{$tempdir}/vpn.cnf", $conf);
 
 			$cafile = "{$keydir}/ca.crt";
-			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
+			file_put_contents("{$cafile}", $server_ca);
 			if ($settings['tls']) {
 				$tlsfile = "{$keydir}/ta.key";
 				file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -455,7 +481,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 			file_put_contents("{$tempdir}/vpn.cnf", $conf);
 
 			$cafile = "{$tempdir}/ca.crt";
-			file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
+			file_put_contents("{$cafile}", $server_ca);
 			if ($settings['tls']) {
 				$tlsfile = "{$tempdir}/ta.key";
 				file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -478,25 +504,32 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifys
 	}
 }
 
-function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $outpass, $proxy, $openvpnmanager, $advancedoptions, $openvpn_version = "2.1") {
-	global $config, $g, $input_errors;
+function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $outpass, $proxy, $openvpnmanager, $advancedoptions, $openvpn_version = "x86-xp") {
+	global $config, $g, $input_errors, $current_openvpn_version, $current_openvpn_version_rev;
 	$uname_p = trim(exec("uname -p"));
 
 	switch ($openvpn_version) {
-		case "2.3-x86":
-			$client_install_exe = "openvpn-install-2.3-i686.exe";
+		case "x86-xp":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I0{$current_openvpn_version_rev}-i686.exe";
 			break;
-		case "2.3-x64":
-			$client_install_exe = "openvpn-install-2.3-x86_64.exe";
+		case "x64-xp":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I0{$current_openvpn_version_rev}-x86_64.exe";
+			break;
+		case "x86-win6":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I6{$current_openvpn_version_rev}-i686.exe";
+			break;
+		case "x64-win6":
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I6{$current_openvpn_version_rev}-x86_64.exe";
 			break;
 		default:
-			$client_install_exe = "openvpn-install-2.3-i686.exe";
+			$client_install_exe = "openvpn-install-{$current_openvpn_version}-I0{$current_openvpn_version_rev}-i686.exe";
 	}
 
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
-	if (!file_exists($workdir . "/template/{$client_install_exe}"))
+	if (!file_exists($workdir . "/template/{$client_install_exe}")) {
 		openvpn_client_export_install();
+	}
 
 	$validconfig = openvpn_client_export_validate_config($srvid, $usrid, $crtid);
 	if ($validconfig) {
@@ -511,15 +544,17 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $veri
 
 	// create config directory
 	$confdir = "{$tempdir}/config";
-	if (!is_dir($conf_dir))
+	if (!is_dir($conf_dir)) {
 		mkdir($confdir, 0700, true);
+	}
 
 	// copy the template directory
 	exec("cp -r {$workdir}/template/* {$tempdir}");
 	// and put the required installer exe in place
 	exec("/bin/cp {$tempdir}/{$client_install_exe} {$tempdir}/openvpn-install.exe");
-	if (stristr($openvpn_version, "x64"))
+	if (stristr($openvpn_version, "x64")) {
 		rename("{$tempdir}/openvpn-postinstall64.exe", "{$tempdir}/openvpn-postinstall.exe");
+	}
 
 	// write configuration file
 	$prefix = openvpn_client_export_prefix($srvid, $usrid, $crtid);
@@ -530,7 +565,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $veri
 		$pwdfle .= "{$proxy['password']}\r\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken,  $nokeys, $proxy, "", "baseconf", false, true, $openvpnmanager, $advancedoptions);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $nokeys, $proxy, "", "baseconf", false, true, $openvpnmanager, $advancedoptions);
 	if (!$conf) {
 		$input_errors[] = "Could not create a config to export.";
 		return false;
@@ -539,7 +574,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $veri
 	file_put_contents($cfgfile, $conf);
 
 	$cafile = "{$tempdir}/config/{$prefix}-ca.crt";
-	file_put_contents($cafile, base64_decode($server_ca['crt']));
+	file_put_contents($cafile, $server_ca);
 	if ($settings['tls']) {
 		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
 		file_put_contents($tlsfile, base64_decode($settings['tls']));
@@ -553,37 +588,40 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $veri
 		file_put_contents($keyfile, base64_decode($cert['prv']));
 		// convert to pkcs12 format
 		$p12file = "{$tempdir}/config/{$prefix}.p12";
-		if ($usetoken)
+		if ($usetoken) {
 			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-		else
+		} else {
 			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+		}
 	}
 
 	// 7zip the configuration data
 	chdir($tempdir);
-	$files  = "config ";
-	if ($openvpnmanager)
+	$files = "config ";
+	if ($openvpnmanager) {
 		$files .= "openvpnmanager ";
+	}
 
 	$files .= "openvpn-install.exe ";
 	$files .= "openvpn-postinstall.exe ";
-	if ($usetoken)
+	if ($usetoken) {
 		$procchain = 	';!@Install@!UTF-8!
 RunProgram="openvpn-postinstall.exe /Import"
 ;!@InstallEnd@!'
 ;
-	else
+	} else {
 		$procchain = 	';!@Install@!UTF-8!
 RunProgram="openvpn-postinstall.exe"
 ;!@InstallEnd@!'
 ;
+	}
 	file_put_contents("{$tempdir}/7zipConfig",$procchain);
 
-	if(file_exists("/usr/pbi/p7zip-{$uname_p}/bin/7z"))
+	if (file_exists("/usr/pbi/p7zip-{$uname_p}/bin/7z")) {
 		exec("/usr/pbi/p7zip-{$uname_p}/bin/7z -y a archive.7z {$files}");
-	else
+	} else {
 		exec("/usr/local/libexec/p7zip/7z -y a archive.7z {$files}");
-
+	}
 	// create the final installer
 	$outfile = "{$tempdir}-install.exe";
 	chdir($g['tmp_path']);
@@ -600,8 +638,9 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	$uname_p = trim(exec("uname -p"));
 
 	$ovpndir = "/usr/local/share/openvpn/";
-	if (!file_exists($workdir . "/template/openvpn-install.exe"))
+	if (!file_exists($workdir . "/template/openvpn-install.exe")) {
 		openvpn_client_export_install();
+	}
 
 	$uniq = uniqid();
 	$tempdir = $g['tmp_path'] . "/openvpn-export-" . $uniq;
@@ -631,14 +670,16 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	}
 
 	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, true, $proxy, "baseconf", $outpass, true, true, $openvpnmanager, $advancedoptions);
-	if (!$conf)
+	if (!$conf) {
 		return false;
+	}
 
 	// We need to nuke the ca line from the above config if it exists.
 	$conf = explode("\n", $conf);
-	for ($i=0; $i < count($conf); $i++) {
-		if ((substr($conf[$i], 0, 3) == "ca ") || (substr($conf[$i], 0, 7) == "pkcs12 "))
+	for ($i = 0; $i < count($conf); $i++) {
+		if ((substr($conf[$i], 0, 3) == "ca ") || (substr($conf[$i], 0, 7) == "pkcs12 ")) {
 			unset($conf[$i]);
+		}
 	}
 	$conf = implode("\n", $conf);
 
@@ -669,7 +710,7 @@ EOF;
 
 	// write ca
 	$cafile = "{$tempdir}/ca.crt";
-	file_put_contents($cafile, base64_decode($server_ca['crt']));
+	file_put_contents($cafile, $server_ca);
 
 	if ($settings['mode'] != "server_user") {
 
@@ -700,11 +741,11 @@ EOF;
 	}
 
 	// Zip Viscosity file
-	if(file_exists("/usr/pbi/zip-{$uname_p}/bin/zip"))
+	if (file_exists("/usr/pbi/zip-{$uname_p}/bin/zip")) {
 		exec("cd {$tempdir}/.. && /usr/pbi/zip-{$uname_p}/bin/zip -r {$zipfile} Viscosity.visc");
-	else
+	} else {
 		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$zipfile} Viscosity.visc");
-
+	}
 	// Remove temporary directory
 	exec("rm -rf {$tempdir}");
 
@@ -732,30 +773,34 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		if (!empty($settings['ipaddr']) && is_ipaddr($settings['ipaddr'])) {
 			$server_host = $settings['ipaddr'];
 		} else {
-			if (!$interface)
+			if (!$interface) {
 				$interface = "wan";
-			if (in_array(strtolower($settings['protocol']), array("udp6", "tcp6")))
+			}
+			if (in_array(strtolower($settings['protocol']), array("udp6", "tcp6"))) {
 				$server_host = get_interface_ipv6($interface);
-			else
+			} else {
 				$server_host = get_interface_ip($interface);
+			}
 		}
-	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
+	} elseif ($useaddr == "serverhostname" || empty($useaddr)) {
 		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
 		$server_host .= "{$config['system']['domain']}";
-	} else
+	} else {
 		$server_host = $useaddr;
+	}
 
 	$server_port = $settings['local_port'];
 
 	$proto = strtolower($settings['protocol']);
-	if (strtolower(substr($settings['protocol'], 0, 3)) == "tcp")
+	if (strtolower(substr($settings['protocol'], 0, 3)) == "tcp") {
 		$proto .= "-client";
+	}
 
 	$cipher = $settings['crypto'];
 	$digest = !empty($settings['digest']) ? $settings['digest'] : "SHA1";
 
 	// add basic settings
-	$conf  = "dev tun\n";
+	$conf = "dev tun\n";
 	if(! empty($settings['tunnel_networkv6'])) {
 		$conf .= "tun-ipv6\n";
 	}
@@ -791,14 +836,16 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 			}
 			$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
 		}
-		if ($proxy['proxy_type'] == "socks") 
+		if ($proxy['proxy_type'] == "socks") {
 			$conf .= "socks-proxy {$proxy['ip']} {$proxy['port']} ";
-		if ($proxy['proxy_authtype'] != "none") {
-			if (!isset($proxy['passwdfile']))
-				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid) . "-proxy";
-			$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
 		}
-		$conf .= "\n";
+		if ($proxy['proxy_authtype'] != "none") {
+			if (!isset($proxy['passwdfile'])) {
+				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid) . "-proxy";
+				$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
+			}
+			$conf .= "\n";
+		}
 	}
 
 	// add key settings
@@ -822,16 +869,18 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		$shkeyfile = "{$tempdir}/{$shkeyfile}";
 		file_put_contents("{$shkeyfile}", base64_decode($settings['shared_key']));
 
-		if(file_exists("/usr/pbi/zip-{$uname_p}/bin/zip"))
+		if (file_exists("/usr/pbi/zip-{$uname_p}/bin/zip")) {
 			exec("cd {$tempdir}/.. && /usr/pbi/zip-{$uname_p}/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
-		else
+		} else {
 			exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+		}
 
 		// Remove temporary directory
 		exec("rm -rf {$tempdir}");
 		return "{$prefix}-config.zip";
-	} else
+	} else {
 		return $conf;
+	}
 }
 
 function openvpn_client_export_build_remote_lines($settings, $useaddr, $interface, $expformat, $nl) {
@@ -842,25 +891,30 @@ function openvpn_client_export_build_remote_lines($settings, $useaddr, $interfac
 		if (!empty($settings['ipaddr']) && is_ipaddr($settings['ipaddr'])) {
 			$server_host = $settings['ipaddr'];
 		} else {
-			if (!$interface || ($interface == "any"))
+			if (!$interface || ($interface == "any")) {
 				$interface = "wan";
-			if (in_array(strtolower($settings['protocol']), array("udp6", "tcp6")))
+			}
+			if (in_array(strtolower($settings['protocol']), array("udp6", "tcp6"))) {
 				$server_host = get_interface_ipv6($interface);
-			else
+			} else {
 				$server_host = get_interface_ip($interface);
+			}
 		}
 	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
 		$server_host = empty($config['system']['hostname']) ? "" : "{$config['system']['hostname']}.";
 		$server_host .= "{$config['system']['domain']}";
-	} else
+	} else {
 		$server_host = $useaddr;
+	}
 
 	$proto = strtolower($settings['protocol']);
-	if (strtolower(substr($settings['protocol'], 0, 3)) == "tcp")
+	if (strtolower(substr($settings['protocol'], 0, 3)) == "tcp") {
 		$proto .= "-client";
+	}
 
-	if (($expformat == "inlineios") && ($proto == "tcp-client"))
+	if (($expformat == "inlineios") && ($proto == "tcp-client")) {
 		$proto = "tcp";
+	}
 
 	if (($useaddr == "servermagic") || ($useaddr == "servermagichost")) {
 		$destinations = openvpn_client_export_find_port_forwards($server_host, $settings['local_port'], $proto, true, ($useaddr == "servermagichost"));
@@ -876,19 +930,18 @@ function openvpn_client_export_build_remote_lines($settings, $useaddr, $interfac
 
 function openvpn_client_export_find_port_forwards($targetip, $targetport, $targetproto, $skipprivate, $findhostname=false) {
 	global $config, $FilterIflist;
-	if (empty($FilterIflist))
+	if (empty($FilterIflist)) {
 		filter_generate_optcfg_array();
+	}
 	$destinations = array();
 
-	if (!is_array($config['nat']) || !is_array($config['nat']['rule']))
+	if (!is_array($config['nat']) || !is_array($config['nat']['rule'])) {
 		return $destinations;
+	}
 
 	foreach ($config['nat']['rule'] as $natent) {
 		$dest = array();
-		if (!isset($natent['disabled'])
-			&& ($natent['target'] == $targetip)
-			&& ($natent['local-port'] == $targetport)
-			&& ($natent['protocol'] == $targetproto)) {
+		if (!isset($natent['disabled']) && ($natent['target'] == $targetip) && ($natent['local-port'] == $targetport) && ($natent['protocol'] == $targetproto)) {
 			$dest['proto'] = $natent['protocol'];
 
 			// Could be multiple ports... But we can only use one.
@@ -898,32 +951,36 @@ function openvpn_client_export_find_port_forwards($targetip, $targetport, $targe
 			// Could be network or address ...
 			$natif = (!$natent['interface']) ? "wan" : $natent['interface'];
 
-			if (!isset($FilterIflist[$natif]))
+			if (!isset($FilterIflist[$natif])) {
 				continue; // Skip if there is no interface
+			}
 
 			$dstaddr = trim(filter_generate_address($natent, 'destination', true));
-			if(!$dstaddr)
+			if (!$dstaddr) {
 				$dstaddr = $FilterIflist[$natif]['ip'];
+			}
 
 			$dstaddr_port = explode(" ", $dstaddr);
 
-			if(empty($dstaddr_port[0]) || strtolower(trim($dstaddr_port[0])) == "port")
+			if (empty($dstaddr_port[0]) || strtolower(trim($dstaddr_port[0])) == "port") {
 				continue; // Skip port forward if no destination address found
+			}
 
-
-			if (!is_ipaddr($dstaddr_port[0]))
+			if (!is_ipaddr($dstaddr_port[0])) {
 				continue; // We can only work with single IPs, not subnets!
+			}
 
-
-			if ($skipprivate && is_private_ip($dstaddr_port[0]))
+			if ($skipprivate && is_private_ip($dstaddr_port[0])) {
 				continue; // Skipping a private IP destination!
+			}
 
 			$dest['host'] = $dstaddr_port[0];
 
 			if ($findhostname) {
 				$hostname = openvpn_client_export_find_hostname($natif);
-				if (!empty($hostname))
+				if (!empty($hostname)) {
 					$dest['host'] = $hostname;
+				}
 			}
 
 			$destinations[] = $dest;
@@ -938,14 +995,16 @@ function openvpn_client_export_find_hostname($interface) {
 	$hostname = "";
 	if (is_array($config['dyndnses']['dyndns'])) {
 		foreach ($config['dyndnses']['dyndns'] as $ddns) {
-			if (($ddns['interface'] == $interface) && isset($ddns['enable']) && !empty($ddns['host']) && !is_numeric($ddns['host']) && is_hostname($ddns['host']))
+			if (($ddns['interface'] == $interface) && isset($ddns['enable']) && !empty($ddns['host']) && !is_numeric($ddns['host']) && is_hostname($ddns['host'])) {
 				return $ddns['host'];
+			}
 		}
 	}
 	if (is_array($config['dnsupdates']['dnsupdate'])) {
 		foreach ($config['dnsupdates']['dnsupdate'] as $ddns) {
-			if (($ddns['interface'] == $interface) && isset($ddns['enable']) && !empty($ddns['host']) && !is_numeric($ddns['host']) && is_hostname($ddns['host']))
+			if (($ddns['interface'] == $interface) && isset($ddns['enable']) && !empty($ddns['host']) && !is_numeric($ddns['host']) && is_hostname($ddns['host'])) {
 				return $ddns['host'];
+			}
 		}
 	}
 

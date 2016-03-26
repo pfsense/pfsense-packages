@@ -53,7 +53,7 @@ if (is_null($id)) {
 
 // Set who called us so we can return to the correct page with
 // the RETURN ('cancel') button.
-if ($_POST['referrer'])
+if (isset($_POST['referrer']) && strpos($_POST['referrer'], '://'.$_SERVER['SERVER_NAME'].'/') !== FALSE)
 	$referrer = $_POST['referrer'];
 else
 	$referrer = $_SERVER['HTTP_REFERER'];
@@ -127,7 +127,9 @@ if ($_POST['addsuppress'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid
 	if ($found_list) {
 		write_config("Snort pkg: modified Suppress List for {$a_nat[$id]['interface']}.");
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 		snort_reload_config($a_nat[$id]);
 		$savemsg = gettext("An entry to suppress the Alert for 'gen_id {$_POST['gid']}, sig_id {$_POST['sid']}' has been added to Suppress List '{$a_nat[$id]['suppresslistname']}'.");
 	}
@@ -216,7 +218,7 @@ if ($savemsg)
 				<col axis="string">
 			</colgroup>
 			<thead>
-			   <tr>
+			   <tr class="sortableHeaderRowIdentifier">
 				<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
@@ -263,7 +265,7 @@ if ($savemsg)
 
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
-								"<td class=\"listr\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
+								"<td class=\"listr\" style=\"sorttable_customkey:{$sid};\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
 								"<td class=\"listr\" style=\"text-align:center;\">{$protocol}</td>" . 
 								"<td class=\"listr\" style=\"overflow: hidden; text-overflow: ellipsis; text-align:center;\" nowrap><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
 								"<td class=\"listr\" style=\"overflow: hidden; text-overflow: ellipsis; text-align:center;\" nowrap><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 

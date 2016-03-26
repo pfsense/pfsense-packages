@@ -1,7 +1,10 @@
 <?php
 /*
 	ladvd.inc
-        Copyright (C) 2006 Scott Ullrich
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2014 Andrea Tuccia
+	Copyright (C) 2014 Ermal Luçi
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -25,7 +28,6 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require_once("globals.inc");
 require_once("util.inc");
 require_once("functions.inc");
@@ -34,55 +36,61 @@ require_once("pkg-utils.inc");
 function ladvd_resync_config() {
 	global $config;
 
-	conf_mount_rw();
-
-	if (!is_array($config['installedpackages']['ladvd']))
+	if (!is_array($config['installedpackages']['ladvd'])) {
 		return;
-	if (!is_array($config['installedpackages']['ladvd']['config']))
+	}
+	if (!is_array($config['installedpackages']['ladvd']['config'])) {
 		return;
+	}
 
 	$ladvd_conf = &$config['installedpackages']['ladvd']['config'][0];
+	conf_mount_rw();
 
 	/* ladvd is turned off in package settings */
-	if (empty($ladvd_conf['enable']))
+	if (empty($ladvd_conf['enable'])) {
+		if (is_service_running("ladvd")) {
+			 stop_service("ladvd");
+		}
+		unlink_if_exists("/usr/local/etc/rc.d/ladvd.sh");
 		return;
+	}
 
 	$cmdline = "";
 
 	if (!empty($ladvd_conf['autoenable'])) {
-	    $cmdline .= "-a ";
+		$cmdline .= "-a ";
 	}
 
 	if (!empty($ladvd_conf['silent'])) {
-	    $cmdline .= "-s ";
+		$cmdline .= "-s ";
 	}
 
 	if (!empty($ladvd_conf['management'])) {
-	    $cmdline .= "-m " . escapeshellarg(get_real_interface($ladvd_conf['management'])) . " ";
+		$cmdline .= "-m " . escapeshellarg(get_real_interface($ladvd_conf['management'])) . " ";
 	}
 
 	if (!empty($ladvd_conf['location'])) {
-	    $cmdline .= "-l '{$ladvd_conf['location']}' ";
+		$cmdline .= "-l '{$ladvd_conf['location']}' ";
 	}
 
 	if (!empty($ladvd_conf['lldp'])) {
-	    $cmdline .= "-L ";
+		$cmdline .= "-L ";
 	}
 
 	if (!empty($ladvd_conf['cdp'])) {
-	    $cmdline .= "-C ";
+		$cmdline .= "-C ";
 	}
 
 	if (!empty($ladvd_conf['edp'])) {
-	    $cmdline .= "-E ";
+		$cmdline .= "-E ";
 	}
 
 	if (!empty($ladvd_conf['fdp'])) {
-	    $cmdline .= "-F ";
+		$cmdline .= "-F ";
 	}
 
 	if (!empty($ladvd_conf['ndp'])) {
-	    $cmdline .= "-N ";
+		$cmdline .= "-N ";
 	}
 
 	$ifaces = explode(",", $ladvd_conf['iface_array']);
@@ -91,12 +99,17 @@ function ladvd_resync_config() {
 
 	write_rcfile(array(
 		"file" => "ladvd.sh",
-		"start" => "/usr/local/sbin/ladvd $cmdline",
+		"start" => "/usr/local/sbin/ladvd {$cmdline}",
 		"stop" => "/usr/bin/killall -9 ladvd"
 		)
 	);
 
-	restart_service("ladvd");
+	if (is_service_running("ladvd")) {
+		restart_service("ladvd");
+	} else {
+		start_service("ladvd");
+	}
+
 	sleep(1);
 	conf_mount_ro();
 }

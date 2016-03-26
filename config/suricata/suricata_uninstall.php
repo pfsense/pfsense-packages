@@ -44,9 +44,12 @@ global $config, $g;
 
 $suricatadir = SURICATADIR;
 $suricatalogdir = SURICATALOGDIR;
+$sidmodspath = SURICATA_SID_MODS_PATH;
+$iprep_path = SURICATA_IPREP_PATH;
 $rcdir = RCFILEPREFIX;
-$suricata_rules_upd_log = RULES_UPD_LOGFILE;
+$suricata_rules_upd_log = SURICATA_RULES_UPD_LOGFILE;
 $suri_pf_table = SURICATA_PF_TABLE;
+$mounted_rw = FALSE;
 
 log_error(gettext("[Suricata] Suricata package uninstall in progress..."));
 
@@ -58,7 +61,7 @@ killbyname("suricata");
 sleep(1);
 
 // Delete any leftover suricata PID files in /var/run
-array_map('@unlink', glob("/var/run/suricata_*.pid"));
+unlink_if_exists("{$g['varrun_path']}/suricata_*.pid");
 
 /* Make sure all active Barnyard2 processes are terminated */
 /* Log a message only if a running process is detected     */
@@ -68,26 +71,35 @@ killbyname("barnyard2");
 sleep(1);
 
 // Delete any leftover barnyard2 PID files in /var/run
-array_map('@unlink', glob("/var/run/barnyard2_*.pid"));
-
-/* Remove the suricata user and group */
-mwexec('/usr/sbin/pw userdel suricata; /usr/sbin/pw groupdel suricata', true);
+unlink_if_exists("{$g['varrun_path']}/barnyard2_*.pid");
 
 /* Remove the Suricata cron jobs. */
-install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/www/suricata/suricata_check_for_rule_updates.php", false);
-install_cron_job("/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/suricata/suricata_check_cron_misc.inc", false);
-install_cron_job("pfctl -t {$suri_pf_table} -T expire" , false);
+install_cron_job("suricata_check_for_rule_updates.php", false);
+install_cron_job("suricata_check_cron_misc.inc", false);
+install_cron_job("{$suri_pf_table}" , false);
+install_cron_job("suricata_geoipupdate.php" , false);
+install_cron_job("suricata_etiqrisk_update.php", false);
 
 /* See if we are to keep Suricata log files on uninstall */
 if ($config['installedpackages']['suricata']['config'][0]['clearlogs'] == 'on') {
 	log_error(gettext("[Suricata] Clearing all Suricata-related log files..."));
-	@unlink("{$suricata_rules_upd_log}");
-	mwexec("/bin/rm -rf {$suricatalogdir}");
+	unlink_if_exists("{$suricata_rules_upd_log}");
+	rmdir_recursive("{$suricatalogdir}");
+}
+
+/**************************************************/
+/* If not already, set Suricata conf partition to */
+/* read-write so we can make changes there        */
+/**************************************************/
+if (!is_subsystem_dirty('mount')) {
+	conf_mount_rw();
+	$mounted_rw = TRUE;
 }
 
 /* Remove the Suricata GUI app directories */
-mwexec("/bin/rm -rf /usr/local/pkg/suricata");
-mwexec("/bin/rm -rf /usr/local/www/suricata");
+rmdir_recursive("/usr/local/pkg/suricata");
+rmdir_recursive("/usr/local/www/suricata");
+rmdir_recursive("/usr/local/etc/suricata");
 
 /* Remove our associated Dashboard widget config and files. */
 /* If "save settings" is enabled, then save old widget      */
@@ -108,19 +120,26 @@ if (!empty($widgets)) {
 		}
 	}
 	$config['widgets']['sequence'] = implode(",", $widgetlist);
-	write_config();
 }
-@unlink("/usr/local/www/widgets/include/widget-suricata.inc");
-@unlink("/usr/local/www/widgets/widgets/suricata_alerts.widget.php");
-@unlink("/usr/local/www/widgets/javascript/suricata_alerts.js");
+unlink_if_exists("/usr/local/www/widgets/include/widget-suricata.inc");
+unlink_if_exists("/usr/local/www/widgets/widgets/suricata_alerts.widget.php");
+unlink_if_exists("/usr/local/www/widgets/javascript/suricata_alerts.js");
+
+/*******************************************************/
+/* We're finished with conf partition mods, return to  */
+/* read-only if we changed it                          */
+/*******************************************************/
+if ($mounted_rw == TRUE)
+	conf_mount_ro();
 
 /* Keep this as a last step */
 if ($config['installedpackages']['suricata']['config'][0]['forcekeepsettings'] != 'on') {
 	log_error(gettext("Not saving settings... all Suricata configuration info and logs deleted..."));
 	unset($config['installedpackages']['suricata']);
 	unset($config['installedpackages']['suricatasync']);
-	@unlink("{$suricata_rules_upd_log}");
-	mwexec("/bin/rm -rf {$suricatalogdir}");
+	unlink_if_exists("{$suricata_rules_upd_log}");
+	rmdir_recursive("{$suricatalogdir}");
+	rmdir_recursive("{$g['vardb_path']}/suricata");
 	log_error(gettext("[Suricata] The package has been removed from this system..."));
 }
 

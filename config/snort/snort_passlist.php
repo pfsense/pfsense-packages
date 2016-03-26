@@ -86,7 +86,9 @@ if ($_POST['del'] && is_numericint($_POST['list_id'])) {
 		if (!$input_errors) {
 			unset($a_passlist[$_POST['list_id']]);
 			write_config("Snort pkg: deleted PASS LIST.");
+			conf_mount_rw();
 			sync_snort_package_config();
+			conf_mount_ro();
 			header("Location: /snort/snort_passlist.php");
 			exit;
 		}
@@ -125,7 +127,9 @@ if ($savemsg) {
         $tab_array[5] = array(gettext("Pass Lists"), true, "/snort/snort_passlist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array, true);
 ?>
 	</td>
@@ -193,7 +197,8 @@ if ($savemsg) {
 	<p><?php echo gettext("1. Here you can create Pass List files for your Snort package rules.  Hosts on a Pass List are never blocked by Snort."); ?><br/>
 	<?php echo gettext("2. Add all the IP addresses or networks (in CIDR notation) you want to protect against Snort block decisions."); ?><br/>
 	<?php echo gettext("3. The default Pass List includes the WAN IP and gateway, defined DNS servers, VPNs and locally-attached networks."); ?><br/>
-	<?php echo gettext("4. Be careful, it is very easy to get locked out of your system by altering the default settings."); ?></p></span></td>
+	<?php echo gettext("4. Be careful, it is very easy to get locked out of your system by altering the default settings."); ?><br/>
+	<?php echo gettext("5. To use a custom Pass List on an interface, you must manually assign the list using the drop-down control on the Interface Settings tab."); ?></p></span></td>
 	</tr>
 	<tr>
 	<td width="100%"><span class="vexpl"><?php echo gettext("Remember you must restart Snort on the interface for changes to take effect!"); ?></span></td>

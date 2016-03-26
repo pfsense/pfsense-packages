@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	olsrd.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<name>olsrd</name>
+	<version>1.0.4</version>
+	<title>Services: OLSRD Settings</title>
+	<include_file>/usr/local/pkg/olsrd.inc</include_file>
+	<menu>
+		<name>OLSRD</name>
+		<section>Services</section>
+		<configfile>olsrd.xml</configfile>
+		<url>/pkg_edit.php?xml=olsrd.xml</url>
+	</menu>
+	<service>
+		<name>olsrd</name>
+		<rcfile>olsrd.sh</rcfile>
+		<executable>olsrd</executable>
+		<description>Optimized Link State Routing Protocol Daemon</description>
+	</service>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<item>https://packages.pfsense.org/packages/config/olsrd/olsrd.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/olsrd/olsrd.priv.inc</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<name>Service Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable OLSR</fielddescr>
+			<fieldname>enable</fieldname>
+			<description>Enables the dynamic mesh linking daemon.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Secure Mode</fielddescr>
+			<fieldname>enabledsecure</fieldname>
+			<description>Enables the secure mode.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Key</fielddescr>
+			<fieldname>securekey</fieldname>
+			<description>Paste the secure key information here.</description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+		</field>
+		<field>
+			<name>General Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Link Quality Level</fielddescr>
+			<fieldname>enablelqe</fieldname>
+			<type>select</type>
+			<size>1</size>
+			<options>
+				<option><value>2</value><name>2</name></option>
+				<option><value>0</value><name>0</name></option>
+				<option><value>1</value><name>1</name></option>
+			</options>
+			<default_value>2</default_value>
+		</field>
+		<field>
+			<fielddescr>Interfaces</fielddescr>
+			<fieldname>iface_array</fieldname>
+			<value>lan</value>
+			<multiple>true</multiple>
+			<size>3</size>
+			<type>interfaces_selection</type>
+			<description>Select the interfaces that OLSR will bind to. You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+		</field>
+		<field>
+			<fielddescr>Enable HTTPInfo Plugin</fielddescr>
+			<fieldname>enablehttpinfo</fieldname>
+			<description>Enables the OLSR stats web server.</description>
+			<type>checkbox</type>
+			<enablefields>port,allowedhttpinfohost,allowedhttpinfosubnet</enablefields>
+		</field>
+		<field>
+			<fielddescr>HTTPInfo Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Port that HTTPInfo will listen on.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Allowed Host(s) IP Address/Subnet</fielddescr>
+			<fieldname>allowedhttpinfohost</fieldname>
+			<description>IP(s) that are allowed to access the HTTPInfo web service.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Allowed Host(s) Netmask</fielddescr>
+			<fieldname>allowedhttpinfosubnet</fieldname>
+			<description>Enter the subnet mask in long form (e.g. 255.255.255.0)</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Announce Self as Dynamic Gateway</fielddescr>
+			<fieldname>enableannounce</fieldname>
+			<description>Enables the OLSR Dynamic Gateways Announcing feature.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Announce Dynamic Local Route</fielddescr>
+			<fieldname>announcedynamicroute</fieldname>
+			<description>Enter the IP/Netmask.</description>
+			<type>textarea</type>
+			<rows>3</rows>
+			<cols>50</cols>
+		</field>
+		<!-- Disabled since the required plugin is missing in the package -->
+		<!--
+		<field>
+			<name>Dynamic Gateway</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable Dynamic Gateway</fielddescr>
+			<fieldname>enabledyngw</fieldname>
+			<description>Enables the OLSR Dynamic Gateways feature.</description>
+			<type>checkbox</type>
+			<enablefields>ping,polling</enablefields>
+		</field>
+		<field>
+			<fielddescr>Ping IP Address</fielddescr>
+			<fieldname>ping</fieldname>
+			<description>Pings this IPv4 address to ensure connectivity.</description>
+			<type>input</type>
+			<default_value>5</default_value>
+		</field>
+		<field>
+			<fielddescr>Poll Interval</fielddescr>
+			<fieldname>polling</fieldname>
+			<description>How often to look for an inet GW (in seconds).</description>
+			<type>input</type>
+			<default_value>5</default_value>
+		</field>
+		-->
+	</fields>
+	<custom_php_deinstall_command>
+		php_deinstall_olsrd();
+	</custom_php_deinstall_command>
+	<custom_php_resync_config_command>
+		setup_wireless_olsr($if);
+	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+		validate_form_olsrd($_POST, $input_errors);
+	</custom_php_validation_command>
+</packagegui>

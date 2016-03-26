@@ -2,51 +2,46 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    nut.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	nut.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009-2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>nut</name>
-	<version>2.6.4 pkg 2.0</version>
+	<version>2.1.2</version>
 	<title>Services: NUT</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/status_nut.php</aftersaveredirect>
@@ -70,20 +65,35 @@
 		</tab>
 		<tab>
 			<text>NUT Settings</text>
-			<url>/pkg_edit.php?xml=nut.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=nut.xml</url>
 			<active/>
 		</tab>
 	</tabs>
 	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/usr/local/pkg/</prefix>
 		<item>https://packages.pfsense.org/packages/config/nut/nut.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-	    <prefix>/usr/local/www/</prefix>
-	    <chmod>0755</chmod>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nut/nut.priv.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
 		<item>https://packages.pfsense.org/packages/config/nut/status_nut.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nut/ups_status.widget.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/javascript/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nut/ups_status.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/widgets/include/</prefix>
+		<item>https://packages.pfsense.org/packages/config/nut/ups_status.inc</item>
+	</additional_files_needed>
+	<advanced_options>enabled</advanced_options>
 	<fields>
 		<field>
 			<name>General Settings</name>
@@ -119,6 +129,42 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>ups.conf options</fielddescr>
+			<fieldname>custom_upsconf</fieldname>
+			<description>Write there any custom options for ups.conf. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>upsd.conf options</fielddescr>
+			<fieldname>custom_upsdconf</fieldname>
+			<description>Write there any custom options for upsd.conf. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>upsd.users options</fielddescr>
+			<fieldname>custom_upsdusers</fieldname>
+			<description>Write there any custom options for upsd.users. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>upsmon.conf options</fielddescr>
+			<fieldname>custom_upsmonconf</fieldname>
+			<description>Write there any custom options for upsmon.conf. All options must be separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
+		</field>		
+		<field>
 			<name>Remote Access Settings - Used for Local and SNMP Types to allow access</name>
 			<type>listtopic</type>
 		</field>
@@ -150,8 +196,7 @@
 		<field>
 			<fielddescr>&lt;strong&gt;Local UPS Model&lt;/strong&gt;</fielddescr>
 			<fieldname>driver</fieldname>
-			<description>If generic or cable specified in parenthesis you need 
-				to select the appropriate option below.</description>
+			<description>If generic or cable specified in parenthesis you need to select the appropriate option below.</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -646,10 +691,10 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-		before_form_nut(&amp;$pkg);
+		before_form_nut($pkg);
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		validate_form_nut($_POST, &amp;$input_errors);
+		validate_form_nut($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_nut();	

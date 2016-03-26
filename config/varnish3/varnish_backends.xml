@@ -9,7 +9,7 @@
     varnish_backends.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011-2013 Marcello Coutinho
+    Copyright (C) 2011-2014 Marcello Coutinho
     All rights reserved.                                                      
 /*/
 /* ========================================================================== */
@@ -293,18 +293,15 @@
 		varnish_install();
 	</custom_php_install_command>
 	<custom_php_command_before_form>
+		varnish_check_config();
 	</custom_php_command_before_form>
 	<custom_delete_php_command>
 		sync_package_varnish();
-		create_varnish_rcd_file();
-		varnish_start();
 	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
-		create_varnish_rcd_file();
-		varnish_start();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		varnish_backends_post_validate($_POST, &amp;$input_errors);
+		varnish_backends_post_validate($_POST, $input_errors);
 	</custom_php_validation_command>
 </packagegui>

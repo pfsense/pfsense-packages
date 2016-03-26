@@ -5,44 +5,44 @@
 	<copyright>
 	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    postfix_sync.xml
-    part of the Postfix package for pfSense
-    Copyright (C) 2011-2013 Marcello Coutinho
-    All rights reserved.            
-                                                                  */
-/* ========================================================================== */
+	postfix_sync.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2011-2014 Marcello Coutinho
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form MUST reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
 	]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
-	<name>postfix_sync</name>
-	<version>1.0</version>
+	<name>postfixsync</name>
+	<version>2.4.5</version>
 	<title>Services: Postfix relay and antispam</title>
 	<include_file>/usr/local/pkg/postfix.inc</include_file>
 	<menu>
@@ -100,12 +100,12 @@
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Sync method</fielddescr>
+			<fielddescr>Sync Method</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>Automatically sync postfix configuration changes.</description>
 			<type>select</type>
 			<required/>
-			<default_value>auto</default_value>
+			<default_value>disabled</default_value>
 			<options>
 				<option><name>Sync to configured system backup server</name><value>auto</value></option>
 				<option><name>Sync to host(s) defined below</name><value>manual</value></option>
@@ -113,7 +113,7 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Sync timeout</fielddescr>
+			<fielddescr>Sync Timeout</fielddescr>
 			<fieldname>synctimeout</fieldname>
 			<description>Select sync max wait time</description>
 			<type>select</type>
@@ -128,73 +128,89 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr><![CDATA[Remote Server]]></fielddescr>
+			<fielddescr>Remote Server</fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<dontdisplayname/>
 			<usecolspan2/>
 			<rowhelper>
-			<rowhelperfield>
-				<fielddescr>Enable</fielddescr>
-				<fieldname>enabless</fieldname>
-				<type>checkbox</type>
-			</rowhelperfield>
-			<rowhelperfield>
-			<fielddescr>Sync Type  </fielddescr>
-			<fieldname>sync_type</fieldname>
-			<type>select</type>
-			<options>
-				<option><name>XMLRPC Sync</name><value>xmlrpc</value></option>
-				<option><name>Share Database To</name><value>share</value></option>
-				<option><name>Fetch Database From</name><value>fetch</value></option>
-				<option><name>Disabled</name><value>disabled</value></option>
-			</options>
-		</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Remote Server IP</fielddescr>
-				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
-				<type>input</type>
-				<size>10</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Username</fielddescr>
-				<fieldname>username</fieldname>
-				<description>Username for remote server.</description>
-				<type>input</type>
-				<size>10</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Password</fielddescr>
-				<fieldname>password</fieldname>
-				<description>Password for remote server.</description>
-				<type>password</type>
-				<size>10</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Description</fielddescr>
-				<fieldname>description</fieldname>
-				<type>input</type>
-				<size>27</size>
-			</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Enable</fielddescr>
+					<fieldname>enabless</fieldname>
+					<type>checkbox</type>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Sync Type</fielddescr>
+					<fieldname>sync_type</fieldname>
+					<type>select</type>
+					<options>
+						<option><name>XMLRPC Sync</name><value>xmlrpc</value></option>
+						<option><name>Share Database To</name><value>share</value></option>
+						<option><name>Fetch Database From</name><value>fetch</value></option>
+						<option><name>Disabled</name><value>disabled</value></option>
+					</options>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Protocol</fielddescr>
+					<fieldname>syncprotocol</fieldname>
+					<description>Choose the protocol used to sync with the destination host (HTTP or HTTPS).</description>
+					<type>select</type>
+					<default_value>HTTP</default_value>
+					<options>
+						<option><name>HTTP</name><value>http</value></option>
+						<option><name>HTTPS</name><value>https</value></option>
+					</options>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Remote Server IP/Hostname</fielddescr>
+					<fieldname>ipaddress</fieldname>
+					<description>IP address or hostname of remote server</description>
+					<type>input</type>
+					<size>30</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Port</fielddescr>
+					<fieldname>syncport</fieldname>
+					<description>Choose the sync port of the remote server.</description>
+					<type>input</type>
+					<size>5</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Username</fielddescr>
+					<fieldname>username</fieldname>
+					<description>Username for remote server.</description>
+					<type>input</type>
+					<size>20</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Password</fielddescr>
+					<fieldname>password</fieldname>
+					<description>Password for remote server.</description>
+					<type>password</type>
+					<size>20</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Description</fielddescr>
+					<fieldname>description</fieldname>
+					<type>input</type>
+					<size>30</size>
+				</rowhelperfield>
 			</rowhelper>
-			<description><![CDATA[<br>Sync types Description:<br><br>
-								<strong>XMLRPC Sync</strong> - Forward postfix settings to other pfsense boxes. Remote password required<br>
-								<strong>Share Database To</strong> - Allow other pfsense boxes to fetch maillog data via xml. Remote password NOT required.<br>
-								<strong>Fetch Database From</strong> - Merge logs from other pfsense boxes to this local database. Remote password required.<br>
-								<strong>Disabled</strong> - Ignore this host while sync.<br><br>
-								While sharing databases works only when you select 'Sync to host(s) defined below' on sync method and you must setup 'Share Database To' in source box and 'Fetch Database From' on destination box.]]></description>
+			<description>
+			<![CDATA[
+				<br/>Sync types Description:<br/><br/>
+				<strong>XMLRPC Sync</strong> - Forward postfix settings to other pfSense boxes. Remote password required.<br/>
+				<strong>Share Database To</strong> - Allow other pfSense boxes to fetch maillog data via XMLRPC. Remote password NOT required.<br/>
+				<strong>Fetch Database From</strong> - Merge logs from other pfSense boxes to this local database. Remote password required.<br/>
+				<strong>Disabled</strong> - Ignore this host while syncing.<br/><br/>
+				Sharing databases works only when you select 'Sync to host(s) defined below' sync method; you must setup 'Share Database To' in source box and 'Fetch Database From' on destination box.
+				]]>
+			</description>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		postfix_php_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		postfix_php_deinstall_command();
-	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		postfix_validate_input($_POST, &amp;$input_errors);
-	</custom_php_validation_command>	
+		postfix_validate_input($_POST, $input_errors);
+	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_postfix();
 	</custom_php_resync_config_command>

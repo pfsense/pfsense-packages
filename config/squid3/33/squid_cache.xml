@@ -280,14 +280,14 @@
 		<field>
 			<fielddescr>Refresh Patterns</fielddescr>
 			<fieldname>refresh_patterns</fieldname>
-			<description><![CDATA[With dynamic cache enabled, you can also apply squid wiki refresh_patterns to sites like <a target=_new href='http://wiki.squid-cache.org/ConfigExamples/DynamicContent/YouTube'>Youtube</a> and <a target=_new href='http://wiki.squid-cache.org/SquidFaq/WindowsUpdate'>windowsupdate</a><br>
+			<description><![CDATA[With dynamic cache enabled, you can also apply squid wiki refresh_patterns to sites like <a target=_new href='http://wiki.squid-cache.org/SquidFaq/WindowsUpdate'>windowsupdate</a><br>
 			<br><strong>Notes:</strong><br>
 			Squid wiki suggests 'Finish transfer if less than x KB remaining' on 'traffic mgmt' squid tab to -1 but you can apply your own values to control cache.<br><br>
 			set Maximum download size on 'traffic mgmt' squid tab to a value that fits patterns your are applying.<br>Microsoft may need 200Mb and youtube 4GB.]]></description>
 			<type>select</type>
 			<default_value>none</default_value>
 			<options>
-				<option><name>Youtube</name><value>youtube</value></option>
+				<!--<option><name>Youtube</name><value>youtube</value></option>-->
 				<option><name>Windows Update</name><value>windows</value></option>
 				<option><name>Symantec Antivirus</name><value>symantec</value></option>
 				<option><name>Avira</name><value>avira</value></option>
@@ -312,7 +312,7 @@
 		}
 	</custom_php_command_before_form>
 	<custom_php_validation_command>
-		squid_validate_cache($_POST, &amp;$input_errors);
+		squid_validate_cache($_POST, $input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();

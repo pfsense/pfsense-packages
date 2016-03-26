@@ -1,8 +1,9 @@
 <?php
 /*
 	sudo.inc
-
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2013 Jim Pingle (jpingle@gmail.com)
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,21 +29,35 @@
 */
 require_once("config.inc");
 
-$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+global $pfs_version;
+$pfs_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
 switch ($pfs_version) {
-	case "1.2":
-	case "2.0":
+	case "2.1":
+		/* Hackish way to detect if someone manually did pkg_add rather than use pbi. */
+		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
+			define('SUDO_BASE', '/usr/pbi/sudo-' . php_uname("m"));
+			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/');
+		} else {
+			define('SUDO_BASE', '/usr/local');
+			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
+		}
+		break;
+	case "2.2":
 		define('SUDO_BASE','/usr/local');
+		/* Hackish way to detect if someone manually did pkg_add rather than use pbi. */
+		if (is_dir('/usr/pbi/sudo-' . php_uname("m"))) {
+			define('SUDO_LIBEXEC_DIR', '/usr/pbi/sudo-' . php_uname("m") . '/local/libexec/sudo');
+		} else {
+			define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
+		}
 		break;
 	default:
-		// Hackish way to detect if someone manually did pkg_add rather than use pbi.
-		if (is_dir('/usr/pbi/sudo-' . php_uname("m")))
-			define('SUDO_BASE', '/usr/pbi/sudo-' . php_uname("m"));
-		else
-			define('SUDO_BASE','/usr/local');
+		define('SUDO_BASE','/usr/local');
+		define('SUDO_LIBEXEC_DIR', '/usr/local/libexec/sudo');
 }
 
 define('SUDO_CONFIG_DIR', SUDO_BASE . '/etc');
+define('SUDO_CONF', SUDO_CONFIG_DIR . '/sudo.conf');
 define('SUDO_SUDOERS', SUDO_CONFIG_DIR . '/sudoers');
 
 function sudo_install() {
@@ -51,17 +66,17 @@ function sudo_install() {
 	if (!is_array($config['installedpackages']['sudo']['config'][0]['row'])) {
 		$config['installedpackages']['sudo']['config'][0]['row'] = array(
 			0 => array(
-				"username" => "user:root", 
+				"username" => "user:root",
 				"runas" => "user:root",
 				"cmdlist" => "ALL"
 			),
 			1 => array(
-				"username" => "user:admin", 
+				"username" => "user:admin",
 				"runas" => "user:root",
 				"cmdlist" => "ALL"
 			),
 			2 => array(
-				"username" => "group:admins", 
+				"username" => "group:admins",
 				"runas" => "user:root",
 				"cmdlist" => "ALL"
 			)
@@ -70,9 +85,18 @@ function sudo_install() {
 }
 
 function sudo_write_config() {
-	global $config;
+	global $config, $pfs_version;
 	$sudoers = "";
+	if ($pfs_version == "2.2") {
+		mwexec_bg("/sbin/ldconfig -m /usr/pbi/sudo-" . php_uname("m") . "/local/lib/");
+	}
 	conf_mount_rw();
+
+	$sudoconf = "Plugin sudoers_policy " . SUDO_LIBEXEC_DIR . "/sudoers.so\n";
+	$sudoconf .= "Plugin sudoers_io " . SUDO_LIBEXEC_DIR . "/sudoers.so\n";
+	$sudoconf .= "Path noexec " . SUDO_LIBEXEC_DIR . "/sudo_noexec.so\n";
+	file_put_contents(SUDO_CONF, $sudoconf);
+
 	if (!is_array($config['installedpackages']['sudo']['config'][0]['row'])) {
 		/* No config, wipe sudoers file and bail. */
 		unlink(SUDO_SUDOERS);
@@ -109,16 +133,19 @@ function sudo_write_config() {
 	conf_mount_ro();
 }
 
-/* Get a list of users and groups in a format we can use to make proper sudoers entries.
+/*
+Get a list of users and groups in a format we can use to make proper sudoers entries.
 Optionally include "ALL" as a user (for use by the Run As list)
  */
 function sudo_get_users($list_all_user = false) {
 	global $config;
-	if (!is_array($config['system']['user'])) 
+	if (!is_array($config['system']['user'])) {
 		$config['system']['user'] = array();
+	}
 	$a_user = &$config['system']['user'];
-	if (!is_array($config['system']['group']))
+	if (!is_array($config['system']['group'])) {
 		$config['system']['group'] = array();
+	}
 	$a_group = &$config['system']['group'];
 	$users = array();
 
@@ -151,8 +178,9 @@ function sudo_get_users($list_all_user = false) {
 
 	foreach ($a_group as $group) {
 		/* The "all" group is internal and doesn't make sense to use here. */
-		if ($group['name'] == "all")
+		if ($group['name'] == "all") {
 			continue;
+		}
 		$tmpgroup = array();
 		$tmpgroup["name"] = "group:{$group['name']}";
 		$tmpgroup["descr"] = "Group: {$group['name']}";
@@ -162,20 +190,23 @@ function sudo_get_users($list_all_user = false) {
 	return $users;
 }
 
-/* Make sure commands passed in are valid executables to help ensure a valid sudoers file and expected behavior.
-   This also forces the user to give full paths to executables, which they should be doing anyhow.
+/*
+Make sure commands passed in are valid executables to help ensure a valid sudoers file and expected behavior.
+This also forces the user to give full paths to executables, which they should be doing anyhow.
  */
 function sudo_validate_commands(&$input_errors) {
 	$idx = 0;
-	while(isset($_POST["cmdlist{$idx}"])) {
+	while (isset($_POST["cmdlist{$idx}"])) {
 		$commands = $_POST["cmdlist" . $idx++];
-		if (strtoupper($commands) == "ALL")
+		if (strtoupper($commands) == "ALL") {
 			continue;
+		}
 		$commands = explode(",", $commands);
 		foreach ($commands as $command) {
 			list($cmd, $params) = explode(" ", trim($command), 2);
-			if (!is_executable($cmd))
+			if (!is_executable($cmd)) {
 				$input_errors[] = htmlspecialchars($cmd) . " is not an executable command.";
+			}
 		}
 	}
 }

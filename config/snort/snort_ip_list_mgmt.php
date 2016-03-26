@@ -43,7 +43,7 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
 
 // Hard-code the path where IP Lists are stored
 // and disregard any user-supplied path element.
-$iprep_path = IPREP_PATH;
+$iprep_path = SNORT_IPREP_PATH;
 
 // Set default to not show IP List editor controls
 $iplist_edit_style = "display: none;";
@@ -152,6 +152,7 @@ if ($savemsg)
 <input type="hidden" name="MAX_FILE_SIZE" value="100000000" />
 <input type="hidden" name="iplist_fname" id="iplist_fname" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
         $tab_array = array();
@@ -163,26 +164,26 @@ if ($savemsg)
 	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
         $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
         $tab_array[7] = array(gettext("IP Lists"), true, "/snort/snort_ip_list_mgmt.php");
-        $tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
         display_top_tabs($tab_array, true);
 ?>
 </td>
 </tr>
-<tbody id="uploader" style="display: none;" class="tabcont">
-	<tr>
-		<td colspan="4" class="list"><br/><?php echo gettext("Click BROWSE to select a file to import, and then click UPLOAD.  Click CLOSE to quit."); ?></td>
-	</tr>
-	<tr>
-		<td colspan="4" class="list"><input type="file" name="iprep_fileup" id="iprep_fileup" class="formfld file" size="50" />
-			&nbsp;&nbsp;<input type="submit" name="upload" id="upload" value="<?=gettext("Upload");?>" 
-			title="<?=gettext("Upload selected IP list to firewall");?>"/>&nbsp;&nbsp;<input type="button" 
-			value="<?=gettext("Close");?>" onClick="document.getElementById('uploader').style.display='none';" /><br/></td>
-		<td class="list"></td>
-	</tr>
-</tbody>
 <tr>
 	<td>
 	<div id="mainarea">
+
+	<?php if ($g['platform'] == "nanobsd") : ?>
+		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tbody>
+			<tr>
+				<td colspan="2" class="listtopic"><?php echo gettext("IP Reputation is not supported on NanoBSD installs"); ?></td>
+			</tr>
+			</tbody>
+		</table>
+	<?php else: ?>
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 			<colgroup>
 				<col style="width: 50%;">
@@ -207,20 +208,32 @@ if ($savemsg)
 			</thead>
 		<?php foreach ($ipfiles as $file): ?>
 			<tr>
-				<td class="listr"><?php echo gettext($file); ?></td>
+				<td class="listr"><?php echo htmlspecialchars(gettext($file)); ?></td>
 				<td class="listr"><?=date('M-d Y g:i a', filemtime("{$iprep_path}{$file}")); ?></td>
 				<td class="listr"><?=format_bytes(filesize("{$iprep_path}{$file}")); ?> </td>
 				<td class="list"><input type="image" name="iplist_edit[]" id="iplist_edit[]" 
-				onClick="document.getElementById('iplist_fname').value='<?=$file;?>';" 
+				onClick="document.getElementById('iplist_fname').value='<?=addslashes($file);?>';"
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" 
 				height="17" border="0" title="<?php echo gettext('Edit this IP List');?>"/>
 				<input type="image" name="iplist_delete[]" id="iplist_delete[]" 
-				onClick="document.getElementById('iplist_fname').value='<?=$file;?>'; 
+				onClick="document.getElementById('iplist_fname').value='<?=addslashes($file);?>';
 				return confirm('<?=gettext("Are you sure you want to permanently delete this IP List file?  Click OK to continue or CANCEL to quit.");?>');" 
 				src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" 
 				height="17" border="0" title="<?php echo gettext('Delete this IP List');?>"/></td>
 			</tr>
 		<?php endforeach; ?>
+			<tbody id="uploader" style="display: none;">
+				<tr>
+					<td colspan="4" class="list"><br/><?php echo gettext("Click BROWSE to select a file to import, and then click UPLOAD.  Click CLOSE to quit."); ?></td>
+				</tr>
+				<tr>
+					<td colspan="4" class="list"><input type="file" name="iprep_fileup" id="iprep_fileup" class="formfld file" size="50" />
+					&nbsp;&nbsp;<input type="submit" name="upload" id="upload" value="<?=gettext("Upload");?>" 
+					title="<?=gettext("Upload selected IP list to firewall");?>"/>&nbsp;&nbsp;<input type="button" 
+					value="<?=gettext("Close");?>" onClick="document.getElementById('uploader').style.display='none';" /><br/></td>
+					<td colspan="4" class="list"></td>
+				</tr>
+			</tbody>
 			<tbody id="iplist_editor" style="<?=$iplist_edit_style;?>">
 			<tr>
 				<td colspan="4">&nbsp;</td>
@@ -265,9 +278,11 @@ if ($savemsg)
 				<td class="list"></td>
 			</tr>
 		</table>
+	<?php endif; ?>
 	</div>
 	</td>
 </tr>
+</tbody>
 </table>
 </form>
 <?php include("fend.inc"); ?>

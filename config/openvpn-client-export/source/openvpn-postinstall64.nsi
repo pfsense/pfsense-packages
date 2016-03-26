@@ -38,7 +38,7 @@ Var /GLOBAL mui.FinishPage.Run
 !define WELCOME_TITLE 'Welcome to OpenVPN installer.'
 
 !define WELCOME_TEXT "This wizard will guide you through the installation of the OpenVPN client and configuration.$\r$\n$\r$\n\
-This wil automaticaly install the configuration files needed for your connection. \
+This will automatically install the configuration files needed for your connection. \
 And if needed install the required DotNet2 framework."
   !define MUI_WELCOMEPAGE_TITLE '${WELCOME_TITLE}'
   ;!define MUI_WELCOMEPAGE_TITLE_3LINES

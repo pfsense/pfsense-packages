@@ -69,7 +69,6 @@ function migrate_old_sync_config(){
 }
 function haproxy_custom_php_install_command() {
 	global $g, $config;
-	conf_mount_rw();
 
 	$haproxy = <<<EOD
 #!/bin/sh
@@ -81,7 +80,7 @@ function haproxy_custom_php_install_command() {
 . /etc/rc.subr
 
 name="haproxy"
-rcvar=`set_rcvar`
+rcvar="\${name}_enable"
 command="/usr/local/bin/haproxy"
 haproxy_enable=\${haproxy-"YES"}
 
@@ -118,7 +117,6 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 	migrate_old_sync_config();
-	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
 }
@@ -347,8 +345,8 @@ function haproxy_sync_on_changes() {
 					}
 				break;
 			case "auto":
-					if (is_array($config['installedpackages']['carpsettings']) && is_array($config['installedpackages']['carpsettings']['config'])){
-						$system_carp=$config['installedpackages']['carpsettings']['config'][0];
+					if (is_array($config['hasync'])) {
+						$system_carp = $config['hasync'];
 						$rs[0]['ipaddress']=$system_carp['synchronizetoip'];
 						$rs[0]['username']=$system_carp['username'];
 						$rs[0]['password']=$system_carp['password'];
