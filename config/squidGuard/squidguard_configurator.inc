@@ -1995,8 +1995,7 @@ function squidguard_ramdisk($enable)
         # create temp ramdisk
         # size 300Mb very nice for work with Archive < 30Mb
         # this is size use physical RAM + Swap file
-        if (!file_exists(SQUIDGUARD_TMP))
-            mkdir(SQUIDGUARD_TMP);
+        safe_mkdir(SQUIDGUARD_TMP);
         mwexec("/sbin/mdmfs -s {$ramsize}M md15 " . SQUIDGUARD_TMP);
         mwexec("chmod 1777 " . SQUIDGUARD_TMP);
     }
