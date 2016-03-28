@@ -9,7 +9,7 @@
 	pfBlockerNG.xml
 
 	pfBlockerNG
-	Copyright (c) 2015 BBcan177@gmail.com
+	Copyright (c) 2015-2016 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfblocker for pfSense
@@ -48,7 +48,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>pfblockerng</name>
-	<version>2.0.4</version>
+	<version>2.0.5</version>
 	<title>pfBlockerNG: General Settings</title>
 	<include_file>/usr/local/pkg/pfblockerng/pfblockerng.inc</include_file>
 	<addedit_string>pfBlockerNG: Save General Settings</addedit_string>
@@ -386,12 +386,13 @@
 		<field>
 			<fielddescr>Max daily download failure threshold</fielddescr>
 			<fieldname>skipfeed</fieldname>
-			<description><![CDATA[Default: <strong>0</strong> (Disabled)<br />
-				Select max daily download failure threshold via CRON. Clear widget 'failed downloads' to reset.]]>
+			<description><![CDATA[Default: <strong>No limit</strong><br />
+				Select max daily download failure threshold via CRON. Clear widget 'failed downloads' to reset.<br />
+				On a download failure, the previously downloaded list is reloaded.]]>
 			</description>
 			<type>select</type>
 			<options>
-				<option><name>0</name><value>0</value></option>
+				<option><name>No limit</name><value>0</value></option>
 				<option><name>1</name><value>1</value></option>
 				<option><name>2</name><value>2</value></option>
 				<option><name>3</name><value>3</value></option>
@@ -400,15 +401,6 @@
 				<option><name>6</name><value>6</value></option>
 			</options>
 			<default_value>0</default_value>
-		</field>
-		<field>
-			<fielddescr>Restore previous download on failure</fielddescr>
-			<fieldname>restore_feed</fieldname>
-			<type>checkbox</type>
-			<description><![CDATA[Default: <strong>Enabled</strong><br />
-				When 'selected', on a download failure, the previously downloaded list is restored.]]>
-			</description> 
-			<default_value>on</default_value>
 		</field>
 		<field>
 			<fielddescr>Logfile Size</fielddescr>

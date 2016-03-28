@@ -3,7 +3,7 @@
 	pfBlockerNG.php
 
 	pfBlockerNG
-	Copyright (c) 2015 BBcan177@gmail.com
+	Copyright (c) 2015-2016 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfBlocker by
@@ -142,31 +142,26 @@ function pfb_update_check($header, $list_url, $pfbfolder, $pfborig, $pflex, $for
 	pfb_logger("{$log}", 1);
 	$pfb['cron_update'] = FALSE;
 
-	// Determine if previous download fails have exceeded threshold.
-	if ($pfb['restore'] == 'on') {
-		if ($pfb['skipfeed'] != 0) {
-			// Call function to get all previous download fails
-			pfb_failures();
+	// Call function to get all previous download fails
+	pfb_failures();
 
-			if ($pfb['failed'][$header] >= $pfb['skipfeed']) {
-				$log = "  Max daily download failure attempts exceeded. Clear widget 'failed downloads' to reset.\n\n";
-				pfb_logger("{$log}", 1);
-				unlink_if_exists("{$pfbfolder}/{$header}.fail");
-				return;
-			}
-		}
-
-		// Attempt download, when a previous 'fail' file marker is found.
-		if (file_exists("{$pfbfolder}/{$header}.fail")) {
-			$log = "\t\t\tPrevious download failed.\tRe-attempt download\n";
+	if ($pfb['skipfeed'] != 0) {
+		// Determine if previous download fails have exceeded threshold. ('0' no download failure threshold)
+		if ($pfb['failed'][$header] >= $pfb['skipfeed']) {
+			$log = "  Max daily download failure attempts exceeded. Clear widget 'failed downloads' to reset.\n\n";
 			pfb_logger("{$log}", 1);
-			$pfb['update_cron'] = TRUE;
-			unlink_if_exists("{$pfbfolder}/{$header}.txt");
+			unlink_if_exists("{$pfbfolder}/{$header}.fail");
 			return;
 		}
 	}
-	else {
-		unlink_if_exists("{$pfbfolder}/{$header}.fail");
+
+	// Attempt download, when a previous 'fail' file marker is found.
+	if (file_exists("{$pfbfolder}/{$header}.fail")) {
+		$log = "\t\t\tPrevious download failed.\tRe-attempt download\n";
+		pfb_logger("{$log}", 1);
+		$pfb['update_cron'] = TRUE;
+		unlink_if_exists("{$pfbfolder}/{$header}.txt");
+		return;
 	}
 
 	// Check if List file doesn't exist or Format is 'whois'.
@@ -692,7 +687,7 @@ $xml = <<<EOF
 	pfblockerng_{$cont_name}.xml
 
 	pfBlockerNG
-	Copyright (C) 2015 BBcan177@gmail.com
+	Copyright (C) 2015-2016 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfblocker for pfSense
@@ -969,26 +964,32 @@ $xml .= <<<EOF
 		</field>
 		<field>
 			<type>info</type>
-			<description><![CDATA[<font color='red'>Note: </font>In general, Auto-Rules are created as follows:<br />
-				<ul>Inbound &emsp;- 'any' port, 'any' protocol and 'any' destination<br />
-				Outbound - 'any' port, 'any' protocol and 'any' destination address in the lists</ul>
-				Configuring the Adv. Inbound Rule settings, will allow for more customization of the Inbound Auto-Rules.<br />
-				<strong>Select the pfSense 'Port' and/or 'Destination' Alias below:</strong>]]>
+			<description><![CDATA[<font color='red'>Note: </font>&emsp;In general, Auto-Rules are created as follows:<br />
+				<ul>Inbound &emsp;- 'any' port, 'any' protocol, 'any' destination and 'any' gateway</ul>
+				Configuring the Adv. Inbound Rule settings, will allow for more customization of the Inbound Auto-Rules.]]>
 			</description>
 		</field>
 		<field>
-			<fieldname>autoports</fieldname>
-			<fielddescr>Enable Custom Port</fielddescr>
+			<fielddescr>Invert Source</fielddescr>
+			<fieldname>autoaddrnot_in</fieldname>
+			<description><![CDATA[<strong>Invert</strong> - Option to invert the sense of the match.
+				ie - Not (!) Source Address(es)]]>
+			</description>
 			<type>checkbox</type>
-			<enablefields>aliasports</enablefields>
+		</field>
+		<field>
+			<fielddescr>Enable Custom Port</fielddescr>
+			<fieldname>autoports_in</fieldname>
+			<type>checkbox</type>
+			<enablefields>aliasports_in</enablefields>
 			<usecolspan2/>
 			<combinefields>begin</combinefields>
 		</field>
 		<field>
 			<fielddescr>Define Alias</fielddescr>
-			<fieldname>aliasports</fieldname>
+			<fieldname>aliasports_in</fieldname>
 			<description><![CDATA[<a href="/firewall_aliases.php?tab=port">Click Here to add/edit Aliases</a>
-				Do not manually enter port numbers. <br />Do not use 'pfB_' in the Port Alias name.]]>
+				Do not manually enter port numbers.<br />Do not use 'pfB_' in the Port Alias name.]]>
 			</description>
 			<size>21</size>
 			<type>aliases</type>
@@ -998,17 +999,17 @@ $xml .= <<<EOF
 			<combinefields>end</combinefields>
 		</field>
 		<field>
-			<fieldname>autodest</fieldname>
 			<fielddescr>Enable Custom Destination</fielddescr>
+			<fieldname>autoaddr_in</fieldname>
 			<type>checkbox</type>
-			<enablefields>aliasdest,autonot</enablefields>
+			<enablefields>aliasaddr_in,autonot_in</enablefields>
 			<usecolspan2/>
 			<combinefields>begin</combinefields>
 		</field>
 		<field>
-			<fieldname>aliasdest</fieldname>
+			<fieldname>aliasaddr_in</fieldname>
 			<description><![CDATA[<a href="/firewall_aliases.php?tab=ip">Click Here to add/edit Aliases</a>
-				Do not manually enter Addresses(es). <br />Do not use 'pfB_' in the 'IP Network Type' Alias name.]]>
+				Do not manually enter Addresses(es).<br />Do not use 'pfB_' in the 'IP Network Type' Alias name.]]>
 			</description>
 			<size>21</size>
 			<type>aliases</type>
@@ -1019,7 +1020,7 @@ $xml .= <<<EOF
 		</field>
 		<field>
 			<fielddescr>Invert</fielddescr>
-			<fieldname>autonot</fieldname>
+			<fieldname>autonot_in</fieldname>
 			<description><![CDATA[<div style="padding-left: 22px;"><strong>Invert</strong> - Option to invert the sense of the match.<br />
 				ie - Not (!) Destination Address(es)</div>]]>
 			</description>
@@ -1030,7 +1031,7 @@ $xml .= <<<EOF
 		</field>
 		<field>
 			<fielddescr>Custom Protocol</fielddescr>
-			<fieldname>autoproto</fieldname>
+			<fieldname>autoproto_in</fieldname>
 			<description><![CDATA[<strong>Default: any</strong><br />Select the Protocol used for Inbound Firewall Rule(s).<br />
 				Do not use 'any' with Adv. Inbound Rules as it will bypass these settings!]]></description>
 			<type>select</type>
@@ -1042,6 +1043,116 @@ $xml .= <<<EOF
 			</options>
 			<size>4</size>
 			<default_value></default_value>
+		</field>
+		<field>
+			<fielddescr>Custom Gateway</fielddescr>
+			<fieldname>agateway_in</fieldname>
+			<description><![CDATA[Select alternate Gateway or keep 'default' setting.]]></description>
+			<size>1</size>
+			<type>select_source</type>
+			<source><![CDATA[\$config['gateways']['gateway_item']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<default_value>default</default_value>
+			<show_disable_value>default</show_disable_value>
+		</field>
+		<field>
+			<name>Advanced Outbound Firewall Rule Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<type>info</type>
+			<description><![CDATA[<font color='red'>Note: </font>&emsp;In general, Auto-Rules are created as follows:<br />
+				<ul>Outbound &emsp;- 'any' port, 'any' protocol, 'any' destination and 'any' gateway</ul>
+				Configuring the Adv. Outbound Rule settings, will allow for more customization of the Outbound Auto-Rules.]]>
+			</description>
+		</field>
+		<field>
+			<fielddescr>Invert Destination</fielddescr>
+			<fieldname>autoaddrnot_out</fieldname>
+			<description><![CDATA[<strong>Invert</strong> - Option to invert the sense of the match.
+				ie - Not (!) Destination Address(es)]]>
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Custom Port</fielddescr>
+			<fieldname>autoports_out</fieldname>
+			<type>checkbox</type>
+			<enablefields>aliasports_out</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fielddescr>Define Alias</fielddescr>
+			<fieldname>aliasports_out</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=port">Click Here to add/edit Aliases</a>
+				Do not manually enter port numbers.<br />Do not use 'pfB_' in the Port Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>port</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fielddescr>Enable Custom Source</fielddescr>
+			<fieldname>autoaddr_out</fieldname>
+			<type>checkbox</type>
+			<enablefields>aliasaddr_out,autonot_out</enablefields>
+			<usecolspan2/>
+			<combinefields>begin</combinefields>
+		</field>
+		<field>
+			<fieldname>aliasaddr_out</fieldname>
+			<description><![CDATA[<a href="/firewall_aliases.php?tab=ip">Click Here to add/edit Aliases</a>
+				Do not manually enter Addresses(es).<br />Do not use 'pfB_' in the 'IP Network Type' Alias name.]]>
+			</description>
+			<size>21</size>
+			<type>aliases</type>
+			<typealiases>network</typealiases>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields/>
+		</field>
+		<field>
+			<fielddescr>Invert</fielddescr>
+			<fieldname>autonot_out</fieldname>
+			<description><![CDATA[<div style="padding-left: 22px;"><strong>Invert</strong> - Option to invert the sense of the match.<br />
+				ie - Not (!) Destination Address(es)</div>]]>
+			</description>
+			<type>checkbox</type>
+			<dontdisplayname/>
+			<usecolspan2/>
+			<combinefields>end</combinefields>
+		</field>
+		<field>
+			<fielddescr>Custom Protocol</fielddescr>
+			<fieldname>autoproto_out</fieldname>
+			<description><![CDATA[<strong>Default: any</strong><br />Select the Protocol used for Outbound Firewall Rule(s).<br />
+				Do not use 'any' with Adv. Outbound Rules as it will bypass these settings!]]></description>
+			<type>select</type>
+			<options>
+				<option><name>any</name><value></value></option>
+				<option><name>TCP</name><value>tcp</value></option>
+				<option><name>UDP</name><value>udp</value></option>
+				<option><name>TCP/UDP</name><value>tcp/udp</value></option>
+			</options>
+			<size>4</size>
+			<default_value></default_value>
+		</field>
+		<field>
+			<fielddescr>Custom Gateway</fielddescr>
+			<fieldname>agateway_out</fieldname>
+			<description><![CDATA[Select alternate Gateway or keep 'default' setting.]]></description>
+			<size>1</size>
+			<type>select_source</type>
+			<source><![CDATA[\$config['gateways']['gateway_item']]]></source>
+			<source_name>name</source_name>
+			<source_value>name</source_value>
+			<default_value>default</default_value>
+			<show_disable_value>default</show_disable_value>
 		</field>
 		<field>
 			<name><![CDATA[<center>Click to SAVE Settings and/or Rule Edits. &emsp; Changes are Applied via CRON or
@@ -1101,7 +1212,7 @@ $xmlrep = <<<EOF
 	pfBlockerNG_Reputation.xml
 
 	pfBlockerNG
-	Copyright (C) 2015 BBcan177@gmail.com
+	Copyright (C) 2015-2016 BBcan177@gmail.com
 	All rights reserved.
 
 	Based upon pfblocker for pfSense
@@ -1384,7 +1495,7 @@ $xmlrep = <<<EOF
 					<ul>https://rules.emergingthreatspro.com/XXXXXXXXXXXXXXXX/reputation/iprepdata.txt.gz</ul>
 					Select the <strong>ET IQRisk'</strong> format. The URL should use the .gz File Type.<br />
 					Enter your "ETPRO" code in URL. Further information can be found @
-					<a target="_blank" href="http://emergingthreats.net/solutions/iqrisk-suite/">ET IQRisk IP Reputation</a><br /><br />
+					<a target="_blank" href="https://www.proofpoint.com/us/solutions/products/threat-intelligence">Proofpoint IQRisk</a><br /><br />
 					To use <strong>'Match'</strong> Lists, Create a new 'Alias' and select one of the <strong>
 					Action 'Match'</strong> Formats and <br />
 					enter the 'Localfile' as: <ul>/var/db/pfblockerng/match/ETMatch.txt</ul>

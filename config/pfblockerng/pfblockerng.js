@@ -1,6 +1,6 @@
 /* pfBlockerNG update engine */
 
-// Part of pfBlockerNG by BBCan177@gmail.com (c) 2015
+// Part of pfBlockerNG by BBCan177@gmail.com (c) 2015-2016
 //
 // Javascript and Integration modifications by J. Nieuwenhuizen
 
