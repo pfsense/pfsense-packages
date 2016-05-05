@@ -2019,6 +2019,12 @@ function squidguard_update_log($msg, $new="")
 # -----------------------------------------------------------------------------
 function squidguard_blacklist_update_start($url_filename)
 {
+    # 0. Validate URL. Is this a real URL?                                                                                                                                         
+    if( !preg_match('/^(?:ht|f)tps*:\/\//', $url_filename) || preg_match('/["\'\s\n\r\(\);]+/', $url_filename) )                                                                   
+    {                                                                                                                                                                              
+        sg_addlog("squidguard_blacklist_update_start", "Error: Bad blacklist URL.", SQUIDGUARD_ERROR);                                                                             
+        return false;                                                                                                                                                              
+    }
     # 1. if started - calncel
     if (squidguard_blacklist_update_IsStarted()) squidguard_blacklist_update_cancel();
 
