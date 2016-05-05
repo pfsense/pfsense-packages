@@ -64,14 +64,12 @@ function squidguard_blacklist_AJAX_response( $request )
 
     # Actions
     if ($request['blacklist_download_start'])
-        {
-                $url = $request['blacklist_url'];
-                if ( preg_match('/["\'\s\n\r\(\);]+/', $url )){
-                        $status = "Error: Bad blacklist URL";
-                        squidguard_update_log($status,"");
-                }else{
-                	squidguard_blacklist_update_start( $url ); # update start
-                }
+    {
+    	if( squidguard_blacklist_update_start( $request['blacklist_url'] ) === false ) # update start
+    	{
+    		$status = "Blacklist update error. Please check URL";                                                                                                                  
+		squidguard_update_log($status,"");
+    	}                                                                                                                                                                          
     }
     elseif ($request['blacklist_download_cancel']){	squidguard_blacklist_update_cancel();	}                           # update cancel
     elseif ($request['blacklist_restore_default']){	squidguard_blacklist_restore_arcdb();	}                           # restore default db
