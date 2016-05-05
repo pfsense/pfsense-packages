@@ -69,11 +69,13 @@ function squidguard_blacklist_AJAX_response( $request )
                 if ( preg_match('/["\'\s\n\r\(\);]+/', $url )){
                         $status = "Error: Bad blacklist URL";
                         squidguard_update_log($status,"");
-                }else   squidguard_blacklist_update_start( $url ); # update start
+                }else{
+                	squidguard_blacklist_update_start( $url ); # update start
+                }
     }
-    elseif ($request['blacklist_download_cancel']) squidguard_blacklist_update_cancel();                           # update cancel
-    elseif ($request['blacklist_restore_default']) squidguard_blacklist_restore_arcdb();                           # restore default db
-    elseif ($request['blacklist_clear_log'])       squidguard_blacklist_update_clearlog();                         # clear log
+    elseif ($request['blacklist_download_cancel']){	squidguard_blacklist_update_cancel();	}                           # update cancel
+    elseif ($request['blacklist_restore_default']){	squidguard_blacklist_restore_arcdb();	}                           # restore default db
+    elseif ($request['blacklist_clear_log']){		squidguard_blacklist_update_clearlog();	}                         # clear log
  
     # Activity
     # Rebuild progress /check SG rebuild process/
@@ -102,7 +104,9 @@ function squidguard_blacklist_AJAX_response( $request )
 
     if (empty($status) && file_exists(SGUPD_STATFILE)) {
         $status = file_get_contents(SGUPD_STATFILE);
-        if ($sz && $sz != 100) $status .= "Completed {$sz} %";
+        if ($sz && $sz != 100){
+        	$status .= "Completed {$sz} %";
+        }
     }
     if ($status) {
         $status = str_replace("\n", "\\r\\n", trim($status));
