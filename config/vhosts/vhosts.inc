@@ -283,7 +283,12 @@ EOF;
 						$tmp .= "\$SERVER[\"socket\"] == \"" . $ipaddress . ":" . $port . "\" {\n";
 					}
 
-					$tmp .= "	\$HTTP[\"host\"] == \"" . $host . "\" {\n";
+					// if host empty, define wildcard regex 
+					if (empty($host)) {
+						$tmp .= "	\$HTTP[\"host\"] =~ \"^(.*)\$\" {\n";
+					} else {
+						$tmp .= "       \$HTTP[\"host\"] == \"" . $host . "\" {\n";
+					}
 					$tmp .= "		server.document-root        = \"/usr/local/vhosts/" . $directory . "\"\n";
 
 					// Enable SSL if the cert and key were both provided
