@@ -34,6 +34,11 @@ if ($uname['machine'] == 'amd64') {
 	ini_set('memory_limit', '250M');
 }
 
+// local file inclusion check
+if(!empty($_REQUEST['file'])){
+        $_REQUEST['file']=preg_replace('/(\.+\/|\\\.*|\/{2,})*/',"", $_REQUEST['file']);
+}
+
 if (preg_match("/(\S+)\W(\w+.html)/", $_REQUEST['file'], $matches)) {
 	// URL format
 	// https://192.168.1.1/sarg_reports.php?file=2012Mar30-2012Mar30/index.html
