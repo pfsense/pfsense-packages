@@ -277,6 +277,18 @@ function quagga_ospfd_install_conf() {
 	fwrite($fd, $zebraconffile);
 	fclose($fd);
 
+	/* Make manual BGP config */
+	if (isset($config['installedpackages']['quaggaospfdraw']['config'][0]['bgpd'])
+	    && !empty($config['installedpackages']['quaggaospfdraw']['config'][0]['bgpd'])) {
+		// if there is a raw config specified in the config.xml use that
+		$bgpdconffile = str_replace("\r", "", base64_decode($config['installedpackages']['quaggaospfdraw']['config'][0]['bgpd']));
+	} else {
+		$bgpdconffile = "";
+	}
+	$fd = fopen("{$quagga_config_base}/bgpd.conf", "w");
+	fwrite($fd, $bgpdconffile);
+	fclose($fd);
+	
 	$carp_ip_status_check = "";
 	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
 
@@ -328,12 +340,17 @@ if [ -e /var/run/quagga/ospfd.pid ]; then
 	/bin/kill -9 `/bin/cat /var/run/quagga/ospfd.pid`
 	/bin/rm -f /var/run/quagga/ospfd.pid
 fi
+if [ -e /var/run/quagga/bgpd.pid ]; then
+	/bin/kill -9 `/bin/cat /var/run/quagga/bgpd.pid`
+	/bin/rm -f /var/run/quagga/bgpd.pid
+fi
 EOF;
 	$rc_file_start = <<<EOF
 /bin/mkdir -p /var/run/quagga
 /bin/mkdir -p /var/log/quagga
 /bin/rm -f /var/run/quagga/zebra.pid
 /bin/rm -f /var/run/quagga/ospfd.pid
+/bin/rm -f /var/run/quagga/bgpd.pid
 
 if [ `/usr/sbin/pw groupshow {$pkg_group} 2>&1 | /usr/bin/grep -c "pw: unknown group"` -gt 0 ]; then
 	/usr/sbin/pw groupadd {$pkg_group} -g {$pkg_gid}
@@ -348,10 +365,14 @@ fi
 # Ensure no other copies of the daemons are running or it breaks.
 /usr/bin/killall -9 zebra 2>/dev/null
 /usr/bin/killall -9 ospfd 2>/dev/null
+/usr/bin/killall -9 bgpd 2>/dev/null
 sleep 1
 {$carp_ip_status_check}
 /usr/local/sbin/zebra -d -f {$quagga_config_base}/zebra.conf
 /usr/local/sbin/ospfd -d -f {$quagga_config_base}/ospfd.conf
+if [ -s {$quagga_config_base}/bgpd.conf ]; then
+	/usr/local/sbin/bgpd -d -f {$quagga_config_base}/bgpd.conf
+fi
 EOF;
 	write_rcfile(array(
 			"file" => "quagga.sh",
@@ -364,6 +385,7 @@ EOF;
 	mwexec("/bin/chmod a+rx /usr/local/etc/rc.d/quagga.sh");
 	mwexec("/bin/chmod u+rw,go-rw {$quagga_config_base}/ospfd.conf");
 	mwexec("/bin/chmod u+rw,go-rw {$quagga_config_base}/zebra.conf");
+	mwexec("/bin/chmod u+rw,go-rw {$quagga_config_base}/bgpd.conf");
 
 	// Kick off newly created rc.d script
 	if (is_ipaddr($ospfd_conf['carpstatusip'])) {
