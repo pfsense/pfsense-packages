@@ -115,6 +115,20 @@
 			<rows>30</rows>
 			<cols>65</cols>
 		</field>
+		<field>
+			<fielddescr>bgpd.conf</fielddescr>
+			<fieldname>bgpd</fieldname>
+			<description>
+				<![CDATA[
+				Note: Once you click "Save" below, the assistant (in the "Global Settings" and "Interface Settings" tabs above) will be overridden with whatever you type here.<br />
+				To get back the assisted config save this form below once with both empty input fields.
+				]]>
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>20</rows>
+			<cols>65</cols>
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		quagga_ospfd_install_conf();
