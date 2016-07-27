@@ -1,9 +1,9 @@
 <?php
-/* $Id$ */
 /*
 	spamd.inc
-	part of the SpamD package for pfSense
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2008 Scott Ullrich
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,23 +26,29 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
-
 */
-
-if(!function_exists("filter_configure")) 
+if (!function_exists("filter_configure")) {
 	require_once("filter.inc");
+}
 
 function sync_package_spamd() {
-	global $config, $g;
-	
+	global $config, $localpath;
+	$pf_version = substr(trim(file_get_contents("/etc/version")), 0, 3);
+	if ($pf_version != "2.2") {
+		$localpath = "/usr/local";
+	} else {
+		$ARCH = php_uname("m");
+		$localpath = "/usr/pbi/spamd-$ARCH/local";
+	}
+
+	// write config file
 	conf_mount_rw();
-	config_lock();
-	$fd = fopen("/etc/spamd.conf","w");
+	$fd = fopen("/etc/spamd.conf", "w");
 	/* all header */
 	fwrite($fd, "all:\\\n\t:whitelist:blacklist");
-	if($config['installedpackages']['spamdsources']['config']) {
-		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
-			if($spamd['providername']) {
+	if ($config['installedpackages']['spamdsources']['config']) {
+		foreach ($config['installedpackages']['spamdsources']['config'] as $spamd) {
+			if ($spamd['providername']) {
 				fwrite($fd, ":" . remove_spaces($spamd['providername']));
 			}
 		}
@@ -58,12 +64,12 @@ function sync_package_spamd() {
 	fwrite($fd, "\t:msg=\"Sorry, you spammed us before.\":\\\n");
 	fwrite($fd, "\t:method=file:\\\n");
 	fwrite($fd, "\t:file=/var/db/blacklist.txt:\n\n");
-	log_error("Looping through each item and write out its configuration");
+	log_error("[spamd] Looping through each item and write out its configuration");
 	/* loop through each item and write out its configuration */
-	if($config['installedpackages']['spamdsources']['config'] != "") {
-		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
-			if(remove_spaces($spamd['providername'])) {
-				if($spamd['providername']) {
+	if ($config['installedpackages']['spamdsources']['config'] != "") {
+		foreach ($config['installedpackages']['spamdsources']['config'] as $spamd) {
+			if (remove_spaces($spamd['providername'])) {
+				if ($spamd['providername']) {
 					fwrite($fd, remove_spaces($spamd['providername']) . ":\\\n");
 					fwrite($fd, "\t:" . remove_spaces($spamd['providertype']) . ":\\\n");
 					fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
@@ -77,15 +83,32 @@ function sync_package_spamd() {
 		}
 	}
 	fclose($fd);
-		log_error("Creating /var/db/whitelist.txt");
+	log_error("[spamd] Creating /var/db/whitelist.txt");
 	$fd = fopen("/var/db/whitelist.txt","w");
-	if($config['installedpackages']['spamdwhitelist']['config'] != "") {
-	    foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
-			if($spamd['ip'])
+	if ($config['installedpackages']['spamdwhitelist']['config'] != "") {
+		foreach ($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
+			if ($spamd['ip']) {
 				fwrite($fd, $spamd['ip'] . "\n");
+			}
 		}
 	}
 	fclose($fd);
+
+	/* if the package is disabled, remove the cronjob, rcfile and do nothing else here ... */
+	if (!spamd_enabled()) {
+		log_error("[spamd] Removing cron job");
+		install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup", false);
+		if (is_service_running("spamd")) {
+			log_error("[spamd] Stopping and disabling SpamD service");
+			stop_service("spamd");
+		}
+		unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
+		log_error("[spamd] Reconfiguring filter");
+		filter_configure();
+		log_error("[spamd] Package successfully disabled.");
+		return;
+	}
+	/* ... otherwise, create the rcfile and (re)start spamd */
 	$passtime = "5";
 	$greyexp = "4";
 	$whiteexp = "864";
@@ -94,85 +117,122 @@ function sync_package_spamd() {
 	$maxblack = "";
 	$stuttersecs = "";
 	$delaysecs = "";
-	log_error("Looping through spamdsettings");
-	if($config['installedpackages']['spamdsettings']['config']) {
-		foreach($config['installedpackages']['spamdsettings']['config'] as $ss) {
-			if($ss['nextmta'] <> "")
-				$nextmta = $ss['nextmta'];
-			if($ss['greylistingparms'] <> "")
+	log_error("[spamd] Looping through spamdsettings");
+	if ($config['installedpackages']['spamdsettings']['config']) {
+		foreach ($config['installedpackages']['spamdsettings']['config'] as $ss) {
+			if ($ss['next_mta'] != "") {
+				$nextmta = $ss['next_mta'];
+			}
+			if ($ss['greylistingparms'] != "") {
 				$passtime = " -G " . $ss['greylistingparms'];
-			if($ss['identifier'] <> "")
+			}
+			if ($ss['identifier'] != "") {
 				$identifier = " -n \"" . $ss['identifier'] . "\"";
+			}
 			// Default is greylisting, turn on blacklisting if not checked.
-			if($ss['greylisting'] <> "on")
+			if ($ss['greylisting'] != "on") {
 				$greylisting = " -b";
-			if($ss['maxblack'] <> "")
+				$spamd_setup_opts = "-b";
+			}
+			if ($ss['maxblack'] != "") {
 				$maxblack = " -B " . $ss['maxblack'];
-			if($ss['maxcon'] <> "")
+			}
+			if ($ss['maxcon'] != "") {
 				$maxcon = " -c " . $ss['maxcon'];
-			if($ss['stuttersecs'] <> "")
+			}
+			if ($ss['stuttersecs'] != "") {
 				$stuttersecs = " -S " . $ss['stuttersecs'];
-			if($ss['delaysecs'] <> "")
+			}
+			if ($ss['delaysecs'] != "") {
 				$delaysecs = " -s " . $ss['delaysecs'];
-			if($ss['window'] <> "")
+			}
+			if ($ss['window'] != "") {
 				$window = " -w " . $ss['window'];
-			if($ss['passtime'] <> "")
+			}
+			if ($ss['passtime'] != "") {
 				$passtime = $ss['passtime'];
-			if($ss['greyexp'] <> "")
+			}
+			if ($ss['greyexp'] != "") {
 				$greyexp = $ss['greyexp'];
-			if($ss['whiteexp'] <> "")
+			}
+			if ($ss['whiteexp'] != "") {
 				$whiteexp = $ss['whiteexp'];
+			}
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
-	$start = "if [ `mount | grep -v grep | grep fdescfs | wc -l` -lt 1 ]; then \n" .
-		 "/sbin/mount -t fdescfs fdescfs /dev/fd\n" .
-		 "fi\n" .
-	     "/usr/local/sbin/spamd-setup -d &\n" .
-		 "/sbin/pflogd &\n" .
-		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &\n" .
-		 "/usr/local/libexec/spamlogd\n";
-	$stop  = "/usr/bin/killall spamd-setup\n" .
-		 "/usr/bin/killall spamlogd\n" .
-		 "/usr/bin/killall spamd\n" .
-		 "/usr/bin/killall pflogd\n" .
-		 "sleep 2";
-	log_error("Writing rc_file");		
-	write_rcfile(array(
-				"file" => "spamd.sh",
-				"start" => $start,
-				"stop" =>  $stop
-			    )
-	);
-	log_error("Installing CRON");	
-	spamd_install_cron(true);
-	log_error("Mounting RO");	
+	$rc = array();
+	$rc['file'] = "spamd.sh";
+	$rc['start'] = <<< EOF
+
+if [ `/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l` -lt 1 ]; then
+	/sbin/mount -t fdescfs fdescfs /dev/fd
+fi
+if [ ! -f "/var/db/spamd" ]; then
+	/usr/bin/touch /var/db/spamd
+fi
+/usr/sbin/chown _spamd:proxy /var/db/spamd
+/usr/local/sbin/spamd-setup -d -D {$spamd_setup_opts}
+{$localpath}/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &
+{$localpath}/libexec/spamlogd
+EOF;
+
+	$rc['stop']  = <<< EOF
+
+/usr/bin/killall spamd-setup 2>/dev/null
+/usr/bin/killall spamlogd 2>/dev/null
+/usr/bin/killall spamd 2>/dev/null
+sleep 3
+if [ `/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l` -gt 0 ]; then
+	/sbin/umount /dev/fd
+fi
+EOF;
+
+	log_error("[spamd] Writing rc_file");
+	write_rcfile($rc);
+
+	log_error("[spamd] Installing cron job");
+	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup -d -D {$spamd_setup_opts}", true, "*/120");
+	log_error("[spamd] Setting up spamd.conf symlink");
+	unlink_if_exists("{$localpath}/etc/spamd/spamd.conf");
+	symlink("/etc/spamd.conf", "{$localpath}/etc/spamd/spamd.conf");
 	conf_mount_ro();
-	log_error("Unlocking config");	
-	config_unlock();
-	log_error("Restart cron");	
-	mwexec("killall -HUP cron");
-	log_error("Setting up spamd.conf symlink");	
-	mwexec("rm -f /usr/local/etc/spamd/spamd.conf");
-	mwexec("ln -s /etc/spamd.conf /usr/local/etc/spamd/spamd.conf");
-	log_error("Stopping spamd");
-	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
-	sleep(1);
-	log_error("Starting spamd");
-	mwexec_bg("/usr/local/etc/rc.d/spamd.sh start");
-	log_error("Reconfiguring filter");
+
+	log_error("[spamd] (Re)starting spamd");
+	if (is_service_running("spamd")) {
+		restart_service("spamd");
+	} else {
+		start_service("spamd");
+	}
+
+	log_error("[spamd] Reconfiguring filter");
 	filter_configure();
-	log_error("SpamD setup completed");	
+	log_error("[spamd] Package setup completed");
+}
+
+function spamd_enabled() {
+	global $config, $spamd_enabled;
+	$spamd_enabled = false;
+
+	if (is_array($config['installedpackages']['spamdsettings'])) {
+		$spamdsettings = $config['installedpackages']['spamdsettings']['config'][0];
+	} else {
+		$spamdsettings = array();
+	}
+	if ($spamdsettings['spamd_enable'] == "on") {
+		$spamd_enabled = true;
+	}
+
+	return $spamd_enabled;
 }
 
 function sync_package_spamd_whitelist() {
 	global $config;
 	conf_mount_rw();
-	config_lock();
 	/* write out ip to the whitelist db */
 	$fd = fopen("/var/db/whitelist.txt","w");
-	if($config['installedpackages']['spamdwhitelist']['config'] != "") {
-		foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
+	if ($config['installedpackages']['spamdwhitelist']['config'] != "") {
+		foreach ($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
 			fwrite($fd, $spamd['ip'] . "\n");
 		}
 	}
@@ -181,35 +241,56 @@ function sync_package_spamd_whitelist() {
 	mwexec("/usr/bin/killall -HUP spamlogd");
 	mwexec("/sbin/pfctl -t spamd-white -T add {$spamd['ip']}");
 	conf_mount_ro();
-	config_unlock();
 }
 
 function spamd_generate_rules($type) {
 	global $config;
 
+	// do not install any rules if disabled
+	if (!spamd_enabled()) {
+		return;
+	}
+
 	$natrules = "";
 	switch($type) {
 	case 'nat':
 		$natrules .= "\n# spam table \n";
-                $wanif = get_real_interface("wan");
-                $natrules .= "table <whitelist> persist\n";
-                $natrules .= "table <blacklist> persist\n";
-                $natrules .= "table <spamd> persist\n";
-                if(file_exists("/var/db/whitelist.txt"))
-                        $natrules .= "table <spamd-white> persist file \"/var/db/whitelist.txt\"\n";
-                $natrules .= "rdr pass on {$wanif} proto tcp from <blacklist> to port smtp -> 127.0.0.1 port spamd\n";
-                $natrules .= "rdr pass on {$wanif} proto tcp from <spamd> to port smtp -> 127.0.0.1 port spamd\n";
-                $natrules .= "rdr pass on {$wanif} proto tcp from !<spamd-white> to port smtp -> 127.0.0.1 port spamd\n";
-                if($config['installedpackages']['spamdsettings']['config'])
-                        foreach($config['installedpackages']['spamdsettings']['config'] as $ss)
-                                $nextmta = $ss['nextmta'];
-                if($nextmta <> "") {
-                        $natrules .= "rdr pass on {$wanif} proto tcp from <spamd-white> to port smtp -> {$nextmta} port smtp\n";
-                }
+		$natrules .= "table <whitelist> persist\n";
+		$natrules .= "table <blacklist> persist\n";
+		$natrules .= "table <spamd> persist\n";
+		if (file_exists("/var/db/whitelist.txt")) {
+			$natrules .= "table <spamd-white> persist file \"/var/db/whitelist.txt\"\n";
+		}
+
+		if (is_array($config['installedpackages']['spamdsettings']['config'])) {
+			$spamdconfig = $config['installedpackages']['spamdsettings']['config']['0'];
+		} else {
+			$spamdconfig = $config['installedpackages']['spamdsettings']['config'];
+		}
+
+		if ($spamdconfig) {
+			$nextmta = $spamdconfig['next_mta'];
+			$spamdbinds = explode(',', $spamdconfig['spamdbinds_array']);
+			if (is_array($spamdbinds)) {
+				foreach ($spamdbinds as $interface) {
+					$wanif = get_real_interface($interface);
+					if (!isset($wanif)) {
+						continue;
+					}
+					$natrules .= "rdr pass on {$wanif} proto tcp from <blacklist> to port smtp -> 127.0.0.1 port spamd\n";
+					$natrules .= "rdr pass on {$wanif} proto tcp from <spamd> to port smtp -> 127.0.0.1 port spamd\n";
+					$natrules .= "rdr pass on {$wanif} proto tcp from !<spamd-white> to port smtp -> 127.0.0.1 port spamd\n";
+					if ($nextmta != "") {
+						$natrules .= "rdr pass on {$wanif} proto tcp from <spamd-white> to port smtp -> {$nextmta} port smtp\n";
+					}
+				}
+			}
+		}
+		$natrules .= "\n";
 
 		break;
 	}
-	
+
 	return $natrules;
 }
 
@@ -218,128 +299,96 @@ function remove_spaces($string) {
 	return $string;
 }
 
-function sync_spamd_config_to_backup() {
-	global $g, $config;
-	if(is_array($config['installedpackages']['carpsettings']['config'])) {
-		foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
-			if($carp['synchronizetoip'] != "" ) {
-				$synctoip = $carp['synchronizetoip'];
-				$password = $carp['password'];
-				if($config['system']['username'])
-					$username = $config['system']['username'];
-				else 
-					$username = "admin";
-			}
-		}
-	}
-	if($synctoip and $password) {
-		if($config['system']['webgui']['protocol'] != "") {
-			$synchronizetoip = $config['system']['webgui']['protocol'];
-			$synchronizetoip .= "://";
-		}
-		$port = $config['system']['webgui']['port'];
-		/* if port is empty lets rely on the protocol selection */
-		if($port == "") {
-			if($config['system']['webgui']['protocol'] == "http") {
-				$port = "80";
-			} else {
-				$port = "443";
-			}
-		}
-		$params = array(XML_RPC_encode($password),XML_RPC_encode($xml));
-		/* create files to sync array */
-		$filetosync = array("/var/db/spamd", "/var/db/whitelist.txt");
-		/* loop through files to sync list and sync them up */
-		foreach($filetosync as $f2s) {
-			$f2c_contents = file_get_contents($f2s);
-			xmlrpc_sync_file($url, $password, $f2s, $f2c_contents, $port);
-		}
-		/* signal remote process config reload */
-		xmlrpc_exec_shell($url, $password, "/usr/bin/killall -HUP spamlogd", $port);
-		xmlrpc_exec_shell($url, $password, "/usr/bin/killall -HUP spamd", $port);
-	}
-}
-
 function custom_php_install_command() {
-	global $config, $g;
+	global $config;
 	system("touch /var/db/whitelist.txt");
 	system("touch /var/db/blacklist.txt");
-	sync_package_spamd();
-	conf_mount_rw();
 	exec("/usr/sbin/pw usermod _spamd -g proxy -G _spamd,proxy");
-	exec("/bin/cp /usr/local/etc/spamd/spamd.conf.sample /usr/local/etc/spamd/spamd.conf");
-	conf_mount_ro();
+	sync_package_spamd();
 }
 
 function custom_php_deinstall_command() {
-	global $config, $g;
-	conf_mount_rw();
-	exec("killall -9 spamd");
+	global $config;
 	unlink_if_exists("/usr/local/pkg/pf/spamd_rules.php");
-	unlink_if_exists("/usr/local/www/spamd_rules.php");
-	unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
-	spamd_install_cron(false);
-	conf_mount_ro();
+	install_cron_job("/usr/bin/nice -n20 /usr/local/sbin/spamd-setup", false);
+	/* clean up user/groups */
+	if (exec("/usr/sbin/pw groupshow proxy | /usr/bin/grep _spamd")) {
+		exec ("/usr/sbin/pw groupmod proxy -d _spamd");
+	}
+	if (exec("/usr/sbin/pw usershow _spamd")) {
+		exec("/usr/sbin/pw userdel _spamd");
+	}
+	if (exec("/usr/sbin/pw groupshow _spamd")) {
+		exec("/usr/sbin/pw groupdel _spamd");
+	}
+	/* unmount fdescfs if needed */
+	if (trim(shell_exec("/sbin/mount | /usr/bin/grep '[f]descfs' | /usr/bin/wc -l")) != 0) {
+		log_error("[spamd] Unmounting fdescfs.");
+		mwexec("/sbin/umount /dev/fd");
+	}
+	unlink_if_exists("/var/db/spamd");
 	filter_configure();
 }
 
-function spamd_install_cron($should_install) {
-	global $config, $g;
-	$is_installed = false;
-	if(!$config['cron']['item'])
-		return;
-	$x=0;
-	foreach($config['cron']['item'] as $item) {
-		if(strstr($item['command'], "spamd-setup")) {
-			$is_installed = true;
-			break;
+function spamd_validate_input($post, &$input_errors) {
+	if (!empty($post["next_mta"])) {
+		if (!is_ipaddrv4($post['next_mta'])) {
+			$input_errors[] = "'NextMTA' is not a valid IPv4 address";
 		}
-		$x++;
 	}
-	switch($should_install) {
-		case true:
-			if(!$is_installed) {
-				$cron_item = array();
-				$cron_item['minute'] = "*/120";
-				$cron_item['hour'] = "*";
-				$cron_item['mday'] = "*";
-				$cron_item['month'] = "*";
-				$cron_item['wday'] = "*";
-				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/spamd-setup";		
-				$config['cron']['item'][] = $cron_item;
-				write_config("Installed SPAMD crontab entries.");
-				configure_cron();
-			}
-		break;
-		case false:
-			if($is_installed == true) {
-				if($x > 0) {
-					unset($config['cron']['item'][$x]);
-					write_config();
-				}
-				configure_cron();
-			}
-		break;
-	}
-}
 
-function spamd_validate_input($post, $input_errors) {
-	global $config, $g;
-	$nextmta = str_replace("$", "", $post['nextmta']);
-	if(stristr($nextmta, "{")) {
-		/* item is an alias, make sure the name exists */
-		$nextmta = str_replace("$", "", $nextmta);
-		$found = false;
-		if($config['aliases']['alias']) {
-			foreach($config['aliases']['alias'] as $alias) {
-				if($alias['name'] == $nextmta) {
-					$found = true;
-				}
-			}
+	if (isset($post['maxblack']) && $post['maxblack'] != "") {
+		if (!is_numericint($post['maxblack']) || $post['maxblack'] < 1) {
+			$input_errors[] = "'Maximum Blacklisted Connections' must be a positive integer or empty.";
 		}
-		if($found == false)
-			$intput_errors = "Could not locate alias named " . htmlentities($nextmta);
+	}
+
+	if (isset($post['maxcon']) && $post['maxcon'] != "") {
+		if (!is_numericint($post['maxcon']) || $post['maxcon'] < 1) {
+			$input_errors[] = "'Max Concurrent Connections' must be a positive integer or empty.";
+		}
+	}
+
+	if (!empty($post['maxblack']) && is_numericint($post['maxblack']) && !empty($post['maxcon']) && is_numericint($post['maxcon'])) {
+		if ($post['maxblack'] >  $post['maxcon']) {
+			$input_errors[] = "'Maximum Blacklisted Connections' must not be higher than 'Max Concurrent Connections'.";
+		}
+	}
+
+	if (isset($post['passtime']) && $post['passtime'] != "") {
+		if (!is_numericint($post['passtime']) || $post['passtime'] < 1) {
+			$input_errors[] = "'Passtime' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['greyexp']) && $post['greyexp'] != "") {
+		if (!is_numericint($post['greyexp']) || $post['greyexp'] < 1) {
+			$input_errors[] = "'Grey Expiration' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['whiteexp']) && $post['whiteexp'] != "") {
+		if (!is_numericint($post['whiteexp']) || $post['whiteexp'] < 1) {
+			$input_errors[] = "'White Exp' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['stuttersecs']) && $post['stuttersecs'] != "") {
+		if (!is_numericint($post['stuttersecs']) || $post['stuttersecs'] < 1) {
+			$input_errors[] = "'Stutter Secs' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['delaysecs']) && $post['delaysecs'] != "") {
+		if (!is_numericint($post['delaysecs']) || $post['delaysecs'] < 1) {
+			$input_errors[] = "'Delay Secs' must be a positive integer or empty.";
+		}
+	}
+
+	if (isset($post['window']) && $post['window'] != "") {
+		if (!is_numericint($post['window']) || $post['window'] < 1) {
+			$input_errors[] = "'Window Size' must be a positive integer or empty.";
+		}
 	}
 }
 

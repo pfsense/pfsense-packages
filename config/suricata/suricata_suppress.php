@@ -94,15 +94,18 @@ function suricata_find_suppresslist_interface($supplist) {
 	return false;
 }
 
-if ($_GET['act'] == "del") {
-	if ($a_suppress[$_GET['id']]) {
+if ($_POST['del'] && is_numericint($_POST['list_id'])) {
+	if ($a_suppress[$_POST['list_id']]) {
 		// make sure list is not being referenced by any Suricata-configured interface
-		if (suricata_suppresslist_used($a_suppress[$_GET['id']]['name'])) {
+		if (suricata_suppresslist_used($a_suppress[$_POST['list_id']]['name'])) {
 			$input_errors[] = gettext("ERROR -- Suppress List is currently assigned to an interface and cannot be removed!");
 		}
 		else {
-			unset($a_suppress[$_GET['id']]);
-			write_config();
+			unset($a_suppress[$_POST['list_id']]);
+			write_config("Suricata pkg: deleted SUPPRESS LIST.");
+			conf_mount_rw();
+			sync_suricata_package_config();
+			conf_mount_ro();
 			header("Location: /suricata/suricata_suppress.php");
 			exit;
 		}
@@ -126,19 +129,24 @@ if ($input_errors) {
 ?>
 
 <form action="/suricata/suricata_suppress.php" method="post"><?php if ($savemsg) print_info_box($savemsg); ?>
+<input type="hidden" name="list_id" id="list_id" value=""/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr><td>
 <?php
         $tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-	$tab_array[] = array(gettext("Blocked"), false, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), false, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), true, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 ?>
 </td>
@@ -172,6 +180,7 @@ if ($input_errors) {
 				</td>
 				<td height="20px" valign="middle" nowrap class="list">
 					<table border="0" cellspacing="0" cellpadding="1">
+						<tbody>
 						<tr>
 							<td valign="middle"><a
 							href="suricata_suppress_edit.php?id=<?=$i;?>"><img
@@ -185,13 +194,12 @@ if ($input_errors) {
 							width="17" height="17" border="0" title="<?php echo gettext("Goto first instance associated with this Suppress List");?>"/></a>
 							</td>
 						<?php else : ?>
-							<td><a href="/suricata/suricata_suppress.php?act=del&id=<?=$i;?>"
-							onclick="return confirm('<?php echo gettext("Do you really want to delete this Suppress List?"); ?>')"><img
-							src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" 
-							width="17" height="17" border="0" title="<?php echo gettext("delete Suppress List"); ?>"></a></td>
+							<td><input type="image" name="del[]" onclick="document.getElementById('list_id').value='<?=$i;?>';return confirm('<?=gettext("Do you really want to delete this Suppress List?");?>');" 
+							src="/themes/<?=$g['theme'];?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="<?=gettext("delete Suppress List");?>"/></td>
 							<td>&nbsp;</td>
 						<?php endif; ?>
 						</tr>
+						</tbody>
 					</table>
 				</td>
 			</tr>
@@ -200,6 +208,7 @@ if ($input_errors) {
 				<td class="list" colspan="2"></td>
 				<td  class="list">
 					<table border="0" cellspacing="0" cellpadding="1">
+						<tbody>
 						<tr>
 							<td valign="middle" width="17">&nbsp;</td>
 							<td valign="middle"><a
@@ -207,6 +216,7 @@ if ($input_errors) {
 							src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif"
 							width="17" height="17" border="0" title="<?php echo gettext("add a new list"); ?>"></a></td>
 						</tr>
+						</tbody>
 					</table>
 				</td>
 			</tr>
@@ -224,6 +234,7 @@ if ($input_errors) {
 	gettext("You must first unassign the Suppress List on the Interface Edit tab."); ?>
 	</p></span></td>
 </tr>
+</tbody>
 </table>
 </form>
 <?php include("fend.inc"); ?>

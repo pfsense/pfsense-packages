@@ -100,9 +100,6 @@ $pconfig = $a_nat[$id];
 $if_real = get_real_interface($pconfig['interface']);
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
-/* alert file */
-$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
-
 if ($_POST['save']) {
 
 	$natent = array();
@@ -110,11 +107,15 @@ if ($_POST['save']) {
 
 	foreach ($snort_servers as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
-			$input_errors[] = "Only aliases are allowed";
+			$input_errors[] = "Only aliases are allowed.";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed in Snort.";
 	}
 	foreach ($snort_ports as $key => $server) {
 		if ($_POST["def_{$key}"] && !is_alias($_POST["def_{$key}"]))
-			$input_errors[] = "Only aliases are allowed";
+			$input_errors[] = "Only aliases are allowed.";
+		if ($_POST["def_{$key}"] && is_alias($_POST["def_{$key}"]) && trim(filter_expand_alias($_POST["def_{$key}"])) == "")
+			$input_errors[] = "FQDN aliases are not allowed in Snort.";
 	}
 	/* if no errors write to conf */
 	if (!$input_errors) {
@@ -138,10 +139,15 @@ if ($_POST['save']) {
 
 		/* Update the snort conf file for this interface. */
 		$rebuild_rules = false;
+		conf_mount_rw();
 		snort_generate_conf($a_nat[$id]);
+		conf_mount_ro();
 
 		/* Soft-restart Snort to live-load new variables. */
 		snort_reload_config($a_nat[$id]);
+
+		/* Sync to configured CARP slaves if any are enabled */
+		snort_sync_on_changes();
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -189,7 +195,9 @@ if ($savemsg)
 		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+		$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+		$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 		display_top_tabs($tab_array, true);
 		echo '</td></tr>';
 		echo '<tr><td class="tabnavtbl">';
@@ -202,6 +210,7 @@ if ($savemsg)
 		$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Logs"), false, "/snort/snort_interface_logs.php?id={$id}");
 		display_top_tabs($tab_array, true);
 ?>
 </td></tr>

@@ -32,13 +32,13 @@ require_once("functions.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 // Retrieve any passed QUERY STRING or POST variables
-if (isset($_POST['id']))
+if (isset($_POST['id']) && is_numericint($_POST['id']))
 	$id = $_POST['id'];
 elseif (isset($_GET['id']) && is_numericint($_GET['id']))
 	$id = htmlspecialchars($_GET['id']);
 
 if (isset($_POST['eng']))
-	$eng = $_POST['eng'];
+	$eng = htmlspecialchars($_POST['eng']);
 elseif (isset($_GET['eng']))
 	$eng = htmlspecialchars($_GET['eng']);
 

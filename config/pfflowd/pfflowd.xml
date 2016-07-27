@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+		<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	pfflowd.xml
+	Copyright (C) 2008 Bill Marquette
+	Copyright (C) 2011 Ermal Luçi
+	Copyright (C) 2011 Jim Pingle
+	Copyright (C) 2015 ESF, LLC
+	part of pfSense (http://www.pfSense.org/)
+	All rights reserved.
+*/
+/* ========================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ========================================================================== */
+		]]>
+	</copyright>
+	<name>pfflowd</name>
+	<version>1.0.4</version>
+	<title>Services: pfflowd Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=pfflowd.xml</aftersaveredirect>
+	<menu>
+		<name>pfflowd</name>
+		<tooltiptext>Modify pfflowd settings.</tooltiptext>
+		<section>Services</section>
+		<configfile>pfflowd.xml</configfile>
+		<url>/pkg_edit.php?xml=pfflowd.xml</url>
+	</menu>
+	<service>
+		<name>pfflowd</name>
+		<rcfile>pfflowd.sh</rcfile>
+		<executable>pfflowd</executable>
+		<description>Netflow Export Daemon</description>
+	</service>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/pfflowd/pfflowd.priv.inc</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Enable pfflowd</fielddescr>
+			<fieldname>enabled</fieldname>
+			<description>Check this to enable pfflowd daemon.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Destination Host</fielddescr>
+			<fieldname>host</fieldname>
+			<description>Specify the IP address of the host that datagrams are to be sent to.</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Destination Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the port that datagrams are to be sent to.</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Source IP</fielddescr>
+			<fieldname>sourcehost</fieldname>
+			<description>
+				<![CDATA[
+				Specify the IP address that datagrams are to be sent from. <strong>The IP must be local to this system.</strong>
+				]]>
+			</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>pf Rule Direction Restriction</fielddescr>
+			<fieldname>direction</fieldname>
+			<description>Restrict creation of flow records to states matching a certain direction (in, out, or any).</description>
+			<type>select</type>
+			<options>
+				<option><name>Any</name><value>any</value></option>
+				<option><name>In</name><value>in</value></option>
+				<option><name>Out</name><value>out</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Netflow Version</fielddescr>
+			<fieldname>version</fieldname>
+			<description>Select which version of the NetFlow protocol to use.</description>
+			<type>select</type>
+			<options>
+				<option><name>9</name><value>9</value></option>
+				<option><name>5</name><value>5</value></option>
+				<option><name>1</name><value>1</value></option>
+			</options>
+		</field>
+	</fields>
+	<custom_php_global_functions>
+		<![CDATA[
+		function sync_package_pfflowd() {
+			global $config;
+			conf_mount_rw();
+			if (is_array($config['installedpackages']['pfflowd']['config'])) {
+				$cf = $config['installedpackages']['pfflowd']['config'][0];
+			} else {
+				$cf = array();
+			}
+			if ($cf['enabled'] == "on") {
+				$start = "\n/sbin/ifconfig pfsync0 up\n";
+				$start .= "/usr/local/sbin/pfflowd ";
+				$start .= " -n {$cf['host']}";
+				$start .= ":{$cf['port']}";
+				if (!empty($cf['sourcehost'])) {
+					$start .= " -s {$cf['sourcehost']} ";
+				}
+				if ($cf['direction'] != "") {
+					$start .= " -S {$cf['direction']}";
+				}
+				if ($cf['version'] != "") {
+					$start .= " -v {$cf['version']}";
+				}
+				write_rcfile(array("file" => "pfflowd.sh", "start" => $start, "stop" => "/usr/bin/killall pfflowd"));
+				if (is_service_running("pfflowd")) {
+					restart_service("pfflowd");
+				} else {
+					start_service("pfflowd");
+				}
+			} else {
+				if (is_service_running("pfflowd")) {
+					stop_service("pfflowd");
+				}
+				unlink_if_exists("/usr/local/etc/rc.d/pfflowd.sh");
+			}
+			conf_mount_ro();
+		}
+
+		function validate_form_pfflowd($post, &$input_errors) {
+			if ($post['host'] != "" && !is_ipaddr($post['host'])) {
+				$input_errors[] = 'You must specify a valid IP address in the \'Destination Host\' field';
+			}
+			if ($post['port'] != "" && !is_port($post['port'])) {
+				$input_errors[] = 'You must specify a valid port number in the \'Destination Port\' field';
+			}
+			if ($post['sourcehost'] != "" && !is_ipaddr($post['sourcehost'])) {
+				$input_errors[] = 'You must specify a valid IP address in the \'Source IP\' field';
+			}
+		}
+		]]>
+	</custom_php_global_functions>
+	<custom_php_resync_config_command>
+		sync_package_pfflowd();
+	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+		validate_form_pfflowd($_POST, $input_errors);
+	</custom_php_validation_command>
+</packagegui>

@@ -42,7 +42,7 @@ $type = htmlspecialchars($_GET['type']);
 $title = "List";
 
 if (isset($id) && isset($wlist)) {
-	$a_rule = $config['installedpackages']['suricataglobal']['rule'][$id];
+	$a_rule = $config['installedpackages']['suricata']['rule'][$id];
 	if ($type == "homenet") {
 		$list = suricata_build_list($a_rule, $wlist);
 		$contents = implode("\n", $list);
@@ -57,6 +57,20 @@ if (isset($id) && isset($wlist)) {
 		$list = suricata_find_list($wlist, $type);
 		$contents = str_replace("\r", "", base64_decode($list['suppresspassthru']));
 		$title = "Suppress List";
+	}
+	elseif ($type == "externalnet") {
+		if ($wlist == "default") {
+			$list = suricata_build_list($a_rule, $a_rule['homelistname']);
+			$contents = "";
+			foreach ($list as $ip)
+				$contents .= "!{$ip}\n";
+			$contents = trim($contents, "\n");
+		}
+		else {
+			$list = suricata_build_list($a_rule, $wlist, false, true);
+			$contents = implode("\n", $list);
+		}
+		$title = "EXTERNAL_NET";
 	}
 	else
 		$contents = gettext("\n\nERROR -- Requested List Type entity is not valid!");
@@ -76,7 +90,7 @@ $pgtitle = array(gettext("Suricata"), gettext($title . " Viewer"));
 	<td class="tabcont">
 		<table width="100%" cellpadding="0" cellspacing="6" bgcolor="#eeeeee">
 		<tr>
-			<td class="pgtitle" colspan="2">Snort: <?php echo gettext($title . " Viewer"); ?></td>
+			<td class="pgtitle" colspan="2">Suricata: <?php echo gettext($title . " Viewer"); ?></td>
 		</tr>
 		<tr>
 			<td align="left" width="20%">

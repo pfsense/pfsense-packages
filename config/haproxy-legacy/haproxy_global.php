@@ -46,9 +46,7 @@ if ($_POST) {
 	
 	if ($_POST['apply']) {
 		$retval = 0;
-		config_lock();
 		$retval = haproxy_configure();
-		config_unlock();
 		$savemsg = get_std_save_message($retval);
 		unlink_if_exists($d_haproxyconfdirty_path);
 	} else {
@@ -57,7 +55,11 @@ if ($_POST) {
 			$reqdfieldsn = explode(",", "Maximum connections");		
 		}
 
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+		$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
+		if ($pf_version < 2.1)
+			$input_errors = eval('do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors); return $input_errors;');
+		else
+			do_input_validation($_POST, $reqdfields, $reqdfieldsn, $input_errors);
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";

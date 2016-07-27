@@ -1,9 +1,9 @@
 <?php
-/* $Id$ */
 /*
 	arping.inc
+	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006 Scott Ullrich
-	part of pfSense
+	Copyright (C) 2009-2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,22 +28,25 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-function arping_deinstall() {
-}
-
-function arping_package_reinstall() {
-}
-
 function arping_package_php_command() {
 	require_once("util.inc");
-	if (is_ipaddr($_POST['hostip']) || is_hostname($_POST['hostip']) || is_macaddr($_POST['hostip']))
-		system("arping -c3 " . escapeshellarg($_POST['hostip']));
-	else
-		echo "Invalid input. Supplied address must be a valid IP or MAC address.";
+	
+	$button = "<br /><br /><input class=\"formbtn\" type=\"button\" value=\"Back to ARPing\" onclick=\"history.back()\" />";
+	$int_count = (is_numeric($_POST['count']) ? (abs(intval($_POST['count']))) : 3);
+	$arping_options = " -v -c {$int_count}";
+	if (!empty($_POST['interface'])) {
+		$iface = convert_friendly_interface_to_real_interface_name($_POST['interface']);
+		$arping_options .= " -i {$iface}";
+	}
+	if (is_ipaddr($_POST['pinghost']) || is_hostname($_POST['pinghost']) || is_macaddr($_POST['pinghost'])) {
+		$arping_options .= " " . $_POST['pinghost'];
+		echo "<strong>arping {$arping_options} output:</strong><br /><br />";
+		system("/usr/local/sbin/arping {$arping_options}");
+		echo "{$button}";
+	} else {
+		echo "<div class=\"errmsg\">ERROR: Invalid input. Supplied address must be a valid hostname, IP or MAC address.</div>";
+		echo "{$button}";
+	}
 	exit;
 }
-
-function arping_package_resync() {
-}
-
 ?>

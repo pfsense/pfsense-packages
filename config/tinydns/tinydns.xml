@@ -2,47 +2,49 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    tinydns.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	tinydns.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009 Bill Marquette
+	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2010-2011 Scott Ullrich
+	Copyright (C) 2012-2015 ESF, LLC
+	All rights reserved. 
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
 	<name>tinydns</name>
-	<version>1.0</version>
+	<version>1.0.6.24</version>
 	<title>DNS Server: Settings</title>
 	<aftersaveredirect>/pkg_edit.php?xml=tinydns.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
@@ -57,13 +59,13 @@
 		<rcfile>svscan.sh</rcfile>
 		<executable>svscan</executable>
 		<description>Daemontools service directory watcher</description>
-	</service>	
+	</service>
 	<service>
 		<name>DNS Server</name>
 		<rcfile>tinydns.sh</rcfile>
 		<executable>tinydns</executable>
 		<description>TinyDNS DNS Server</description>
-	</service>	
+	</service>
 	<tabs>
 		<tab>
 			<text>Settings</text>
@@ -94,70 +96,56 @@
 	<configpath>installedpackages->package->tinydns</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/pf/</prefix>
-		<chmod>077</chmod>
-		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_xmlrpc_sync.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_domains.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_status.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_dhcp_filter.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_filter.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
+		<chmod>0775</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_down.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
+		<chmod>0775</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_up.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
+		<chmod>0775</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_parse_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_view_logs.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/tinydns_sync.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/wizards/</prefix>
-		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/tinydns/new_zone_wizard.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>
 			<type>listtopic</type>
 			<name>Binding IP Address</name>
-			<fieldname>temp</fieldname>			
-		</field>		
+		</field>
 		<field>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
@@ -167,8 +155,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Recursive DNS Resolver</name>
-			<fieldname>temp</fieldname>						
-		</field>		
+		</field>
 		<field>
 		 	<fielddescr>Enable recursive DNS responder</fielddescr>
 			<fieldname>enableforwarding</fieldname>
@@ -204,7 +191,6 @@
 		<field>
 			<type>listtopic</type>
 			<name>IP Monitoring</name>
-			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>Enable IP monitoring</fielddescr>
@@ -220,40 +206,28 @@
 		</field>
 		<field>
 			<type>listtopic</type>
-			<name>Sync TinyDNS settings via XMLRPC</name>
-			<fieldname>temp</fieldname>
-		</field>
-		<field>
-			<fielddescr>XMLRPC Sync</fielddescr>
-			<fieldname>syncxmlrpc</fieldname>
-			<description>Sync TinyDNS configuration to backup firewalls</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<type>listtopic</type>
 			<name>Zone transfers</name>
-			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>Hosts allowed to perform DNS Zone Transfers - Note: this requires TCP port 53 firewall permit rule!</fielddescr>
 			<fieldname>none</fieldname>
-		    <type>rowhelper</type>
-		    <rowhelper>
-			<rowhelperfield>
-			    <fielddescr>IP Address</fielddescr>
-			    <fieldname>ztipaddress</fieldname>
-			    <description>Enter the IP Address that is allowed to transfer zone records (ex: 4.2.2.1)</description>
-			    <type>input</type>
-			    <size>20</size>
-			</rowhelperfield>
-			<rowhelperfield>
-			    <fielddescr>DNS Zone - Use * for all Zones</fielddescr>
-			    <fieldname>dnszone</fieldname>
-			    <description>Enter the DNS zone that this IP address is allowed to transfer (ex: domain.com)</description>
-			    <type>input</type>
-			    <size>20</size>
-			</rowhelperfield>			
-		    </rowhelper>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>IP Address</fielddescr>
+					<fieldname>ztipaddress</fieldname>
+					<description>Enter the IP Address that is allowed to transfer zone records (ex: 4.2.2.1)</description>
+					<type>input</type>
+					<size>20</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>DNS Zone - Use * for all Zones</fielddescr>
+					<fieldname>dnszone</fieldname>
+					<description>Enter the DNS zone that this IP address is allowed to transfer (ex: domain.com)</description>
+					<type>input</type>
+					<size>20</size>
+				</rowhelperfield>
+			</rowhelper>
 		</field>
 	</fields>
 	<custom_delete_php_command>
@@ -261,7 +235,7 @@
 		tinydns_custom_php_install_command();
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
-		tinydns_sync_on_changes();		
+		tinydns_sync_on_changes();
 	</custom_delete_php_command>
 	<custom_php_validation_command>
 		tinydns_validate();
@@ -271,28 +245,27 @@
 		tinydns_custom_php_install_command();
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
-		tinydns_sync_on_changes();		
+		tinydns_sync_on_changes();
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		tinydns_custom_php_changeip_command();
 		tinydns_custom_php_install_command();
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
-		tinydns_sync_on_changes();		
+		tinydns_sync_on_changes();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		tinydns_custom_php_install_command();
-		tinydns_sync_on_changes();		
+		tinydns_upgrade_config();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		tinydns_custom_php_deinstall_command();
-		tinydns_sync_on_changes();		
 	</custom_php_deinstall_command>
 	<custom_php_command_before_form>
 		<![CDATA[
-			unset($_POST['temp']);
-			if(!is_process_running("svscan"))
-				$savemsg = "NOTE: svscan is not running.  Please <a href='/status_services.php?mode=restartservice&service=svscan'>start svscan</a> to bring up the DNS Server";
+		if (!is_process_running("svscan")) {
+			$savemsg = "NOTE: svscan is not running. Please <a href='/status_services.php?mode=restartservice&service=svscan'>start svscan</a> to bring up the DNS Server";
+		}
 		]]>
 	</custom_php_command_before_form>
 </packagegui>

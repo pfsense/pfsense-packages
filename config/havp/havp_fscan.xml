@@ -1,50 +1,90 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-        <name>havpfscan</name>
-        <title>Antivirus: Files scanner</title>
-        <category>Status</category>
-        <version>none</version>
-        <include_file>/usr/local/pkg/havp.inc</include_file>
-        <tabs>
-                <tab>
-                        <text>General page</text>
-                        <url>/antivirus.php</url>
-                </tab>
-                <tab>
-                        <text>HTTP Proxy</text>
-                        <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
-                </tab>
-                <!--tab>
-                        <text>Files Scanner</text>
-                        <url>/pkg_edit.php?xml=havp_fscan.xml&amp;id=0</url>
-                        <active/>
-                </tab-->
-                <tab>
-                        <text>Settings</text>
-                        <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
-                </tab>
-        </tabs>
-        <fields>
-                <field>
-                        <fielddescr>Scan file path</fielddescr>
-                        <fieldname>scanfilepath</fieldname>
-                        <description>
-				            Enter file path or catalog for scanning. &lt;br&gt;
-                        </description>
-                        <type>input</type>
-                        <size>90</size>
-                </field>
-        </fields>
-        <custom_php_command_before_form>
-            havp_fscan_before_form(&amp;$pkg);
-        </custom_php_command_before_form>
-        <custom_php_validation_command>
-            havp_validate_settings($_POST, &amp;$input_errors);
-        </custom_php_validation_command>
-        <custom_php_resync_config_command>
-        </custom_php_resync_config_command>
-        <custom_php_install_command>
-        </custom_php_install_command>
-        <custom_php_deinstall_command>
-        </custom_php_deinstall_command>
+	<copyright>
+<![CDATA[
+/* $Id$ */
+/* ====================================================================================== */
+/*
+	havp_fscan.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2009-2010 Sergey Dvoriancev <dv_serg@mail.ru>
+	Copyright (C) 2014 Andrew Nikitin <andrey.b.nikitin@gmail.com>.
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
+/*
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
+	]]>
+	</copyright>
+	<name>havpfscan</name>
+	<title>Antivirus: Files Scanner</title>
+	<category>Status</category>
+	<version>none</version>
+	<include_file>/usr/local/pkg/havp.inc</include_file>
+	<tabs>
+		<tab>
+			<text>General Page</text>
+			<url>/antivirus.php</url>
+		</tab>
+		<tab>
+			<text>HTTP Proxy</text>
+			<url>/pkg_edit.php?xml=havp.xml</url>
+		</tab>
+		<!--
+		<tab>
+			<text>Files Scanner</text>
+			<url>/pkg_edit.php?xml=havp_fscan.xml</url>
+			<active/>
+		</tab>
+		-->
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=havp_avset.xml</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Scan File Path</fielddescr>
+			<fieldname>scanfilepath</fieldname>
+			<description>
+				<![CDATA[
+				Enter file path or catalog for scanning.<br />
+				]]>
+			</description>
+			<type>input</type>
+			<size>90</size>
+		</field>
+	</fields>
+	<custom_php_command_before_form>
+		havp_fscan_before_form($pkg);
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		havp_validate_settings($_POST, $input_errors);
+	</custom_php_validation_command>
 </packagegui>

@@ -3,213 +3,317 @@
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-	<![CDATA[
+<![CDATA[
 /* $Id$ */
-/* ========================================================================== */
+/* ====================================================================================== */
 /*
-    bandwidthd.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
-/* ========================================================================== */
+	bandwidthd.xml
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2009 Bill Marquette
+	Copyright (C) 2012-2013 Phil Davis
+	Copyright (C) 2015 ESF, LLC
+	All rights reserved.
+*/
+/* ====================================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
-/* ========================================================================== */
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+/* ====================================================================================== */
 	]]>
 	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
 	<name>bandwidthd</name>
-	<version>2.0.1_5 pkg v.0.3</version>
-	<title>Bandwidthd</title>
-	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
+	<version>0.6.1</version>
+	<title>Diagnostics: Bandwidthd</title>
+	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml</aftersaveredirect>
 	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
 	<menu>
 		<name>BandwidthD</name>
 		<tooltiptext></tooltiptext>
-		<section>Services</section>
-		<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
+		<section>Diagnostics</section>
+		<url>/bandwidthd/index.html</url>
+	</menu>
+	<menu>
+		<name>BandwidthD Settings</name>
+		<tooltiptext></tooltiptext>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=bandwidthd.xml</url>
 	</menu>
 	<service>
-			<name>bandwidthd</name>
-			<rcfile>bandwidthd.sh</rcfile>
-			<executable>bandwidthd</executable>
-			<description>BandwidthD bandwidth monitoring daemon</description>
+		<name>bandwidthd</name>
+		<rcfile>bandwidthd.sh</rcfile>
+		<executable>bandwidthd</executable>
+		<description>BandwidthD bandwidth monitoring daemon</description>
 	</service>
 	<tabs>
 		<tab>
-			<text>BandwidthD</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
 			<text>Access BandwidthD</text>
-			<url>/bandwidthd/index.html" target="_blank</url>
+			<url>/bandwidthd/index.html</url>
 		</tab>
 	</tabs>
+	<advanced_options>enabled</advanced_options>
 	<configpath>installedpackages->package->bandwidthd</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0677</chmod>
 		<item>https://packages.pfsense.org/packages/config/bandwidthd/bandwidthd.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/etc/inc/priv/</prefix>
+		<item>https://packages.pfsense.org/packages/config/bandwidthd/bandwidthd.priv.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>
-			<fielddescr>Enable bandwidthd</fielddescr>
+			<name>General Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable BandwidthD</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>Interface</fielddescr>
+			<fielddescr>BandwidthD Web Interface</fielddescr>
 			<fieldname>active_interface</fieldname>
-			<description>The interface that bandwidthd will bind to.</description>
+			<description>Bind the BandwidthD web interface to IP address of the specified interface.</description>
 			<type>interfaces_selection</type>
+			<hideinterfaceregex>(loopback|wan)</hideinterfaceregex>
 			<required/>
 			<default_value>lan</default_value>
 		</field>
 		<field>
-			<fielddescr>Subnet</fielddescr>
-			<fieldname>subnets_custom</fieldname>
-			<description>The subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24) The ordinary subnet for the selected interface/s is automatically put in the config, do not specify it here.</description>
-			<type>input</type>
+			<fielddescr>Subnet(s) for Statistics Collection</fielddescr>
+			<fieldname>interface_array</fieldname>
+			<description>
+				<![CDATA[
+				The subnet(s) on which BandwidthD will collect statistics. Traffic that matches none of these subnets will be ignored.<br />
+				<strong>Note: PPPoE interfaces are NOT supported!</strong>
+				]]>
+			</description>
+			<type>interfaces_selection</type>
+			<hideinterfaceregex>loopback</hideinterfaceregex>
+			<size>3</size>
+			<multiple>true</multiple>
+			<required/>
 		</field>
 		<field>
-			<fielddescr>Skip intervals</fielddescr>
-			<fieldname>skipintervals</fieldname>
-			<description>Number of intervals to skip between graphing. Default 0. Each interval is 200 seconds = 3 min 20 sec.</description>
+			<fielddescr>Extra Subnet(s) for Statistics Collection</fielddescr>
+			<fieldname>subnets_extra</fieldname>
+			<description>
+				<![CDATA[
+				Specify additional IPv4 subnet(s) in CIDR notation for statistics collection (or leave empty if none).
+				For multiple subnets, separate entries with ';'<br />
+				(Example: 192.168.1.0/24;10.0.0.0/24)<br />
+				<strong>Note: Do NOT specify any local subnets already selected in 'Subnet(s) for Statistics Collection' above!</strong>
+				]]>
+			</description>
 			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Graph cutoff</fielddescr>
-			<fieldname>graphcutoff</fieldname>
-			<description>Graph cutoff is how many KB must be transferred by an IP before it is graphed. Default 1024.</description>
-			<type>input</type>
+			<size>50</size>
 		</field>
 		<field>
 			<fielddescr>Promiscuous</fielddescr>
 			<fieldname>promiscuous</fieldname>
-			<description>Put interface in promiscuous mode to see traffic that may not be routing through the host machine.&lt;br&gt;
-			Note: If the interface is connected to a switch then the interface will only see the traffic on its port.</description>
+			<description>
+				<![CDATA[
+				Put interface in promiscuous mode to see traffic that may not be routing through the host machine.<br />
+				Note: If the interface is connected to a switch then the interface will only see the traffic on its port.
+				]]>
+			</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>output_cdf</fielddescr>
-			<fieldname>outputcdf</fieldname>
-			<description>Log data to cdf files log*.cdf</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>recover_cdf</fielddescr>
-			<fieldname>recovercdf</fieldname>
-			<description>Read back the cdf files on startup</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>output PostgreSQL</fielddescr>
-			<fieldname>outputpostgresql</fieldname>
-			<description>Log data to a PostgreSQL database.&lt;br&gt;
-			Get the postgreSQL schema and PHP files to display the results from: &lt;a target="_new" href="https://github.com/individual-it/bandwidthd-pSQL-frontend"&gt;https://github.com/individual-it/bandwidthd-pSQL-frontend&lt;/a&gt;</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Database host</fielddescr>
-			<fieldname>postgresqlhost</fieldname>
-			<description>Hostname of the postgreSQL database server.</description>
+			<fielddescr>Sensor ID</fielddescr>
+			<fieldname>sensorid</fieldname>
+			<description>
+				<![CDATA[
+				Arbitrary sensor name.<br />
+				(Using the sensor's fully qualified domain name is recommended.)
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Database name</fielddescr>
+			<name>Graph Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Draw Graphs</fielddescr>
+			<fieldname>drawgraphs</fieldname>
+			<description>
+				<![CDATA[
+				Enabled by default in order to graph the traffic that BandwidthD is recording. Uncheck this if you only want CDF output or you are using the database output option.<br />
+				BandwidthD will use very little RAM and CPU if this option is disabled.
+				]]>
+			</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+			<enablefields>meta_refresh,skipintervals,graphcutoff</enablefields>
+		</field>
+		<field>
+			<fielddescr>Meta Refresh</fielddescr>
+			<fieldname>meta_refresh</fieldname>
+			<description>
+				<![CDATA[
+				Sets the interval (seconds) at which the browser graph display refreshes<br />
+				Default 150, use 0 to disable.
+				]]>
+			</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Skip Intervals</fielddescr>
+			<fieldname>skipintervals</fieldname>
+			<description>
+				<![CDATA[
+				Number of intervals to skip between graphing.<br />
+				Default 0. (Each interval is 200 seconds = 3 min 20 sec.)
+				]]>
+			</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph Cutoff</fielddescr>
+			<fieldname>graphcutoff</fieldname>
+			<description>
+				<![CDATA[
+				Graph cutoff means how many KB must be transferred by an IP before it is graphed.<br />
+				Default 1024.
+				]]>
+			</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Output to CDF</fielddescr>
+			<fieldname>outputcdf</fieldname>
+			<description>Log data to CDF files log*.cdf</description>
+			<type>checkbox</type>
+			<enablefields>recovercdf</enablefields>
+		</field>
+		<field>
+			<fielddescr>Recover CDF</fielddescr>
+			<fieldname>recovercdf</fieldname>
+			<description>Read back the CDF files on startup.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Graph and Log Info</fielddescr>
+			<fieldname>graph_log_info</fieldname>
+			<description>
+			<![CDATA[
+				If "Draw Graphs" is on, then the daily report and graph html data is regenerated every (skip intervals + 1) * 200 seconds.&nbsp;
+				The data volumes in the report are for the same period as the span of the graph.<br />
+				If "Output to CDF" is on, then a cron job is added to rotate the log files at 00:01 each day. 6 log files are kept for each log frequency (daily, weekly, monthly, yearly).&nbsp;
+				At the respective rotation intervals, the oldest log is deleted, the others are shuffled back and a new log is created.<br /><br />
+				<table cellpadding="1" cellspacing="0" style="text-align: left"><tbody>
+				<tr><th></th><th>Data Interval</th><th>Graph Span</th><th>Log Rotation</th><th>Log File Name</th></tr>
+				<tr><th>Daily</th><td>200 seconds</td><td>2 days</td><td>1 day</td><td>log.1.[0-5].cdf</td></tr>
+				<tr><th>Weekly</th><td>10 minutes</td><td>7 days</td><td>7 days</td><td>log.2.[0-5].cdf</td></tr>
+				<tr><th>Monthly</th><td>1 hour</td><td>35 days</td><td>35 days</td><td>log.3.[0-5].cdf</td></tr>
+				<tr><th>Yearly</th><td>12 hours</td><td>412.5 days</td><td>412.5 days </td><td>log.4.[0-5].cdf</td></tr>
+				</tbody></table>
+				]]>
+			</description>
+			<type>info</type>
+		</field>
+		<field>
+			<name>PostgreSQL Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Output to PostgreSQL</fielddescr>
+			<fieldname>outputpostgresql</fieldname>
+			<description>
+				<![CDATA[
+				Log data to a PostgreSQL database.<br />
+				Get the PostgreSQL schema and PHP files to display the results from <a href="https://github.com/individual-it/bandwidthd-pSQL-frontend">https://github.com/individual-it/bandwidthd-pSQL-frontend</a>
+				]]>
+			</description>
+			<enablefields>postgresqlhost,postgresqldatabase,postgresqlusername,postgresqlpasswordenc</enablefields>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Database Host</fielddescr>
+			<fieldname>postgresqlhost</fieldname>
+			<description>Hostname of the PostgreSQL database server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Database Name</fielddescr>
 			<fieldname>postgresqldatabase</fieldname>
-			<description>Database on the postgreSQL database server.</description>
+			<description>Database on the PostgreSQL database server.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Database Username</fielddescr>
 			<fieldname>postgresqlusername</fieldname>
-			<description>Username of the postgreSQL database server.</description>
+			<description>Username of the PostgreSQL database server.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Database Password</fielddescr>
-			<fieldname>postgresqlpassword</fieldname>
-			<description>Password of the postgreSQL database server.</description>
+			<fieldname>postgresqlpasswordenc</fieldname>
+			<description>Password of the PostgreSQL database server.</description>
 			<type>password</type>
+			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>sensor_id</fielddescr>
-			<fieldname>sensorid</fieldname>
-			<description>Arbitrary sensor name, I recommend the sensors fully qualified domain name.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Filter</fielddescr>
-			<fieldname>filter</fieldname>
-			<description>Libpcap format filter string used to control what bandwidthd sees.  Please always include "ip" in the string to avoid strange problems.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Draw Graphs</fielddescr>
-			<fieldname>drawgraphs</fieldname>
-			<description>This defaults to true to graph the traffic bandwidthd is recording. Set this to false if you only want cdf output or you are using the database output option. Bandwidthd will use very little RAM and CPU if this is set to false.</description>
-			<type>checkbox</type>
-			<default_value>on</default_value>
-		</field>
-		<field>
-			<fielddescr>Meta Refresh</fielddescr>
-			<fieldname>meta_refresh</fieldname>
-			<description>Sets the interval (seconds) at which the browser graph display refreshes (default 150, use 0 to disable).</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Graph and Log Info</fielddescr>
-			<fieldname>graph_log_info</fieldname>
-			<description>If draw graphs is on, then the daily report and graph html data is regenerated every (skip intervals + 1) * 200 seconds. The data volumes in the report are for the same period as the span of the graph.&lt;br&gt;
-			If output_cdf is on, then a cron job is added to rotate the log files at 00:01 each day. 6 log files are kept for each log frequency (daily, weekly, monthly, yearly). At the respective rotation intervals, the oldest log is deleted, the others are shuffled back and a new log is created.&lt;br&gt;
-			&lt;table cellpadding=1 cellspacing=0 style=&quot;text-align: left;&quot;&gt; &lt;tbody&gt;
-			&lt;tr&gt;&lt;th&gt;  &lt;/th&gt;&lt;th&gt; Data Interval &lt;/th&gt;&lt;th&gt; Graph Span &lt;/th&gt;&lt;th&gt; Log Rotation &lt;/th&gt;&lt;th&gt; Log File Name &lt;/th&gt;&lt;/tr&gt;
-			&lt;tr&gt;&lt;th&gt; Daily &lt;/th&gt;&lt;td&gt; 200 seconds &lt;/td&gt;&lt;td&gt; 2 days &lt;/td&gt;&lt;td&gt; 1 day &lt;/td&gt;&lt;td&gt; log.1.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
-			&lt;tr&gt;&lt;th&gt; Weekly &lt;/th&gt;&lt;td&gt; 10 minutes &lt;/td&gt;&lt;td&gt; 7 days &lt;/td&gt;&lt;td&gt; 7 days &lt;/td&gt;&lt;td&gt; log.2.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
-			&lt;tr&gt;&lt;th&gt; Monthly &lt;/th&gt;&lt;td&gt; 1 hour &lt;/td&gt;&lt;td&gt; 35 days &lt;/td&gt;&lt;td&gt; 35 days &lt;/td&gt;&lt;td&gt; log.3.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
-			&lt;tr&gt;&lt;th&gt; Yearly &lt;/th&gt;&lt;td&gt; 12 hours &lt;/td&gt;&lt;td&gt; 412.5 days &lt;/td&gt;&lt;td&gt; 412.5 days &lt;/td&gt;&lt;td&gt; log.4.[0-5].cdf &lt;/td&gt;&lt;/tr&gt;
-			&lt;/tbody&gt; &lt;/table&gt;
+			<fielddescr>Advanced Filter</fielddescr>
+			<fieldname>advfilter</fieldname>
+			<description>
+				<![CDATA[
+				Libpcap format filter string used to control what traffic is counted.&nbsp;
+				Please, refer to <a href="https://www.freebsd.org/cgi/man.cgi?query=pcap-filter&amp;sektion=7&amp;apropos=0&amp;manpath=FreeBSD+10.1-RELEASE+and+Ports">pcap-filter(7)</a> for documentation.
+				<br />
+				NOTE: You should always specify "ip" in the filter to avoid strange results.<br /><br />
+				Example: We only want to account for a certain IP.<br />
+				Filter expression: <em>ip and host 192.0.2.1</em><br /><br />
+				<strong>WARNING: You are completely on your own with this! If misconfigured, BandwidthD will malfunction or even not start at all.</strong>
+				]]>
 			</description>
-			<type>info</type>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<cols>65</cols>
+			<rows>5</rows>
+			<advancedfield/>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		bandwidthd_install_config();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
+		bandwidthd_upgrade_config();
 		bandwidthd_install_config();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		bandwidthd_install_deinstall();
 	</custom_php_deinstall_command>
+	<custom_php_validation_command>
+		bandwidthd_validate_input($_POST, $input_errors);
+	</custom_php_validation_command>
 </packagegui>

@@ -38,7 +38,6 @@ function global_write_squid_config()
 {
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
     /* define squid configuration file in variable for replace function */
     $squidconfig = "/usr/local/etc/squid/squid.conf";
@@ -791,7 +790,6 @@ function global_write_squid_config()
 	fclose($fout);
 
 	conf_mount_ro();
-	config_unlock();
 
 	touch($squidconfig);
 } /* end function write_squid_config */
@@ -1032,7 +1030,6 @@ function write_static_squid_config() {
 function mod_htpasswd() {
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
 	if (!file_exists("/usr/local/etc/squid/advanced/ncsa")) mwexec("mkdir -p /usr/local/etc/squid/advanced/ncsa");
 
@@ -1048,7 +1045,6 @@ function mod_htpasswd() {
 	fclose($passfile);
 
 	conf_mount_ro();
-	config_unlock();
 }
 
 function generate_htpasswd($username, $password) {

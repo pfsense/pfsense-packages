@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2008-2009 Robert Zelaya.
  * Copyright (C) 2011-2012 Ermal Luci
- * Copyright (C) 2014 Bill Meeks
+ * Copyright (C) 2015 Bill Meeks
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-global $g, $rebuild_rules;
+global $g, $config, $rebuild_rules;
 
 $snortdir = SNORTDIR;
 $snortlogdir = SNORTLOGDIR;
@@ -54,6 +54,13 @@ if (is_null($id)) {
         header("Location: /snort/snort_interfaces.php");
         exit;
 }
+
+if (isset($_POST['action']))
+	$action = htmlspecialchars($_POST['action'], ENT_QUOTES | ENT_HTML401);
+elseif (isset($_GET['action']))
+	$action = htmlspecialchars($_GET['action'], ENT_QUOTES | ENT_HTML401);
+else
+	$action = "";
 
 $pconfig = array();
 if (empty($snortglob['rule'][$id]['uuid'])) {
@@ -89,7 +96,7 @@ elseif (isset($id) && !isset($a_rule[$id])) {
 	foreach ($ifaces as $i) {
 		if (!in_array($i, $ifrules)) {
 			$pconfig['interface'] = $i;
-			$pconfig['descr'] = strtoupper($i);
+			$pconfig['descr'] = convert_friendly_interface_to_friendly_descr($i);
 			$pconfig['enable'] = 'on';
 			break;
 		}
@@ -106,8 +113,41 @@ if (empty($pconfig['blockoffendersip']))
 	$pconfig['blockoffendersip'] = "both";
 if (empty($pconfig['performance']))
 	$pconfig['performance'] = "ac-bnfa";
+if (empty($pconfig['alertsystemlog_facility']))
+	$pconfig['alertsystemlog_facility'] = "log_auth";
+if (empty($pconfig['alertsystemlog_priority']))
+	$pconfig['alertsystemlog_priority'] = "log_alert";
 
-if ($_POST["save"]) {
+// See if creating a new interface by duplicating an existing one
+if (strcasecmp($action, 'dup') == 0) {
+
+	// Try to pick the next available physical interface to use
+	$ifaces = get_configured_interface_list();
+	$ifrules = array();
+	foreach($a_rule as $r)
+		$ifrules[] = $r['interface'];
+	foreach ($ifaces as $i) {
+		if (!in_array($i, $ifrules)) {
+			$pconfig['interface'] = $i;
+			$pconfig['enable'] = 'on';
+			$pconfig['descr'] = convert_friendly_interface_to_friendly_descr($i);
+			break;
+		}
+	}
+	if (count($ifrules) == count($ifaces)) {
+		$input_errors[] = gettext("No more available interfaces to configure for Snort!");
+		$interfaces = array();
+		$pconfig = array();
+	}
+
+	// Set Home Net, External Net, Suppress List and Pass List to defaults
+	unset($pconfig['suppresslistname']);
+	unset($pconfig['whitelistname']);
+	unset($pconfig['homelistname']);
+	unset($pconfig['externallistname']);
+}
+
+if ($_POST["save"] && !$input_errors) {
 	if (!isset($_POST['interface']))
 		$input_errors[] = "Interface is mandatory";
 
@@ -121,8 +161,32 @@ if ($_POST["save"]) {
 		}
 	}
 
+	// If Snort is disabled on this interface, stop any running instance,
+	// save the change, and exit.
+	if ($_POST['enable'] != 'on') {
+		$a_rule[$id]['enable'] = $_POST['enable'] ? 'on' : 'off';
+		touch("{$g['varrun_path']}/snort_{$a_rule[$id]['uuid']}.disabled");
+		touch("{$g['varrun_path']}/barnyard2_{$a_rule[$id]['uuid']}.disabled");
+		snort_stop($a_rule[$id], get_real_interface($a_rule[$id]['interface']));
+		write_config("Snort pkg: modified interface configuration for {$a_rule[$id]['interface']}.");
+		$rebuild_rules = false;
+		conf_mount_rw();
+		sync_snort_package_config();
+		conf_mount_ro();
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /snort/snort_interfaces.php");
+		exit;
+	}
+
 	/* if no errors write to conf */
 	if (!$input_errors) {
+		/* Most changes don't require a rules rebuild, so default to "off" */
+		$rebuild_rules = false;
+
 		$natent = $a_rule[$id];
 		$natent['interface'] = $_POST['interface'];
 		$natent['enable'] = $_POST['enable'] ? 'on' : 'off';
@@ -137,7 +201,7 @@ if ($_POST["save"]) {
 		if ($_POST['suppresslistname'] && ($_POST['suppresslistname'] <> $natent['suppresslistname']))
 			$snort_reload = true;
 
-		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = strtoupper($natent['interface']);
+		if ($_POST['descr']) $natent['descr'] =  $_POST['descr']; else $natent['descr'] = convert_friendly_interface_to_friendly_descr($natent['interface']);
 		if ($_POST['performance']) $natent['performance'] = $_POST['performance']; else  unset($natent['performance']);
 		/* if post = on use on off or rewrite the conf */
 		if ($_POST['blockoffenders7'] == "on") $natent['blockoffenders7'] = 'on'; else $natent['blockoffenders7'] = 'off';
@@ -150,14 +214,16 @@ if ($_POST["save"]) {
 		if ($_POST['externallistname']) $natent['externallistname'] =  $_POST['externallistname']; else unset($natent['externallistname']);
 		if ($_POST['suppresslistname']) $natent['suppresslistname'] =  $_POST['suppresslistname']; else unset($natent['suppresslistname']);
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = 'on'; }else{ $natent['alertsystemlog'] = 'off'; }
-		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode($_POST['configpassthru']); else unset($natent['configpassthru']);
+		if ($_POST['alertsystemlog_facility']) $natent['alertsystemlog_facility'] = $_POST['alertsystemlog_facility'];
+		if ($_POST['alertsystemlog_priority']) $natent['alertsystemlog_priority'] = $_POST['alertsystemlog_priority'];
+		if ($_POST['configpassthru']) $natent['configpassthru'] = base64_encode(str_replace("\r\n", "\n", $_POST['configpassthru'])); else unset($natent['configpassthru']);
 		if ($_POST['cksumcheck']) $natent['cksumcheck'] = 'on'; else $natent['cksumcheck'] = 'off';
 		if ($_POST['fpm_split_any_any'] == "on") { $natent['fpm_split_any_any'] = 'on'; }else{ $natent['fpm_split_any_any'] = 'off'; }
 		if ($_POST['fpm_search_optimize'] == "on") { $natent['fpm_search_optimize'] = 'on'; }else{ $natent['fpm_search_optimize'] = 'off'; }
 		if ($_POST['fpm_no_stream_inserts'] == "on") { $natent['fpm_no_stream_inserts'] = 'on'; }else{ $natent['fpm_no_stream_inserts'] = 'off'; }
 
 		$if_real = get_real_interface($natent['interface']);
-		if (isset($id) && $a_rule[$id]) {
+		if (isset($id) && $a_rule[$id] && $action == '') {
 			// See if moving an existing Snort instance to another physical interface
 			if ($natent['interface'] != $a_rule[$id]['interface']) {
 				$oif_real = get_real_interface($a_rule[$id]['interface']);
@@ -167,13 +233,24 @@ if ($_POST["save"]) {
 				}
 				else
 					$snort_start = false;
-				exec("mv -f {$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']} {$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");
+				@rename("{$snortlogdir}/snort_{$oif_real}{$a_rule[$id]['uuid']}", "{$snortlogdir}/snort_{$if_real}{$a_rule[$id]['uuid']}");
 				conf_mount_rw();
-				exec("mv -f {$snortdir}/snort_{$a_rule[$id]['uuid']}_{$oif_real} {$snortdir}/snort_{$a_rule[$id]['uuid']}_{$if_real}");
+				@rename("{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$oif_real}", "{$snortdir}/snort_{$a_rule[$id]['uuid']}_{$if_real}");
 				conf_mount_ro();
 			}
 			$a_rule[$id] = $natent;
-		} else {
+		}
+		elseif (strcasecmp($action, 'dup') == 0) {
+			// Duplicating a new interface, so set flag to build new rules
+			$rebuild_rules = true;
+
+			// Duplicating an interface, so need to generate a new UUID for the cloned interface
+			$natent['uuid'] = snort_generate_id();
+
+			// Add the new duplicated interface configuration to the [rule] array in config
+			$a_rule[] = $natent;
+		}
+		else {
 			// Adding new interface, so set required interface configuration defaults
 			$frag3_eng = array( "name" => "default", "bind_to" => "all", "policy" => "bsd", 
 					    "timeout" => 60, "min_ttl" => 1, "detect_anomalies" => "on", 
@@ -192,7 +269,8 @@ if ($_POST["save"]) {
 					   "unlimited_decompress" => "on", "inspect_gzip" => "on", "normalize_cookies" =>"on", 
 					   "normalize_headers" => "on", "normalize_utf" => "on", "normalize_javascript" => "on", 
 					   "allow_proxy_use" => "off", "inspect_uri_only" => "off", "max_javascript_whitespaces" => 200,
-					   "post_depth" => -1, "max_headers" => 0, "max_spaces" => 0, "max_header_length" => 0, "ports" => "default" );
+					   "post_depth" => -1, "max_headers" => 0, "max_spaces" => 0, "max_header_length" => 0, "ports" => "default",
+					   "decompress_swf" => "off", "decompress_pdf" => "off" );
 
 			$ftp_client_eng = array( "name" => "default", "bind_to" => "all", "max_resp_len" => 256, 
 						 "telnet_cmds" => "no", "ignore_telnet_erase_cmds" => "yes", 
@@ -221,11 +299,35 @@ if ($_POST["save"]) {
 			$natent['ftp_server_engine']['item'][] = $ftp_server_eng;
 
 			$natent['smtp_preprocessor'] = 'on';
+			$natent['smtp_memcap'] = "838860";
+			$natent['smtp_max_mime_mem'] = "838860";
+			$natent['smtp_b64_decode_depth'] = "0";
+			$natent['smtp_qp_decode_depth'] = "0";
+			$natent['smtp_bitenc_decode_depth'] = "0";
+			$natent['smtp_uu_decode_depth'] = "0";
+			$natent['smtp_email_hdrs_log_depth'] = "1464";
+			$natent['smtp_ignore_data'] = 'off';
+			$natent['smtp_ignore_tls_data'] = 'on';
+			$natent['smtp_log_mail_from'] = 'on';
+			$natent['smtp_log_rcpt_to'] = 'on';
+			$natent['smtp_log_filename'] = 'on';
+			$natent['smtp_log_email_hdrs'] = 'on';
+
 			$natent['dce_rpc_2'] = 'on';
 			$natent['dns_preprocessor'] = 'on';
 			$natent['ssl_preproc'] = 'on';
 			$natent['pop_preproc'] = 'on';
+			$natent['pop_memcap'] = "838860";
+			$natent['pop_b64_decode_depth'] = "0";
+			$natent['pop_qp_decode_depth'] = "0";
+			$natent['pop_bitenc_decode_depth'] = "0";
+			$natent['pop_uu_decode_depth'] = "0";
 			$natent['imap_preproc'] = 'on';
+			$natent['imap_memcap'] = "838860";
+			$natent['imap_b64_decode_depth'] = "0";
+			$natent['imap_qp_decode_depth'] = "0";
+			$natent['imap_bitenc_decode_depth'] = "0";
+			$natent['imap_uu_decode_depth'] = "0";
 			$natent['sip_preproc'] = 'on';
 			$natent['other_preprocs'] = 'on';
 
@@ -265,6 +367,14 @@ if ($_POST["save"]) {
 				$natent['stream5_tcp_engine']['item'] = array();
 			$natent['stream5_tcp_engine']['item'][] = $stream5_eng;
 
+			$natent['alertsystemlog_facility'] = "log_auth";
+			$natent['alertsystemlog_priority'] = "log_alert";
+
+			$natent['appid_preproc'] = "off";
+			$natent['sf_appid_mem_cap'] = "256";
+			$natent['sf_appid_statslog'] = "on";
+			$natent['sf_appid_stats_period'] = "300";
+
 			$a_rule[] = $natent;
 		}
 
@@ -275,15 +385,15 @@ if ($_POST["save"]) {
 		/* Save configuration changes */
 		write_config("Snort pkg: modified interface configuration for {$natent['interface']}.");
 
-		/* Most changes don't require a rules rebuild, so default to "off" */
-		$rebuild_rules = false;
-
 		/* Update snort.conf and snort.sh files for this interface */
+		conf_mount_rw();
 		sync_snort_package_config();
+		conf_mount_ro();
 
 		/* See if we need to restart Snort after an interface re-assignment */
-		if ($snort_start == true)
+		if ($snort_start == true) {
 			snort_start($natent, $if_real);
+		}
 
 		/*******************************************************/
 		/* Signal Snort to reload configuration if we changed  */
@@ -326,6 +436,7 @@ include_once("head.inc");
 
 <form action="snort_interfaces_edit.php" method="post" name="iform" id="iform">
 <input name="id" type="hidden" value="<?=$id;?>"/>
+<input name="action" type="hidden" value="<?=$action;?>"/>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
@@ -338,7 +449,9 @@ include_once("head.inc");
 	$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 	$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-	$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+	$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+	$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+	$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 	display_top_tabs($tab_array, true);
 	echo '</td></tr>';
 	echo '<tr><td class="tabnavtbl">';
@@ -351,6 +464,7 @@ include_once("head.inc");
 	$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
 	$tab_array[] = array($menu_iface . gettext("IP Rep"), false, "/snort/snort_ip_reputation.php?id={$id}");
+	$tab_array[] = array($menu_iface . gettext("Logs"), false, "/snort/snort_interface_logs.php?id={$id}");
 	display_top_tabs($tab_array, true);
 ?>
 </td></tr>
@@ -397,9 +511,44 @@ include_once("head.inc");
 	</tr>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Send Alerts to System Logs"); ?></td>
-				<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?>/>
+				<td width="78%" class="vtable"><input name="alertsystemlog" type="checkbox" value="on" onclick="toggle_system_log();" <?php if ($pconfig['alertsystemlog'] == "on") echo " checked"; ?>/>
 				<?php echo gettext("Snort will send Alerts to the firewall's system logs."); ?></td>
 	</tr>
+	<tbody id="alertsystemlog_rows">
+		<tr>
+			<td width="22%" valign="top" class="vncell"><?php echo gettext("System Log Facility"); ?></td>
+			<td width="78%" class="vtable">
+				<select name="alertsystemlog_facility" id="alertsystemlog_facility" class="formselect">
+				<?php
+					$log_facility = array(  "log_auth", "log_authpriv", "log_daemon", "log_user", "log_local0", "log_local1",
+								"log_local2", "log_local3", "log_local4", "log_local5", "log_local6", "log_local7" );
+					foreach ($log_facility as $facility) {
+						$selected = "";
+						if ($facility == $pconfig['alertsystemlog_facility'])
+							$selected = " selected";
+						echo "<option value='{$facility}'{$selected}>" . $facility . "</option>\n";
+					}
+				?></select>&nbsp;&nbsp;
+				<?php echo gettext("Select system log Facility to use for reporting.  Default is ") . "<strong>" . gettext("log_auth") . "</strong>."; ?>
+			</td>
+		</tr>
+		<tr>
+			<td width="22%" valign="top" class="vncell"><?php echo gettext("System Log Priority"); ?></td>
+			<td width="78%" class="vtable">
+				<select name="alertsystemlog_priority" id="alertsystemlog_priority" class="formselect">
+				<?php
+					$log_priority = array( "log_emerg", "log_crit", "log_alert", "log_err", "log_warning", "log_notice", "log_info", "log_debug" );
+					foreach ($log_priority as $priority) {
+						$selected = "";
+						if ($priority == $pconfig['alertsystemlog_priority'])
+							$selected = " selected";
+						echo "<option value='{$priority}'{$selected}>" . $priority . "</option>\n";
+					}
+				?></select>&nbsp;&nbsp;
+				<?php echo gettext("Select system log Priority (Level) to use for reporting.  Default is ") . "<strong>" . gettext("log_alert") . "</strong>."; ?>
+			</td>
+		</tr>
+	</tbody>
 	<tr>
 				<td width="22%" valign="top" class="vncell"><?php echo gettext("Block Offenders"); ?></td>
 				<td width="78%" class="vtable">
@@ -555,13 +704,17 @@ include_once("head.inc");
 							}
 						}
 					?>
-					</select>&nbsp;&nbsp;
-					<span class="vexpl"><?php echo gettext("Choose the External Net you want this interface " .
-					"to use."); ?></span>&nbsp;<br/><br/>
+					</select>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" class="formbtns" value="View List"  
+					onclick="viewList('<?=$id;?>','externallistname','externalnet')" id="btnExternalNet" 
+					title="<?php echo gettext("Click to view currently selected External Net contents"); ?>"/>
+					<br/>
+					<?php echo gettext("Choose the External Net you want this interface " .
+					"to use."); ?>&nbsp;<br/><br/>
 					<span class="red"><?php echo gettext("Note:"); ?></span>&nbsp;<?php echo gettext("Default " .
-					"External Net is networks that are not Home Net."); ?><br/>
-					<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;<?php echo gettext("Most users should leave this " .
-					"setting at default.  Create an Alias for custom External Net settings."); ?><br/>
+					"External Net is networks that are not Home Net.  Most users should leave this setting at default."); ?><br/>
+					<span class="red"><?php echo gettext("Hint:"); ?></span>&nbsp;
+					<?php echo gettext("Create a Pass List and add an Alias to it, and then assign the Pass List here for custom External Net settings."); ?><br/>
 				</td>
 	</tr>
 	<tr>
@@ -659,6 +812,14 @@ function enable_blockoffenders() {
 	document.iform.btnWhitelist.disabled=endis;
 }
 
+function toggle_system_log() {
+	var endis = !(document.iform.alertsystemlog.checked);
+	if (endis)
+		document.getElementById("alertsystemlog_rows").style.display="none";
+	else
+		document.getElementById("alertsystemlog_rows").style.display="";
+}
+
 function enable_change(enable_change) {
 	endis = !(document.iform.enable.checked || enable_change);
 	// make sure a default answer is called if this is invoked.
@@ -713,6 +874,7 @@ function viewList(id, elemID, elemType) {
 
 enable_change(false);
 enable_blockoffenders();
+toggle_system_log();
 
 //-->
 </script>

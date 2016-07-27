@@ -45,7 +45,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeradiusclients</name>
-	<version>none</version>
+	<version>2.2.0</version>
 	<title>FreeRADIUS: Clients</title>
 	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<tabs>
@@ -132,13 +132,13 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>GENERAL CONFIGURATION</name>
+			<name>General Configuration</name>
 			<type>listtopic</type>
 		</field>	
 		<field>
 			<fielddescr>Client IP Address</fielddescr>
 			<fieldname>varclientip</fieldname>
-			<description><![CDATA[Enter the IP address of the client. This is in general the IP of the NAS (switch,accesspoint).]]></description>
+			<description><![CDATA[Enter the IP address of the RADIUS client. This is the IP of the NAS (switch, access point, firewall, router, etc.).]]></description>
 			<type>input</type>
 			<required/>
 		</field>
@@ -156,19 +156,19 @@
 		<field>
 			<fielddescr>Client Shortname</fielddescr>
 			<fieldname>varclientshortname</fieldname>
-			<description><![CDATA[Enter shortname of the client. This is in general the hostname of the NAS (switch,accesspoint).]]></description>
+			<description><![CDATA[Enter a short name for the client. This is generally the hostname of the NAS.]]></description>
 			<type>input</type>
 			<required/>
 		</field>
 		<field>
 			<fielddescr>Client Shared Secret</fielddescr>
 			<fieldname>varclientsharedsecret</fieldname>
-			<description><![CDATA[Enter the shared secret of the client here. This is the shared secret (password) which the NAS (switch or accesspoint) needs to communicate with the RADIUS server.]]></description>
+			<description><![CDATA[Enter the shared secret of the RADIUS client here. This is the shared secret (password) which the NAS (switch or accesspoint) needs to communicate with the RADIUS server. FreeRADIUS is limited to 31 characters for the shared secret.]]></description>
 			<type>password</type>
 			<required/>
 		</field>
 		<field>
-			<name>MISCELLANEOUS CONFIGURATION</name>
+			<name>Miscellaneous Configuration</name>
 			<type>listtopic</type>
 		</field>		
 		<field>

@@ -10,6 +10,7 @@
  * Copyright (C) 2006 Scott Ullrich
  * Copyright (C) 2009 Robert Zelaya Sr. Developer
  * Copyright (C) 2012 Ermal Luci
+ * Copyright (C) 2014 Jim Pingle jim@pingle.org
  * All rights reserved.
  *
  * Adapted for Suricata by:
@@ -41,6 +42,8 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/suricata/suricata.inc");
 
+global $g, $config;
+
 $suricatalogdir = SURICATALOGDIR;
 $suri_pf_table = SURICATA_PF_TABLE;
 
@@ -54,6 +57,21 @@ if (empty($pconfig['blertnumber']))
 	$bnentries = '500';
 else
 	$bnentries = $pconfig['blertnumber'];
+
+# --- AJAX REVERSE DNS RESOLVE Start ---
+if (isset($_POST['resolve'])) {
+	$ip = strtolower($_POST['resolve']);
+	$res = (is_ipaddr($ip) ? gethostbyaddr($ip) : '');
+	
+	if ($res && $res != $ip)
+		$response = array('resolve_ip' => $ip, 'resolve_text' => $res);
+	else
+		$response = array('resolve_ip' => $ip, 'resolve_text' => gettext("Cannot resolve"));
+	
+	echo json_encode(str_replace("\\","\\\\", $response)); // single escape chars can break JSON decode
+	exit;
+}
+# --- AJAX REVERSE DNS RESOLVE End ---
 
 if ($_POST['todelete']) {
 	$ip = "";
@@ -78,22 +96,22 @@ if ($_POST['download'])
 	exec("/sbin/pfctl -t {$suri_pf_table} -T show", $blocked_ips_array_save);
 	/* build the list */
 	if (is_array($blocked_ips_array_save) && count($blocked_ips_array_save) > 0) {
-		$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+		$save_date = date("Y-m-d-H-i-s");
 		$file_name = "suricata_blocked_{$save_date}.tar.gz";
-		exec('/bin/mkdir -p /tmp/suricata_blocked');
-		file_put_contents("/tmp/suricata_blocked/suricata_block.pf", "");
+		safe_mkdir("{$g['tmp_path']}/suricata_blocked");
+		file_put_contents("{$g['tmp_path']}/suricata_blocked/suricata_block.pf", "");
 		foreach($blocked_ips_array_save as $counter => $fileline) {
 			if (empty($fileline))
 				continue;
 			$fileline = trim($fileline, " \n\t");
-			file_put_contents("/tmp/suricata_blocked/suricata_block.pf", "{$fileline}\n", FILE_APPEND);
+			file_put_contents("{$g['tmp_path']}/suricata_blocked/suricata_block.pf", "{$fileline}\n", FILE_APPEND);
 		}
 
 		// Create a tar gzip archive of blocked host IP addresses
-		exec("/usr/bin/tar -czf /tmp/{$file_name} -C/tmp/suricata_blocked suricata_block.pf");
+		exec("/usr/bin/tar -czf {$g['tmp_path']}/{$file_name} -C{$g['tmp_path']}/suricata_blocked suricata_block.pf");
 
 		// If we successfully created the archive, send it to the browser.
-		if(file_exists("/tmp/{$file_name}")) {
+		if(file_exists("{$g['tmp_path']}/{$file_name}")) {
 			ob_start(); //important or other posts will fail
 			if (isset($_SERVER['HTTPS'])) {
 				header('Pragma: ');
@@ -103,14 +121,14 @@ if ($_POST['download'])
 				header("Cache-Control: private, must-revalidate");
 			}
 			header("Content-Type: application/octet-stream");
-			header("Content-length: " . filesize("/tmp/{$file_name}"));
+			header("Content-length: " . filesize("{$g['tmp_path']}/{$file_name}"));
 			header("Content-disposition: attachment; filename = {$file_name}");
 			ob_end_clean(); //important or other post will fail
-			readfile("/tmp/{$file_name}");
+			readfile("{$g['tmp_path']}/{$file_name}");
 
 			// Clean up the temp files and directory
-			@unlink("/tmp/{$file_name}");
-			exec("/bin/rm -fr /tmp/suricata_blocked");
+			unlink_if_exists("{$g['tmp_path']}/{$file_name}");
+			rmdir_recursive("{$g['tmp_path']}/suricata_blocked");
 		} else
 			$savemsg = gettext("An error occurred while creating archive");
 	} else
@@ -138,8 +156,6 @@ include_once("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<script src="/javascript/filter_log.js" type="text/javascript"></script>
-
 <?php
 
 include_once("fbegin.inc");
@@ -147,33 +163,39 @@ include_once("fbegin.inc");
 /* refresh every 60 secs */
 if ($pconfig['brefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/suricata/suricata_blocked.php\" />\n";
+?>
 
+<form action="/suricata/suricata_blocked.php" method="post">
+<input type="hidden" name="ip" id="ip" value=""/>
+
+<?php
 /* Display Alert message */
 if ($input_errors) {
-	print_input_errors($input_errors); // TODO: add checks
+	print_input_errors($input_errors);
 }
 if ($savemsg) {
 	print_info_box($savemsg);
 }
 ?>
 
-<form action="/suricata/suricata_blocked.php" method="post">
-<input type="hidden" name="ip" id="ip" value=""/>
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tbody>
 <tr>
 	<td>
 	<?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Suricata Interfaces"), false, "/suricata/suricata_interfaces.php");
+	$tab_array[] = array(gettext("Interfaces"), false, "/suricata/suricata_interfaces.php");
 	$tab_array[] = array(gettext("Global Settings"), false, "/suricata/suricata_global.php");
-	$tab_array[] = array(gettext("Update Rules"), false, "/suricata/suricata_download_updates.php");
+	$tab_array[] = array(gettext("Updates"), false, "/suricata/suricata_download_updates.php");
 	$tab_array[] = array(gettext("Alerts"), false, "/suricata/suricata_alerts.php");
-	$tab_array[] = array(gettext("Blocked"), true, "/suricata/suricata_blocked.php");
+	$tab_array[] = array(gettext("Blocks"), true, "/suricata/suricata_blocked.php");
 	$tab_array[] = array(gettext("Pass Lists"), false, "/suricata/suricata_passlist.php");
 	$tab_array[] = array(gettext("Suppress"), false, "/suricata/suricata_suppress.php");
-	$tab_array[] = array(gettext("Logs Browser"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
+	$tab_array[] = array(gettext("Logs View"), false, "/suricata/suricata_logs_browser.php?instance={$instanceid}");
 	$tab_array[] = array(gettext("Logs Mgmt"), false, "/suricata/suricata_logs_mgmt.php");
+	$tab_array[] = array(gettext("SID Mgmt"), false, "/suricata/suricata_sid_mgmt.php");
+	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=suricata/suricata_sync.xml");
+	$tab_array[] = array(gettext("IP Lists"), false, "/suricata/suricata_ip_list_mgmt.php");
 	display_top_tabs($tab_array, true);
 	?>
 	</td>
@@ -181,6 +203,7 @@ if ($savemsg) {
 <tr>
 	<td><div id="mainarea">
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tbody>
 			<tr>
 				<td colspan="2" class="listtopic"><?php echo gettext("Blocked Hosts Log View Settings"); ?></td>
 			</tr>
@@ -190,7 +213,7 @@ if ($savemsg) {
 				<input name="download" type="submit" class="formbtns" value="Download" title="<?=gettext("Download list of blocked hosts as a gzip archive");?>"/>
 				&nbsp;<?php echo gettext("All blocked hosts will be saved."); ?>&nbsp;&nbsp;
 				<input name="remove" type="submit" class="formbtns" value="Clear" title="<?=gettext("Remove blocks for all listed hosts");?>" 
-				onClick="return confirm('<?=gettext("Are you sure you want to remove all blocked hosts?  Click OK to continue or CANCLE to quit.");?>');"/>&nbsp;
+				onClick="return confirm('<?=gettext("Are you sure you want to remove all blocked hosts?  Click OK to continue or CANCEL to quit.");?>');"/>&nbsp;
 				<span class="red"><strong><?php echo gettext("Warning:"); ?></strong></span>&nbsp;<?php echo gettext("all hosts will be removed."); ?>
 				</td>
 			</tr>
@@ -219,11 +242,11 @@ if ($savemsg) {
 						<col width="10%" align="center">
 					</colgroup>
 					<thead>
-					   <tr>
+					   <tr class="sortableHeaderRowIdentifier">
 						<th class="listhdrr" axis="number">#</th>
 						<th class="listhdrr" axis="string"><?php echo gettext("IP"); ?></th>
 						<th class="listhdrr" axis="string"><?php echo gettext("Alert Description"); ?></th>
-						<th class="listhdrr"><?php echo gettext("Remove"); ?></th>
+						<th class="listhdrr sorttable_nosort"><?php echo gettext("Remove"); ?></th>
 					   </tr>
 					</thead>
 				<tbody>
@@ -239,16 +262,67 @@ if ($savemsg) {
 			foreach (glob("{$suricatalogdir}*/block.log*") as $alertfile) {
 				$fd = fopen($alertfile, "r");
 				if ($fd) {
-					/*	       0         1      2             3      4       5   6              7        8     9  10   */
-					/* File format timestamp,action,sig_generator,sig_id,sig_rev,msg,classification,priority,proto,ip,port */
-					while (($fields = fgetcsv($fd, 1000, ',', '"')) !== FALSE) {
-						if(count($fields) < 11)
+
+					/*************** FORMAT for file -- BLOCK -- **************************************************************************/
+					/* Line format: timestamp  action [**] [gid:sid:rev] msg [**] [Classification: class] [Priority: pri] {proto} ip:port */
+					/*              0          1            2   3   4    5                         6                 7     8      9  10   */
+					/**********************************************************************************************************************/
+
+					$buf = "";
+					while (($buf = fgets($fd)) !== FALSE) {
+						$fields = array();
+						$tmp = array();
+
+						/***************************************************************/
+						/* Parse block log entry to find the parts we want to display. */
+						/* We parse out all the fields even though we currently use    */
+						/* just a few of them.                                         */
+						/***************************************************************/
+
+						// Field 0 is the event timestamp
+						$fields['time'] = substr($buf, 0, strpos($buf, '  '));
+
+						// Field 1 is the action
+						if (strpos($buf, '[') !== FALSE && strpos($buf, ']') !== FALSE)
+							$fields['action'] = substr($buf, strpos($buf, '[') + 1, strpos($buf, ']') - strpos($buf, '[') - 1);
+						else
+							$fields['action'] = null;
+
+						// The regular expression match below returns an array as follows:
+						// [2] => GID, [3] => SID, [4] => REV, [5] => MSG, [6] => CLASSIFICATION, [7] = PRIORITY
+						preg_match('/\[\*{2}\]\s\[((\d+):(\d+):(\d+))\]\s(.*)\[\*{2}\]\s\[Classification:\s(.*)\]\s\[Priority:\s(\d+)\]\s/', $buf, $tmp);
+						$fields['gid'] = trim($tmp[2]);
+						$fields['sid'] = trim($tmp[3]);
+						$fields['rev'] = trim($tmp[4]);
+						$fields['msg'] = trim($tmp[5]);
+						$fields['class'] = trim($tmp[6]);
+						$fields['priority'] = trim($tmp[7]);
+
+						// The regular expression match below looks for the PROTO, IP and PORT fields
+						// and returns an array as follows:
+						// [1] = PROTO, [2] => IP:PORT
+						if (preg_match('/\{(.*)\}\s(.*)/', $buf, $tmp)) {
+							// Get PROTO
+							$fields['proto'] = trim($tmp[1]);
+
+							// Get IP
+							$fields['ip'] = trim(substr($tmp[2], 0, strrpos($tmp[2], ':')));
+							if (is_ipaddrv6($fields['ip']))
+								$fields['ip'] = inet_ntop(inet_pton($fields['ip']));
+
+							// Get PORT
+							$fields['port'] = trim(substr($tmp[2], strrpos($tmp[2], ':') + 1));
+						}
+
+						// In the unlikely event we read an old log file and fail to parse
+						// out an IP address, just skip the record since we can't use it.
+						if (empty($fields['ip']))
 							continue;
-						$fields[9] = inet_pton($fields[9]);
-						if (isset($tmpblocked[$fields[9]])) {
-							if (!is_array($src_ip_list[$fields[9]]))
-								$src_ip_list[$fields[9]] = array();
-							$src_ip_list[$fields[9]][$fields[5]] = "{$fields[5]} - " . substr($fields[0], 0, -7);
+						$fields['ip'] = inet_pton($fields['ip']);
+						if (isset($tmpblocked[$fields['ip']])) {
+							if (!is_array($src_ip_list[$fields['ip']]))
+								$src_ip_list[$fields['ip']] = array();
+							$src_ip_list[$fields['ip']][$fields['msg']] = "{$fields['msg']} - " . substr($fields['time'], 0, -7);
 						}
 					}
 					fclose($fd);
@@ -274,18 +348,15 @@ if ($savemsg) {
 				$tmp_ip = str_replace(":", ":&#8203;", $block_ip_str);
 				/* Add reverse DNS lookup icons */
 				$rdns_link = "";
-				$rdns_link .= "<a onclick=\"javascript:getURL('/diag_dns.php?host={$block_ip_str}&dialog_output=true', outputrule);\">";
-				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log_d.gif' width='11' height='11' border='0' ";
-				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup (quick pop-up)") . "' style=\"cursor: pointer;\"></a>&nbsp;";
-				$rdns_link .= "<a href='/diag_dns.php?host={$block_ip_str}'>";
-				$rdns_link .= "<img src='../themes/{$g['theme']}/images/icons/icon_log.gif' width='11' height='11' border='0' ";
-				$rdns_link .= "title='" . gettext("Resolve host via reverse DNS lookup") . "'></a>";
+				$rdns_link .= "<img onclick=\"javascript:resolve_with_ajax('{$block_ip_str}');\" title=\"";
+				$rdns_link .= gettext("Resolve host via reverse DNS lookup") . "\" border=\"0\" src=\"/themes/{$g['theme']}/images/icons/icon_log.gif\" alt=\"Icon Reverse Resolve with DNS\" ";
+				$rdns_link.= " style=\"cursor: pointer;\"/>";
 				/* use one echo to do the magic*/
 					echo "<tr>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$counter}</td>
 						<td align=\"center\" valign=\"middle\" class=\"listr\">{$tmp_ip}<br/>{$rdns_link}</td>
 						<td valign=\"middle\" class=\"listr\">{$blocked_desc}</td>
-						<td align=\"center\" valign=\"middle\" class=\"listr\" sorttable_customkey=\"\">
+						<td align=\"center\" valign=\"middle\" class=\"listr\">
 						<input type=\"image\" name=\"todelete[]\" onClick=\"document.getElementById('ip').value='{$block_ip_str}';\" 
 						src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\" title=\"" . gettext("Delete host from Blocked Table") . "\" border=\"0\" /></td>
 					</tr>\n";
@@ -310,14 +381,49 @@ if ($savemsg) {
 			?>
 			</td>
 		</tr>
+		</tbody>
 	</table>
 	</div>
 	</td>
 </tr>
+</tbody>
 </table>
 </form>
 <?php
 include("fend.inc");
 ?>
+
+<!-- The following AJAX code was borrowed from the diag_logs_filter.php -->
+<!-- file in pfSense.  See copyright info at top of this page.          -->
+<script type="text/javascript">
+//<![CDATA[
+function resolve_with_ajax(ip_to_resolve) {
+	var url = "/suricata/suricata_blocked.php";
+
+	jQuery.ajax(
+		url,
+		{
+			type: 'post',
+			dataType: 'json',
+			data: {
+				resolve: ip_to_resolve,
+				},
+			complete: resolve_ip_callback
+		});
+}
+
+function resolve_ip_callback(transport) {
+	var response = jQuery.parseJSON(transport.responseText);
+	var msg = 'IP address "' + response.resolve_ip + '" resolves to\n';
+	alert(msg + 'host "' + htmlspecialchars(response.resolve_text) + '"');
+}
+
+// From http://stackoverflow.com/questions/5499078/fastest-method-to-escape-html-tags-as-html-entities
+function htmlspecialchars(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+//]]>
+</script>
+
 </body>
 </html>

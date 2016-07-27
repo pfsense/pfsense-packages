@@ -4,7 +4,7 @@
 	varnish.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    Copyright (C) 2011-2013 Marcello Coutinho
+    Copyright (C) 2011-2014 Marcello Coutinho
     Copyright (C) 2012 Marcio Carlos Antao
     All rights reserved.
                                                                               */
@@ -32,25 +32,34 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
+require_once("globals.inc");
+require_once("notices.inc");
+require_once("util.inc");
+require_once("xmlrpc.inc");
+require_once("xmlrpc_client.inc");
+
 $shortcut_section = "varnish";
 
-$pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
-if ($pf_version > 2.0)
-	define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m"));
-else
-  define('VARNISH_LOCALBASE','/usr/local');
+$pfs_version = substr(trim(file_get_contents("/etc/version")),0,3);
+if ($pfs_version == "2.1" || $pfs_version == "2.2") {
+		define('VARNISH_LOCALBASE', '/usr/pbi/varnish-' . php_uname("m"));
+} else {
+	define('VARNISH_LOCALBASE','/usr/local');
+}
 
+define('VARNISH_DIRTYPATH',"{$g['varrun_path']}/varnish.conf.dirty");
+define('VARNISH_CONFFILE','/var/etc/default.vcl');
 
-function varnish_settings_post_validate($post, $input_errors) {
-	if( !is_numeric($post['storagesize'])) 
-		$input_errors[] = "A valid number is required for the field 'Storage size'";	
-	if($post['listeningport'] && !is_numeric($post['listeningport'])) 
-		$input_errors[] = "A valid number is required for the field 'Listening port'";	
-	if($post['minworkers'] && !is_numeric($post['minworkers'])) 
-		$input_errors[] = "A valid number is required for the field 'Minimum worker threads'";	
-	if($post['maxworkers'] && !is_numeric($post['maxworkers'])) 
-		$input_errors[] = "A valid number is required for the field 'Maximum worker threads'";	
-	if($post['timeoutworkers'] && !is_numeric($post['timeoutworkers'])) 
+function varnish_settings_post_validate($post, &$input_errors) {
+	if( !is_numeric($post['storagesize']))
+		$input_errors[] = "A valid number is required for the field 'Storage size'";
+	if($post['listeningport'] && !is_numeric($post['listeningport']))
+		$input_errors[] = "A valid number is required for the field 'Listening port'";
+	if($post['minworkers'] && !is_numeric($post['minworkers']))
+		$input_errors[] = "A valid number is required for the field 'Minimum worker threads'";
+	if($post['maxworkers'] && !is_numeric($post['maxworkers']))
+		$input_errors[] = "A valid number is required for the field 'Maximum worker threads'";
+	if($post['timeoutworkers'] && !is_numeric($post['timeoutworkers']))
 		$input_errors[] = "A valid number is required for the field 'Worker thread timeout'";
 	if($post['managment']){
 		$mgm= explode(":",$post['managment']);
@@ -61,10 +70,10 @@ function varnish_settings_post_validate($post, $input_errors) {
 		$input_errors[] = "A valid number with a time reference is required for the field 'Fetch grace'";
 	if($post['saint'] &&  ! preg_match("/^\d+(h|m|s)$/",$post['saint']))
 		$input_errors[] = "A valid number with a time reference is required for the field 'Saint mode'";
-		
+
 }
 
-function varnish_lb_directors_post_validate($post, $input_errors) {
+function varnish_lb_directors_post_validate($post, &$input_errors) {
 	if (preg_match("/[^a-zA-Z0-9]/", $post['directorname'])){
 		$input_errors[] = "The directorname name must only contain the characters a-Z or 0-9";
 	}
@@ -78,24 +87,24 @@ function varnish_lb_directors_post_validate($post, $input_errors) {
 		$input_errors[] = "A valid number with a time reference is required for the field 'Req grace'";
 }
 
-function varnish_backends_post_validate($post, $input_errors) {
+function varnish_backends_post_validate($post, &$input_errors) {
  	if (!$post['backendname'] || preg_match("/[^a-zA-Z0-9]/", $post['backendname']))
 		$input_errors[] = "The backend name must only contain the characters a-Z or 0-9";
-	if(!is_ipaddr($post['ipaddress'])) 
+	if(!is_ipaddr($post['ipaddress']))
 		$input_errors[] = "A valid IP address is required for the field 'IPAddress'";
-	if($post['first_byte_timeout'] && !is_numeric($post['first_byte_timeout'])) 
+	if($post['first_byte_timeout'] && !is_numeric($post['first_byte_timeout']))
 		$input_errors[] = "A valid number is required for the field 'first byte timeout'";
-	if($post['connect_timeout'] && !is_numeric($post['connect_timeout'])) 
+	if($post['connect_timeout'] && !is_numeric($post['connect_timeout']))
 		$input_errors[] = "A valid number is required for the field 'connect timeout'";
-	if($post['probe_interval'] && !is_numeric($post['probe_interval'])) 
+	if($post['probe_interval'] && !is_numeric($post['probe_interval']))
 		$input_errors[] = "A valid number is required for the field 'probe interval'";
-	if($post['probe_interval'] && !is_numeric($post['probe_interval'])) 
+	if($post['probe_interval'] && !is_numeric($post['probe_interval']))
 		$input_errors[] = "A valid number is required for the field 'probe interval'";
-	if($post['probe_timeout'] && !is_numeric($post['probe_timeout'])) 
+	if($post['probe_timeout'] && !is_numeric($post['probe_timeout']))
 		$input_errors[] = "A valid number is required for the field 'probe timeout'";
-	if($post['probe_window'] && !is_numeric($post['probe_window'])) 
+	if($post['probe_window'] && !is_numeric($post['probe_window']))
 		$input_errors[] = "A valid number is required for the field 'probe window'";
-	if($post['probe_threshold'] && !is_numeric($post['probe_threshold'])) 
+	if($post['probe_threshold'] && !is_numeric($post['probe_threshold']))
 		$input_errors[] = "A valid number is required for the field 'probe threshold'";
 	$x=0;
 	while ($post['maptype'.$x] != ""){
@@ -103,13 +112,24 @@ function varnish_backends_post_validate($post, $input_errors) {
 		$input_errors[] = "A valid number with a time reference is required for the field 'grace' in map ".($x +1);
 		}
 		$x++;
-		
+
 }
 
 }
 
 function varnish_install() {
 	create_varnish_rcd_file();
+
+	if (file_exists(VARNISH_LOCALBASE . '/local/lib/varnish/libvarnish.so')) {
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvarnish.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvarnish.so');
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvarnishcompat.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvarnishcompat.so');
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvcl.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvcl.so');
+		@symlink(VARNISH_LOCALBASE . '/local/lib/varnish/libvgz.so',
+			 VARNISH_LOCALBASE . '/local/lib/libvgz.so');
+	}
 }
 
 function varnish_deinstall() {
@@ -117,14 +137,51 @@ function varnish_deinstall() {
 }
 
 function text_area_decode($text){
-	return preg_replace('/\r\n/', "\n",base64_decode($text));	
+	return preg_replace('/\r\n/', "\n",base64_decode($text));
 }
-function varnish_start() {
+
+function varnish_check_config(){
+	global $savemsg,$config;
+
+	if (!isset($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish']))
+		return;
+
+	$path = '/usr/bin/env PATH=' . VARNISH_LOCALBASE . '/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin';
+	exec($path . " " . VARNISH_LOCALBASE."/bin/varnishd -C -f ".VARNISH_CONFFILE." 2>&1",$output,$return);
+	if ($return == 0){
+		if (isset($_REQUEST['apply'])){
+			varnish_start(true);
+			return;
+			}
+
+		if (file_exists(VARNISH_DIRTYPATH))
+			$savemsg="Varnish configuration has been changed.<br>You must apply in order to take effect.<br>";
+		}
+	else{
+		$savemsg.= implode("<br>",$output);
+		$savemsg.= "<br>Daemon will not be restarted.";
+		return 1;
+		}
+	return 0;
+}
+
+
+function varnish_start($force_start=false) {
 	global $g, $config;
+
+	if ($force_start){
+		mwexec("/usr/local/etc/rc.d/varnish.sh");
+		unlink_if_exists(VARNISH_DIRTYPATH);
+		return;
+		}
+
 	if ($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish']){
 		exec("chmod +x /usr/local/etc/rc.d/varnish.sh");
-		mwexec("/usr/local/etc/rc.d/varnish.sh");}
-	else{
+		if (varnish_check_config() == 0 || $force_start){
+			unlink_if_exists(VARNISH_DIRTYPATH);
+			mwexec("/usr/local/etc/rc.d/varnish.sh");
+			}
+		}else{
 		exec("chmod -x /usr/local/etc/rc.d/varnish.sh");
 		mwexec("/usr/bin/killall varnishd");}
 }
@@ -160,8 +217,15 @@ function varnish_get_url_mappings_txt() {
 						$urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'") {'."\n";
 					else
 				        $urlmappings .= "if (req.http.host $fieldtype ".'"'.$url['directorurl'].'"'." && req.url $fieldtype ".'"^'.$url['directorurl2'].'") {'."\n";
-				
+
 					$urlbackend = "\t\t\tset req.backend = ".$url['directorname'].";";
+					// check force ssl option
+					if ($url['forcessl']){
+						$urlmappings .="\t\t#Force ssl for this host/director\n";
+						$urlmappings .="\t\tif((req.http.X-Forwarded-Proto !~ \"(?i)https\" ) && !(client.ip ~ SslOffloadServers)){\n";
+						$urlmappings .="\t\t\tset req.http.x-redir-url = \"https://\" + req.http.host + req.url;\n";
+      					$urlmappings .="\t\t\terror 750 req.http.x-redir-url;\n\t\t\t}\n";
+						}
 					// check rewrite options
 					if ($url['rewritehost'])
 						$urlmappings .= "\t\t\tset req.http.host = regsub(req.http.host, ".'"'.$url['directorurl'].'",'.'"'.$url['rewritehost'].'")'.";\n";
@@ -202,7 +266,7 @@ function varnish_get_url_mappings_txt() {
 							$urlmappings .= <<<EOAU
 if (req.{$req} {$fieldtype} "{$url['urlmapping']}") {
 		set req.backend = {$urlmapping['backendname']}BACKEND;{$directo_grace_time}
-	} 
+	}
 
 EOAU;
 							$isfirst = false;
@@ -224,33 +288,35 @@ function create_varnish_rcd_file() {
 		foreach($config['installedpackages']['varnishsettings']['config'] as $vs) {
 			if($vs['storagetype'] == "malloc")
 				$storage_type = "-s malloc,{$vs['storagesize']}MB";
-			else 
+			else
 				$storage_type = "-s file,/var/varnish/storage.bin,{$vs['storagesize']}MB";
 			if($vs['listeningport'])
 				$listeningport = "-a :{$vs['listeningport']}";
-			else 
+			else
 				$listeningport = "-a :80";
 			if($vs['managment'])
 				$advancedstartup = "-T {$vs['managment']} ";
-			else 
+			else
 				$advancedstartup = "";
 			if($vs['advancedstartup'])
 				$advancedstartup .= text_area_decode($vs['advancedstartup'])."\n";
 			if($vs['minworkers'])
 				$minworkers = "{$vs['minworkers']}";
-			else 
+			else
 				$minworkers = "200";
 			if($vs['maxworkers'])
 				$maxworkers = "{$vs['maxworkers']}";
-			else 
+			else
 				$maxworkers = "4000";
 			if($vs['timeoutworkers'])
 				$timeoutworkers = "{$vs['timeoutworkers']}";
-			else 
-				$timeoutworkers = "50";				
+			else
+				$timeoutworkers = "50";
 		}
 	}
 	$fd = fopen("/usr/local/etc/rc.d/varnish.sh", "w");
+	$conf_file=VARNISH_CONFFILE;
+	$bin_path=VARNISH_LOCALBASE . '/bin';
 	$rc_file = <<<EOF
 #!/bin/sh
 mkdir -p /var/varnish
@@ -261,26 +327,25 @@ sysctl kern.ipc.somaxconn=16384
 sysctl kern.maxfiles=131072
 sysctl kern.maxfilesperproc=104856
 sysctl kern.threads.max_threads_per_proc=4096
-/usr/bin/env \
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+export PATH={$bin_path}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 /usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDOFF
 <?php
-	require_once("globals.inc");		
+	require_once("globals.inc");
 	require_once("functions.inc");
 	require_once("pkg-utils.inc");
 	require_once("varnish.inc");
 	sync_package_varnish();
-	#varnish_start();
+	unlink_if_exists(VARNISH_DIRTYPATH);
 
 ?>
 ENDOFF
 
 /usr/local/sbin/varnishd \
 	{$listeningport} \
-	-f /var/etc/default.vcl \
+	-f {$conf_file} \
 	{$storage_type} \
 	-w {$minworkers},{$maxworkers},{$timeoutworkers} \
-	{$advancedstartup} 
+	{$advancedstartup}
 
 EOF;
 
@@ -296,15 +361,15 @@ function get_backend_config_txt() {
     	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
 			if ($backend['connect_timeout'])
 				$connect_timeout = $backend['connect_timeout'] . "s";
-			else 
+			else
 				$connect_timeout = "25s";
 			if ($backend['port'])
 				$connect_port = $backend['port'];
-			else 
+			else
 				$connect_port = "80";
 			if ($backend['first_byte_timeout'])
 				$first_byte_timeout = $backend['first_byte_timeout'] . "s";
-			else 
+			else
 				$first_byte_timeout = "300s";
 			if ($backend['probe_url'])
 				if (preg_match("@^(http)://([a-zA-Z0-9.-]*)/(.*)$@",$backend['probe_url'],$matches)){
@@ -386,7 +451,7 @@ function get_lb_directors_config_txt() {
 						$weight = "\t\t.weight = {$be['weight']};\n";
 					elseif($weight != " ")
 						$weight = "\t\t.weight = 100;\n";
-				
+
 			$director .=  "\t{\n\t\t.backend = {$be['backendname']}BACKEND;\n{$weight}\t}";
 			$backends_in_use[$be['backendname']].= $backend['directorname']." ";
 			}
@@ -397,7 +462,7 @@ director {$backend['directorname']} {$backend['directortype']} {
 
 
 EOFA;
-				
+
 			}
 		}
 	}
@@ -406,6 +471,12 @@ EOFA;
 
 function sync_package_varnish() {
 	global $config, $g;
+
+	if (isset($_POST["apply"])){
+		varnish_start();
+		unlink_if_exists(VARNISH_DIRTYPATH);
+		return;
+	}
 	if (is_array($config['installedpackages']['varnishcustomvcl']['config'])) {
 		foreach($config['installedpackages']['varnishcustomvcl']['config'] as $vcl) {
 			if ($vcl['vcl_recv_early'])
@@ -422,11 +493,23 @@ function sync_package_varnish() {
 				$vcl_pipe_late = text_area_decode($vcl['vcl_pipe_late']);
 		}
 	}
-		$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
-		$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
-		#$plataform=posix_uname();
-		if (is_array($config['installedpackages']['varnishsettings']['config']))
-		  foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
+
+	$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
+	$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
+	#$plataform=posix_uname();
+	if (is_array($config['installedpackages']['varnishsettings']['config']))
+		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
+		  	if ($vcl['ssloffload']){
+		  		$vcl_acls="acl SslOffloadServers {\n\t\"localhost\";";
+				$sslservers= split (" ",$vcl['ssloffload']);
+				foreach ($sslservers as $sslserver){
+					if (preg_match("/(\S+)\/(d+)/",$sslserver,$sslm))
+						$vcl_acls.="\n\t\"{$sslm[1]}\"/{$sslm[2]};";
+					else
+						$vcl_acls.="\n\t\"{$sslserver}\";";
+					}
+				$vcl_acls.="\n\t}\n";
+		  	}
 			if ($vcl['streaming'])
 				$vcl_fetch_stream="set beresp.do_stream = true;\n";
 			if ($vcl['fixgzip']) {
@@ -463,7 +546,9 @@ function sync_package_varnish() {
 						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-For = req.http.X-Forwarded-For + \",\" + client.ip;\n\n";
 					break;
 					case 'create':
-						$vcl_recv_set_basic .= "\tset req.http.X-Forwarded-Varnish = client.ip;\n\n";
+						$vcl_recv_set_basic .= "\tif (req.http.X-Forwarded-For && client.ip ~ SslOffloadServers){\n\t\t";
+						$vcl_recv_set_basic .= "set req.http.X-Forwarded-Varnish = req.http.X-Forwarded-For;\n\t}";
+						$vcl_recv_set_basic .= "else{\n\t\tset req.http.X-Forwarded-Varnish = client.ip;\n\n\t}";
 					break;
 					case 'unset':
 						$vcl_recv_set_basic .= "\tunset req.http.X-Forwarded-For;\n\n";
@@ -478,7 +563,7 @@ function sync_package_varnish() {
 			$vcl_fetch_session = "#Disable cache when backend is starting a session\n";
 			$vcl_fetch_session .= "\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
 			$vcl_fetch_session .= "\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(JSESSION|jsession)") {'."\n\t\treturn(hit_for_pass);\n\t\t}\n";
-					
+
 			if ($vcl['sessioncache'] == "never") {
 				$vcl_recv_session = "\t#Disable session cache\n";
 				$vcl_recv_session .= "\t".'if (req.http.Cookie && req.http.Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(pass);\n\t\t}\n";
@@ -498,7 +583,7 @@ function sync_package_varnish() {
 			$vcl_fetch_static = "#Enable static cache\n";
 			$vcl_fetch_static .= 'if (req.url ~ "\.(css|js|txt|zip|pdf|rtf|flv|swf|html|htm)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
 			$vcl_fetch_static .= 'if (req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
-			
+
 			switch ($vcl['staticache']) {
 				case "all":
 					// cache all static content, unseting cookie when present
@@ -515,7 +600,7 @@ function sync_package_varnish() {
 					$vcl_recv_action_basic .= $vcl_recv_static.$vcl_recv_session;
 					$vcl_fetch_action = $vcl_fetch_session;
 			}
-				
+
 			if ($vcl['rfc2616']) {
 				$vcl_recv_action_basic .= "\t#Be rfc2616 compliant\n";
 				$vcl_recv_action_basic .= "\t".'if (req.request ~ "^(GET|HEAD|PUT|POST|TRACE|OPTIONS|DELETE)$") {'."\n\t\treturn(lookup);\n\t\t}\n\telse\t{\n\t\treturn(pipe);\n\t\t}\n";
@@ -560,24 +645,31 @@ $varnish_config_file = <<<EOF
 # Varnish configuration file
 # Automatically generated by the pfSense package system
 
-# This file is located in /var/etc/default.vcl
+# This file is located in {$conf_file}
 
 sub vcl_error {
-		if (obj.status == 503 && req.restarts < {$vcl_restarts}) {
-			return(restart);
+	if (obj.status == 503 && req.restarts < {$vcl_restarts}) {
+		return(restart);
 		}
-	
+
+	if (obj.status == 750) {
+		set obj.http.Location = obj.response;
+		set obj.status = 301;
+		return(deliver);
+	}
+
 	set obj.http.Content-Type = "text/html; charset=utf-8";
 	synthetic {"<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 {$errorvcl}"};
 	return(deliver);
-	
+
 }
-        
+
 {$backends}
 {$vcl_hash}
+{$vcl_acls}
 sub vcl_recv {
 	{$vcl_recv_early}
 	{$vcl_recv_set_basic}
@@ -588,7 +680,7 @@ sub vcl_recv {
 		{
 		return(pass);
 		}
-	
+
 	{$vcl_recv_action_basic}
 	return(lookup);
 }
@@ -623,12 +715,12 @@ sub vcl_fetch {
     ## If the number of restarts reaches the value of the parameter max_restarts,
     ## the request will be error'ed.  max_restarts defaults to 4.  This prevents
     ## an eternal loop in the event that, e.g., the object does not exist at all.
-    if (beresp.status != 200 && beresp.status != 403 && beresp.status != 404 && 
+    if (beresp.status != 200 && beresp.status != 403 && beresp.status != 404 &&
     	beresp.status != 303 && beresp.status != 302 && beresp.status != 301 && beresp.status != 401 ) {
 		{$vcl_saint_mode}return(restart);
         }
 
-    
+
 	{$vcl_fetch_late}
 	{$vcl_grace_time}return(deliver);
 }
@@ -636,10 +728,10 @@ sub vcl_fetch {
 sub vcl_deliver {
 	##set resp.http.X-Served-By = server.hostname;
   	if (obj.hits > 0) {
-    	set resp.http.X-Cache = "HIT";	
+    	set resp.http.X-Cache = "HIT";
     	set resp.http.X-Cache-Hits = obj.hits;
   	} else {
-    	set resp.http.X-Cache = "MISS";	
+    	set resp.http.X-Cache = "MISS";
   	}
 	return(deliver);
 }
@@ -647,26 +739,28 @@ sub vcl_deliver {
 sub vcl_init {
 	return (ok);
 }
-	
+
 sub vcl_fini {
 	return (ok);
-}	
+}
 
 EOF;
-		file_put_contents("/var/etc/default.vcl",$varnish_config_file,LOCK_EX);
-		$cc_file="/usr/local/bin/cc";
+		file_put_contents(VARNISH_CONFFILE,$varnish_config_file,LOCK_EX);
+		touch(VARNISH_DIRTYPATH);
+		varnish_sync_on_changes();
+
+		$cc_file=VARNISH_LOCALBASE."/bin/cc";
 		foreach (glob(VARNISH_LOCALBASE."/bin/gcc*") as $bin_file) {
+			if (strpos($bin_file, '.pbiopt') != FALSE)
+				continue;
 			$gcc_file=$bin_file;
 		}
 		if (!file_exists($cc_file) && file_exists($gcc_file)){
 			symlink($gcc_file,$cc_file);
 		}
-		
-		$fd = fopen("/var/etc/default.vcl", "w");
-		fwrite($fd, $varnish_config_file);
-		fclose($fd);
 
-		varnish_sync_on_changes();
+		create_varnish_rcd_file();
+
 }
 
 /* Uses XMLRPC to synchronize the changes to a remote node */
@@ -697,7 +791,7 @@ function varnish_sync_on_changes() {
 						log_error("[varnish] xmlrpc sync is enabled but there is no system backup hosts to push varnish config.");
 						return;
 					}
-				break;			
+				break;
 			default:
 				return;
 			break;
@@ -721,16 +815,16 @@ function varnish_sync_on_changes() {
 /* Do the actual XMLRPC sync */
 function varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) {
 	global $config, $g;
-	
+
 	if(!$username)
 		return;
-		
+
 	if(!$password)
 		return;
 
 	if(!$sync_to_ip)
 		return;
-	
+
 	if(!$synctimeout)
 		$synctimeout=25;
 
@@ -742,9 +836,9 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) 
     $port = $config['system']['webgui']['port'];
     /* if port is empty lets rely on the protocol selection */
     if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http") 
+		if($config['system']['webgui']['protocol'] == "http")
 			$port = "80";
-		else 
+		else
 			$port = "443";
     }
 	$synchronizetoip .= $sync_to_ip;
@@ -755,7 +849,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) 
 	$xml['varnishbackends'] = $config['installedpackages']['varnishbackends'];
 	$xml['varnishlbdirectors'] = $config['installedpackages']['varnishlbdirectors'];
 	$xml['varnishsettings'] = $config['installedpackages']['varnishsettings'];
-	
+
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
@@ -786,7 +880,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) 
 	} else {
 		log_error("varnish XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
-	
+
 	/* tell varnish to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/varnish.inc');\n";
@@ -796,7 +890,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) 
 		XML_RPC_encode($password),
 		XML_RPC_encode($execcmd)
 	);
-	
+
 	log_error("varnish XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -815,7 +909,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $username, $password,$synctimeout) 
 	} else {
 		log_error("varnish XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
-	
+
 }
 
 ?>

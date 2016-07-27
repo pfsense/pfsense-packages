@@ -64,7 +64,7 @@ if ($_GET) {
 				// Apply filter and color
 				// Need validate special chars
 				if ($filter != "")
-					$logline = preg_replace("@($filter)@i","<spam><font color='red'>$1</font></span>",$logline);
+					$logline = preg_replace("@($filter)@i","<span><font color='red'>$1</font></span>",$logline);
 
 				echo $logline[0]."\n<br/>";
 			}

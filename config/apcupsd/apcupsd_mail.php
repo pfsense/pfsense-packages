@@ -1,8 +1,9 @@
 <?php
 /*
 	apcupsd_mail.php
-	part of pfSense (https://www.pfsense.org/)
-	Copyright (C) 2014 Danilo G. Baio <dbaio@bsd.com.br>
+	part of pfSense (https://www.pfSense.org/)
+	Copyright (C) 2014-2015 Danilo G. Baio <dbaio@bsd.com.br>
+	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -26,10 +27,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
 require_once("pkg-utils.inc");
 require_once("globals.inc");
-require_once("phpmailer/class.phpmailer.php");
+require_once("phpmailer/PHPMailerAutoload.php");
 
 global $config, $g;
 
@@ -49,25 +49,31 @@ $apcstatus[emergency] = "Emergency Shutdown. Possible UPS battery failure";
 $apcstatus[changeme] = "Emergency! UPS batteries have failed. Change them NOW";
 $apcstatus[remotedown] = "Remote Shutdown. Beginning Shutdown Sequence";
 
-if (empty($argv[1]) || empty($apcstatus["$argv[1]"]))
+if (empty($argv[1]) || empty($apcstatus["$argv[1]"])) {
 	return;
+}
 
 $apcsubject = $apcstatus["$argv[1]"];
 
-if (empty($config['notifications']['smtp']['ipaddress']))
+if (empty($config['notifications']['smtp']['ipaddress'])) {
 	return;
+}
 
 $mail = new PHPMailer();
 $mail->IsSMTP();
 $mail->Host = $config['notifications']['smtp']['ipaddress'];
 
-if ($config['notifications']['smtp']['ssl'] == "checked")
-	$mail->SMTPSecure =  "ssl";
+if ((isset($config['notifications']['smtp']['ssl']) && $config['notifications']['smtp']['ssl'] != "unchecked") || $config['notifications']['smtp']['ssl'] == "checked") {
+	$mail->SMTPSecure = "ssl";
+}
+
+if ((isset($config['notifications']['smtp']['tls']) && $config['notifications']['smtp']['tls'] != "unchecked") || $config['notifications']['smtp']['tls'] == "checked") {
+	$mail->SMTPSecure = "tls";
+}
 
 $mail->Port = empty($config['notifications']['smtp']['port']) ? 25 : $config['notifications']['smtp']['port'];
 
-if($config['notifications']['smtp']['username'] &&
-   $config['notifications']['smtp']['password']) {
+if ($config['notifications']['smtp']['username'] && $config['notifications']['smtp']['password']) {
 	$mail->SMTPAuth	= true;
 	$mail->Username	= $config['notifications']['smtp']['username'];
 	$mail->Password	= $config['notifications']['smtp']['password'];
@@ -88,7 +94,7 @@ while ($line = fgets($ph)) $mail->Body .= htmlspecialchars($line);
 pclose($ph);
 $mail->Body .= "</pre>";
 
-if(!$mail->Send()) {
+if (!$mail->Send()) {
 	echo "Mailer Error: " . $mail->ErrorInfo;
 }
 

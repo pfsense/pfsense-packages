@@ -89,17 +89,10 @@
 		<chmod>077</chmod>
 		<item>https://packages.pfsense.org/packages/config/haproxy/haproxy_pool_edit.php</item>
 	</additional_files_needed>
-	<custom_delete_php_command>
-	</custom_delete_php_command>
-	<custom_add_php_command>
-	</custom_add_php_command>
-	<custom_php_resync_config_command>
-	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		/*
 		included in package install
 		$freebsdv=trim(`uname -r | cut -d'.' -f1`);
-		conf_mount_rw();
 		`fetch -q -o /usr/local/sbin/ https://packages.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy`;
 		exec("chmod a+rx /usr/local/sbin/haproxy");
 		*/
@@ -108,6 +101,4 @@
 	<custom_php_deinstall_command>
 		haproxy_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
-	<custom_php_command_before_form>	
-	</custom_php_command_before_form>
 </packagegui>

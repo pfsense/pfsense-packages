@@ -17,7 +17,7 @@
     // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
     //
     //
-    // see file COPYING or at http://www.gnu.org/licenses/gpl.html 
+    // see file COPYING or at http://www.gnu.org/licenses/gpl.html
     // for more information.
     //
     require 'config.php';
@@ -32,7 +32,7 @@
     {
 	return imagecolorallocatealpha($im, $colors[0], $colors[1], $colors[2], $colors[3]);
     }
-            
+
     function init_image()
     {
         global $im, $xlm, $xrm, $ytm, $ybm, $iw, $ih,$graph, $cl, $iface, $colorscheme, $style;
@@ -42,7 +42,7 @@
 
         //
         // image object
-        //    
+        //
         $xlm = 70;
         $xrm = 20;
         $ytm = 35;
@@ -50,7 +50,7 @@
         if ($graph == 'small')
         {
             $iw = 300 + $xrm + $xlm;
-            $ih = 100 + $ytm + $ybm;    
+            $ih = 100 + $ytm + $ybm;
         }
         else
         {
@@ -75,10 +75,10 @@
         $cl['rx_border'] = allocate_color($im, $cs['rx_border']);
         $cl['tx'] = allocate_color($im, $cs['tx']);
         $cl['tx_border'] = allocate_color($im, $cs['tx_border']);
-	
+
         imagefilledrectangle($im,0,0,$iw,$ih,$cl['image_background']);
 	imagefilledrectangle($im,$xlm,$ytm,$iw-$xrm,$ih-$ybm, $cl['background']);
-	
+
 	$x_step = ($iw - $xlm - $xrm) / 12;
 	$depth = ($x_step / 8) + 4;
 	imagefilledpolygon($im, array($xlm, $ytm, $xlm, $ih - $ybm, $xlm - $depth, $ih - $ybm + $depth, $xlm - $depth, $ytm + $depth), 4, $cl['background_2']);
@@ -89,7 +89,7 @@
  	$bbox = imagettfbbox(10, 0, GRAPH_FONT, $text);
 	$textwidth = $bbox[2] - $bbox[0];
 	imagettftext($im, 10, 0, ($iw-$textwidth)/2, ($ytm/2), $cl['text'], GRAPH_FONT, $text);
-		
+
     }
 
     function draw_border()
@@ -98,16 +98,16 @@
 
         imageline($im,     0,    0,$iw-1,    0, $cl['border']);
         imageline($im,     0,$ih-1,$iw-1,$ih-1, $cl['border']);
-        imageline($im,     0,    0,    0,$ih-1, $cl['border']);  
+        imageline($im,     0,    0,    0,$ih-1, $cl['border']);
         imageline($im, $iw-1,    0,$iw-1,$ih-1, $cl['border']);
     }
-    
+
     function draw_grid($x_ticks, $y_ticks)
     {
         global $im, $cl, $iw, $ih, $xlm, $xrm, $ytm, $ybm;
         $x_step = ($iw - $xlm - $xrm) / $x_ticks;
         $y_step = ($ih - $ytm - $ybm) / $y_ticks;
-	
+
 	$depth = 10;//($x_step / 8) + 4;
 
         $ls = array($cl['grid_stipple_1'],$cl['grid_stipple_2']);
@@ -119,14 +119,13 @@
         }
         for ($i=$ytm;$i<=($ih-$ybm); $i += $y_step)
         {
-            imageline($im, $xlm, $i, $iw - $xrm, $i, IMG_COLOR_STYLED); 
+            imageline($im, $xlm, $i, $iw - $xrm, $i, IMG_COLOR_STYLED);
 	    imageline($im, $xlm, $i, $xlm - $depth, $i + $depth, IMG_COLOR_STYLED);
         }
         imageline($im, $xlm, $ytm, $xlm, $ih - $ybm, $cl['border']);
         imageline($im, $xlm, $ih - $ybm, $iw - $xrm, $ih - $ybm, $cl['border']);
     }
-    
-    
+
     function draw_data($data)
     {
         global $im,$cl,$iw,$ih,$xlm,$xrm,$ytm,$ybm;
@@ -168,7 +167,7 @@
             {
             $prescale = $prescale * 1024;
             $y_scale = $y_scale / 1024;
-            if ($unit == 'K') 
+            if ($unit == 'K')
                 $unit = 'M';
             else if ($unit == 'M')
                 $unit = 'G';
@@ -178,7 +177,7 @@
         }
 
         draw_grid($x_ticks, $y_ticks);
-	
+
         //
         // graph scale factor (per pixel)
         //
@@ -187,7 +186,7 @@
 
         if ($data[0] == 'nodata')
         {
-            $text = 'no data available';
+            $text = T('no data available');
 	    $bbox = imagettfbbox(10, 0, GRAPH_FONT, $text);
 	    $textwidth = $bbox[2] - $bbox[0];
 	    imagettftext($im, 10, 0, ($iw-$textwidth)/2, $ytm + 80, $cl['text'], GRAPH_FONT, $text);
@@ -196,26 +195,26 @@
         {
             //
             // draw bars
-            //      
+            //
             for ($i=0; $i<$x_ticks; $i++)
             {
         	$x = $xlm + ($i * $x_step);
         	$y = $ytm + ($ih - $ytm - $ybm) - (($data[$i]['rx'] - $offset) / $sf);
-		
+
 		$depth = $x_step / 8;
 		$space = 0;
-		
+
 		$x1 = $x;
 		$y1 = $y;
 		$x2 = $x + $bar_w - $space;
 		$y2 = $ih - $ybm;
-		
+
         	imagefilledrectangle($im, $x1, $y1, $x2, $y2, $cl['rx']);
 		imagerectangle($im, $x1, $y1, $x2, $y2, $cl['rx_border']);
-		
+
 		imagefilledrectangle($im, $x1 - $depth, $y1 + $depth, $x2 -$depth, $y2 + $depth, $cl['rx']);
 		imagerectangle($im, $x1 - $depth, $y1 + $depth, $x2 - $depth, $y2 + $depth, $cl['rx_border']);
-		
+
 		imagefilledpolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['rx']);
 		imagepolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['rx_border']);
 		imagefilledpolygon($im, array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth), 4, $cl['rx']);
@@ -227,16 +226,16 @@
 
         	imagefilledrectangle($im, $x1, $y1, $x2, $y2, $cl['tx']);
 		imagerectangle($im, $x1, $y1, $x2, $y2, $cl['tx_border']);
-		
+
         	imagefilledrectangle($im, $x1 - $depth, $y1 + $depth, $x2 - $depth, $y2 + $depth, $cl['tx']);
-		imagerectangle($im, $x1 - $depth, $y1 + $depth, $x2 - $depth, $y2 + $depth, $cl['tx_border']);		
-		
+		imagerectangle($im, $x1 - $depth, $y1 + $depth, $x2 - $depth, $y2 + $depth, $cl['tx_border']);
+
 		imagefilledpolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['tx']);
 		imagepolygon($im, array($x1, $y1, $x2, $y1, $x2 - $depth, $y1 + $depth, $x1 - $depth, $y1 + $depth), 4, $cl['tx_border']);
 		imagefilledpolygon($im, array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth), 4, $cl['tx']);
 		imagepolygon($im, array($x2, $y1, $x2, $y2, $x2 - $depth, $y2 + $depth, $x2 - $depth, $y1 + $depth), 4, $cl['tx_border']);
             }
-    
+
             //
             // axis labels
             //
@@ -265,11 +264,11 @@
         //
         imagefilledrectangle($im, $xlm, $ih-$ybm+39, $xlm+8,$ih-$ybm+47,$cl['rx']);
         imagerectangle($im, $xlm, $ih-$ybm+39, $xlm+8,$ih-$ybm+47,$cl['text']);
-	imagettftext($im, 8,0, $xlm+14, $ih-$ybm+48,$cl['text'], GRAPH_FONT,'bytes in');
+	imagettftext($im, 8,0, $xlm+14, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('bytes in'));
 
         imagefilledrectangle($im, $xlm+120 , $ih-$ybm+39, $xlm+128,$ih-$ybm+47,$cl['tx']);
         imagerectangle($im, $xlm+120, $ih-$ybm+39, $xlm+128,$ih-$ybm+47,$cl['text']);
-	imagettftext($im, 8,0, $xlm+134, $ih-$ybm+48,$cl['text'], GRAPH_FONT,'bytes out'); 
+	imagettftext($im, 8,0, $xlm+134, $ih-$ybm+48,$cl['text'], GRAPH_FONT,T('bytes out'));
     }
 
     function output_image()
@@ -293,11 +292,11 @@
         {
             draw_data($month);
         }
-	
-        header('Content-type: image/png');	
+
+        header('Content-type: image/png');
         imagepng($im);
     }
 
     get_vnstat_data();
     output_image();
-?>        
+?>

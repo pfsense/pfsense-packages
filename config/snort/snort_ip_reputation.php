@@ -56,7 +56,7 @@ if (!is_array($config['installedpackages']['snortglobal']['rule'][$id]['blist_fi
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $pconfig = $a_nat[$id];
-$iprep_path = IPREP_PATH;
+$iprep_path = SNORT_IPREP_PATH;
 $if_real = get_real_interface($a_nat[$id]['interface']);
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
@@ -78,7 +78,7 @@ if ($_POST['mode'] == 'blist_add' && isset($_POST['iplist'])) {
 		// See if the file is already assigned to the interface
 		foreach ($a_nat[$id]['blist_files']['item'] as $f) {
 			if ($f == basename($_POST['iplist'])) {
-				$input_errors[] = gettext("The file {$f} is already assigned as a blacklist file.");
+				$input_errors[] = sprintf(gettext("The file %s is already assigned as a blacklist file."), htmlspecialchars($f));
 				break;
 			}
 		}
@@ -89,7 +89,7 @@ if ($_POST['mode'] == 'blist_add' && isset($_POST['iplist'])) {
 		}
 	}
 	else
-		$input_errors[] = gettext("The file '{$_POST['iplist']}' could not be found.");
+		$input_errors[] = sprintf(gettext("The file '%s' could not be found."), htmlspecialchars($_POST['iplist']));
 
 	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
 	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
@@ -103,7 +103,7 @@ if ($_POST['mode'] == 'wlist_add' && isset($_POST['iplist'])) {
 		// See if the file is already assigned to the interface
 		foreach ($a_nat[$id]['wlist_files']['item'] as $f) {
 			if ($f == basename($_POST['iplist'])) {
-				$input_errors[] = gettext("The file {$f} is already assigned as a whitelist file.");
+				$input_errors[] = sprintf(gettext("The file %s is already assigned as a whitelist file."), htmlspecialchars($f));
 				break;
 			}
 		}
@@ -114,7 +114,7 @@ if ($_POST['mode'] == 'wlist_add' && isset($_POST['iplist'])) {
 		}
 	}
 	else
-		$input_errors[] = gettext("The file '{$_POST['iplist']}' could not be found.");
+		$input_errors[] = sprintf(gettext("The file '%s' could not be found."), htmlspecialchars($_POST['iplist']));
 
 	$pconfig['blist_files'] = $a_nat[$id]['blist_files'];
 	$pconfig['wlist_files'] = $a_nat[$id]['wlist_files'];
@@ -162,11 +162,16 @@ if ($_POST['save'] || $_POST['apply']) {
 
 		// Update the snort conf file for this interface
 		$rebuild_rules = false;
+		conf_mount_rw();
 		snort_generate_conf($a_nat[$id]);
+		conf_mount_ro();
 
 		// Soft-restart Snort to live-load new variables
 		snort_reload_config($a_nat[$id]);
 		$pconfig = $natent;
+
+		// Sync to configured CARP slaves if any are enabled
+		snort_sync_on_changes();
 
 		// We have saved changes and done a soft restart, so clear "dirty" flag
 		clear_subsystem_dirty('snort_iprep');
@@ -202,6 +207,7 @@ if ($savemsg)
 <?php endif; ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tbody>
 	<tr>
 		<td>
 		<?php
@@ -214,7 +220,9 @@ if ($savemsg)
 		$tab_array[5] = array(gettext("Pass Lists"), false, "/snort/snort_passlist.php");
 		$tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
 		$tab_array[7] = array(gettext("IP Lists"), false, "/snort/snort_ip_list_mgmt.php");
-		$tab_array[8] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
+		$tab_array[8] = array(gettext("SID Mgmt"), false, "/snort/snort_sid_mgmt.php");
+		$tab_array[9] = array(gettext("Log Mgmt"), false, "/snort/snort_log_mgmt.php");
+		$tab_array[10] = array(gettext("Sync"), false, "/pkg_edit.php?xml=snort/snort_sync.xml");
 		display_top_tabs($tab_array, true);
 		echo '</td></tr>';
 		echo '<tr><td class="tabnavtbl">';
@@ -227,6 +235,7 @@ if ($savemsg)
 		$tab_array[] = array($menu_iface . gettext("Preprocs"), false, "/snort/snort_preprocessors.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
 		$tab_array[] = array($menu_iface . gettext("IP Rep"), true, "/snort/snort_ip_reputation.php?id={$id}");
+		$tab_array[] = array($menu_iface . gettext("Logs"), false, "/snort/snort_interface_logs.php?id={$id}");
 		display_top_tabs($tab_array, true);
 		?>
 		</td>
@@ -234,6 +243,12 @@ if ($savemsg)
 	<tr>
 		<td><div id="mainarea">
 			<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
+				<tbody>
+			<?php if ($g['platform'] == "nanobsd") : ?>
+				<tr>
+					<td colspan="2" class="listtopic"><?php echo gettext("IP Reputation is not supported on NanoBSD installs"); ?></td>
+				</tr>
+			<?php else: ?>
 				<tr>
 					<td colspan="2" valign="top" class="listtopic"><?php echo gettext("IP Reputation Preprocessor Configuration"); ?></td>
 				</tr>
@@ -363,9 +378,9 @@ if ($savemsg)
 					<td width="22%" valign='top' class='vncell'><?php echo gettext("Whitelist Files"); ?>
 					</td>
 					<td width="78%" class="vtable">
-						<table width="95%" border="0" cellpadding="2" cellspacing="0">
 					<!-- wlist_chooser -->
 					<div id="wlistChooser" name="wlistChooser" style="display:none; border:1px dashed gray; width:98%;"></div>
+						<table width="95%" border="0" cellpadding="2" cellspacing="0">
 							<colgroup>
 								<col style="text-align:left;">
 								<col style="width: 30%; text-align:left;">
@@ -406,12 +421,16 @@ if ($savemsg)
 						</table>
 					</td>
 				</tr>
+			<?php endif; ?>
+				</tbody>
 			</table>
 		</div>
 		</td>
 	</tr>
+	</tbody>
 </table>
 
+<?php if ($g['platform'] != "nanobsd") : ?>
 <script type="text/javascript">
 Event.observe(
 	window, "load",
@@ -499,6 +518,7 @@ function wlistComplete(req) {
 }
 
 </script>
+<?php endif; ?>
 
 </form>
 <?php include("fend.inc"); ?>

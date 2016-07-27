@@ -65,7 +65,7 @@ if (is_null($id)) {
 
 // Set who called us so we can return to the correct page with
 // the RETURN ('cancel') button.
-if ($_POST['referrer'])
+if (isset($_POST['referrer']) && strpos($_POST['referrer'], '://'.$_SERVER['SERVER_NAME'].'/') !== FALSE)
 	$referrer = $_POST['referrer'];
 else
 	$referrer = $_SERVER['HTTP_REFERER'];
@@ -139,7 +139,9 @@ if ($_POST['addsuppress'] && is_numeric($_POST['sid']) && is_numeric($_POST['gid
 	if ($found_list) {
 		write_config();
 		$rebuild_rules = false;
+		conf_mount_rw();
 		sync_suricata_package_config();
+		conf_mount_ro();
 		suricata_reload_config($a_nat[$id]);
 		$savemsg = gettext("An entry to suppress the Alert for 'gen_id {$_POST['gid']}, sig_id {$_POST['sid']}' has been added to Suppress List '{$a_nat[$id]['suppresslistname']}'.");
 	}
@@ -159,7 +161,6 @@ include_once("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC" >
-
 <?php
 include("fbegin.inc");
 if ($input_errors) print_input_errors($input_errors);
@@ -227,7 +228,7 @@ if ($savemsg)
 				<col axis="string">
 			</colgroup>
 			<thead>
-			   <tr>
+			   <tr class="sortableHeaderRowIdentifier">
 				<th class="listhdrr" axis="number"><?php echo gettext("SID"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Proto"); ?></th>
 				<th class="listhdrr" axis="string"><?php echo gettext("Source"); ?></th>
@@ -274,7 +275,7 @@ if ($savemsg)
 
 							// Use "echo" to write the table HTML row-by-row.
 							echo "<tr>" . 
-								"<td class=\"listr\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
+								"<td class=\"listr\" style=\"sorttable_customkey:{$sid};\" sorttable_customkey=\"{$sid}\">{$sid}&nbsp;{$supplink}</td>" . 
 								"<td class=\"listr\" style=\"text-align:center;\">{$protocol}</td>" . 
 								"<td class=\"listr ellipsis\" nowrap style=\"text-align:center;\"><span title=\"{$rule_content[2]}\">{$source}</span></td>" . 
 								"<td class=\"listr ellipsis\" nowrap style=\"text-align:center;\"><span title=\"{$rule_content[5]}\">{$destination}</span></td>" . 
