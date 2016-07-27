@@ -117,6 +117,10 @@ function freeradius_install_command() {
 	if (file_exists(FREERADIUS_ETC . "/raddb/sites-enabled/control-socket")) { unlink(FREERADIUS_ETC . "/raddb/sites-enabled/control-socket"); }
 	if (file_exists(FREERADIUS_ETC . "/raddb/sites-enabled/inner-tunnel")) { unlink(FREERADIUS_ETC . "/raddb/sites-enabled/inner-tunnel"); }
 
+	// Install Google Authenticator scripts
+	if (!file_exists(FREERADIUS_ETC . "/radd/usr/local/pkg/scripts/googleauth.py")) { copy("googleauth.py", FREERADIUS_ETC . "/radd/usr/local/pkg/scripts/");}
+        if (!file_exists(FREERADIUS_ETC . "/radd/usr/local/pkg/modules/googleauth")) { copy("googleauth", FREERADIUS_ETC . "/radd/usr/local/pkg/modules/");}
+
 	// We run this here just to suppress some warnings on syslog if file doesn't exist
 	freeradius_authorizedmacs_resync();
 
