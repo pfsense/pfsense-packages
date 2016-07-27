@@ -456,7 +456,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 				$varuserspassword = $users['varuserspassword'];
 		}
 	
-		
+	$varusersauthmethod = $users['varusersauthmethod'];	
 	$varusersmotpinitsecret = $users['varusersmotpinitsecret'];
 	$varusersmotppin = $users['varusersmotppin'];
 	$varusersmotpoffset = ($users['varusersmotpoffset']?$users['varusersmotpoffset']:'0');
@@ -547,7 +547,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	
 		// if otp is enabled we need to set Auth-Type to accept because password will be checked when the otp script gets executed in reply-item list
 		else {
-			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = motp";
+			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = " . $varusersauthmethod;
 		}
 	
 	// Add additional CHECK-ITEMS here. Different formatting in "users" file needed.
@@ -1795,6 +1795,12 @@ authenticate {
 		motp
 	}
 	
+	#
+	# Google-Authenticator authentication.
+	Auth-Type GOOGLEAUTH {
+       		googleauth
+	}
+
 	#
 	#  If you have a Cisco SIP server authenticating against
 	#  FreeRADIUS, uncomment the following line, and the 'digest'
