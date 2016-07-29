@@ -368,6 +368,10 @@
 					<name>8bit wiring winamp style to parallel port</name>
 				</option>
 				<option>
+					<value>lcm162</value>
+					<name>8bit wiring nexcom style to parallel port</name>
+				</option>
+				<option>
 					<value>serialLpt</value>
 					<name>Serial LPT wiring</name>
 				</option>
