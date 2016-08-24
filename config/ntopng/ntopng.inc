@@ -118,9 +118,19 @@ function ntopng_sync_package() {
 	switch ($ntopng_config['local_networks']) {
 		case "selected":
 			$nets = array();
+			// link-local is always local
+			$nets[] = "fe80::/10";
 			foreach ($ntopng_config['interface_array'] as $iface) {
 				if (is_ipaddr(get_interface_ip($iface))) {
 					$nets[] = gen_subnet(get_interface_ip($iface), get_interface_subnet($iface)) . '/' . get_interface_subnet($iface);
+				}
+				// do the same thing for ipv6
+				$ip6addr = get_interface_ipv6($iface);
+				// Trim off the interface designation (e.g., %em1) if present
+				if (strpos($ip6addr, "%") !== FALSE)
+					$ip6addr = substr($ip6addr, 0, strpos($ip6addr, "%"));
+				if (is_ipaddrv6($ip6addr)) {
+					$nets[] = gen_subnetv6($ip6addr, get_interface_subnetv6($iface)) . '/' . get_interface_subnetv6($iface);
 				}
 			}
 			if (!empty($nets)) {
@@ -128,13 +138,28 @@ function ntopng_sync_package() {
 			}
 			break;
 		case "lanonly":
+			$nets = array();
+			// ipv6 link local is always local
+			$nets[] = "fe80::/10";			
 			if (is_ipaddr(get_interface_ip('lan'))) {
-				$local_networks = "--local-networks " . escapeshellarg(gen_subnet(get_interface_ip('lan'), get_interface_subnet('lan')) . '/' . get_interface_subnet('lan'));
+				$nets[] = gen_subnet(get_interface_ip('lan'), get_interface_subnet('lan')) . '/' . get_interface_subnet('lan');
+			}
+			// do the same thing for ipv6
+			$ip6addr = get_interface_ipv6('lan');
+			// Trim off the interface designation (e.g., %em1) if present
+			if (strpos($ip6addr, "%") !== FALSE)
+				$ip6addr = substr($ip6addr, 0, strpos($ip6addr, "%"));
+			if (is_ipaddrv6($ip6addr)) {
+				$nets[] = gen_subnetv6($ip6addr, get_interface_subnetv6('lan')) . '/' . get_interface_subnetv6('lan');
+			}
+			if (!empty($nets)) {
+				$local_networks = "--local-networks " . escapeshellarg(implode(",", $nets));				
 			}
 			break;
 		case "rfc1918":
 		default:
-			$local_networks = "--local-networks '192.168.0.0/16,172.16.0.0/12,10.0.0.0/8'";
+			// for ipv6, just add fe80 (link-local)
+			$local_networks = "--local-networks 'fe80::/10,192.168.0.0/16,172.16.0.0/12,10.0.0.0/8'";
 			break;
 	}
 
