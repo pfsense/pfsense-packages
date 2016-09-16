@@ -66,6 +66,8 @@ function openbgpd_install_conf() {
 	if ($config['installedpackages']['openbgpd']['rawconfig'] && $config['installedpackages']['openbgpd']['rawconfig']['item']) {
 		// If there is a raw config specified in the config.xml, use that instead of the assisted config
 		$conffile = implode("\n", $config['installedpackages']['openbgpd']['rawconfig']['item']);
+		// OpenBGPd will error if carriage returns endings exist.
+		$conffile = str_replace("\r", "", $conffile);
 		//$conffile = $config['installedpackages']['openbgpd']['rawconfig'];
 	} else {
 		// Generate bgpd.conf based on the assistant
