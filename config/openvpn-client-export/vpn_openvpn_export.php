@@ -256,8 +256,20 @@ if (!empty($act)) {
 		$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions);
 	}
 
-	if (substr($act, 0, 4) == "inst") {
-		$exp_name = urlencode($exp_name."-install.exe");
+	if (substr($act, 0, 6) == "inst-x") {
+		if (substr($act, 6, 9) == "86-") {
+			if (substr($act, 9, 11) == "xp) {
+				$exp_name = urlencode($exp_name."x86-xp.exe");
+			}else if(substr($act, 9, 13) == "win6){
+				$exp_name = urlencode($exp_name."x86-win6.exe");
+			}
+		}else if (substr($act, 6, 9) == "64-") {
+			if (substr($act, 9, 11) == "xp) {
+				$exp_name = urlencode($exp_name."x64-xp.exe");
+			}else if(substr($act, 9, 13) == "win6){
+				$exp_name = urlencode($exp_name."x64-win6.exe");
+			}
+		}
 		$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $verifyservercn, $randomlocalport, $usetoken, $password, $proxy, $openvpnmanager, $advancedoptions, substr($act, 5));
 	}
 
