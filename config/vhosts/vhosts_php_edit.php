@@ -201,7 +201,7 @@ function openwindow(url) {
 			<td width="78%" class="vtable">
 				<input name="host" type="text" class="formfld" id="host" size="40" value="<?=htmlspecialchars($pconfig['host']);?>" />
 				<br />
-				Required. If the host is intended for internal you can use the DNS forwarder to set a host name that is valid inside the local network. Default: vhost01.local
+				Required. If the host is intended for internal you can use the DNS forwarder to set a host name that is valid inside the local network. If keep empty, host will be set on a willcard associated with the IP Address.
 			</td>
 		</tr>
 		<tr>
