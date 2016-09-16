@@ -58,14 +58,22 @@ if ($_REQUEST['getactivity'])
 function squidguard_blacklist_AJAX_response( $request )
 {
     $res = '';
+    $status = '';
     $sz  = 0;
     $pcaption = '&nbsp;';
 
     # Actions
-    if     ($request['blacklist_download_start'])  squidguard_blacklist_update_start( $request['blacklist_url'] ); # update start
-    elseif ($request['blacklist_download_cancel']) squidguard_blacklist_update_cancel();                           # update cancel
-    elseif ($request['blacklist_restore_default']) squidguard_blacklist_restore_arcdb();                           # restore default db
-    elseif ($request['blacklist_clear_log'])       squidguard_blacklist_update_clearlog();                         # clear log
+    if ($request['blacklist_download_start'])
+    {
+    	if( squidguard_blacklist_update_start( $request['blacklist_url'] ) === false ) # update start
+    	{
+    		$status = "Blacklist update error. Please check URL";                                                                                                                  
+		squidguard_update_log($status,"");
+    	}                                                                                                                                                                          
+    }
+    elseif ($request['blacklist_download_cancel']){	squidguard_blacklist_update_cancel();	}                           # update cancel
+    elseif ($request['blacklist_restore_default']){	squidguard_blacklist_restore_arcdb();	}                           # restore default db
+    elseif ($request['blacklist_clear_log']){		squidguard_blacklist_update_clearlog();	}                         # clear log
  
     # Activity
     # Rebuild progress /check SG rebuild process/
@@ -92,10 +100,11 @@ function squidguard_blacklist_AJAX_response( $request )
     $res .= "el('widthb').width = {$szright};";
     $res .= "el('progress_text').innerHTML = '{$sz} %';";
 
-    $status = '';
-    if (file_exists(SGUPD_STATFILE)) {
+    if (empty($status) && file_exists(SGUPD_STATFILE)) {
         $status = file_get_contents(SGUPD_STATFILE);
-        if ($sz && $sz != 100) $status .= "Completed {$sz} %";
+        if ($sz && $sz != 100){
+        	$status .= "Completed {$sz} %";
+        }
     }
     if ($status) {
         $status = str_replace("\n", "\\r\\n", trim($status));
