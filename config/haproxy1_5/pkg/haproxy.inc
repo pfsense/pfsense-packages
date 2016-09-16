@@ -512,6 +512,7 @@ function write_backend($configpath, $fd, $name, $pool, $backendsettings) {
 		$backend_mode = $frontendtype;
 	}
 	fwrite ($fd, "\tmode\t\t\t" . $backend_mode . "\n");
+	fwrite ($fd, "\tlog\t\t\tglobal\n");
 	if ($pool['log-health-checks'] == 'yes')
 		fwrite ($fd, "\toption\t\t\tlog-health-checks\n");
 		
