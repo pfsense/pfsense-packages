@@ -57,6 +57,7 @@ if (!is_array($config['cert'])) {
 }
 
 $a_cert = $config['cert'];
+$a_ca = $config['ca'];
 
 $ras_server = array();
 foreach ($a_server as $sindex => $server) {
@@ -65,8 +66,12 @@ foreach ($a_server as $sindex => $server) {
 	}
 	$ras_user = array();
 	$ras_certs = array();
+	$ras_ca = NULL;
 	if (stripos($server['mode'], "server") === false) {
 		continue;
+	}
+	if (array_key_exists('caref', $server)) {
+		$ras_ca = lookup_ca($server['caref']);
 	}
 	if (($server['mode'] == "server_tls_user") && ($server['authmode'] == "Local Database")) {
 		foreach ($a_user as $uindex => $user) {
@@ -79,24 +84,30 @@ foreach ($a_server as $sindex => $server) {
 					$cert = lookup_cert($cert);
 				}
 
-				if ($cert['caref'] != $server['caref']) {
+				if ($ras_ca == NULL || cert_get_issuer($cert) != cert_get_subject($ras_ca)) {
 					continue;
 				}
+
 				$ras_userent = array();
 				$ras_userent['uindex'] = $uindex;
 				$ras_userent['cindex'] = $cindex;
 				$ras_userent['name'] = $user['name'];
-				$ras_userent['certname'] = $cert['descr'];
+				$ras_userent['certname'] = $cert['descr'] || cert_get_subject($cert);
 				$ras_user[] = $ras_userent;
 			}
 		}
 	} elseif (($server['mode'] == "server_tls") || (($server['mode'] == "server_tls_user") && ($server['authmode'] != "Local Database"))) {
 		foreach ($a_cert as $cindex => $cert) {
-			if (($cert['caref'] != $server['caref']) || ($cert['refid'] == $server['certref'])) {
+			if(cert_in_use($cert['refid'])) {
 				continue;
 			}
+
+			if ($ras_ca == NULL || cert_get_issuer($cert['crt']) != cert_get_subject($ras_ca['crt']) || $cert['refid'] == $server['certref']) {
+				continue;
+			}
+
 			$ras_cert_entry['cindex'] = $cindex;
-			$ras_cert_entry['certname'] = $cert['descr'];
+			$ras_cert_entry['certname'] = $cert['descr'] ? $cert['descr'] : cert_get_subject($cert);
 			$ras_cert_entry['certref'] = $cert['refid'];
 			$ras_certs[] = $ras_cert_entry;
 		}

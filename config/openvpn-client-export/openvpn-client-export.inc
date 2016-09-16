@@ -128,6 +128,13 @@ function openvpn_client_export_validate_config($srvid, $usrid, $crtid) {
 		$input_errors[] = "Could not locate server certificate.";
 	} else {
 		$server_ca = ca_chain($server_cert);
+		if (!$server_ca && array_key_exists('caref', $settings)) {
+			$server_ca = lookup_ca($settings['caref']);
+
+			if($server_ca) {
+				$server_ca = base64_decode($server_ca['crt']);
+			}
+		}
 		if (!$server_ca) {
 			$input_errors[] = "Could not locate the CA reference for the server certificate.";
 		}
