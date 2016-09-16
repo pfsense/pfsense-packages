@@ -44,7 +44,7 @@ $a_acltypes[] = array('name' => 'host_matches', 'descr' => 'Host matches',
 $a_acltypes[] = array('name' => 'host_regex', 'descr' => 'Host regex',
 				'mode' =>'http', 'syntax' => 'hdr_reg(host) -i');
 $a_acltypes[] = array('name' => 'host_contains', 'descr' => 'Host contains',
-				'mode' => 'http', 'syntax' => 'hdr_dir(host) -i');
+				'mode' => 'http', 'syntax' => 'hdr_sub(host) -i');
 $a_acltypes[] = array('name' => 'path_starts_with', 'descr' => 'Path starts with',
 				'mode' => 'http', 'syntax' => 'path_beg -i');
 $a_acltypes[] = array('name' => 'path_ends_with', 'descr' => 'Path ends with',

@@ -144,7 +144,7 @@
 		</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>0.33</version>
+		<version>0.34</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy1_5/haproxy.xml</config_file>
@@ -159,6 +159,7 @@
 			<port>net/haproxy</port>
 		</build_pbi>
 		<build_options>WITH_OPENSSL_PORT=yes;haproxy_UNSET_FORCE=DPCRE;haproxy_SET_FORCE=OPENSSL SPCRE</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>haproxy-devel</name>
@@ -172,7 +173,7 @@
 		</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Services</category>
-		<version>0.36</version>
+		<version>0.37</version>
 		<status>RELEASE</status>
 		<required_version>2.2</required_version>
 		<config_file>https://packages.pfsense.org/packages/config/haproxy-devel/haproxy.xml</config_file>
@@ -187,6 +188,7 @@
 			<port>net/haproxy</port>
 		</build_pbi>
 		<build_options>WITH_OPENSSL_PORT=yes;net_haproxy_UNSET_FORCE=DPCRE;net_haproxy_SET_FORCE=OPENSSL SPCRE LUA CPU_AFFINITY</build_options>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>Apache with mod_security-dev</name>
