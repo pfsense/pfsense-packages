@@ -1,7 +1,8 @@
 <?php
 # ------------------------------------------------------------------------------
 /*  squidguard_configurator.inc
-    2006-2011 Serg Dvoriancev
+    Copyright (C) 2006-2011 Serg Dvoriancev
+    Copyright (C) 2016 ESF, LLC
 
     part of pfSense (www.pfSense.com)
 
@@ -96,7 +97,7 @@ $pf_version=substr(trim(file_get_contents("/etc/version")),0,3);
 
 define('REDIRECTOR_OPTIONS_REM',   '# squidGuard options');
 define('REDIRECT_CHILDREN_OPT',    'url_rewrite_children');
-if ($pf_version >= 2.2) { 
+if ($pf_version >= 2.2) {
    define('REDIRECTOR_PROGRAM_OPT',   'url_rewrite_program');
    define('REDIRECT_BYPASS_OPT',      'url_rewrite_bypass');
    define('REDIRECTOR_PROCESS_COUNT', '16 startup=8 idle=4 concurrency=0');
@@ -262,6 +263,7 @@ define('F_LDAPBINDPASS',        'ldapbindpass');
 define('F_LDAPVERSION',         'ldapversion');
 define('F_STRIPNTDOMAIN',       'stripntdomain');
 define('F_STRIPREALM',          'striprealm');
+define('F_LDAPFETCH',           'ldapfetch');
 define('F_BINPATH',             'binpath');
 define('F_PROCCESSCOUNT',       'process_count');
 define('F_SQUIDCONFIGFILE',     'squid_configfile');
@@ -349,7 +351,7 @@ function sg_init($init = '')
         $squidguard_config[F_BINPATH]         = SQUIDGUARD_BINPATH;
         $squidguard_config[F_SQUIDCONFIGFILE] = SQUID_CONFIGFILE;
         $squidguard_config[F_PROCCESSCOUNT]   = REDIRECTOR_PROCESS_COUNT;
-        
+
     } else {
         # copy config from $init
         foreach($init as $key => $in)
@@ -867,7 +869,7 @@ function sg_create_config()
     $sgconf[] = CONFIG_SG_HEADER;
     $sgconf[] = "logdir {$squidguard_config[F_LOGDIR]}";
     $sgconf[] = "dbhome {$squidguard_config[F_DBHOME]}";
-    if ( $squidguard_config[F_LDAPENABLE] == 'on' ) {
+    if ( $squidguard_config[F_LDAPENABLE] == 'on' && $squidguard_config[F_LDAPFETCH] != "batch" ) {
         $sgconf[] = "ldapbinddn {$squidguard_config[F_LDAPBINDDN]}";
         $sgconf[] = "ldapbindpass {$squidguard_config[F_LDAPBINDPASS]}";
         $sgconf[] = "ldapprotover {$squidguard_config[F_LDAPVERSION]}";
@@ -909,12 +911,25 @@ function sg_create_config()
             # separate IP, domains, usernames
             if (strpos(trim($src[F_SOURCE]), 'ldapusersearch') === false) {
                 $tsrc = explode(" ", trim($src[F_SOURCE]));
+                $sr_group=0;
                 foreach($tsrc as $sr) {
                         $sr = trim($sr);
                         if     (empty($sr))           continue;
-                        if     (is_ipaddr_valid($sr)) $sg_tag->items[] = "ip     $sr";
+                        elseif (is_ipaddr_valid($sr)) $sg_tag->items[] = "ip     $sr";
                         elseif (is_domain_valid($sr)) $sg_tag->items[] = "domain $sr";
                         elseif (is_username($sr))     $sg_tag->items[] = "user   " . str_replace("'", "", $sr);
+                		elseif (is_group($sr) && $sr_group == 0) {
+							$sg_tag->items[] = "userlist " . SQUIDGUARD_DBHOME . ".ldap/{$src[F_NAME]}";
+							if (! is_dir(SQUIDGUARD_DBHOME . ".ldap")) {
+							        mkdir(SQUIDGUARD_DBHOME . ".ldap",0755,true);
+							        chown(SQUIDGUARD_DBHOME . ".ldap",OWNER_NAME);
+							}
+							if (! file_exists (SQUIDGUARD_DBHOME . ".ldap/{$src[F_NAME]}")) {
+								file_put_contents(SQUIDGUARD_DBHOME . ".ldap/{$src[F_NAME]}","",LOCK_EX);
+							}
+							$sr_group ++;
+						}
+
                 }
             } else {
                 $sg_tag->items[] = trim($src[F_SOURCE]);
@@ -977,7 +992,7 @@ function sg_create_config()
 		  $ads_pos = strpos($ent, '_ads');
 		  if ( ($ads_pos > 0 || $adv_pos > 0) && $squidguard_config[F_ADV_BLANKIMG] == 'on')
 			     $sg_tag->items[] = "redirect " . sg_redirector_base_url($dst[F_REDIRECT], RMOD_INT_BLANKIMG);
-			
+
                 if ($squidguard_config[F_ENABLELOG] == 'on' ) {
                     $sg_tag->items[] = "log ". SQUIDGUARD_LOGFILE;
                 }
@@ -1664,6 +1679,13 @@ function is_ipaddr_valid($val)
     return is_string($val) && (is_ipaddr($val) || is_masksubnet($val) || is_subnet($val) || is_iprange_sg($val));
 }
 
+# is_group - validade if $val is in ldap group name format
+# ------------------------------------------------------------------------------
+function is_group($val) {
+	return preg_match("/^\[(.*)\]$/",$val);
+}
+
+
 # ------------------------------------------------------------------------------
 # is_domain_valid - check domain format
 # ------------------------------------------------------------------------------
@@ -1933,7 +1955,7 @@ function acl_remove_blacklist_items(&$items)
 function sg_script_logrotate()
 {
 	$lines = SQUIDGUARD_LOGROTATE_MAXCOUNT;
-	
+
 	global $squidguard_config;
 
 	$sglogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_LOGFILE;
@@ -1974,6 +1996,16 @@ function squidguard_cron_install()
     } else {
 	    install_cron_job("{$cron_cmd}", false);
     }
+
+	# ldap batch mode
+	$cron_cmd="/usr/local/bin/squidguard_ldap.php";
+	$on_off = $squidguard_config[F_LDAPFETCH] == 'batch';
+	if($on_off) {
+		install_cron_job($cron_cmd, true, "*/5", "*", "*", "*", "*", "root");
+	} else {
+		install_cron_job($cron_cmd, false);
+	}
+
 }
 
 # *****************************************************************************

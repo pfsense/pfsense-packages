@@ -10,7 +10,7 @@
 	squidguard.xml
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2006-2013 Sergey Dvoriancev <dv_serg@mail.ru>
-	Copyright (C) 2015 ESF, LLC
+	Copyright (C) 2015-2016 ESF, LLC
 	All rights reserved.
 */
 /* ====================================================================================== */
@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidguardgeneral</name>
-	<version>1.9.17</version>
+	<version>1.9.18</version>
 	<title>Proxy filter SquidGuard: General settings</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<!-- Installation -->
@@ -141,6 +141,10 @@
             <item>https://packages.pfsense.org/packages/config/squidGuard/squidguard_blacklist.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/bin/</prefix>
+		<item>https://packages.pfsense.org/packages/config/squidGuard/squidguard_ldap.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
             <prefix>/usr/local/www/</prefix>
             <item>https://packages.pfsense.org/packages/config/squidGuard/sgerror.php</item>
 	</additional_files_needed>
@@ -166,7 +170,7 @@
                         <fieldname>ldap_enable</fieldname>
                         <description><![CDATA[Enable options for setup ldap connection to create filters with ldap search]]></description>
                         <type>checkbox</type>
-                        <enablefields>ldapbinddn,ldapbindpass,stripntdomain,striprealm,ldapversion</enablefields>
+                        <enablefields>ldapbinddn,ldapbindpass,stripntdomain,striprealm,ldapversion,ldapbatchserver,ldapbatchou</enablefields>
                 </field>
                 <field>
                         <fielddescr>LDAP DN</fielddescr>
@@ -211,6 +215,37 @@
                                 </option>
                         </options>
                 </field>
+		<field>
+			<fielddescr>LDAP query mode</fielddescr>
+			<fieldname>ldapfetch</fieldname>
+			<type>select</type>
+			<default_value>online</default_value>
+			<options>
+				<option>
+					<name>Online</name>
+					<value>online</value>
+				</option>
+				<option>
+					<name>Batch every 5 minutes</name>
+					<value>batch</value>
+				</option>
+			</options>
+		</field>
+		<field>
+		<fielddescr>LDAP query Server in Batch mode</fielddescr>
+			<fieldname>ldapbatchserver</fieldname>
+			<description><![CDATA[Configure your LDAP server to query in batch mode]]></description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+		<fielddescr>LDAP query base OU DN in Batch mode</fielddescr>
+			<fieldname>ldapbatchou</fieldname>
+			<description><![CDATA[Configure your LDAP DN (ex: "OU=INTERNET,DC=domain,DC=local")]]></description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+
                 <field>
                         <name>Logging options</name>
                         <type>listtopic</type>
