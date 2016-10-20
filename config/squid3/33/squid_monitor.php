@@ -82,6 +82,7 @@ include("head.inc");
 		$tab_array = array();
 		if ($_REQUEST["menu"]=="reverse"){
 			$tab_array[] = array(gettext("General"), false, "/pkg_edit.php?xml=squid_reverse_general.xml&amp;id=0");
+			$tab_array[] = array(gettext("Additional ports"), false, "/pkg_edit.php?xml=squid_reverse_ports.xml&amp;id=0");
 			$tab_array[] = array(gettext("Web Servers"), false, "/pkg.php?xml=squid_reverse_peer.xml");
 			$tab_array[] = array(gettext("Mappings"), false, "/pkg.php?xml=squid_reverse_uri.xml");
 			$tab_array[] = array(gettext("Redirects"), false, "/pkg.php?xml=squid_reverse_redir.xml");
