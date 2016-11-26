@@ -312,6 +312,7 @@ EOD;
 		$bindview = array();
 	}
 
+	$master_ddns_zones = "";
 	for ($i = 0; $i < sizeof($bindview); $i++) {
 		$views = $config['installedpackages']['bindviews']['config'][$i];
 		$viewname = $views['name'];
@@ -572,6 +573,21 @@ EOD;
 						// Save zone configuration DB file
 						file_put_contents(CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB", $zone_conf);
 
+						//add to list of master ddns zones
+						if (($custom_root_zone == false) &&
+						    (($zone['enable_updatepolicy'] == "on") || ($zoneallowupdate != 'none'))) {
+							if ($zone['reverso'] == "on") {
+								if ($zone['reversv6o'] == "on") {
+									$zonesuffix .= ".ip6.arpa";
+								} else {
+									$zonesuffix .= ".in-addr.arpa";
+								}
+							} else {
+								$zonesuffix = '';
+							}
+							$master_ddns_zones .= $zonename.$zonesuffix.','.CHROOT_LOCALBASE."/etc/namedb/$zonetype/$zoneview/$zonename.DB\n";
+						}
+
 						$config['installedpackages']['bindzone']['config'][$x]['resultconfig'] = base64_encode($zone_conf);
 						$write_config++;
 						// Check DNSSEC keys creation for master zones
@@ -688,6 +704,7 @@ EOD;
 		}
 		$bind_conf .= "};\n";
 	}
+	file_put_contents(CHROOT_LOCALBASE."/etc/namedb/master-ddns.lst", $master_ddns_zones);
 	$dirs = array("/etc/namedb/keys", "/var/run/named", "/var/dump", "/var/log", "/var/stats", "/dev");
 	foreach ($dirs as $dir) {
 		safe_mkdir(CHROOT_LOCALBASE . $dir, 0755);
@@ -849,29 +866,53 @@ function bind_print_javascript_type_zone2() {
 function bind_write_rcfile() {
 	global $config;
 	$bind = $config['installedpackages']['bind']['config'][0];
-	$ip_version = ($bind['bind_ip_version'] ? $bind['bind_ip_version'] : "");
 	$rc = array();
 	$BIND_LOCALBASE = "/usr/local";
+	$CHROOT_LOCALBASE = "/cf/named";
 	$rc['file'] = 'named.sh';
 	// Curly braces in the following <<<EOD are PHP {$variable}, not named.conf text { value; }
 	$rc['start'] = <<<EOD
-		if [ -z "`/bin/ps auxw | /usr/bin/grep "[n]amed {$ip_version} -c /etc/namedb/named.conf" | /usr/bin/awk '{print $2}'`" ]; then
-			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
+		if [ -z "`/bin/ps auxw | /usr/bin/grep "[n]amed -c /etc/namedb/named.conf" | /usr/bin/awk '{print $2}'`" ]; then
+			{$BIND_LOCALBASE}/sbin/named -c /etc/namedb/named.conf -u bind -t /cf/named/
+		fi
+		# Validate that all dynamic zones loaded.  If not, archive the zone's journal and reload.
+		if [ -s {$CHROOT_LOCALBASE}/etc/namedb/master-ddns.lst ]; then
+			IFS=","$'\\n'
+			{$BIND_LOCALBASE}/sbin/rndc -c {$CHROOT_LOCALBASE}/etc/namedb/rndc.conf sync >/dev/null 2>&1
+			if [ "$?" -ne 0 ]; then
+				echo "[bind] Failure communicating with named.  Check logs."
+				return
+			fi
+			while read -r zonename zonefile; do
+				#check if the zone is loaded.
+				{$BIND_LOCALBASE}/sbin/rndc -c {$CHROOT_LOCALBASE}/etc/namedb/rndc.conf freeze "\$zonename" >/dev/null 2>&1
+				{$BIND_LOCALBASE}/sbin/rndc -c {$CHROOT_LOCALBASE}/etc/namedb/rndc.conf thaw   "\$zonename" >/dev/null 2>&1
+				if [ "$?" -ne 0 ]; then
+					echo "[bind] Zone \$zonename is not loaded."
+					#Zone is not loaded. Try moving the journal file and reloading the zone.
+					if [ -f "\$zonefile.jnl" ]; then
+						mv -f "\$zonefile.jnl" "\$zonefile.jnl.bad" >/dev/null 2>&1 && echo "[bind] Moved \$zonefile.jnl to \$zonefile.jnl.bad"
+						{$BIND_LOCALBASE}/sbin/rndc -c {$CHROOT_LOCALBASE}/etc/namedb/rndc.conf reload "\$zonename" >/dev/null 2>&1
+						if [ "$?" -ne 0 ]; then
+							echo "[bind] Failure re-loading zone \$zonemame.   Check logs."
+						else
+							echo "[bind] Zone \$zonename successfully loaded."
+						fi
+					fi
+				fi
+			done < {$CHROOT_LOCALBASE}/etc/namedb/master-ddns.lst
+			unset IFS
 		fi
 EOD;
 	$rc['stop'] = <<<EOD
-		/usr/bin/killall -9 named 2>/dev/null
-		sleep 2
+		/bin/pgrep -anx "[n]amed" > /dev/null && {$BIND_LOCALBASE}/sbin/rndc -c {$CHROOT_LOCALBASE}/etc/namedb/rndc.conf stop >/dev/null 2>&1 && sleep 1
+		/usr/bin/killall -9 named 2>/dev/null && sleep 3
+		echo > /dev/null
 EOD;
 	// curly braces in the following <<<EOD are PHP {$variable}, not named.conf text { value; }
 	$rc['restart'] = <<<EOD
-		if [ -z "`/bin/ps auxw | /usr/bin/grep "[n]amed {$ip_version} -c /etc/namedb/named.conf" | /usr/bin/awk '{print $2}'`" ]; then
-			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
-		else
-			/usr/bin/killall -9 named 2>/dev/null
-		        sleep 3
-			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
-		fi
+		rc_stop
+                rc_start
 EOD;
 	conf_mount_rw();
 	write_rcfile($rc);
