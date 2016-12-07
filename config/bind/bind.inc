@@ -976,8 +976,8 @@ function bind_do_xmlrpc_sync($sync_to_ip, $username, $password, $synctimeout, $m
 	if (is_array($config['installedpackages']['dnsseckeys'])) {
 		$xml['dnsseckeys'] = $config['installedpackages']['dnsseckeys'];
 	}
-	// Change master zone to slave on backup servers
-	if (is_array($xml['bindzone']["config"])) {
+	// Change master zone to slave on backup servers if master zone ip is set
+	if (is_array($xml['bindzone']["config"]) && $master_zone_ip != "") {
 		for ($x = 0; $x < sizeof($xml['bindzone']["config"]); $x++) {
 			if ($xml['bindzone']["config"][$x]['type'] == "master") {
 				$xml['bindzone']["config"][$x]['type'] = "slave";
