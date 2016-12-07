@@ -128,6 +128,10 @@ function freeradius_install_command() {
 	freeradius_modulesdatacounter_resync();
 	freeradius_datacounter_acct_resync();
 	freeradius_datacounter_auth_resync();
+	
+	// Install the Google Authenticator files
+	if (!file_exists("FREERADIUS_ETC . "/raddb/scripts/googleauth.py")) { copy("googleauth.py, FREERADIUS_ETC . "/raddb/scripts/");}
+	if (!file_exists("FREERADIUS_ETC . "/raddb/modules/googleauth")) { copy("googleauth, FREERADIUS_ETC . "/raddb/modules/");}
 
 	// Some initial module configuration
 	freeradius_modulesmschap_resync();
@@ -547,7 +551,7 @@ if (is_array($arrusers) && !empty($arrusers)) {
 	
 		// if otp is enabled we need to set Auth-Type to accept because password will be checked when the otp script gets executed in reply-item list
 		else {
-			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = motp";
+			$varuserscheckitem = '"' . $varusersusername . '"' . " Auth-Type = " . $users['varusersauthmethod'];
 		}
 	
 	// Add additional CHECK-ITEMS here. Different formatting in "users" file needed.
@@ -1793,6 +1797,12 @@ authenticate {
 	#  Mobile-One-Time-Password (MOTP) authentication.
 	Auth-Type MOTP {
 		motp
+	}
+	
+	#
+	# Google-Authenticator authentication.
+	Auth-Type GOOGLEAUTH {
+	       googleauth
 	}
 	
 	#
