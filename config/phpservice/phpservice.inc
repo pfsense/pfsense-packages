@@ -34,15 +34,15 @@ function phpservice_sync_package() {
 	conf_mount_rw();
 
 	if ($config['installedpackages']['phpservice']['config'] != "") {
-		$tmp = <<<EOF
+	    $tmp = '
 <?php
 
 // Set time limit to indefinite execution
 set_time_limit (0);
 
 //run this program as long as the pid file exists
-$filename = '/tmp/phpmonitor.pid';
-$fp = fopen($filename, 'w');
+$filename = "/tmp/phpmonitor.pid";
+$fp = fopen($filename, "w");
 fwrite($fp, "If this file is deleted then phpmonitor will stop.");
 fclose($fp);
 unset($filename);
@@ -65,11 +65,12 @@ $x = 0;
 while ($x == 0) {
 
 // If the pid file does not exist then close the program.
-if (!file_exists('/tmp/phpmonitor.pid')) {
+if (!file_exists("/tmp/phpmonitor.pid")) {
 	return;
 }
 
-EOF;
+
+';
 	      
 		foreach ($config['installedpackages']['phpservice']['config'] as $rowhelper) {
 			if ($rowhelper['enabled'] != "false") {
@@ -83,14 +84,13 @@ EOF;
 			}
 		}
 
-		$tmp .= <<< EOF
+		$tmp .= '
 
 sleep(1);
 
 }
 ?>
-
-EOF;
+';
 
 		$fout = fopen("/usr/local/pkg/phpservice.php", "w");
 		fwrite($fout, $tmp);
