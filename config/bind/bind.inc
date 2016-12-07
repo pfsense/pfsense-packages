@@ -860,6 +860,8 @@ function bind_write_rcfile() {
 		fi
 EOD;
 	$rc['stop'] = <<<EOD
+		/usr/local/sbin/rndc -c /cf/named/etc/namedb/rndc.conf stop
+		sleep 1
 		/usr/bin/killall -9 named 2>/dev/null
 		sleep 2
 EOD;
@@ -868,6 +870,8 @@ EOD;
 		if [ -z "`/bin/ps auxw | /usr/bin/grep "[n]amed {$ip_version} -c /etc/namedb/named.conf" | /usr/bin/awk '{print $2}'`" ]; then
 			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
 		else
+			/usr/local/sbin/rndc -c /cf/named/etc/namedb/rndc.conf stop
+			sleep 1
 			/usr/bin/killall -9 named 2>/dev/null
 		        sleep 3
 			{$BIND_LOCALBASE}/sbin/named {$ip_version} -c /etc/namedb/named.conf -u bind -t /cf/named/
