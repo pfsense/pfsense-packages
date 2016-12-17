@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+  <name>DShield Sensor</name>
+  <version>2015-04-03 pkg 0.9.0</version>
+  <title>DShield Sensor Settings</title>
+  <include_file>/usr/local/pkg/dshield-sensor.inc</include_file>
+  <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+  <menu>
+    <name>DShield Sensor</name>
+    <section>Services</section>
+    <configfile>dshield-sensor.xml</configfile>
+    <tooltiptext>DShield Sensor settings.</tooltiptext>
+    <url>/pkg_edit.php?xml=dshield-sensor.xml</url>
+  </menu>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/</prefix>
+    <chmod>0755</chmod>
+    <item>http://packages.pfsense.org/packages/config/dshield-sensor/dshield-sensor.xml</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/</prefix>
+    <chmod>0755</chmod>
+    <item>http://packages.pfsense.org/packages/config/dshield-sensor/dshield-sensor.inc</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/dshield-sensor/</prefix>
+    <chmod>0755</chmod>
+    <item>http://packages.pfsense.org/packages/config/dshield-sensor/pfsense_mailer.php</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/dshield-sensor/</prefix>
+    <chmod>0755</chmod>
+    <item>http://packages.pfsense.org/packages/config/dshield-sensor/pfsense_preprocessor.php</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/dshield-sensor/</prefix>
+    <chmod>0755</chmod>
+    <item>http://packages.pfsense.org/packages/config/dshield-sensor/cronjob</item>
+  </additional_files_needed>
+  <fields>
+    <field>
+      <fielddescr>Enabled</fielddescr>
+      <fieldname>enable</fieldname>
+      <description>Enable log submission.</description>
+      <type>checkbox</type>
+    </field>
+    <field>
+      <fielddescr>DShield User ID</fielddescr>
+      <fieldname>userid</fieldname>
+      <description>User ID assigned by DShield for submissions.  Set to 0 to submit anonymously.</description>
+      <type>input</type>
+    </field>
+    <field>
+      <fielddescr>CC Report</fielddescr>
+      <fieldname>ccreport</fieldname>
+      <description>Emailed reports are CCed to the Notification Email address configured in the system's notification settings.</description>
+      <type>checkbox</type>
+    </field>
+    <field>
+      <fielddescr>Obfuscate IP Addresses</fielddescr>
+      <fieldname>obfuscate</fieldname>
+      <description>Target IP addresses in submitted logs are obfuscated.</description>
+      <type>checkbox</type>
+    </field>
+    <field>
+      <fielddescr>Submission Frequency</fielddescr>
+      <fieldname>frequency</fieldname>
+      <description>The log is circular so this should be frequent enough that records aren't overwritten.</description>
+      <type>select</type>
+      <options>
+        <option><name>Every hour</name><value>1</value></option>
+        <option><name>Every two hours</name><value>2</value></option>
+        <option><name>Every four hours</name><value>4</value></option>
+        <option><name>Four times per day</name><value>6</value></option>
+        <option><name>Three times per day</name><value>8</value></option>
+        <option><name>Twice per day</name><value>12</value></option>
+        <option><name>Once per day</name><value>24</value></option>
+      </options>
+    </field>
+  </fields>
+  <custom_php_install_command>
+    dshield_sensor_install_command();
+  </custom_php_install_command>
+  <custom_php_deinstall_command>
+    dshield_sensor_deinstall_command();
+  </custom_php_deinstall_command>
+  <custom_php_resync_config_command>
+    dshield_sensor_resync_config_command();
+  </custom_php_resync_config_command>
+</packagegui>
