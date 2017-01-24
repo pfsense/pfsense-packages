@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    surftool.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2015 H. Reimers <reimers@mail.de>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+    
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+	<description>Manage your squidguard groups. You can set every group very easily. The modes on/off/only/on plus and adminfree are available. This tool was made for schools.</description>
+	<requirements>This package needs squidguard</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>surftool</name>
+	<version>0.01</version>
+	<title>Services: Surftool -> Settings</title>
+	<category>Services</category>
+	<include_file>/usr/local/pkg/surftool.inc</include_file>
+	<service>
+		<name>surftool</name>
+		<rcfile>surftool.sh</rcfile>
+		<executable>/bin/sh /usr/local/share/surftool/surftooldaemon.sh</executable>
+		<description>Surftool Service</description>
+		<custom_php_service_status_command>$surftool_ret = exec('/bin/pgrep -anf surftooldaemon.sh start'); if($surftool_ret>0) {return true;} else {return false;};</custom_php_service_status_command>
+	</service>
+	<menu>
+		<name>Surftool</name>
+		<tooltiptext>Manage your squidguard groups</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=surftool.xml&amp;id=0</url>
+	</menu>
+        <tabs>
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=surftool.xml&amp;id=0</url>
+                        <active/>
+                </tab>
+		<tab>
+			<text>Log</text>
+			<url>/surftool/surftool_log.php</url>
+		</tab>
+                <tab>
+                        <text>Switch groups</text>
+                        <url>/surftool/surftool_set.php</url>
+                </tab>
+                <tab>
+                        <text>external</text>
+                        <url>/surftool/index.php</url>
+                </tab>
+        </tabs>
+        <additional_files_needed>
+               <prefix>/usr/local/pkg/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool.inc</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/surftool/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool_log.php</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/surftool/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool_set.php</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/surftool/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool/index.php</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/surftool/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool/surftool.ini</item>
+        </additional_files_needed>
+	<additional_files_needed>
+               <prefix>/usr/local/www/surftool/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool/surftool_class.inc</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/surftool/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool/check_and_activate.php</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/www/surftool/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool/set.php</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/usr/local/share/surftool/</prefix>
+               <chmod>0755</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool/surftooldaemon.sh</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/etc/inc/priv/</prefix>
+               <chmod>0644</chmod>
+               <item>https://packages.pfsense.org/packages/config/surftool/surftool.priv.inc</item>
+        </additional_files_needed>
+        <fields>
+                <field>
+                        <name>General Options</name>
+                        <type>listtopic</type>
+				<fieldname>temp</fieldname>
+                </field>	
+                <field>
+                        <fielddescr>Language</fielddescr>
+                        <fieldname>surftool_lang</fieldname>
+                        <description>Select language</description>
+                        <type>select</type>
+                        <value>eng</value>
+                        <options>
+                                 <option><name>English</name><value>eng</value></option>
+                                 <option><name>German</name><value>deu</value></option>
+                        </options>
+                </field>
+		<field>
+			<fielddescr>logfile</fielddescr>
+			<fieldname>surftool_logfile</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path and name of the logfile. <br>Default:<b>/var/log/surftool.log</b>]]>
+			</description>
+			<size>70</size>
+			<default_value>/var/log/surftool.log</default_value>
+		</field>    
+		<field>
+			<fielddescr>loglevel</fielddescr>
+			<fieldname>surftool_debuglevel</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the loglevel. <br>0 less<br>9 much<br>Default:<b>0</b>]]>
+			</description>
+			<size>3</size>
+			<default_value>0</default_value>
+		</field>
+		<field>
+			<name>External usage</name>
+			<type>listtopic</type>
+			<fieldname>temp1</fieldname>
+		</field>
+		<field>
+			<fielddescr>user name</fielddescr>
+			<fieldname>surftool_user_name</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Username for the local user<br>Default:<b>admin</b>]]>
+			</description>
+			<size>20</size>
+			<default_value>admin</default_value>
+		</field>   
+		<field>
+			<fielddescr>user password</fielddescr>
+			<fieldname>surftool_user_password</fieldname>
+			<type>password</type>
+			<description>
+				<![CDATA[Password for the local user<br>Default:<b>admin</b>]]>
+			</description>
+			<default_value>admin</default_value>
+		</field>
+		<field>
+			<fielddescr>Secret external link</fielddescr>
+			<fieldname>surftool_redirect_secret</fieldname>
+			<type>password</type>
+			<description>
+				<![CDATA[A secret for others system, which refer with a link to the surftool site. It's a kind of api key<br>Default:<b>not set</b>]]>
+			</description>
+		</field>
+ 		<field>
+			<fielddescr>logout target</fielddescr>
+			<fieldname>surftool_logout_target</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter a link for auto redirection after logout<br>Maybe:<b>http://www.company.com/index.php</b> - Default:<b>not set</b>]]>
+			</description>
+			<size>70</size>
+		</field> 
+		<field>
+			<name>Daemon Options</name>
+			<type>listtopic</type>
+			<fieldname>temp</fieldname>
+		</field>	
+		<field>
+			<fielddescr>Refresh time</fielddescr>
+			<fieldname>surftool_refresh_time</fieldname>
+			<value>2</value>
+			<type>input</type>
+			<description>
+				<![CDATA[Look every x seconds for changes <br>
+				Default:<b>1</b>]]>
+			</description>
+			<size>4</size>
+			<default_value>1</default_value>
+		</field> 
+		<field>
+			<fielddescr>daemon script</fielddescr>
+			<fieldname>surftool_daemon_executable</fieldname>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path and name of the worker script. <br>Default:<b>/usr/local/share/surftool/surftooldaemon.sh</b>]]>
+			</description>
+			<size>70</size>
+			<default_value>/usr/local/share/surftool/surftooldaemon.sh</default_value>
+		</field>
+		<field>
+			<fielddescr>worker script</fielddescr>
+			<fieldname>surftool_worker_executable</fieldname>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path and name of the worker script. <br>Default:<b>/usr/local/www/surftool/check_and_activate.php</b>]]>
+			</description>
+			<size>70</size>
+			<default_value>/usr/local/www/surftool/check_and_activate.php</default_value>
+		</field>
+		<field>
+			<fielddescr>php</fielddescr>
+			<fieldname>surftool_php</fieldname>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the full path to php. <br>Default:<b>/usr/local/bin/php</b>]]>
+			</description>
+			<default_value>/usr/local/bin/php</default_value>
+		</field>
+		<field>
+			<fielddescr>command path</fielddescr>
+			<fieldname>surftool_command_path</fieldname>
+			<value>/tmp/surftool</value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path for the command files. <br>Default:<b>/tmp/surftool</b>]]>
+			</description>
+			<default_value>/tmp/surftool</default_value>
+		</field>
+		<field>
+			<name>squid(/Guard) parameter</name>
+			<type>listtopic</type>
+			<fieldname>temp1</fieldname>
+		</field>
+		<field>
+			<fielddescr>Name of the squidGuard group onplus</fielddescr>
+			<fieldname>surftool_group_onplus_name</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the name of the squidguard group onplus. <br>
+				Default:<b>surftool_onplus</b><br>
+				 Size must be between [2..16].]]>
+			</description>
+			<default_value>surftool_onplus</default_value>
+		</field>         		
+		<field>
+			<fielddescr>Name of the squidGuard group only</fielddescr>
+			<fieldname>surftool_group_only_name</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the name of the squidguard group only. <br>Default:<b>surftool_only</b><br>Size must be between [2..16].]]>
+			</description>
+			<default_value>surftool_only</default_value>
+		</field>
+		<field>
+			<fielddescr>Name of the squidGuard adminfree</fielddescr>
+			<fieldname>surftool_group_adminfree_name</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the name of the squidguard group adminfree. <br>Default:<b>surftool_admin</b><br>Size must be between [2..16].]]>
+			</description>
+			<default_value>surftool_admin</default_value>
+		</field>	
+		<field>
+			<fielddescr>Path to the squid binary</fielddescr>
+			<fieldname>surftool_squid_binary</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path to the squid binary. <br>
+				Default for amd64:<b>/usr/pbi/squid-amd64/local/sbin/squid</b> or <b>/usr/pbi/bin/squid</b>]]>
+			</description>
+			<size>70</size>
+			<default_value>/usr/pbi/bin/squid</default_value>
+		</field>  
+		<field>
+			<fielddescr>Path to the squidGuard binary</fielddescr>
+			<fieldname>surftool_sg_binary</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path to the squidGuard binary. <br>
+				Default:<b>/usr/local/bin/squidGuard</b>]]>
+			</description>
+			<size>70</size>
+			<default_value>/usr/local/bin/squidGuard</default_value>
+		</field>  		
+		<field>
+			<fielddescr>Path to the squidGuard configuration file</fielddescr>
+			<fieldname>surftool_sg_config_file</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path to the squidGuard configuration file. <br>
+				Default for amd64:<b>/usr/pbi/squidguard-amd64/etc/squidGuard/squidGuard.conf</b>]]>
+			</description>
+			<size>70</size>
+			<default_value>/usr/pbi/squidguard-amd64/etc/squidGuard/squidGuard.conf</default_value>
+		</field>  			
+		<field>
+			<fielddescr>Path to the squidGuard database</fielddescr>
+			<fieldname>surftool_sg_db</fieldname>
+			<value></value>
+			<type>input</type>
+			<description>
+				<![CDATA[Enter the path to the squidGuard database. <br>
+				Default:<b>/var/db/squidGuard/</b>]]>
+			</description>
+			<size>70</size>
+			<default_value>/var/db/squidGuard/</default_value>
+		</field>  		
+		<field>
+			<name>Custom Options</name>
+			<type>listtopic</type>
+			<fieldname>temp1</fieldname>
+		</field>
+		<field>
+			<fielddescr>Custom Options</fielddescr>
+			<fieldname>surftool_custom_options</fieldname>
+			<description>You can put your own custom options here, separated by semi-colons (;).</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+		</field>
+	</fields>
+	<custom_php_validation_command>
+		surftool_validate($_POST, $input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		exec("/bin/rm -f /usr/local/etc/rc.d/surftool*");
+	  	surftool_resync();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		exec("/bin/mkdir -p /usr/local/share/surftool/");
+		surftool_install();
+		surftool_resync();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		surftool_deinstall();
+		exec("/bin/rm -f /usr/local/etc/rc.d/surftool*");
+		exec("/usr/local/www/surftool/surftool.ini");
+		exec("/bin/rm -f -r /usr/local/share/surftool/");
+		exec("/bin/rm -f -r /usr/local/www/surftool/");
+	</custom_php_deinstall_command>
+</packagegui>
