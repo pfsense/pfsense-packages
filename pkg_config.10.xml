@@ -821,6 +821,7 @@
 		<build_pbi>
 			<port>security/nmap</port>
 		</build_pbi>
+		<maximum_version>2.2.999</maximum_version>
 	</package>
 	<package>
 		<name>imspector</name>
