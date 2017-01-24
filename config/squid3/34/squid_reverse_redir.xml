@@ -42,7 +42,7 @@
 	]]>
 	</copyright>
 	<name>squidreverseredir</name>
-	<version>0.4.5</version>
+	<version>0.4.8</version>
 	<title>Reverse Proxy Server: Redirects</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<tabs>
@@ -62,6 +62,10 @@
 			<text>Redirects</text>
 			<url>/pkg.php?xml=squid_reverse_redir.xml</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Security</text>
+			<url>/pkg_edit.php?xml=squid_reverse_security.xml</url>
 		</tab>
 		<tab>
 			<text>Real Time</text>

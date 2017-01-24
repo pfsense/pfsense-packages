@@ -3,6 +3,7 @@
 	squid_js.inc
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2015 ESF, LLC
+	Copyright (C) 2015 Gekkenhuis
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -30,6 +31,81 @@
  * Squid javascript helpers for GUI fields status manipulation
  */
 require_once('config.inc');
+
+/*
+ * Add custom dhparam options when the file(s) existis
+ */
+function squid_print_javascript_dhparams() {
+	global $config;
+	if (is_array($config['installedpackages']['squidreversesecurity'])) {
+		$reverse_security = $config['installedpackages']['squidreversesecurity']['config'][0];
+	} else {
+		$reverse_security = array();
+	}
+	$javascript = <<< EOD
+<script type="text/javascript">
+//<![CDATA[
+	var field = document.iform.dhparams_size;
+EOD;
+	if (file_exists(SQUID_CONFBASE . "/dhparams1024.pem")) {
+		$javascript .= <<< EOD
+	document.getElementById("generate_dhparams1024").disabled = 1;
+	
+	// create new option element
+	var opt1 = document.createElement('option');
+	opt1.appendChild( document.createTextNode('1024 custom generated') );
+	opt1.value = '1024c';
+EOD;
+	if ($reverse_security['dhparams_size'] == '1024c') {
+		$javascript .= "opt1.selected = 'true'";
+	}
+	$javascript .= <<< EOD
+	
+	field.options.add(opt1);
+EOD;
+	}
+	if (file_exists(SQUID_CONFBASE . "/dhparams2048.pem")) {
+		$javascript .= <<< EOD
+	document.getElementById("generate_dhparams2048").disabled = 1;
+	
+	// create new option element
+	var opt2 = document.createElement('option');
+	opt2.appendChild( document.createTextNode('2048 custom generated') );
+	opt2.value = '2048c';
+EOD;
+	if ($reverse_security['dhparams_size'] == '2048c') {
+		$javascript .= "opt2.selected = 'true'";
+	}
+	$javascript .= <<< EOD
+	
+	field.options.add(opt2);
+EOD;
+	}
+	if (file_exists(SQUID_CONFBASE . "/dhparams4096.pem")) {
+		$javascript .= <<< EOD
+	document.getElementById("generate_dhparams4096").disabled = 1;
+	
+	// create new option element
+	var opt4 = document.createElement('option');
+	opt4.appendChild( document.createTextNode('4096 custom generated') );
+	opt4.value = '4096c';
+EOD;
+	if ($reverse_security['dhparams_size'] == '4096c') {
+		$javascript .= "opt4.selected = 'true'";
+	}
+	$javascript .= <<< EOD
+	
+	field.options.add(opt4);
+EOD;
+	}
+	
+	$javascript .= <<< EOD
+//]]>
+</script>
+EOD;
+	
+	print($javascript);
+}
 
 /*
  * Enable/disable and blank out various parts of the Authentication tab
@@ -247,7 +323,6 @@ function on_antivirus_advanced_config_changed() {
 		document.iform['raw_cicap_magic'].disabled = 0;
 		document.iform['raw_freshclam_conf'].disabled = 0;
 		document.iform['raw_clamd_conf'].disabled = 0;
-
 	}
 
 	if (document.getElementById("enable").checked == 0) {

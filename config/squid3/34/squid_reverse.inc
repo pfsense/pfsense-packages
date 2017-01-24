@@ -4,7 +4,7 @@
 	part of pfSense (https://www.pfSense.org/)
 	Copyright (C) 2012 Martin Fuchs
 	Copyright (C) 2012-2014 Marcello Coutinho
-	Copyright (C) 2013 Gekkenhuis
+	Copyright (C) 2013-2015 Gekkenhuis
 	Copyright (C) 2015 ESF, LLC
 	All rights reserved.
 
@@ -60,6 +60,11 @@ function squid_resync_reverse() {
 	} else {
 		$reverse_redir = array();
 	}
+	if (is_array($config['installedpackages']['squidreversesecurity'])) {
+		$reverse_security = $config['installedpackages']['squidreversesecurity']['config'][0];
+	} else {
+		$reverse_security = array();
+	}
 
 	$conf = "# Reverse Proxy settings\n";
 
@@ -101,7 +106,8 @@ function squid_resync_reverse() {
 			if ($crl != false) {
 				if (base64_decode($crl['text'])) {
 					file_put_contents(SQUID_CONFBASE . "/{$settings['reverse_ssl_clientcrl']}.crl", sq_text_area_decode($crl['text']));
-					$clientca_opts .= " crlfile=" . SQUID_CONFBASE . "/{$settings['reverse_ssl_clientcrl']}.crl sslflags=VERIFY_CRL";
+					$clientca_opts .= " crlfile=" . SQUID_CONFBASE . "/{$settings['reverse_ssl_clientcrl']}.crl";
+					$sslflags_https_port_iface = "sslflags=VERIFY_CRL";
 				}
 			}
 		}
@@ -119,7 +125,70 @@ function squid_resync_reverse() {
 	$https_defsite = (empty($settings['reverse_https_defsite']) ? $settings['reverse_external_fqdn'] : $settings['reverse_https_defsite']);
 
 	// Ignore Internal Certificate Validation
-	$sslflags = ($settings['reverse_ignore_ssl_valid'] == "on" ? "sslflags=DONT_VERIFY_PEER" : "");
+	$sslflags_cache_peer = ($settings['reverse_ignore_ssl_valid'] == "on" ? "sslflags=DONT_VERIFY_PEER" : "");
+
+	// Reverse Proxy security settings
+	if (!empty($reverse_security['custom_ssl_security_active'])) {
+		$options_array = array();
+		if (!empty($reverse_security['disable_sslv2'])) {
+			array_push($options_array, "NO_SSLv2");
+		}
+		if (!empty($reverse_security['disable_sslv3'])) {
+			array_push($options_array, "NO_SSLv3");
+		}
+		if (!empty($reverse_security['disable_tlsv1'])) {
+			array_push($options_array, "NO_TLSv1");
+		}
+		if (!empty($reverse_security['single_dh_use'])) {
+			array_push($options_array, "SINGLE_DH_USE");
+		}
+		if (!empty($reverse_security['cipher_server_preference'])) {
+			array_push($options_array, "CIPHER_SERVER_PREFERENCE");
+		}
+
+		$options_array = array_filter($options_array);
+		if (!empty($options_array)) {
+			$options = "options=";
+			$options .= implode(',', $options_array);
+		}
+
+		if (!empty($reverse_security['disable_session_reuse'])) {
+			// reverse_ssl_clientcrl doesn't set the sslflags on 
+			// reverse_ip https_port so we cannot use the same variable
+			$sslflags_https_port_reverse = "sslflags=NO_SESSION_REUSE";
+			
+			// Check or the sslflags for the interface https_port 
+			// are already set by reverse_ssl_clientcrl setting
+			if(!empty($sslflags_iface)) {
+				// Append the sslflags
+				$sslflags_https_port_iface .= ",NO_SESSION_REUSE";
+			} else {
+				// Set the sslflags
+				$sslflags_https_port_iface = $sslflags_https_port_reverse;
+			}
+		}
+		
+		// Validate dhparam files because the custom files must be generated before they can be used
+		if (!empty($reverse_security['use_dhparams']) && isset($reverse_security["dhparams_size"])) {
+			if ($reverse_security['dhparams_size'] == '1024' && file_exists("/etc/dh-parameters.1024")) {
+				$dhparam = "dhparams=/etc/dh-parameters.1024";
+			} else if ($reverse_security['dhparams_size'] == '1024c' && file_exists(SQUID_CONFBASE . "/dhparams1024.pem")) {
+				$dhparam = "dhparams=" . SQUID_CONFBASE . "/dhparams1024.pem";
+			} else if ($reverse_security['dhparams_size'] == '2048' && file_exists("/etc/dh-parameters.2048")) {
+				$dhparam = "dhparams=/etc/dh-parameters.2048";
+			} else if ($reverse_security['dhparams_size'] == '2048c' && file_exists(SQUID_CONFBASE . "/dhparams2048.pem")) {
+				$dhparam = "dhparams=" . SQUID_CONFBASE . "/dhparams2048.pem";
+			} else if ($reverse_security['dhparams_size'] == '4096' && file_exists("/etc/dh-parameters.4096")) {
+				$dhparam = "dhparams=/etc/dh-parameters.4096";
+			} else if ($reverse_security['dhparams_size'] == '4096c' && file_exists(SQUID_CONFBASE . "/dhparams4096.pem")) {
+				$dhparam = "dhparams=" . SQUID_CONFBASE . "/dhparams4096.pem";
+			}
+		}
+
+		if( !empty($reverse_security['disable_weak_ciphers'])) {
+			$ciphers = "cipher=ALL:!aNULL:!eNULL:!RC4:!MD5:!EXP-DES-CBC-SHA:!DES-CBC-SHA:!DHE-RSA-DES-CBC-SHA:!LOW:@STRENGTH";
+		}
+	}
 
 	foreach (explode(",", $ifaces) as $i => $iface) {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
@@ -130,7 +199,11 @@ function squid_resync_reverse() {
 			}
 			//HTTPS
 			if (!empty($settings['reverse_https'])) {
-				$conf .= "https_port {$real_ifaces[$i][0]}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} {$clientca_opts} defaultsite={$https_defsite} vhost\n";
+				if (!empty($reverse_security['custom_ssl_security_active'])) {
+					$conf .= "https_port {$real_ifaces[$i][0]}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} {$clientca_opts} {$sslflags_https_port_iface} {$dhparam} {$ciphers} {$options} defaultsite={$https_defsite} vhost\n";
+				} else {
+					$conf .= "https_port {$real_ifaces[$i][0]}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} {$clientca_opts} {$sslflags_https_port_iface} defaultsite={$https_defsite} vhost\n";
+				}
 			}
 		}
 	}
@@ -144,7 +217,11 @@ function squid_resync_reverse() {
 			}
 			//HTTPS
 			if (!empty($settings['reverse_https'])) {
-				$conf .= "https_port {$reip}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$https_defsite} vhost\n";
+				if (!empty($reverse_security['custom_ssl_security_active'])) {
+					$conf .= "https_port {$reip}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} {$dhparam} {$ciphers} {$options} {$sslflags_https_port_reverse} defaultsite={$https_defsite} vhost\n";
+				} else {
+					$conf .= "https_port {$reip}:{$https_port} accel cert={$reverse_crt} key={$reverse_key} defaultsite={$https_defsite} vhost\n";
+				}
 			}
 		}
 	}
@@ -156,7 +233,7 @@ function squid_resync_reverse() {
 			$casnr = 0;
 			foreach ($reverse_owa_ip as $reowaip) {
 				$casnr++;
-				$conf .= "cache_peer {$reowaip} parent 443 0 proxy-only no-query no-digest originserver login=PASSTHRU connection-auth=on ssl {$sslflags} front-end-https=on name=OWA_HOST_443_{$casnr}_pfs\n";
+				$conf .= "cache_peer {$reowaip} parent 443 0 proxy-only no-query no-digest originserver login=PASSTHRU connection-auth=on ssl {$sslflags_cache_peer} front-end-https=on name=OWA_HOST_443_{$casnr}_pfs\n";
 				$conf .= "cache_peer {$reowaip} parent 80 0 proxy-only no-query no-digest originserver login=PASSTHRU connection-auth=on name=OWA_HOST_80_{$casnr}_pfs\n";
 			}
 		}
@@ -169,7 +246,7 @@ function squid_resync_reverse() {
 				$conf_peer = "#{$rp['description']}\n";
 				$conf_peer .= "cache_peer {$rp['ip']} parent {$rp['port']} 0 proxy-only no-query no-digest originserver login=PASSTHRU connection-auth=on round-robin ";
 				if ($rp['protocol'] == 'HTTPS') {
-					$conf_peer .= "ssl {$sslflags} front-end-https=auto ";
+					$conf_peer .= "ssl {$sslflags_cache_peer} front-end-https=auto ";
 				}
 				$conf_peer .= "name=rvp_{$rp['name']}\n\n";
 
@@ -502,6 +579,24 @@ function squid_validate_reverse($post, &$input_errors) {
 		unset($cfg, $defs);
 	}
 	unset($contents);
+}
+
+/* Reverse Proxy Server Security input validation */
+function squid_validate_reverse_security($post, &$input_errors) {
+	/* Generate DH Parameters */
+	if ($post['generate_dhparams1024'] == "Generate 1024 key") {
+		log_error("[squid] Invoked generating 1024 DHParam file.");
+		mwexec_bg('/usr/local/pkg/gen_dhparams.php 1024 ' . SQUID_CONFBASE . '/dhparams1024.pem proxy proxy');
+		return;
+	} else if ($post['generate_dhparams2048'] == "Generate 2048 key") {
+		log_error("[squid] Invoked generating 2048 DHParam file.");
+		mwexec_bg('/usr/local/pkg/gen_dhparams.php 2048 ' . SQUID_CONFBASE . '/dhparams2048.pem proxy proxy');
+		return;
+	} else if ($post['generate_dhparams4096'] == "Generate 4096 key") {
+		log_error("[squid] Invoked generating 4096 DHParam file.");
+		mwexec_bg('/usr/local/pkg/gen_dhparams.php 4096 ' . SQUID_CONFBASE . '/dhparams4096.pem proxy proxy');
+		return;
+	}
 }
 
 ?>
