@@ -142,7 +142,7 @@
 		<field>
 			<fielddescr>
 				<![CDATA[
-				Blocked Domains<br/><br/>
+				Redirected Domains<br/><br/>
 				Enter the domains to match here.<br/>
 				<strong>Example:</strong> example.com sub.example.com www.example.com<br/><br/>
 				<strong>Do NOT enter http:// or https:// here!</strong> Only the hostname is required.
