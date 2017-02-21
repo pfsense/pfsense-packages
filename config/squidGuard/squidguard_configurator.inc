@@ -2385,7 +2385,7 @@ function scan_blacklist_cat($curdir, $key_name, &$cat_array)
             $fls_file = "$curdir/$fls";
 
             if (($fls != ".") and ($fls != "..")) {
-                if (is_file($fls_file)) {
+                if ((is_file($fls_file)) || (is_link($fls_file)))  {
 
                      # add files path
                      switch(strtolower($fls)) {
