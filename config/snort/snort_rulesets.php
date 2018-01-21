@@ -96,7 +96,7 @@ if (!file_exists("{$snortdir}/rules/" . GPL_FILE_PREFIX . "community.rules"))
 if (($snortdownload == 'off') || ($a_nat[$id]['ips_policy_enable'] != 'on'))
 	$policy_select_disable = "disabled";
 
-// If a Snort VRT policy is enabled and selected, remove all Snort VRT
+// If a Snort Subscriber policy is enabled and selected, remove all Snort Subscriber 
 // rules from the configured rule sets to allow automatic selection.
 if ($a_nat[$id]['ips_policy_enable'] == 'on') {
 	if (isset($a_nat[$id]['ips_policy'])) {
@@ -226,7 +226,7 @@ if ($_POST['selectall']) {
 			$enabled_rulesets_array[] = basename($file);
 	}
 
-	/* Include the Snort VRT rules only if enabled and no IPS policy is set */
+	/* Include the Snort Subscriber rules only if enabled and no IPS policy is set */
 	if ($snortdownload == 'on' && $a_nat[$id]['ips_policy_enable'] == 'off') {
 		$files = glob("{$snortdir}/rules/" . VRT_FILE_PREFIX . "*.rules");
 		foreach ($files as $file)
@@ -371,7 +371,7 @@ if ($savemsg) {
 				</td>
 			</tr>
 			<tr>
-				<td colspan="6" class="listtopic"><?php echo gettext("Snort VRT IPS Policy selection"); ?><br/></td>
+				<td colspan="6" class="listtopic"><?php echo gettext("Snort Subscriber IPS Policy selection"); ?><br/></td>
 			</tr>
 			<tr>
 				<td colspan="6" valign="center" class="listn">
@@ -385,10 +385,10 @@ if ($savemsg) {
 					   <tr>
 						<td width="15%" class="vncell" id="ips_col1">&nbsp;</td>
 						<td width="85%" class="vtable" id="ips_col2">
-  						<?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . gettext("You must enable download of the Snort VRT rules to enable and use this option."); ?>
-						<?php echo gettext("Selecting this option disables manual selection of Snort VRT categories in the list below, " .
+  						<?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . gettext("You must enable download of the Snort Subscriber rules to enable and use this option."); ?>
+						<?php echo gettext("Selecting this option disables manual selection of Snort Subscriber categories in the list below, " .
 						"although Emerging Threats categories may still be selected if enabled on the Global Settings tab.  " .
-						"These will be added to the pre-defined Snort IPS policy rules from the Snort VRT."); ?><br/></td>
+						"These will be added to the pre-defined Snort IPS policy rules from the Snort Subscriber Rule Set."); ?><br/></td>
 					   </tr>
 					   <tr id="ips_row1">
 						<td width="15%" class="listn"><?php echo gettext("IPS Policy Selection"); ?></td>
@@ -396,8 +396,9 @@ if ($savemsg) {
 									<option value="connectivity" <?php if ($pconfig['ips_policy'] == "connected") echo "selected"; ?>><?php echo gettext("Connectivity"); ?></option>
 									<option value="balanced" <?php if ($pconfig['ips_policy'] == "balanced") echo "selected"; ?>><?php echo gettext("Balanced"); ?></option>
 									<option value="security" <?php if ($pconfig['ips_policy'] == "security") echo "selected"; ?>><?php echo gettext("Security"); ?></option>
+									<option value="max-detect" <?php if ($pconfig['ips_policy'] == "max-detect") echo "selected"; ?>><?php echo gettext("Max-Detect"); ?></option>
 								</select>
-						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Snort IPS policies are:  Connectivity, Balanced or Security."); ?></span></td>
+						&nbsp;&nbsp;<span class="vexpl"><?php echo gettext("Snort IPS policies are:  Connectivity, Balanced, Security, or Max-Detect."); ?></span></td>
 					   </tr>
 					   <tr id="ips_row2">
 						<td width="15%">&nbsp;</td>
@@ -406,7 +407,9 @@ if ($savemsg) {
 						"Balanced is a good starter policy.  It is speedy, has good base coverage level, and covers " . 
 						"most threats of the day.  It includes all rules in Connectivity." . 
 						"Security is a stringent policy.  It contains everything in the first two " .
-						"plus policy-type rules such as Flash in an Excel file."); ?><br/></td>
+						"plus policy-type rules such as Flash in an Excel file." .
+						"Max-Detect is a policy created for testing network traffic through your device " .
+						"this policy should be used with caution."); ?><br/></td>
 					   </tr>
 					</table>
 				</td>
@@ -439,7 +442,7 @@ if ($savemsg) {
 			<?php if ($no_community_files)
 				$msg_community = "NOTE: Snort Community Rules have not been downloaded.  Perform a Rules Update to enable them.";
 			      else
-				$msg_community = "Snort GPLv2 Community Rules (VRT certified)";
+				$msg_community = "Snort GPLv2 Community Rules (Talos certified)";
 			      $community_rules_file = GPL_FILE_PREFIX . "community.rules";
 			?>
 			<?php if ($snortcommunitydownload == 'on'): ?>
@@ -500,7 +503,7 @@ if ($savemsg) {
 					<td width="5%" class="listhdrr" align="center"><?php echo gettext("Enabled"); ?></td>
 					<td width="25%" class="listhdrr"><?php echo gettext('Ruleset: Snort SO Rules');?></td>
 				<?php else: ?>
-					<td colspan="4" align="center" width="60%" class="listhdrr"><?php echo gettext("Snort VRT rules {$msg_snort}"); ?></td>
+					<td colspan="4" align="center" width="60%" class="listhdrr"><?php echo gettext("Snort Subscriber rules {$msg_snort}"); ?></td>
 				<?php endif; ?>
 				</tr>
 			<?php
