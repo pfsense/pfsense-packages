@@ -64,7 +64,7 @@ $openappid_detectors = $config['installedpackages']['snortglobal']['openappid_de
 /* Working directory for downloaded rules tarballs and extraction */
 $tmpfname = "{$g['tmp_path']}/snort_rules_up";
 
-/* Use the Snort binary version to construct the proper Snort VRT */
+/* Use the Snort binary version to construct the proper Snort Subscriber */
 /* rules tarball and md5 filenames. Save the version with decimal */
 /* delimiters for use in extracting the rules.                    */
 $snort_version = SNORT_BIN_VERSION;
@@ -96,7 +96,7 @@ else {
 	$emergingthreats_filename = SNORT_ET_DNLD_FILENAME;
 	$emergingthreats_filename_md5 = SNORT_ET_DNLD_FILENAME . ".md5";
 	$emergingthreats_url = ET_BASE_DNLD_URL;
-	// If using Sourcefire VRT rules with ET, then we should use the open-nogpl ET rules
+	// If using Snort Subscriber rules with ET, then we should use the open-nogpl ET rules
 	$emergingthreats_url .= $vrt_enabled == "on" ? "open-nogpl/" : "open/";
 	$emergingthreats_url .= "snort-" . ET_VERSION . "/";
 	$et_name = "Emerging Threats Open";
@@ -427,12 +427,12 @@ error_log(gettext("Starting rules update...  Time: " . date("Y-m-d H:i:s") . "\n
 $last_curl_error = "";
 $update_errors = false;
 
-/*  Check for and download any new Snort VRT sigs */
+/*  Check for and download any new Snort Subscriber sigs */
 if ($snortdownload == 'on') {
-	if (snort_check_rule_md5("{$snort_rule_url}{$snort_filename_md5}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename_md5}", "Snort VRT rules")) {
+	if (snort_check_rule_md5("{$snort_rule_url}{$snort_filename_md5}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename_md5}", "Snort Subscriber rules")) {
 		/* download snortrules file */
 		$file_md5 = trim(file_get_contents("{$tmpfname}/{$snort_filename_md5}"));
-		if (!snort_fetch_new_rules("{$snort_rule_url}{$snort_filename}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename}", $file_md5, "Snort VRT rules"))
+		if (!snort_fetch_new_rules("{$snort_rule_url}{$snort_filename}?oinkcode={$oinkid}", "{$tmpfname}/{$snort_filename}", $file_md5, "Snort Subscriber rules"))
 			$snortdownload = 'off';
 	}
 	else
@@ -479,7 +479,7 @@ if ($emergingthreats == 'on') {
 /* Untar Snort rules file to tmp and install the rules */
 if ($snortdownload == 'on') {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
-		$static_output .= gettext("Installing Sourcefire VRT rules...");
+		$static_output .= gettext("Installing Snort Subscriber ruleset...");
 		update_output_window($static_output);
 
 		/* Currently, only FreeBSD-8-1, FreeBSD-9-0 and FreeBSD-10-0 precompiled SO rules exist from Snort.org */
@@ -491,12 +491,12 @@ if ($snortdownload == 'on') {
 			$freebsd_version_so = 'FreeBSD-10-0';
 
 		/* Remove the old Snort rules files */
-		update_status(gettext("Removing old Snort VRT rules..."));
+		update_status(gettext("Removing old Snort Subscriber rules..."));
 		$vrt_prefix = VRT_FILE_PREFIX;
 		unlink_if_exists("{$snortdir}/rules/{$vrt_prefix}*.rules");
 
-		update_status(gettext("Extracting new Snort VRT rules..."));
-		error_log(gettext("\tExtracting and installing Snort VRT rules...\n"), 3, SNORT_RULES_UPD_LOGFILE);
+		update_status(gettext("Extracting new Snort Subscriber rules..."));
+		error_log(gettext("\tExtracting and installing Snort Subscriber ruleset...\n"), 3, SNORT_RULES_UPD_LOGFILE);
 		/* extract snort.org rules and add VRT_FILE_PREFIX prefix to all snort.org files */
 		safe_mkdir("{$tmpfname}/snortrules");
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname}/snortrules rules/");
@@ -522,8 +522,8 @@ if ($snortdownload == 'on') {
 		}
 		rmdir_recursive("{$tmpfname}/preproc_rules");
 		/* extract so rules */
-		update_status(gettext("Extracting Snort VRT Shared Objects rules..."));
-		error_log(gettext("\tUsing Snort VRT precompiled SO rules for {$freebsd_version_so} ...\n"), 3, SNORT_RULES_UPD_LOGFILE);
+		update_status(gettext("Extracting Snort Subscriber Shared Objects rules..."));
+		error_log(gettext("\tUsing Snort Subscriber precompiled SO rules for {$freebsd_version_so} ...\n"), 3, SNORT_RULES_UPD_LOGFILE);
 		$snort_arch = php_uname("m");
 		$nosorules = false;
 		if ($snort_arch  == 'i386'){
@@ -537,7 +537,7 @@ if ($snortdownload == 'on') {
 		rmdir_recursive("{$tmpfname}/so_rules/");
 		if ($nosorules == false) {
 			/* extract Shared Object stub rules, rename and copy to the rules folder. */
-		        update_status(gettext("Copying Snort VRT Shared Objects rules..."));
+		        update_status(gettext("Copying Snort Subscriber Shared Objects rules..."));
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} --exclude precompiled/ --exclude src/ so_rules/");
 			$files = glob("{$tmpfname}/so_rules/*.rules");
 			foreach ($files as $file) {
@@ -547,7 +547,7 @@ if ($snortdownload == 'on') {
 			rmdir_recursive("{$tmpfname}/so_rules/");
 		}
 		/* extract base etc files */
-	        update_status(gettext("Extracting Snort VRT config and map files..."));
+	        update_status(gettext("Extracting Snort Subscriber config and map files..."));
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} etc/");
 		foreach (array("classification.config", "reference.config", "gen-msg.map", "unicode.map") as $file) {
 			if (file_exists("{$tmpfname}/etc/{$file}"))
@@ -558,10 +558,10 @@ if ($snortdownload == 'on') {
 			update_status(gettext("Copying md5 signature to snort directory..."));
 			@copy("{$tmpfname}/{$snort_filename_md5}", "{$snortdir}/{$snort_filename_md5}");
 		}
-		update_status(gettext("Extraction of Snort VRT rules completed..."));
+		update_status(gettext("Extraction of Snort Subscriber rules completed..."));
 		$static_output .= gettext(" done.\n");
 		update_output_window($static_output);
-		error_log(gettext("\tInstallation of Snort VRT rules completed.\n"), 3, SNORT_RULES_UPD_LOGFILE);
+		error_log(gettext("\tInstallation of Snort Subscriber rules completed.\n"), 3, SNORT_RULES_UPD_LOGFILE);
 	}
 }
 
@@ -698,7 +698,7 @@ function snort_apply_customizations($snortcfg, $if_real) {
 	$snortdir = SNORTDIR;
 
 	/* Update the Preprocessor rules from the master configuration for the interface if Snort */
-	/* VRT rules are in use and the interface's preprocessor rules are not protected.         */
+	/* Subscriber rules are in use and the interface's preprocessor rules are not protected.         */
 	if ($vrt_enabled == 'on' && ($snortcfg['protect_preproc_rules'] != 'on' || $g['snort_postinstall'])) {
 		$preproc_files = glob("{$snortdir}/preproc_rules/*.rules");
 		foreach ($preproc_files as $file) {
@@ -736,7 +736,7 @@ if ($snortdownload == 'on' || $emergingthreats == 'on' || $snortcommunityrules =
 
 	/*******************************************************************/
         /* Determine which map files set to use for the master copy.  If   */
-        /* the Snort VRT rules are not enabled, then use Emerging Threats  */
+        /* the Snort Subscriber rules are not enabled, then use Emerging Threats  */
 	/* or Snort Community Rules, in that order, if either is enabled.  */
 	/*******************************************************************/
 	if ($snortdownload == 'on' || $vrt_enabled == 'on')

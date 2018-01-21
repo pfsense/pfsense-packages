@@ -212,7 +212,7 @@ include_once("head.inc");
 						</tr>
 					</thead>
 					<tr>
-						<td align="center" class="vncell vexpl"><b><?=gettext("Snort VRT Rules");?></b></td>
+						<td align="center" class="vncell vexpl"><b><?=gettext("Snort Subscriber Ruleset");?></b></td>
 						<td align="center" class="vncell vexpl"><? echo trim($snort_org_sig_chk_local);?></td>
 						<td align="center" class="vncell vexpl"><?php echo gettext($snort_org_sig_date);?></td>
 					</tr>

@@ -85,7 +85,7 @@ if ($_POST['rule_update_starttime']) {
 }
 
 if ($_POST['snortdownload'] == "on" && empty($_POST['oinkmastercode']))
-		$input_errors[] = "You must supply an Oinkmaster code in the box provided in order to enable Snort VRT rules!";
+		$input_errors[] = "You must supply an Oinkmaster code in the box provided in order to enable Snort Subscriber rules!";
 
 if ($_POST['emergingthreats_pro'] == "on" && empty($_POST['etpro_code']))
 		$input_errors[] = "You must supply a subscription code in the box provided in order to enable Emerging Threats Pro rules!";
@@ -123,7 +123,7 @@ if (!$input_errors) {
 		// any matching the disabled ruleset prefixes.
 		if (is_array($config['installedpackages']['snortglobal']['rule'])) {
 			foreach ($config['installedpackages']['snortglobal']['rule'] as &$iface) {
-				// Disable Snort IPS policy if VRT rules are disabled
+				// Disable Snort IPS policy if Subscriber rules are disabled
 				if ($disable_ips_policy) {
 					$iface['ips_policy_enable'] = 'off';
 					unset($iface['ips_policy']);
@@ -228,18 +228,18 @@ if ($input_errors)
 	<td colspan="2" valign="top" class="listtopic"><?php echo gettext("Please Choose The Type Of Rules You Wish To Download");?></td>
 </tr>
 <tr>
-	<td width="22%" valign="top" class="vncell"><?php echo gettext("Install ") . "<strong>" . gettext("Snort VRT") . "</strong>" . gettext(" rules");?></td>
+	<td width="22%" valign="top" class="vncell"><?php echo gettext("Install ") . "<strong>" . gettext("Snort Subscriber") . "</strong>" . gettext(" rules");?></td>
 	<td width="78%" class="vtable">
 		<table width="100%" border="0" cellpadding="2" cellspacing="0">
 		<tr>
 			<td><input name="snortdownload" type="checkbox" id="snortdownload" value="on" onclick="enable_snort_vrt();" 
 			<?php if($pconfig['snortdownload']=='on') echo 'checked'; ?> /></td>
-			<td><span class="vexpl"><?php echo gettext("Snort VRT free Registered User or paid Subscriber rules"); ?></span></td>
+			<td><span class="vexpl"><?php echo gettext("Snort Subscriber free Registered User or paid Subscriber rules"); ?></span></td>
 		<tr>
 			<td>&nbsp;</td>
 			<td><a href="https://www.snort.org/users/sign_up" target="_blank"><?php echo gettext("Sign Up for a free Registered User Rule Account"); ?> </a><br/>
 			<a href="https://www.snort.org/products" target="_blank">
-			<?php echo gettext("Sign Up for paid Sourcefire VRT Certified Subscriber Rules"); ?></a></td>
+			<?php echo gettext("Sign Up for paid Snort Subscriber Rule Set (by Talos)"); ?></a></td>
 		</tr>
 		</table>
 		<table id="snort_oink_code_tbl" width="100%" border="0" cellpadding="2" cellspacing="0">
@@ -247,7 +247,7 @@ if ($input_errors)
 			<td colspan="2">&nbsp;</td>
 		</tr>
 		<tr>
-			<td colspan="2" valign="top"><b><span class="vexpl"><?php echo gettext("Snort VRT Oinkmaster Configuration"); ?></span></b></td>
+			<td colspan="2" valign="top"><b><span class="vexpl"><?php echo gettext("Snort Subscriber Rule Set Oinkcode Configuration"); ?></span></b></td>
 		</tr>
 		<tr>
 			<td valign="top"><span class="vexpl"><strong><?php echo gettext("Code:"); ?></strong></span></td>
@@ -265,11 +265,11 @@ if ($input_errors)
 			<tr>
 				<td valign="top" width="8%"><input name="snortcommunityrules" type="checkbox" value="on" 
 				<?php if ($pconfig['snortcommunityrules']=="on") echo "checked";?> /></td>
-				<td class="vexpl"><?php echo gettext("The Snort Community Ruleset is a GPLv2 VRT certified ruleset that is distributed free of charge " . 
-				"without any VRT License restrictions.  This ruleset is updated daily and is a subset of the subscriber ruleset.");?>
+				<td class="vexpl"><?php echo gettext("The Snort Community Ruleset is a GPLv2 Talos certified ruleset that is distributed free of charge " . 
+				"without any Snort Subscriber Rule Set License restrictions.  This ruleset is updated daily and is a subset of the subscriber ruleset.");?>
 				<br/><br/><?php echo "<span class=\"red\"><strong>" . gettext("Note:  ") . "</strong></span>" . 
-				gettext("If you are a Snort VRT Paid Subscriber, the community ruleset is already built into your download of the ") . 
-				gettext("Snort VRT rules, and there is no benefit in adding this rule set.");?><br/></td>
+				gettext("If you use the Snort Subscriber Rule Set, the community ruleset is already built into your download of the ") . 
+				gettext("Snort Subscriber rules, and there is no benefit in adding this rule set.");?><br/></td>
 			</tr>
 		</table></td>
 </tr>
